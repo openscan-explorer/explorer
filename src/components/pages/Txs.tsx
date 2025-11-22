@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { useDataService } from '../../hooks/useDataService';
 import { useEffect, useState } from 'react';
 import { Transaction } from '../../types';
@@ -33,51 +33,209 @@ export default function Txs() {
       .finally(() => setLoading(false));
   }, [dataService, chainId]);
 
+  const truncate = (str: string, start = 10, end = 8) => {
+    if (!str) return '';
+    if (str.length <= start + end) return str;
+    return `${str.slice(0, start)}...${str.slice(-end)}`;
+  };
+
+  const formatValue = (value: string) => {
+    try {
+      const eth = Number(value) / 1e18;
+      return `${eth.toFixed(6)} ETH`;
+    } catch (e) {
+      return value;
+    }
+  };
+
+  const formatGasPrice = (gasPrice: string) => {
+    try {
+      const gwei = Number(gasPrice) / 1e9;
+      return `${gwei.toFixed(2)} Gwei`;
+    } catch (e) {
+      return gasPrice;
+    }
+  };
+
   if (loading) {
     return (
-      <div>
-        <h1>Latest Transactions</h1>
-        <p>chainId: {chainId ?? 'none'}</p>
-        <p>Loading transactions from the last 10 blocks...</p>
+      <div style={{ padding: '20px', maxWidth: '1400px', margin: '0 auto' }}>
+        <h1 style={{ fontFamily: 'Outfit, sans-serif', fontSize: '2rem', color: '#059669', marginBottom: '1rem' }}>Latest Transactions</h1>
+        <p style={{ color: '#6b7280' }}>Loading transactions from the last 10 blocks...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div>
-        <h1>Latest Transactions</h1>
-        <p>chainId: {chainId ?? 'none'}</p>
+      <div style={{ padding: '20px', maxWidth: '1400px', margin: '0 auto' }}>
+        <h1 style={{ fontFamily: 'Outfit, sans-serif', fontSize: '2rem', color: '#059669', marginBottom: '1rem' }}>Latest Transactions</h1>
         <p style={{ color: 'red' }}>Error: {error}</p>
       </div>
     );
   }
 
   return (
-    <div>
-      <h1>Latest Transactions</h1>
-      <p>chainId: {chainId ?? 'none'}</p>
-      <p>Showing {transactions.length} transactions from the last 10 blocks</p>
+    <div style={{ padding: '20px', maxWidth: '1400px', margin: '0 auto' }}>
+      <h1 style={{ fontFamily: 'Outfit, sans-serif', fontSize: '2rem', color: '#059669', marginBottom: '0.5rem' }}>Latest Transactions</h1>
+      <p style={{ color: '#6b7280', marginBottom: '1.5rem' }}>
+        Showing {transactions.length} transactions from the last 10 blocks
+      </p>
       
       {transactions.length === 0 ? (
-        <p>No transactions found in the last 10 blocks</p>
+        <p style={{ textAlign: 'center', color: '#6b7280', padding: '2rem' }}>
+          No transactions found in the last 10 blocks
+        </p>
       ) : (
-        transactions.map((transaction, index) => (
-          <div key={transaction.hash} style={{ marginBottom: '2rem', borderBottom: '1px solid #ccc', paddingBottom: '1rem' }}>
-            <h2>Transaction #{index + 1}</h2>
-            <p><strong>Hash:</strong> {transaction.hash}</p>
-            <p><strong>Block:</strong> {transaction.blockNumber}</p>
-            <pre style={{ 
-              background: '#f5f5f5', 
-              padding: '1rem', 
-              borderRadius: '4px',
-              overflow: 'auto',
-              fontSize: '0.875rem'
-            }}>
-              {JSON.stringify(transaction, null, 2)}
-            </pre>
-          </div>
-        ))
+        <div className="table-wrapper" style={{ 
+          background: 'var(--bg-color, #fff)',
+          border: '1px solid #10b981',
+          borderRadius: '16px',
+          padding: '20px',
+          boxShadow: '0 4px 20px rgba(16, 185, 129, 0.1)'
+        }}>
+          <table className="dash-table">
+            <thead>
+              <tr>
+                <th style={{ 
+                  fontFamily: 'Outfit, sans-serif', 
+                  color: '#10b981', 
+                  fontWeight: '600',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px',
+                  fontSize: '0.9rem'
+                }}>Tx Hash</th>
+                <th style={{ 
+                  fontFamily: 'Outfit, sans-serif', 
+                  color: '#10b981', 
+                  fontWeight: '600',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px',
+                  fontSize: '0.9rem'
+                }}>Block</th>
+                <th style={{ 
+                  fontFamily: 'Outfit, sans-serif', 
+                  color: '#10b981', 
+                  fontWeight: '600',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px',
+                  fontSize: '0.9rem'
+                }}>From</th>
+                <th style={{ 
+                  fontFamily: 'Outfit, sans-serif', 
+                  color: '#10b981', 
+                  fontWeight: '600',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px',
+                  fontSize: '0.9rem'
+                }}>To</th>
+                <th style={{ 
+                  fontFamily: 'Outfit, sans-serif', 
+                  color: '#10b981', 
+                  fontWeight: '600',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px',
+                  fontSize: '0.9rem'
+                }}>Value</th>
+                <th style={{ 
+                  fontFamily: 'Outfit, sans-serif', 
+                  color: '#10b981', 
+                  fontWeight: '600',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px',
+                  fontSize: '0.9rem'
+                }}>Gas Price</th>
+                <th style={{ 
+                  fontFamily: 'Outfit, sans-serif', 
+                  color: '#10b981', 
+                  fontWeight: '600',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px',
+                  fontSize: '0.9rem'
+                }}>Gas</th>
+              </tr>
+            </thead>
+            <tbody>
+              {transactions.map((transaction) => (
+                <tr key={transaction.hash} style={{ 
+                  background: 'rgba(16, 185, 129, 0.04)',
+                  borderRadius: '8px',
+                  transition: 'all 0.2s ease'
+                }}>
+                  <td>
+                    <Link 
+                      to={`/${chainId}/tx/${transaction.hash}`}
+                      style={{ 
+                        color: '#10b981', 
+                        fontWeight: '600',
+                        textDecoration: 'none',
+                        fontFamily: 'Outfit, sans-serif',
+                        fontSize: '0.95rem'
+                      }}
+                      title={transaction.hash}
+                    >
+                      {truncate(transaction.hash)}
+                    </Link>
+                  </td>
+                  <td>
+                    <Link 
+                      to={`/${chainId}/block/${transaction.blockNumber}`}
+                      style={{ 
+                        color: '#059669', 
+                        fontWeight: '600',
+                        textDecoration: 'none',
+                        fontFamily: 'Outfit, sans-serif',
+                        fontSize: '1rem'
+                      }}
+                    >
+                      {transaction.blockNumber}
+                    </Link>
+                  </td>
+                  <td style={{ 
+                    fontSize: '0.9rem', 
+                    fontFamily: 'Outfit, sans-serif',
+                    color: 'var(--text-color, #1f2937)',
+                    fontWeight: '500'
+                  }} title={transaction.from}>
+                    {truncate(transaction.from)}
+                  </td>
+                  <td style={{ 
+                    fontSize: '0.9rem', 
+                    fontFamily: 'Outfit, sans-serif',
+                    color: 'var(--text-color, #1f2937)',
+                    fontWeight: '500'
+                  }} title={transaction.to}>
+                    {truncate(transaction.to)}
+                  </td>
+                  <td style={{ 
+                    fontWeight: '600', 
+                    color: '#059669', 
+                    fontSize: '0.95rem',
+                    fontFamily: 'Outfit, sans-serif'
+                  }}>
+                    {formatValue(transaction.value)}
+                  </td>
+                  <td style={{ 
+                    fontSize: '0.95rem', 
+                    color: '#6b7280',
+                    fontFamily: 'Outfit, sans-serif',
+                    fontWeight: '500'
+                  }}>
+                    {formatGasPrice(transaction.gasPrice)}
+                  </td>
+                  <td style={{ 
+                    fontSize: '0.95rem', 
+                    color: '#6b7280',
+                    fontFamily: 'Outfit, sans-serif',
+                    fontWeight: '500'
+                  }}>
+                    {Number(transaction.gas).toLocaleString()}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );

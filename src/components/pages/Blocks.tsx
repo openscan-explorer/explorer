@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { useDataService } from '../../hooks/useDataService';
 import { useEffect, useState } from 'react';
 import { Block } from '../../types';
@@ -33,46 +33,186 @@ export default function Blocks() {
       .finally(() => setLoading(false));
   }, [dataService, chainId]);
 
+  const truncate = (str: string, start = 10, end = 8) => {
+    if (!str) return '';
+    if (str.length <= start + end) return str;
+    return `${str.slice(0, start)}...${str.slice(-end)}`;
+  };
+
+  const formatTime = (timestamp: string) => {
+    try {
+      const date = new Date(Number(timestamp) * 1000);
+      return date.toLocaleString();
+    } catch (e) {
+      return timestamp;
+    }
+  };
+
   if (loading) {
     return (
-      <div>
-        <h1>Latest Blocks</h1>
-        <p>chainId: {chainId ?? 'none'}</p>
-        <p>Loading...</p>
+      <div style={{ padding: '20px', maxWidth: '1400px', margin: '0 auto' }}>
+        <h1 style={{ fontFamily: 'Outfit, sans-serif', fontSize: '2rem', color: '#059669', marginBottom: '1rem' }}>Latest Blocks</h1>
+        <p style={{ color: '#6b7280' }}>Loading...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div>
-        <h1>Latest Blocks</h1>
-        <p>chainId: {chainId ?? 'none'}</p>
+      <div style={{ padding: '20px', maxWidth: '1400px', margin: '0 auto' }}>
+        <h1 style={{ fontFamily: 'Outfit, sans-serif', fontSize: '2rem', color: '#059669', marginBottom: '1rem' }}>Latest Blocks</h1>
         <p style={{ color: 'red' }}>Error: {error}</p>
       </div>
     );
   }
 
   return (
-    <div>
-      <h1>Latest Blocks</h1>
-      <p>chainId: {chainId ?? 'none'}</p>
-      <p>Showing {blocks.length} most recent blocks</p>
+    <div style={{ padding: '20px', maxWidth: '1400px', margin: '0 auto' }}>
+      <h1 style={{ fontFamily: 'Outfit, sans-serif', fontSize: '2rem', color: '#059669', marginBottom: '0.5rem' }}>Latest Blocks</h1>
+      <p style={{ color: '#6b7280', marginBottom: '1.5rem' }}>Showing {blocks.length} most recent blocks</p>
       
-      {blocks.map((block, index) => (
-        <div key={block.number} style={{ marginBottom: '2rem', borderBottom: '1px solid #ccc', paddingBottom: '1rem' }}>
-          <h2>Block #{block.number}</h2>
-          <pre style={{ 
-            background: '#f5f5f5', 
-            padding: '1rem', 
-            borderRadius: '4px',
-            overflow: 'auto',
-            fontSize: '0.875rem'
-          }}>
-            {JSON.stringify(block, null, 2)}
-          </pre>
-        </div>
-      ))}
+      <div className="table-wrapper" style={{ 
+        background: 'var(--bg-color, #fff)',
+        border: '1px solid #10b981',
+        borderRadius: '16px',
+        padding: '20px',
+        boxShadow: '0 4px 20px rgba(16, 185, 129, 0.1)'
+      }}>
+        <table className="dash-table">
+          <thead>
+            <tr>
+              <th style={{ 
+                fontFamily: 'Outfit, sans-serif', 
+                color: '#10b981', 
+                fontWeight: '600',
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px',
+                fontSize: '0.9rem'
+              }}>Block</th>
+              <th style={{ 
+                fontFamily: 'Outfit, sans-serif', 
+                color: '#10b981', 
+                fontWeight: '600',
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px',
+                fontSize: '0.9rem'
+              }}>Timestamp</th>
+              <th style={{ 
+                fontFamily: 'Outfit, sans-serif', 
+                color: '#10b981', 
+                fontWeight: '600',
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px',
+                fontSize: '0.9rem'
+              }}>Txns</th>
+              <th style={{ 
+                fontFamily: 'Outfit, sans-serif', 
+                color: '#10b981', 
+                fontWeight: '600',
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px',
+                fontSize: '0.9rem'
+              }}>Miner</th>
+              <th style={{ 
+                fontFamily: 'Outfit, sans-serif', 
+                color: '#10b981', 
+                fontWeight: '600',
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px',
+                fontSize: '0.9rem'
+              }}>Gas Used</th>
+              <th style={{ 
+                fontFamily: 'Outfit, sans-serif', 
+                color: '#10b981', 
+                fontWeight: '600',
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px',
+                fontSize: '0.9rem'
+              }}>Gas Limit</th>
+              <th style={{ 
+                fontFamily: 'Outfit, sans-serif', 
+                color: '#10b981', 
+                fontWeight: '600',
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px',
+                fontSize: '0.9rem'
+              }}>Size</th>
+            </tr>
+          </thead>
+          <tbody>
+            {blocks.map((block) => (
+              <tr key={block.number} style={{ 
+                background: 'rgba(16, 185, 129, 0.04)',
+                borderRadius: '8px',
+                transition: 'all 0.2s ease'
+              }}>
+                <td>
+                  <Link 
+                    to={`/${chainId}/block/${block.number}`}
+                    style={{ 
+                      color: '#10b981', 
+                      fontWeight: '700',
+                      textDecoration: 'none',
+                      fontFamily: 'Outfit, sans-serif',
+                      fontSize: '1.1rem'
+                    }}
+                  >
+                    {block.number}
+                  </Link>
+                </td>
+                <td style={{ 
+                  fontSize: '0.95rem', 
+                  color: 'var(--text-color, #1f2937)',
+                  fontFamily: 'Outfit, sans-serif',
+                  fontWeight: '500'
+                }}>
+                  {formatTime(block.timestamp)}
+                </td>
+                <td style={{ 
+                  fontWeight: '600', 
+                  color: '#059669',
+                  fontFamily: 'Outfit, sans-serif',
+                  fontSize: '1rem'
+                }}>
+                  {block.transactions ? block.transactions.length : 0}
+                </td>
+                <td style={{ 
+                  fontSize: '0.9rem', 
+                  fontFamily: 'Outfit, sans-serif',
+                  color: 'var(--text-color, #1f2937)',
+                  fontWeight: '500'
+                }} title={block.miner}>
+                  {truncate(block.miner)}
+                </td>
+                <td style={{ 
+                  fontSize: '0.95rem',
+                  fontFamily: 'Outfit, sans-serif',
+                  color: 'var(--text-color, #1f2937)',
+                  fontWeight: '500'
+                }}>
+                  {Number(block.gasUsed).toLocaleString()}
+                </td>
+                <td style={{ 
+                  fontSize: '0.95rem', 
+                  color: '#6b7280',
+                  fontFamily: 'Outfit, sans-serif',
+                  fontWeight: '500'
+                }}>
+                  {Number(block.gasLimit).toLocaleString()}
+                </td>
+                <td style={{ 
+                  fontSize: '0.95rem', 
+                  color: '#6b7280',
+                  fontFamily: 'Outfit, sans-serif',
+                  fontWeight: '500'
+                }}>
+                  {Number(block.size).toLocaleString()} bytes
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
