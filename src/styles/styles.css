@@ -4555,7 +4555,8 @@ code {
   font-family: 'Outfit', sans-serif;
   font-size: 4.5rem;
   font-weight: 800;
-  margin-bottom: 2.5rem;
+  margin-top: 1rem;
+  margin-bottom: 1.5rem;
   letter-spacing: -2px;
   background: linear-gradient(135deg, #10b981 0%, #047857 100%);
   -webkit-background-clip: text;
