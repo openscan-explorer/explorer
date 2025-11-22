@@ -7,7 +7,7 @@ import { AddressFetcher } from './EVM/L1/fetchers/mainnet/address';
 import { BlockAdapter } from './EVM/L1/adapters/block';
 import { TransactionAdapter } from './EVM/L1/adapters/transaction';
 import { AddressAdapter } from './EVM/L1/adapters/address';
-import type { Block, Transaction, Address } from '../types';
+import type { Block, Transaction, Address, RpcUrlsContextType } from '../types';
 
 interface CacheEntry<T> {
   data: T;
@@ -24,9 +24,9 @@ export class DataService {
   private cache = new Map<string, CacheEntry<any>>();
   private cacheTimeout = 30000; // 30 seconds
 
-  constructor(private chainId: number) {
+  constructor(private chainId: number, rpcUrlsMap: RpcUrlsContextType) {
     console.log('DataService constructor called with chainId:', chainId);
-    const rpcUrls = getRPCUrls(chainId);
+    const rpcUrls = getRPCUrls(chainId, rpcUrlsMap);
     console.log('RPC URLs for chain', chainId, ':', rpcUrls);
     this.rpcClient = new RPCClient(rpcUrls);
     this.blockFetcher = new BlockFetcher(this.rpcClient, chainId);
