@@ -132,6 +132,48 @@ export class DataService {
     return await this.blockFetcher.getLatestBlockNumber();
   }
 
+  async getLatestBlocks(count: number = 10): Promise<Block[]> {
+    const latestBlockNumber = await this.getLatestBlockNumber();
+    const blockNumbers = Array.from(
+      { length: count },
+      (_, i) => latestBlockNumber - i
+    ).filter(num => num >= 0); // Don't go below block 0
+
+    const blocks = await Promise.all(
+      blockNumbers.map(num => this.getBlock(num))
+    );
+
+    return blocks;
+  }
+
+  async getTransactionsFromLatestBlocks(blockCount: number = 10): Promise<Array<Transaction & { blockNumber: string }>> {
+    const latestBlockNumber = await this.getLatestBlockNumber();
+    const blockNumbers = Array.from(
+      { length: blockCount },
+      (_, i) => latestBlockNumber - i
+    ).filter(num => num >= 0);
+
+    // Fetch blocks with full transaction details
+    const blocksWithTxs = await Promise.all(
+      blockNumbers.map(num => this.getBlockWithTransactions(num))
+    );
+
+    // Flatten all transactions from all blocks, maintaining block order
+    const transactions: Array<Transaction & { blockNumber: string }> = [];
+    for (const block of blocksWithTxs) {
+      if (block.transactionDetails && block.transactionDetails.length > 0) {
+        for (const tx of block.transactionDetails) {
+          transactions.push({
+            ...tx,
+            blockNumber: block.number
+          });
+        }
+      }
+    }
+
+    return transactions;
+  }
+
   getChainId(): number {
     return this.chainId;
   }
