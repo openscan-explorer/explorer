@@ -3,6 +3,7 @@ import { useDataService } from '../../hooks/useDataService';
 import { useEffect, useState } from 'react';
 import { Transaction } from '../../types';
 import TransactionDisplay from '../common/TransactionDisplay';
+import Loader from '../common/Loader';
 
 export default function Tx() {
   const { chainId, filter } = useParams<{ chainId?: string; filter?: string }>();
@@ -42,7 +43,7 @@ export default function Tx() {
     return (
       <div style={{ padding: '20px', maxWidth: '1400px', margin: '0 auto' }}>
         <h1 style={{ fontFamily: 'Outfit, sans-serif', fontSize: '2rem', color: '#059669', marginBottom: '1rem' }}>Transaction</h1>
-        <p style={{ color: '#6b7280' }}>Loading...</p>
+        <Loader text="Loading transaction..." />
       </div>
     );
   }

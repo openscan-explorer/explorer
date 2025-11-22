@@ -8,7 +8,7 @@ export class TransactionAdapter {
     chainId: number,
     receipt?: RPCTransactionReceipt | null
   ): Transaction {
-    return {
+    const transaction: Transaction = {
       hash: rpcTx.hash,
       from: rpcTx.from,
       to: rpcTx.to,
@@ -25,5 +25,26 @@ export class TransactionAdapter {
       s: rpcTx.s,
       type: rpcTx.type,
     };
+
+    if (receipt) {
+      transaction.receipt = {
+        blockHash: receipt.blockHash,
+        blockNumber: parseInt(receipt.blockNumber, 16).toString(),
+        contractAddress: receipt.contractAddress,
+        cumulativeGasUsed: BigInt(receipt.cumulativeGasUsed).toString(),
+        effectiveGasPrice: BigInt(receipt.effectiveGasPrice).toString(),
+        from: receipt.from,
+        gasUsed: BigInt(receipt.gasUsed).toString(),
+        logs: receipt.logs,
+        logsBloom: receipt.logsBloom,
+        status: receipt.status,
+        to: receipt.to,
+        transactionHash: receipt.transactionHash,
+        transactionIndex: parseInt(receipt.transactionIndex, 16).toString(),
+        type: receipt.type,
+      };
+    }
+
+    return transaction;
   }
 }

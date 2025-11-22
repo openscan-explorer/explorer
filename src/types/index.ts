@@ -1,3 +1,4 @@
+import { ethers } from 'ethers';
 import React from 'react';
 
 // ==================== CORE DOMAIN TYPES ====================
@@ -48,6 +49,7 @@ export interface Transaction {
   v: string
   r: string
   s: string
+  receipt?: TransactionReceipt
 }
 
 export interface TransactionReceipt {  
@@ -154,7 +156,13 @@ export interface IAppContext {
 
 export type RPCUrls = string[]
 
-export type RpcUrlsContextType = Record<number, RPCUrls>;
+export type supportedChainsIds = 
+1 | // mainnet
+11155111 | // sepolia testnet
+31337 | // local node (hardhat, anvil, aztec)
+677868 // aztec sandobx
+
+export type RpcUrlsContextType = Record<supportedChainsIds, RPCUrls>;
 
 // ==================== HOOK CONFIGURATION TYPES ====================
 

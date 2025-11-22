@@ -1,4 +1,5 @@
 import { RPC_ENDPOINTS } from '../config/rpcConfig';
+import { RpcUrlsContextType } from '../types';
 
 const STORAGE_KEY = 'OPENSCAN_RPC_URLS_V1';
 
@@ -61,10 +62,10 @@ export function saveRpcUrlsToStorage(map: RpcMap): void {
  * Return the effective rpc urls by merging defaults with any stored overrides.
  * Stored values override default for a chainId; missing chains fall back to defaults.
  */
-export function getEffectiveRpcUrls(): RpcMap {
+export function getEffectiveRpcUrls(): RpcUrlsContextType {
   const defaults: RpcMap = RPC_ENDPOINTS as unknown as RpcMap;
   const stored = loadRpcUrlsFromStorage();
-  if (!stored) return defaults;
+  if (!stored) return defaults as RpcUrlsContextType;
   // merge copy
   const merged: RpcMap = { ...defaults };
   for (const k of Object.keys(stored)) {
@@ -74,7 +75,7 @@ export function getEffectiveRpcUrls(): RpcMap {
     if (!val || !Array.isArray(val) || val.length === 0) continue;
     merged[n] = val;
   }
-  return merged;
+  return merged as RpcUrlsContextType;
 }
 
 export { STORAGE_KEY };

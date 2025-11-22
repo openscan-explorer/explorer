@@ -97,7 +97,7 @@ export default function Home() {
               e.currentTarget.style.boxShadow = '0 4px 20px rgba(16, 185, 129, 0.2)';
             }}
           >
-            Hardhat
+            Localhost
           </Link>
         </div>
       </div>
