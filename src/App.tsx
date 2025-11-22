@@ -37,7 +37,8 @@ import {
   LazyTx,
   LazyAddress,
   LazyMempool
-  , LazySettings
+  , LazySettings,
+  LazyDevTools
 } from './components/LazyComponents';
 import { NotificationProvider } from './context/NotificationContext';
 import { SettingsProvider, useTheme } from './context/SettingsContext';
@@ -71,6 +72,7 @@ function AppContent() {
             <Routes>
               <Route path="/" element={<LazyHome />} />
               <Route path="settings" element={<LazySettings />} />
+              <Route path="devtools" element={<LazyDevTools />} />
               <Route path=":chainId" element={<LazyChain />} />
               <Route path=":chainId/blocks" element={<LazyBlocks />} />
               <Route path=":chainId/block/:filter" element={<LazyBlock />} />
