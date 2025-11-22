@@ -4,6 +4,13 @@ import Loading from './common/Loading';
 // Lazy load page components
 const Home = lazy(() => import('./pages/Home'));
 const ConnectWallet = lazy(() => import('./pages/ConnectWallet'));
+const Chain = lazy(() => import('./pages/Chain'));
+const Blocks = lazy(() => import('./pages/Blocks'));
+const Block = lazy(() => import('./pages/Block'));
+const Txs = lazy(() => import('./pages/Txs'));
+const Tx = lazy(() => import('./pages/Tx'));
+const Address = lazy(() => import('./pages/Address'));
+const Mempool = lazy(() => import('./pages/Mempool'));
 
 // Higher-order component to wrap lazy components with Suspense
 export const withSuspense = (Component: React.ComponentType<any>) => {
@@ -19,6 +26,13 @@ export const withSuspense = (Component: React.ComponentType<any>) => {
 // Export lazy components wrapped with Suspense
 export const LazyHome = withSuspense(Home);
 export const LazyConnectWallet = withSuspense(ConnectWallet);
+export const LazyChain = withSuspense(Chain);
+export const LazyBlocks = withSuspense(Blocks);
+export const LazyBlock = withSuspense(Block);
+export const LazyTxs = withSuspense(Txs);
+export const LazyTx = withSuspense(Tx);
+export const LazyAddress = withSuspense(Address);
+export const LazyMempool = withSuspense(Mempool);
 // Default exports for backward compatibility
 export {
   Home,
