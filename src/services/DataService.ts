@@ -1,13 +1,14 @@
 // src/services/DataService.ts
 import { RPCClient } from './EVM/common/RPCClient';
 import { getRPCUrls } from '../config/rpcConfig';
-import { BlockFetcher } from './EVM/L1/fetchers/mainnet/block';
-import { TransactionFetcher } from './EVM/L1/fetchers/mainnet/transaction';
-import { AddressFetcher } from './EVM/L1/fetchers/mainnet/address';
+import { BlockFetcher } from './EVM/L1/fetchers/block';
+import { TransactionFetcher } from './EVM/L1/fetchers/transaction';
+import { AddressFetcher } from './EVM/L1/fetchers/address';
+import { NetworkStatsFetcher } from './EVM/L1/fetchers/networkStats';
 import { BlockAdapter } from './EVM/L1/adapters/block';
 import { TransactionAdapter } from './EVM/L1/adapters/transaction';
 import { AddressAdapter } from './EVM/L1/adapters/address';
-import type { Block, Transaction, Address, RpcUrlsContextType } from '../types';
+import type { Block, Transaction, Address, NetworkStats, RpcUrlsContextType } from '../types';
 
 interface CacheEntry<T> {
   data: T;
@@ -19,6 +20,7 @@ export class DataService {
   private blockFetcher: BlockFetcher;
   private transactionFetcher: TransactionFetcher;
   private addressFetcher: AddressFetcher;
+  private networkStatsFetcher: NetworkStatsFetcher;
   
   // Simple in-memory cache with chainId in key
   private cache = new Map<string, CacheEntry<any>>();
@@ -32,6 +34,7 @@ export class DataService {
     this.blockFetcher = new BlockFetcher(this.rpcClient, chainId);
     this.transactionFetcher = new TransactionFetcher(this.rpcClient, chainId);
     this.addressFetcher = new AddressFetcher(this.rpcClient, chainId);
+    this.networkStatsFetcher = new NetworkStatsFetcher(this.rpcClient, chainId);
   }
 
   private getCached<T>(key: string): T | null {
@@ -132,6 +135,18 @@ export class DataService {
 
   async getLatestBlockNumber(): Promise<number> {
     return await this.blockFetcher.getLatestBlockNumber();
+  }
+
+  async getNetworkStats(): Promise<NetworkStats> {
+    const cacheKey = this.getCacheKey('networkStats', 'current');
+    const cached = this.getCached<NetworkStats>(cacheKey);
+    if (cached) return cached;
+
+    const stats = await this.networkStatsFetcher.getNetworkStats();
+
+    this.cache.set(cacheKey, { data: stats, timestamp: Date.now() });
+
+    return stats;
   }
 
   async getLatestBlocks(count: number = 10): Promise<Block[]> {
