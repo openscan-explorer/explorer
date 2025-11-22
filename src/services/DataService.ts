@@ -1,6 +1,6 @@
 // src/services/DataService.ts
 import { RPCClient } from './RPCClient';
-import { getRPCUrl } from '../config/rpcConfig';
+import { getRPCUrls } from '../config/rpcConfig';
 import { BlockFetcher } from './fetchers/mainnet/block';
 import { TransactionFetcher } from './fetchers/mainnet/transaction';
 import { AddressFetcher } from './fetchers/mainnet/address';
@@ -25,8 +25,8 @@ export class DataService {
   private cacheTimeout = 30000; // 30 seconds
 
   constructor(private chainId: number) {
-    const rpcUrl = getRPCUrl(chainId);
-    this.rpcClient = new RPCClient(rpcUrl);
+    const rpcUrls = getRPCUrls(chainId);
+    this.rpcClient = new RPCClient(rpcUrls);
     this.blockFetcher = new BlockFetcher(this.rpcClient, chainId);
     this.transactionFetcher = new TransactionFetcher(this.rpcClient, chainId);
     this.addressFetcher = new AddressFetcher(this.rpcClient, chainId);
