@@ -10,19 +10,10 @@ import {
 } from 'wagmi/chains';
 import type { Chain } from 'wagmi/chains';
 
-export interface Contract {
-  name: string;
-  version: string;
-  address: string;
-  fromBlock: number;
-}
-
 export interface Network {
   chainId: number;
   name: string;
   currency: string;
-  explorerUrl: string;
-  contracts: Contract[];
 }
 
 export interface Config {
@@ -34,52 +25,6 @@ export interface Config {
  */
 export function getConfig(): Config {
   return jsonConfig;
-}
-
-/**
- * Get contract address by name and chain ID
- * @param contractName - Name of the contract (e.g., 'ERC20FlashLender')
- * @param chainId - Chain ID (e.g., 1 for mainnet, 31337 for localhost)
- * @returns Contract address or undefined if not found
- */
-export function getContractAddress(contractName: string, chainId: number): string | undefined {
-  
-  const config = getConfig();
-
-  const network = config.networks.find(n => n.chainId === chainId);
-  if (!network) {
-    console.warn(`Network with chainId ${chainId} not found in config`);
-    return undefined;
-  }
-
-  const contract = network.contracts.find(c => c.name === contractName);
-  if (!contract) {
-    console.warn(`Contract ${contractName} not found for chainId ${chainId}`);
-    return undefined;
-  }
-
-  return contract.address;
-}
-
-/**
- * Get the ERC20FlashLender contract address for the current network
- * @param chainId - Chain ID
- * @returns ERC20FlashLender contract address
- */
-export function getERC20FlashLenderAddress(chainId: number): string | undefined {
-  return getContractAddress('ERC20FlashLender', chainId);
-}
-
-/**
- * Get all contracts for a specific network
- * @param chainId - Chain ID
- * @returns Array of contracts or empty array if network not found
- */
-export function getNetworkContracts(chainId: number): Contract[] {
-  const config = getConfig();
-  
-  const network = config.networks.find(n => n.chainId === chainId);
-  return network ? network.contracts : [];
 }
 
 /**

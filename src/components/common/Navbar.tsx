@@ -60,14 +60,14 @@ const Navbar = () => {
               </svg>
             </button>
           </li>
-          <li>
+          {/* <li>
             <ConnectButton
               accountStatus={{
                 smallScreen: 'avatar',
                 largeScreen: 'full',
               }}
             />
-          </li>
+          </li> */}
         </ul>
       </div>
     </nav>

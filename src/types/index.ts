@@ -28,7 +28,7 @@ export interface Block {
   stateRoot: string
   timestamp: string
   totalDifficulty: string
-  transactions: Transaction[]
+  transactions: string[]
   transactionsRoot: string
   uncles: any[]
 }
@@ -40,9 +40,9 @@ export interface Transaction {
   gas: string
   gasPrice: string
   hash: string
-  input: string
   nonce: string
   to: string
+  data: string
   transactionIndex: string
   value: string
   type: string
@@ -69,6 +69,7 @@ export interface TransactionReceipt {
 }
 
 export interface Address {
+  address: string
   balance: string
   code: string
   txCount: string
@@ -145,15 +146,6 @@ export interface IAppContext {
   isHydrated: boolean;
 }
 
-
-
-
-
-
-// ==================== HOOK CONFIGURATION TYPES ====================
-
-
-
 // ==================== SETTINGS TYPES ====================
 
 /**
@@ -169,3 +161,77 @@ export interface UserSettings {
 export const DEFAULT_SETTINGS: UserSettings = {
   theme: 'auto'
 };
+
+// src/services/rpc/types.ts
+export interface RPCBlock {
+  number: string; // hex
+  hash: string;
+  parentHash: string;
+  nonce: string;
+  sha3Uncles: string;
+  logsBloom: string;
+  transactionsRoot: string;
+  stateRoot: string;
+  receiptsRoot: string;
+  miner: string;
+  difficulty: string; // hex
+  totalDifficulty: string; // hex
+  extraData: string;
+  size: string; // hex
+  gasLimit: string; // hex
+  gasUsed: string; // hex
+  timestamp: string; // hex
+  transactions: string[] | RPCTransaction[]; // either hashes or full transactions
+  uncles: string[];
+  baseFeePerGas?: string; // hex
+}
+
+export interface RPCTransaction {
+  blockHash: string;
+  blockNumber: string; // hex
+  from: string;
+  gas: string; // hex
+  gasPrice: string; // hex
+  maxFeePerGas?: string; // hex
+  maxPriorityFeePerGas?: string; // hex
+  hash: string;
+  input: string;
+  nonce: string; // hex
+  to: string;
+  transactionIndex: string; // hex
+  value: string; // hex
+  type: string; // hex
+  chainId: string; // hex
+  v: string; // hex
+  r: string;
+  s: string;
+}
+
+export interface RPCTransactionReceipt {
+  transactionHash: string;
+  transactionIndex: string; // hex
+  blockHash: string;
+  blockNumber: string; // hex
+  from: string;
+  to: string;
+  cumulativeGasUsed: string; // hex
+  gasUsed: string; // hex
+  contractAddress: string;
+  logs: RPCLog[];
+  logsBloom: string;
+  status: string; // hex - "0x1" for success, "0x0" for failure
+  effectiveGasPrice: string; // hex
+  type: string; // hex
+}
+
+export interface RPCLog {
+  address: string;
+  topics: string[];
+  data: string;
+  blockNumber: string; // hex
+  transactionHash: string;
+  transactionIndex: string; // hex
+  blockHash: string;
+  logIndex: string; // hex
+  removed: boolean;
+}

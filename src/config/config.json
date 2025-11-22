@@ -1,56 +1,19 @@
 {
   "networks": [
     {
-      "chainId": 31337,
-      "name": "Localhost",
-      "currency": "ETH",
-      "explorerUrl": "http://localhost:8545",
-      "contracts": [
-        {
-          "name": "ERC20FlashLender",
-          "version": "1.0.0-local",
-          "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
-          "fromBlock": 1
-        },
-        {
-          "name": "ERC20FlashLoanExecutorFactory",
-          "version": "1.0.0-local",
-          "address": "0xb7278A61aa25c888815aFC32Ad3cC52fF24fE575",
-          "fromBlock": 1
-        },
-        {
-          "name": "FlashLoanTester",
-          "version": "1.0.0-local",
-          "address": "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
-          "fromBlock": 1
-        }
-      ]
+      "chainId": 1,
+      "name": "Mainnet",
+      "currency": "ETH"
     },
     {
       "chainId": 11155111,
       "name": "Sepolia",
-      "currency": "ETH",
-      "explorerUrl": "https://sepolia.etherscan.io",
-      "contracts": [
-        {
-          "name": "ERC20FlashLender",
-          "version": "1.0.0",
-          "address": "0x2384a819a099a95b5ef41688dAc1EDCF6B35299C",
-          "fromBlock": 9663042
-        },
-        {
-          "name": "ERC20FlashLoanExecutorFactory",
-          "version": "1.0.0",
-          "address": "0xB23b6387bAc7046A460a138275fb1269B1f0abEe",
-          "fromBlock": 9663042
-        },
-        {
-          "name": "FlashLoanTester",
-          "version": "1.0.0-local",
-          "address": "0x1eca542a73459dBdda8fd743f10A3e02807A986b",
-          "fromBlock": 9663042
-        }
-      ]
+      "currency": "ETH"
+    },
+    {
+      "chainId": 31337,
+      "name": "Localhost",
+      "currency": "ETH"
     }
   ]
 }
