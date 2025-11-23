@@ -1,5 +1,11 @@
 import { BrowserRouter as Router, HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useCallback } from 'react';
+import { WagmiProvider } from 'wagmi';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+// @ts-ignore
+import { RainbowKitProvider, darkTheme, lightTheme } from '@rainbow-me/rainbowkit';
+import { networkConfig } from './utils/networkConfig';
+import './styles/rainbowkit.css';
 
 // Detect if we're running on GitHub Pages and get the correct basename
 function getBasename(): string {
@@ -43,6 +49,9 @@ import { SettingsProvider, useTheme } from './context/SettingsContext';
 
 // Detect GH Pages once
 const isGhPages = typeof window !== 'undefined' && window.location.hostname.includes('github.io');
+
+// Create a client for React Query
+const queryClient = new QueryClient();
 
 // Separate component that uses the theme context
 function AppContent() {
@@ -92,14 +101,31 @@ function App() {
 
   return (
     <ErrorBoundary>
-      <NotificationProvider>
-        <SettingsProvider>
-          <BaseRouter basename={basename}>
-            <AppContent />
-          </BaseRouter>
-        </SettingsProvider>
-      </NotificationProvider>
+      <WagmiProvider config={networkConfig}>
+        <QueryClientProvider client={queryClient}>
+          <NotificationProvider>
+            <SettingsProvider>
+              <RainbowKitProviderWrapper>
+                <BaseRouter basename={basename}>
+                  <AppContent />
+                </BaseRouter>
+              </RainbowKitProviderWrapper>
+            </SettingsProvider>
+          </NotificationProvider>
+        </QueryClientProvider>
+      </WagmiProvider>
     </ErrorBoundary>
+  );
+}
+
+// Wrapper component to use theme inside SettingsProvider
+function RainbowKitProviderWrapper({ children }: { children: React.ReactNode }) {
+  const { isDarkMode } = useTheme();
+  
+  return (
+    <RainbowKitProvider theme={isDarkMode ? darkTheme() : lightTheme()}>
+      {children}
+    </RainbowKitProvider>
   );
 }
 

@@ -32,13 +32,11 @@ const SOURCIFY_API_V2_BASE = 'https://sourcify.dev/server';
  * Hook to fetch verified contract data from Sourcify API
  * @param chainId - The chain ID
  * @param address - The contract address
- * @param fields - Fields to return: 'minimal' | 'all' | string[] (specific fields)
  * @param enabled - Whether to fetch data (default: true)
  */
 export const useSourcify = (
   chainId: number,
   address: string | undefined,
-  fields: 'minimal' | 'all' | string[] = 'minimal',
   enabled: boolean = true
 ) => {
   const [data, setData] = useState<SourcifyContractDetails | null>(null);
@@ -58,11 +56,8 @@ export const useSourcify = (
       try {
         // Build query params
         const params = new URLSearchParams();
-        if (fields === 'all') {
-          params.append('fields', 'all');
-        } else if (Array.isArray(fields)) {
-          params.append('fields', fields.join(','));
-        }
+        params.append('fields', 'all');
+  
 
         const queryString = params.toString();
         const url = `${SOURCIFY_API_V2_BASE}/v2/contract/${chainId}/${address}${queryString ? `?${queryString}` : ''}`;
@@ -94,7 +89,7 @@ export const useSourcify = (
     };
 
     fetchContractData();
-  }, [chainId, address, fields, enabled]);
+  }, [chainId, address, enabled]);
 
   return {
     data,
