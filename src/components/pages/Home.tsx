@@ -179,7 +179,7 @@ export default function Home() {
 				</div>
 
 				{/* Localhost card spanning full width */}
-				<div className="container-wide mt-large">
+				<div className="localhost-network-container">
 					<NetworkCard {...localhostNetwork} centered={true} />
 				</div>
 			</div>

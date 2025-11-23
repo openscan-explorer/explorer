@@ -19,10 +19,10 @@
 	border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.dash-table th {
+.dash-table thead th {
 	padding: 12px;
-	text-align: left;
-	color: rgba(255, 255, 255, 0.6);
+	text-align: center;
+	color: #10b981;
 	font-weight: 600;
 	font-size: 0.85rem;
 	font-family: "Outfit", sans-serif;
@@ -30,7 +30,7 @@
 	letter-spacing: 0.5px;
 }
 
-.dash-table th.text-right {
+.dash-table thead th.text-right {
 	text-align: right;
 }
 
@@ -164,10 +164,13 @@
 
 .address-table th {
 	padding: 12px;
-	text-align: left;
-	color: rgba(255, 255, 255, 0.6);
+	text-align: center;
+	color: #10b981;
 	font-weight: 600;
 	font-size: 0.85rem;
+	font-family: "Outfit", sans-serif;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
 }
 
 .address-table tbody tr {
@@ -199,6 +202,13 @@
 	color: #10b981;
 	font-weight: 600;
 	font-size: 0.9rem;
+	text-align: right;
+}
+
+.contract-creation-badge {
+	color: #8b5cf6;
+	font-size: 0.85rem;
+	font-weight: 600;
 }
 
 .table-center {
@@ -207,6 +217,44 @@
 
 .table-right {
 	text-align: right;
+}
+
+/* Recent Transactions Table in Address Display */
+.recent-transactions-table {
+	width: 100%;
+	border-collapse: collapse;
+	font-family: "Outfit", sans-serif;
+}
+
+.recent-transactions-table thead tr {
+	border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.recent-transactions-table th {
+	padding: 12px;
+	text-align: center;
+	color: #10b981;
+	font-weight: 600;
+	font-size: 0.85rem;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+}
+
+.recent-transactions-table tbody tr {
+	border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+	transition: background 0.2s;
+}
+
+.recent-transactions-table tbody tr:hover {
+	background: rgba(255, 255, 255, 0.02);
+}
+
+.recent-transactions-table tbody tr:last-child {
+	border-bottom: none;
+}
+
+.recent-transactions-table td {
+	padding: 12px;
 }
 
 /* Responsive Table */

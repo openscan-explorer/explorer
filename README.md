@@ -1,6 +1,9 @@
 # OpenScan
 
-A trustless, open-open source, standalone web-app, multi-chain blockchain explorer for Ethereum, Layer 2 networks, and local development chains with an intuitive interface.
+A trustless, open-source, standalone web-app, multi-chain blockchain explorer for Ethereum, Layer 2 networks, and local development chains, allowing the direct interaction with verified smart contracts.
+
+**Official URL:** [https://openscan.eth.link/](https://openscan.eth.link/)  
+**GitHub Pages:** [https://augustol.github.io/openscan/](https://augustol.github.io/openscan/)
 
 ## Features
 
@@ -15,8 +18,9 @@ A trustless, open-open source, standalone web-app, multi-chain blockchain explor
 - **Block Explorer** - View detailed block information including transactions, gas usage, and timestamps
 - **Transaction Details** - Inspect transaction data, receipts, logs, and execution details
 - **Address Lookup** - Check balance, transaction history, and contract code
-- **Mempool Viewer** - Monitor pending transactions in real-time
+- **Contract Interaction** - Read from and write to verified smart contracts with an interactive interface
 - **Network Statistics** - Track chain metrics, gas prices, and block times
+- **Read/Write Operations** - Execute smart contract calls on verified smart contracts.
 
 ### 🎨 User Experience
 - **Modern UI** - Clean, card-based design with smooth animations
@@ -30,11 +34,11 @@ A trustless, open-open source, standalone web-app, multi-chain blockchain explor
 - **Unit Converter** - Convert between Wei, Gwei, and ETH
 - **Custom RPC Support** - Configure custom RPC endpoints for each network
 - **Multiple Fallback URLs** - Automatic failover to backup RPC providers
+- **Read/Write Operations** - Execute smart contract calls on verified smart contracts.
 
 ### ⚡ Layer 2 Support
 - **Arbitrum-Specific Fields** - Display L1 block numbers, send counts, and request IDs
 - **Optimism Fee Data** - Show L1 fee breakdown (l1Fee, l1GasPrice, l1GasUsed, l1FeeScalar)
-- **Network Detection** - Automatic adapter selection based on chain ID
 
 ## Getting Started
 

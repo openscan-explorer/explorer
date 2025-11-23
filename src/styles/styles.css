@@ -4558,6 +4558,10 @@ code {
   text-shadow: 0 10px 30px rgba(16, 185, 129, 0.2);
 }
 
+.localhost-network-container {
+  margin-top: 24px;
+}
+
 .search-box-container {
   width: 100%;
   margin: 0 auto;

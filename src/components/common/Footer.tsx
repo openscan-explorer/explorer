@@ -26,7 +26,7 @@ const Footer: React.FC<FooterProps> = ({ className = "" }) => {
 			<div className="footer-content">
 				<div className="footer-left">
 					<Link to="https://trustlessness.eth.link/" className="footer-link">
-						we support trustlessness
+						trustlessness
 					</Link>
 				</div>
 				<div className="footer-version">
