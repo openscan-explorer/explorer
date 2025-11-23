@@ -12,11 +12,7 @@ const Loader: React.FC<LoaderProps> = ({
   text 
 }) => {
   return (
-    <div style={{
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
+    <div className="flex-column flex-center" style={{
       padding: '20px'
     }}>
       <div

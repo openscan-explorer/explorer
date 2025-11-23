@@ -6,7 +6,7 @@ import NetworkStatsDisplay from '../common/NetworkStatsDisplay';
 import Loader from '../common/Loader';
 import { NetworkStats } from '../../types';
 
-export default function Home() {
+export default function Chain() {
   const { chainId } = useParams<{ chainId?: string }>();
   const numericChainId = Number(chainId) || 1;
   const dataService = useDataService(numericChainId);

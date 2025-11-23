@@ -82,12 +82,13 @@ const Artifacts: React.FC = () => {
   };
 
   return (
-    <div style={{
+    <div className="info-box" style={{
       background: '#ffffff',
       borderRadius: '16px',
       padding: '24px',
       boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)',
-      border: '1px solid rgba(16, 185, 129, 0.1)'
+      border: '1px solid rgba(16, 185, 129, 0.1)',
+      display: 'block'
     }}>
       <h3 style={{
         fontSize: '1.1rem',
@@ -154,12 +155,7 @@ const Artifacts: React.FC = () => {
 
       {files.length > 0 && (
         <div>
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: 16
-          }}>
+          <div className="flex-between mb-medium">
             <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: '600', color: '#1f2937' }}>Uploaded Files ({files.length})</h4>
             <button
               onClick={handleClearAll}
@@ -178,7 +174,7 @@ const Artifacts: React.FC = () => {
             </button>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div className="flex-column" style={{ gap: 12 }}>
             {files.map((file, index) => (
               <div
                 key={`${file.name}-${index}`}
@@ -279,13 +275,8 @@ const Artifacts: React.FC = () => {
       )}
 
       {Object.keys(jsonFiles).length > 0 && (
-        <div style={{ marginTop: 24 }}>
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: 16
-          }}>
+        <div className="mt-large">
+          <div className="flex-between mb-medium">
             <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: '600', color: '#1f2937' }}>Extracted JSON Files ({Object.keys(jsonFiles).length})</h4>
             <button
               onClick={handleClearArtifacts}
@@ -303,7 +294,7 @@ const Artifacts: React.FC = () => {
               Clear Artifacts
             </button>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <div className="flex-column" style={{ gap: 10 }}>
             {Object.entries(jsonFiles).map(([path, data]) => (
               <div
                 key={path}

@@ -106,12 +106,7 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = ({ transaction, ch
             </div>
 
             {/* Basic Transaction Info */}
-            <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-                gap: '12px',
-                marginBottom: '16px'
-            }}>
+            <div className="data-grid-2 mb-medium">
                 <div style={{
                     display: 'flex',
                     justifyContent: 'space-between',
@@ -248,12 +243,7 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = ({ transaction, ch
             </div>
 
             {/* Addresses */}
-            <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-                gap: '12px',
-                marginBottom: '16px'
-            }}>
+            <div className="data-grid-3 mb-medium">
                 <div style={{
                     display: 'flex',
                     flexDirection: 'column',
@@ -376,12 +366,7 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = ({ transaction, ch
             </div>
 
             {/* Value and Fees */}
-            <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-                gap: '12px',
-                marginBottom: '16px'
-            }}>
+            <div className="data-grid-2 mb-medium">
                 <div style={{
                     display: 'flex',
                     justifyContent: 'space-between',
@@ -433,12 +418,7 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = ({ transaction, ch
             </div>
 
             {/* Gas Details */}
-            <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-                gap: '12px',
-                marginBottom: '16px'
-            }}>
+            <div className="data-grid-2 mb-medium">
                 <div style={{
                     display: 'flex',
                     justifyContent: 'space-between',
@@ -722,8 +702,8 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = ({ transaction, ch
 
             {/* Input Data Section */}
             {transaction.data && transaction.data !== '0x' && (
-                <div style={{ marginTop: '20px' }}>
-                    <button
+                <div className="mt-large">
+                    <button className="collapsible-button"
                         onClick={() => setShowRawData(!showRawData)}
                         style={{
                             background: '#10b981',
@@ -761,8 +741,8 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = ({ transaction, ch
 
             {/* Event Logs Section */}
             {transaction.receipt && transaction.receipt.logs.length > 0 && (
-                <div style={{ marginTop: '20px' }}>
-                    <button
+                <div className="mt-large">
+                    <button className="collapsible-button"
                         onClick={() => setShowLogs(!showLogs)}
                         style={{
                             background: '#10b981',
@@ -781,10 +761,8 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = ({ transaction, ch
                     </button>
                     
                     {showLogs && (
-                        <div style={{ 
-                            display: 'flex', 
-                            flexDirection: 'column', 
-                            gap: '10px' 
+                        <div className="flex-column" style={{
+                            gap: '10px'
                         }}>
                             {transaction.receipt.logs.map((log: any, index: number) => (
                                 <div key={index} style={{
@@ -860,8 +838,8 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = ({ transaction, ch
 
             {/* Debug Trace Section (Localhost Only) */}
             {isTraceAvailable && (
-                <div style={{ marginTop: '20px' }}>
-                    <button
+                <div className="mt-large">
+                    <button className="collapsible-button"
                         onClick={() => setShowTrace(!showTrace)}
                         style={{
                             background: '#8b5cf6',
@@ -880,10 +858,8 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = ({ transaction, ch
                     </button>
                     
                     {showTrace && (
-                        <div style={{ 
-                            display: 'flex', 
-                            flexDirection: 'column', 
-                            gap: '15px' 
+                        <div className="flex-column" style={{
+                            gap: '15px'
                         }}>
                             {loadingTrace && (
                                 <div style={{ textAlign: 'center', padding: '20px', color: '#6b7280' }}>

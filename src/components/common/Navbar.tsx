@@ -64,59 +64,18 @@ const Navbar = () => {
         
         {/* Search Box */}
         {shouldShowSearch && (
-          <div style={{
-            flex: 1,
-            display: 'flex',
-            justifyContent: 'center',
-            padding: '0 20px'
-          }}>
-            <form onSubmit={handleSearch} style={{
-              display: 'flex',
-              gap: '8px',
-              maxWidth: '500px',
-              width: '100%'
-            }}>
+          <div className="search-container">
+            <form onSubmit={handleSearch} className="search-form">
               <input
                 type="text"
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
                 placeholder="Search by Address / Tx Hash / Block"
-                style={{
-                  flex: 1,
-                  padding: '8px 16px',
-                  borderRadius: '8px',
-                  border: '1px solid rgba(0, 98, 65, 0.3)',
-                  background: '#1b2537',
-                  color: '#f1f5f9',
-                  fontFamily: 'Outfit, sans-serif',
-                  fontSize: '0.9rem',
-                  outline: 'none',
-                  transition: 'all 0.2s ease'
-                }}
+                className="search-input"
               />
               <button
                 type="submit"
-                style={{
-                  padding: '8px 16px',
-                  borderRadius: '8px',
-                  border: 'none',
-                  background: '#10b981',
-                  color: 'white',
-                  fontFamily: 'Outfit, sans-serif',
-                  fontWeight: '600',
-                  fontSize: '0.9rem',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = '#059669';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = '#10b981';
-                }}
+                className="search-button"
                 aria-label="Search"
                 title="Search"
               >

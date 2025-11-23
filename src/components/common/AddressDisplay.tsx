@@ -264,242 +264,152 @@ const AddressDisplay: React.FC<AddressDisplayProps> = ({
   const contractData =
     isVerified && sourcifyData ? sourcifyData : parsedLocalData;
 
-  // Debug: Log ABI information
-  if (contractData && contractData.abi) {
-    const allTypes = contractData.abi.map((item: any) => item.type);
-    const uniqueTypes = Array.from(new Set(allTypes));
-    const functionNames = contractData.abi
-      .filter((item: any) => item.type === "function")
-      .map((f: any) => f.name);
-    console.log("Contract ABI Info:", {
-      source: isVerified && sourcifyData ? "Sourcify" : "Local Artifact",
-      totalItems: contractData.abi.length,
-      functions: contractData.abi.filter(
-        (item: any) => item.type === "function",
-      ).length,
-      events: contractData.abi.filter((item: any) => item.type === "event")
-        .length,
-      constructor: contractData.abi.filter(
-        (item: any) => item.type === "constructor",
-      ).length,
-      fallback: contractData.abi.filter((item: any) => item.type === "fallback")
-        .length,
-      receive: contractData.abi.filter((item: any) => item.type === "receive")
-        .length,
-      other: contractData.abi.filter(
-        (item: any) =>
-          !["function", "event", "constructor", "fallback", "receive"].includes(
-            item.type,
-          ),
-      ).length,
-      allTypes: uniqueTypes,
-      allFunctionNames: functionNames,
-      hasTransfer: functionNames.includes("transfer"),
-      hasTransferFrom: functionNames.includes("transferFrom"),
-      hasApprove: functionNames.includes("approve"),
-    });
-  }
-
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+    <div className="flex-column" style={{ gap: '24px' }}>
       {/* Address Header Card */}
       <div className="block-display-card">
         <div className="block-display-header">
           <span className="block-label">Address</span>
-          <span
-            className="block-number"
-            style={{ fontFamily: "monospace", fontSize: "1.1rem" }}
-          >
+          <span className="block-number" style={{ fontFamily: 'monospace', fontSize: '1.1rem' }}>
             {addressHash}
           </span>
         </div>
 
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-            gap: "12px",
-            marginBottom: "0",
-          }}
-        >
+        <div className="data-grid-2">
           {/* Type */}
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              padding: "10px 16px",
-              background: "rgba(16, 185, 129, 0.04)",
-              borderRadius: "8px",
-              borderLeft: "3px solid #10b981",
-            }}
-          >
-            <span
-              style={{
-                fontSize: "0.85rem",
-                color: "#10b981",
-                fontWeight: "600",
-                fontFamily: "Outfit, sans-serif",
-              }}
-            >
-              Type
-            </span>
-            <span
-              style={{
-                fontWeight: "600",
-                color: isContract ? "#3b82f6" : "#10b981",
-                fontFamily: "Outfit, sans-serif",
-                fontSize: "0.95rem",
-              }}
-            >
-              {isContract ? "📄 Contract" : "👤 EOA"}
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            padding: '10px 16px',
+            background: 'rgba(16, 185, 129, 0.04)',
+            borderRadius: '8px',
+            borderLeft: '3px solid #10b981'
+          }}>
+            <span style={{
+              fontSize: '0.85rem',
+              color: '#10b981',
+              fontWeight: '600',
+              fontFamily: 'Outfit, sans-serif'
+            }}>Type</span>
+            <span style={{
+              fontWeight: '600',
+              color: isContract ? '#3b82f6' : '#10b981',
+              fontFamily: 'Outfit, sans-serif',
+              fontSize: '0.95rem'
+            }}>
+              {isContract ? '📄 Contract' : '👤 EOA'}
             </span>
           </div>
 
           {/* Balance */}
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              padding: "10px 16px",
-              background: "rgba(16, 185, 129, 0.04)",
-              borderRadius: "8px",
-              borderLeft: "3px solid #10b981",
-            }}
-          >
-            <span
-              style={{
-                fontSize: "0.85rem",
-                color: "#10b981",
-                fontWeight: "600",
-                fontFamily: "Outfit, sans-serif",
-              }}
-            >
-              Balance
-            </span>
-            <span
-              style={{
-                fontWeight: "600",
-                color: "#059669",
-                fontFamily: "Outfit, sans-serif",
-                fontSize: "0.95rem",
-              }}
-            >
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            padding: '10px 16px',
+            background: 'rgba(16, 185, 129, 0.04)',
+            borderRadius: '8px',
+            borderLeft: '3px solid #10b981'
+          }}>
+            <span style={{
+              fontSize: '0.85rem',
+              color: '#10b981',
+              fontWeight: '600',
+              fontFamily: 'Outfit, sans-serif'
+            }}>Balance</span>
+            <span style={{
+              fontWeight: '600',
+              color: '#059669',
+              fontFamily: 'Outfit, sans-serif',
+              fontSize: '0.95rem'
+            }}>
               {formatBalance(address.balance)}
             </span>
           </div>
 
           {/* Transaction Count */}
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              padding: "10px 16px",
-              background: "rgba(16, 185, 129, 0.04)",
-              borderRadius: "8px",
-              borderLeft: "3px solid #10b981",
-            }}
-          >
-            <span
-              style={{
-                fontSize: "0.85rem",
-                color: "#10b981",
-                fontWeight: "600",
-                fontFamily: "Outfit, sans-serif",
-              }}
-            >
-              Transactions
-            </span>
-            <span
-              style={{
-                fontWeight: "600",
-                color: "#059669",
-                fontFamily: "Outfit, sans-serif",
-                fontSize: "0.95rem",
-              }}
-            >
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            padding: '10px 16px',
+            background: 'rgba(16, 185, 129, 0.04)',
+            borderRadius: '8px',
+            borderLeft: '3px solid #10b981'
+          }}>
+            <span style={{
+              fontSize: '0.85rem',
+              color: '#10b981',
+              fontWeight: '600',
+              fontFamily: 'Outfit, sans-serif'
+            }}>Transactions</span>
+            <span style={{
+              fontWeight: '600',
+              color: '#059669',
+              fontFamily: 'Outfit, sans-serif',
+              fontSize: '0.95rem'
+            }}>
               {Number(address.txCount).toLocaleString()}
             </span>
           </div>
 
           {/* Verification (only for contracts) */}
           {isContract && (
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                padding: "10px 16px",
-                background: "rgba(16, 185, 129, 0.04)",
-                borderRadius: "8px",
-                borderLeft: "3px solid #10b981",
-              }}
-            >
-              <span
-                style={{
-                  fontSize: "0.85rem",
-                  color: "#10b981",
-                  fontWeight: "600",
-                  fontFamily: "Outfit, sans-serif",
-                }}
-              >
-                Verified
-              </span>
-              <span
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "6px",
-                }}
-              >
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              padding: '10px 16px',
+              background: 'rgba(16, 185, 129, 0.04)',
+              borderRadius: '8px',
+              borderLeft: '3px solid #10b981'
+            }}>
+              <span style={{
+                fontSize: '0.85rem',
+                color: '#10b981',
+                fontWeight: '600',
+                fontFamily: 'Outfit, sans-serif'
+              }}>Verified</span>
+              <span style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px'
+              }}>
                 {sourcifyLoading ? (
-                  <span
-                    style={{
-                      color: "rgba(255, 255, 255, 0.5)",
-                      fontSize: "0.9rem",
-                      fontFamily: "Outfit, sans-serif",
-                    }}
-                  >
+                  <span style={{
+                    color: 'rgba(255, 255, 255, 0.5)',
+                    fontSize: '0.9rem',
+                    fontFamily: 'Outfit, sans-serif'
+                  }}>
                     Checking...
                   </span>
-                ) : isVerified || parsedLocalData ? (
+                ) : (isVerified || parsedLocalData) ? (
                   <>
-                    <span
-                      style={{
-                        color: "#10b981",
-                        fontWeight: "600",
-                        fontSize: "0.95rem",
-                        fontFamily: "Outfit, sans-serif",
-                      }}
-                    >
+                    <span style={{
+                      color: '#10b981',
+                      fontWeight: '600',
+                      fontSize: '0.95rem',
+                      fontFamily: 'Outfit, sans-serif'
+                    }}>
                       ✓ Yes
                     </span>
                     {contractData?.match && (
-                      <span
-                        style={{
-                          fontSize: "0.7rem",
-                          padding: "2px 6px",
-                          background: "rgba(16, 185, 129, 0.2)",
-                          borderRadius: "4px",
-                          color: "#10b981",
-                          fontWeight: "600",
-                        }}
-                      >
-                        {contractData.match === "perfect"
-                          ? parsedLocalData
-                            ? "Local"
-                            : "Perfect"
-                          : "Partial"}
+                      <span style={{
+                        fontSize: '0.7rem',
+                        padding: '2px 6px',
+                        background: 'rgba(16, 185, 129, 0.2)',
+                        borderRadius: '4px',
+                        color: '#10b981',
+                        fontWeight: '600'
+                      }}>
+                        {contractData.match === 'perfect' ? parsedLocalData ? 'Local' : 'Perfect' : 'Partial'}
                       </span>
                     )}
                   </>
                 ) : (
-                  <span
-                    style={{
-                      color: "rgba(255, 255, 255, 0.5)",
-                      fontSize: "0.9rem",
-                      fontFamily: "Outfit, sans-serif",
-                    }}
-                  >
+                  <span style={{
+                    color: 'rgba(255, 255, 255, 0.5)',
+                    fontSize: '0.9rem',
+                    fontFamily: 'Outfit, sans-serif'
+                  }}>
                     No
                   </span>
                 )}
@@ -702,30 +612,30 @@ const AddressDisplay: React.FC<AddressDisplayProps> = ({
                         >
                           ▶
                         </span>
-                      </div>
-                      <div
-                        id="source-code-content"
-                        style={{
-                          marginTop: "8px",
-                          display: "none",
-                        }}
-                      >
-                        {sourceFiles.map((file: any, idx: number) => (
-                          <div key={idx} style={{ marginBottom: "16px" }}>
-                            <div
-                              style={{
-                                padding: "8px 12px",
-                                background: "rgba(16, 185, 129, 0.08)",
-                                border: "1px solid rgba(16, 185, 129, 0.2)",
-                                borderRadius: "6px 6px 0 0",
-                                fontFamily: "monospace",
-                                fontSize: "0.85rem",
-                                color: "#10b981",
-                                fontWeight: "600",
-                              }}
-                            >
-                              📄 {file.name || file.path}
-                            </div>
+                    </div>
+                    <div
+                      id="source-code-content"
+                      style={{
+                        marginTop: "8px",
+                        display: "none",
+                      }}
+                    >
+                      {sourceFiles.map((file: any, idx: number) => (
+                        <div key={idx} style={{ marginBottom: "16px" }}>
+                          <div
+                            style={{
+                              padding: "8px 12px",
+                              background: "rgba(16, 185, 129, 0.08)",
+                              border: "1px solid rgba(16, 185, 129, 0.2)",
+                              borderRadius: "6px 6px 0 0",
+                              fontFamily: "monospace",
+                              fontSize: "0.85rem",
+                              color: "#10b981",
+                              fontWeight: "600",
+                            }}
+                          >
+                            📄 {file.name || file.path}
+                          </div>
                             <pre
                               style={{
                                 margin: 0,

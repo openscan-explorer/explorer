@@ -42,9 +42,7 @@ const Settings: React.FC = () => {
   ];
 
   return (
-    <div style={{ 
-      maxWidth: '1400px', 
-      margin: '0 auto', 
+    <div className="container-wide" style={{
       padding: '32px 24px',
       fontFamily: 'Outfit, sans-serif',
       textAlign: 'center'
@@ -98,9 +96,7 @@ const Settings: React.FC = () => {
           Enter comma-separated RPC URLs for each network. Multiple URLs provide fallback support.
         </p>
 
-        <div style={{ 
-          display: 'flex', 
-          flexDirection: 'column', 
+        <div className="flex-column" style={{
           gap: '20px'
         }}>
           {chainConfigs.map((chain) => (
@@ -111,9 +107,7 @@ const Settings: React.FC = () => {
               border: '1px solid rgba(16, 185, 129, 0.15)',
               transition: 'all 0.2s ease'
             }}>
-              <label style={{ 
-                display: 'flex', 
-                flexDirection: 'column',
+              <label className="flex-column" style={{
                 gap: '8px'
               }}>
                 <div style={{ 
@@ -184,12 +178,10 @@ const Settings: React.FC = () => {
                 )}
                 
                 {/* Display current RPC list as tags */}
-                {rpcUrls[chain.id as keyof RpcUrlsContextType] && 
-                 Array.isArray(rpcUrls[chain.id as keyof RpcUrlsContextType]) && 
+                {rpcUrls[chain.id as keyof RpcUrlsContextType] &&
+                 Array.isArray(rpcUrls[chain.id as keyof RpcUrlsContextType]) &&
                  (rpcUrls[chain.id as keyof RpcUrlsContextType] as string[]).length > 0 && (
-                  <div style={{
-                    display: 'flex',
-                    flexDirection: 'column',
+                  <div className="flex-column" style={{
                     gap: '6px',
                     marginTop: '8px',
                     alignItems: 'flex-start'
@@ -203,8 +195,7 @@ const Settings: React.FC = () => {
                     }}>
                       Current RPCs:
                     </span>
-                    <div style={{
-                      display: 'flex',
+                    <div className="flex-start" style={{
                       flexWrap: 'wrap',
                       gap: '8px'
                     }}>

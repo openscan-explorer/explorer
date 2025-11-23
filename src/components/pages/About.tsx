@@ -6,16 +6,11 @@ const About: React.FC = () => {
     const formattedCommitHash = commitHash.length > 7 ? commitHash.substring(0, 7) : commitHash;
     
     return (
-        <div style={{ 
-            padding: '40px 20px',
-            maxWidth: '1200px',
-            margin: '0 auto'
+        <div className="container-medium" style={{
+            padding: '40px 20px'
         }}>
             {/* Header */}
-            <div style={{
-                textAlign: 'center',
-                marginBottom: '60px'
-            }}>
+            <div className="text-center mb-large">
                 <h1 style={{
                     fontSize: '3rem',
                     fontFamily: 'Outfit, sans-serif',
@@ -44,12 +39,9 @@ const About: React.FC = () => {
                 border: '1px solid rgba(16, 185, 129, 0.2)',
                 borderRadius: '12px',
                 padding: '24px',
-                marginBottom: '40px',
-                textAlign: 'center'
+                marginBottom: '40px'
             }}>
-                <div style={{
-                    display: 'flex',
-                    justifyContent: 'center',
+                <div className="flex-center" style={{
                     gap: '40px',
                     flexWrap: 'wrap'
                 }}>
@@ -98,17 +90,14 @@ const About: React.FC = () => {
                 fontFamily: 'Outfit, sans-serif',
                 fontWeight: '700',
                 color: '#10b981',
-                marginBottom: '32px',
-                textAlign: 'center'
-            }}>
+                marginBottom: '32px'
+            }} className="text-center">
                 Features
             </h2>
-            
-            <div style={{
-                display: 'grid',
+
+            <div className="data-grid-3 mb-large" style={{
                 gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-                gap: '24px',
-                marginBottom: '60px'
+                gap: '24px'
             }}>
                 {[
                     {
@@ -179,17 +168,14 @@ const About: React.FC = () => {
                 fontFamily: 'Outfit, sans-serif',
                 fontWeight: '700',
                 color: '#10b981',
-                marginBottom: '32px',
-                textAlign: 'center'
-            }}>
+                marginBottom: '32px'
+            }} className="text-center">
                 Supported Networks
             </h2>
-            
-            <div style={{
-                display: 'grid',
+
+            <div className="data-grid-3 mb-large" style={{
                 gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-                gap: '20px',
-                marginBottom: '60px'
+                gap: '20px'
             }}>
                 {[
                     { name: 'Ethereum Mainnet', chainId: '1', icon: '⟠' },
@@ -198,22 +184,17 @@ const About: React.FC = () => {
                     { name: 'Optimism', chainId: '10', icon: '🔴' },
                     { name: 'Localhost', chainId: '31337', icon: '💻' }
                 ].map((network, index) => (
-                    <div key={index} style={{
-                        display: 'flex',
-                        alignItems: 'center',
+                    <div key={index} className="flex-start" style={{
                         gap: '16px',
                         padding: '16px',
                         background: 'rgba(16, 185, 129, 0.04)',
                         border: '1px solid rgba(16, 185, 129, 0.2)',
                         borderRadius: '10px'
                     }}>
-                        <div style={{
+                        <div className="flex-center" style={{
                             fontSize: '2rem',
                             width: '48px',
                             height: '48px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
                             background: 'rgba(16, 185, 129, 0.1)',
                             borderRadius: '8px'
                         }}>
@@ -242,13 +223,11 @@ const About: React.FC = () => {
             </div>
 
             {/* Open Source */}
-            <div style={{
+            <div className="text-center mb-large" style={{
                 background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.1))',
                 border: '1px solid rgba(16, 185, 129, 0.3)',
                 borderRadius: '12px',
-                padding: '40px',
-                textAlign: 'center',
-                marginBottom: '40px'
+                padding: '40px'
             }}>
                 <h2 style={{
                     fontSize: '2rem',
@@ -273,30 +252,18 @@ const About: React.FC = () => {
                     href="https://github.com/AugustoL/openscan"
                     target="_blank"
                     rel="noopener noreferrer"
+                    className="button-primary"
                     style={{
                         display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '8px',
-                        padding: '12px 24px',
-                        background: '#10b981',
-                        color: 'white',
-                        textDecoration: 'none',
-                        borderRadius: '8px',
-                        fontFamily: 'Outfit, sans-serif',
-                        fontWeight: '600',
-                        fontSize: '1rem',
-                        transition: 'background 0.2s ease'
+                        padding: '12px 24px'
                     }}
-                    onMouseEnter={(e) => e.currentTarget.style.background = '#059669'}
-                    onMouseLeave={(e) => e.currentTarget.style.background = '#10b981'}
                 >
                     View on GitHub ↗
                 </a>
             </div>
 
             {/* License */}
-            <div style={{
-                textAlign: 'center',
+            <div className="text-center" style={{
                 padding: '20px',
                 color: 'rgba(255, 255, 255, 0.5)',
                 fontFamily: 'Outfit, sans-serif',

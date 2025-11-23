@@ -88,9 +88,7 @@ const DevTools: React.FC = () => {
   };
 
   return (
-    <div style={{ 
-      maxWidth: '1400px', 
-      margin: '0 auto', 
+    <div className="container-wide" style={{
       padding: '32px 24px',
       fontFamily: 'Outfit, sans-serif'
     }}>
@@ -148,11 +146,7 @@ const DevTools: React.FC = () => {
         }}>
           💱 Unit Converter (ETH ⟷ Gwei ⟷ Wei)
         </h3>
-        <div style={{ 
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-          gap: '16px'
-        }}>
+        <div className="data-grid-3">
           <div>
             <label style={{ fontSize: '0.85rem', fontWeight: '600', color: '#6b7280', marginBottom: '6px', display: 'block' }}>
               ETH
@@ -245,7 +239,7 @@ const DevTools: React.FC = () => {
         }}>
           🔤 Hex Encoder/Decoder
         </h3>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <div className="flex-column" style={{ gap: '12px' }}>
           <textarea
             placeholder="Enter text or hex data"
             value={encodedData}
@@ -262,7 +256,7 @@ const DevTools: React.FC = () => {
               resize: 'vertical'
             }}
           />
-          <div style={{ display: 'flex', gap: '12px' }}>
+          <div className="flex-between" style={{ gap: '12px' }}>
             <button
               onClick={() => convertToHex(encodedData)}
               style={{
@@ -306,7 +300,7 @@ const DevTools: React.FC = () => {
               fontSize: '0.85rem',
               wordBreak: 'break-all'
             }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+              <div className="flex-between mb-small">
                 <span style={{ fontWeight: '600', color: '#6b7280' }}>Result:</span>
                 <button
                   onClick={() => copyToClipboard(decodedData)}
@@ -339,7 +333,7 @@ const DevTools: React.FC = () => {
           border: '1px solid rgba(16, 185, 129, 0.1)',
           marginBottom: '24px'
         }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+          <div className="flex-between mb-medium">
             <h3 style={{
               fontSize: '1.1rem',
               fontWeight: '700',

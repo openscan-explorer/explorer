@@ -1,0 +1,306 @@
+/* Reusable Component Styles */
+
+/* Info Boxes - Green bordered data display boxes */
+.info-box {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: rgba(16, 185, 129, 0.04);
+  border-radius: 8px;
+  border-left: 3px solid #10b981;
+}
+
+.info-box-vertical {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px;
+  background: rgba(16, 185, 129, 0.04);
+  border-radius: 8px;
+  border-left: 3px solid #10b981;
+}
+
+.info-box-label {
+  font-size: 0.85rem;
+  color: #10b981;
+  font-weight: 600;
+  font-family: 'Outfit', sans-serif;
+}
+
+.info-box-value {
+  font-weight: 500;
+  color: var(--text-color, #1f2937);
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.95rem;
+}
+
+.info-box-value-mono {
+  font-weight: 500;
+  color: var(--text-color, #1f2937);
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.9rem;
+  word-break: break-all;
+}
+
+.info-box-value-small {
+  font-weight: 500;
+  color: var(--text-color, #1f2937);
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.85rem;
+}
+
+.info-box-value-accent {
+  font-weight: 600;
+  color: #059669;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.95rem;
+}
+
+/* Arbitrum-specific info boxes (blue theme) */
+.info-box-arbitrum {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: rgba(59, 130, 246, 0.08);
+  border-radius: 8px;
+  border-left: 3px solid #3b82f6;
+}
+
+.info-box-arbitrum-vertical {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px;
+  background: rgba(59, 130, 246, 0.08);
+  border-radius: 8px;
+  border-left: 3px solid #3b82f6;
+  grid-column: 1 / -1;
+}
+
+.info-box-arbitrum-label {
+  font-size: 0.85rem;
+  color: #3b82f6;
+  font-weight: 600;
+  font-family: 'Outfit', sans-serif;
+}
+
+/* Network Cards - Home page */
+.network-card-link {
+  text-decoration: none;
+  display: block;
+  width: 100%;
+}
+
+.network-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 24px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+}
+
+.network-card:hover {
+  transform: translateY(-4px);
+}
+
+.network-card-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 12px;
+  justify-content: flex-start;
+}
+
+.network-card-header-centered {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 12px;
+  justify-content: center;
+}
+
+.network-card-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.network-card-info {
+  flex: 1;
+}
+
+.network-card-title {
+  margin: 0;
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #059669;
+  margin-bottom: 4px;
+}
+
+.network-card-chain-id {
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.875rem;
+  color: #059669;
+  font-weight: 500;
+}
+
+.network-card-description {
+  margin: 0;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.95rem;
+  color: #0da978ff;
+  line-height: 1.5;
+  text-align: center;
+}
+
+/* Buttons */
+.button-primary {
+  background: #10b981;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.button-primary:hover {
+  background: #059669;
+}
+
+/* Collapsible sections */
+.collapsible-container {
+  margin-top: 16px;
+}
+
+.collapsible-button {
+  background: #10b981;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+}
+
+.collapsible-button:hover {
+  background: #059669;
+}
+
+.collapsible-content {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Transaction/Block items in lists */
+.list-item {
+  background: rgba(16, 185, 129, 0.04);
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-left: 3px solid #10b981;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.list-item-index {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 600;
+  color: #6b7280;
+  font-size: 0.85rem;
+  min-width: 60px;
+}
+
+.list-item-hash {
+  color: #10b981;
+  font-weight: 600;
+  text-decoration: none;
+  font-family: 'monospace';
+  font-size: 0.85rem;
+  word-break: break-all;
+  flex: 1;
+}
+
+.list-item-hash-plain {
+  font-family: 'monospace';
+  font-size: 0.85rem;
+  word-break: break-all;
+  flex: 1;
+}
+
+/* Withdrawal items */
+.withdrawal-item {
+  background: rgba(16, 185, 129, 0.04);
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-left: 3px solid #10b981;
+}
+
+.withdrawal-header {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 600;
+  color: #10b981;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+}
+
+.withdrawal-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 8px;
+  font-size: 0.85rem;
+}
+
+.withdrawal-label {
+  font-weight: 600;
+  color: #6b7280;
+}
+
+.withdrawal-value {
+  font-family: 'Outfit', sans-serif;
+  color: var(--text-color, #1f2937);
+}
+
+.withdrawal-amount {
+  font-family: 'Outfit', sans-serif;
+  color: #059669;
+  font-weight: 600;
+}
+
+/* Gas percentage display */
+.gas-percentage {
+  color: #6b7280;
+  margin-left: 4px;
+  font-size: 0.85rem;
+}
+
+/* Link styles */
+.link-accent {
+  color: #10b981;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.link-accent:hover {
+  text-decoration: underline;
+}

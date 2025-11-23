@@ -20,84 +20,39 @@ const NetworkCard: React.FC<NetworkCardProps> = ({ to, name, description, icon, 
   return (
     <Link
       to={to}
-      style={{
-        textDecoration: 'none',
-        display: 'block',
-        width: '100%',
-      }}
+      className="network-card-link"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       <div
+        className="network-card"
         style={{
-          background: 'rgba(255, 255, 255, 0.05)',
           border: `2px solid ${isHovered ? color : 'rgba(255, 255, 255, 0.1)'}`,
-          borderRadius: '16px',
-          padding: '24px',
-          transition: 'all 0.3s ease',
           transform: isHovered ? 'translateY(-4px)' : 'translateY(0)',
           boxShadow: isHovered
             ? `0 8px 32px ${color}40`
             : '0 4px 16px rgba(0, 0, 0, 0.2)',
-          cursor: 'pointer',
         }}
       >
-        <div style={{ 
-          display: 'flex', 
-          alignItems: 'center', 
-          gap: '16px', 
-          marginBottom: '12px',
-          justifyContent: centered ? 'center' : 'flex-start',
-        }}>
+        <div className={centered ? 'network-card-header-centered' : 'network-card-header'}>
           <div
+            className="network-card-icon"
             style={{
-              width: '48px',
-              height: '48px',
-              borderRadius: '12px',
               background: `${color}20`,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0,
             }}
           >
             {icon}
           </div>
-          <div style={{ flex: centered ? '0' : '1' }}>
-            <h3
-              style={{
-                margin: 0,
-                fontFamily: 'Outfit, sans-serif',
-                fontSize: '1.5rem',
-                fontWeight: '700',
-                color: "#059669",
-                marginBottom: '4px',
-              }}
-            >
+          <div className="network-card-info" style={{ flex: centered ? '0' : '1' }}>
+            <h3 className="network-card-title">
               {name}
             </h3>
-            <div
-              style={{
-                fontFamily: 'Outfit, sans-serif',
-                fontSize: '0.875rem',
-                color: '#059669',
-                fontWeight: '500',
-              }}
-            >
+            <div className="network-card-chain-id">
               Chain ID: {chainId}
             </div>
           </div>
         </div>
-        <p
-          style={{
-            margin: 0,
-            fontFamily: 'Outfit, sans-serif',
-            fontSize: '0.95rem',
-            color: '#0da978ff',
-            lineHeight: '1.5',
-            textAlign: 'center',
-          }}
-        >
+        <p className="network-card-description">
           {description}
         </p>
       </div>
@@ -173,42 +128,18 @@ export default function Home() {
     <div className="home-container">
       <div className="home-content">
         <h1 className="home-title">OPENSCAN</h1>
-        <p
-          style={{
-            fontFamily: 'Outfit, sans-serif',
-            fontSize: '1.1rem',
-            color: '#0da978ff',
-            textAlign: 'center',
-            marginTop: '12px',
-            marginBottom: '48px',
-          }}
-        >
+        <p className="subtitle">
           Select a blockchain network to explore
         </p>
 
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-            gap: '24px',
-            maxWidth: '1400px',
-            margin: '0 auto',
-            width: '100%',
-          }}
-        >
+        <div className="network-grid">
           {mainNetworks.map((network) => (
             <NetworkCard key={network.chainId} {...network} />
           ))}
         </div>
-        
+
         {/* Localhost card spanning full width */}
-        <div
-          style={{
-            maxWidth: '1400px',
-            margin: '24px auto 0',
-            width: '100%',
-          }}
-        >
+        <div className="container-wide mt-large">
           <NetworkCard {...localhostNetwork} centered={true} />
         </div>
       </div>

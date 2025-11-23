@@ -16,9 +16,9 @@ const NetworkStatsDisplay: React.FC<NetworkStatsDisplayProps> = ({
 }) => {
   if (loading) {
     return (
-      <div style={{ maxWidth: '1400px', margin: '40px auto 0', padding: '0 24px' }}>
+      <div className="container-wide" style={{ margin: '40px auto 0', padding: '0 24px' }}>
         <div className="block-display-card">
-          <div style={{ textAlign: 'center', padding: '20px', color: '#10b981' }}>
+          <div className="text-center" style={{ padding: '20px', color: '#10b981' }}>
             Loading network statistics...
           </div>
         </div>
@@ -28,9 +28,9 @@ const NetworkStatsDisplay: React.FC<NetworkStatsDisplayProps> = ({
 
   if (error) {
     return (
-      <div style={{ maxWidth: '1400px', margin: '40px auto 0', padding: '0 24px' }}>
+      <div className="container-wide" style={{ margin: '40px auto 0', padding: '0 24px' }}>
         <div className="block-display-card">
-          <div style={{ textAlign: 'center', padding: '20px', color: '#ef4444' }}>
+          <div className="text-center" style={{ padding: '20px', color: '#ef4444' }}>
             Error loading network stats: {error}
           </div>
         </div>
@@ -98,7 +98,7 @@ const NetworkStatsDisplay: React.FC<NetworkStatsDisplayProps> = ({
   const forkedNetwork = getForkedNetworkInfo();
 
   return (
-    <div style={{ maxWidth: '1400px', margin: '40px auto 0', padding: '0 24px' }}>
+    <div className="container-wide" style={{ margin: '40px auto 0', padding: '0 24px' }}>
       <div className="block-display-card">
         <h2
           style={{
@@ -114,13 +114,7 @@ const NetworkStatsDisplay: React.FC<NetworkStatsDisplayProps> = ({
           Network Statistics
         </h2>
 
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
-            gap: '16px',
-          }}
-        >
+        <div className="data-grid-3">
           <div className="block-detail-item">
             <span className="detail-label">Current Gas Price</span>
             <span className="detail-value">

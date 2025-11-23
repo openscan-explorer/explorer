@@ -52,7 +52,7 @@ export default function Blocks() {
 
   if (loading) {
     return (
-      <div style={{ padding: '20px', maxWidth: '1400px', margin: '0 auto', textAlign: 'center' }}>
+      <div className="container-wide" style={{ padding: '20px', textAlign: 'center' }}>
         <h1 style={{ fontFamily: 'Outfit, sans-serif', fontSize: '2rem', color: '#059669', marginBottom: '1rem' }}>Latest Blocks</h1>
         <Loader text="Loading blocks..." />
       </div>
@@ -61,7 +61,7 @@ export default function Blocks() {
 
   if (error) {
     return (
-      <div style={{ padding: '20px', maxWidth: '1400px', margin: '0 auto', textAlign: 'center' }}>
+      <div className="container-wide" style={{ padding: '20px', textAlign: 'center' }}>
         <h1 style={{ fontFamily: 'Outfit, sans-serif', fontSize: '2rem', color: '#059669', marginBottom: '1rem' }}>Latest Blocks</h1>
         <p style={{ color: 'red' }}>Error: {error}</p>
       </div>
@@ -69,7 +69,7 @@ export default function Blocks() {
   }
 
   return (
-    <div style={{ padding: '20px', maxWidth: '1400px', margin: '0 auto', textAlign: 'center' }}>
+    <div className="container-wide" style={{ padding: '20px', textAlign: 'center' }}>
       <h1 style={{ fontFamily: 'Outfit, sans-serif', fontSize: '2rem', color: '#059669', marginBottom: '0.5rem' }}>Latest Blocks</h1>
       <p style={{ color: '#6b7280', marginBottom: '1.5rem' }}>Showing {blocks.length} most recent blocks</p>
       

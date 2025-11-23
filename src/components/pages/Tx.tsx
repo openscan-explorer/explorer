@@ -46,7 +46,7 @@ export default function Tx() {
 
   if (loading) {
     return (
-      <div style={{ padding: '20px', maxWidth: '1400px', margin: '0 auto',textAlign: 'center' }}>
+      <div className="container-wide" style={{ padding: '20px', textAlign: 'center' }}>
         <h1 style={{ fontFamily: 'Outfit, sans-serif', fontSize: '2rem', color: '#059669', marginBottom: '1rem' }}>Transaction</h1>
         <Loader text="Loading transaction..." />
       </div>
@@ -55,7 +55,7 @@ export default function Tx() {
 
   if (error) {
     return (
-      <div style={{ padding: '20px', maxWidth: '1400px', margin: '0 auto',textAlign: 'center' }}>
+      <div className="container-wide" style={{ padding: '20px', textAlign: 'center' }}>
         <h1 style={{ fontFamily: 'Outfit, sans-serif', fontSize: '2rem', color: '#059669', marginBottom: '1rem' }}>Transaction</h1>
         <p style={{ color: 'red' }}>Error: {error}</p>
       </div>
@@ -63,7 +63,7 @@ export default function Tx() {
   }
 
   return (
-    <div style={{ padding: '20px', maxWidth: '1400px', margin: '0 auto' }}>     
+    <div className="container-wide" style={{ padding: '20px' }}>     
       {transaction ? (
         <>
           <TransactionDisplay 
