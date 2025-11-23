@@ -97,10 +97,11 @@ const Artifacts: React.FC = () => {
         gap: '8px',
         marginTop: 0
       }}>
-        📦 Hardhat Artifacts
+        🚀 Hardhat Ignition
       </h3>
-      <p style={{ marginBottom: 20, color: '#6b7280', fontSize: '0.85rem', marginTop: 0 }}>
-        Upload and manage your Hardhat build artifacts
+      <p style={{ marginBottom: 20, color: '#6b7280', fontSize: '1rem', marginTop: 0 }}>
+        Provide a .zip file with the project’s <b>contracts/</b> and <b>ignition/</b> directories inside. 
+        This will be used as local verification method
       </p>
 
       <div
