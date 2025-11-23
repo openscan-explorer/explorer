@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { useSourcify } from '../../hooks/useSourcify';
 import { Address } from '../../types';
 import { AppContext } from '../../context';
-import { useZipJsonReader } from '../../hooks/useZipJsonReader';
 
 interface AddressDisplayProps {
     address: Address;
@@ -15,8 +14,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = ({ address, addressHash, c
     const [storageSlot, setStorageSlot] = useState('');
     const [storageValue, setStorageValue] = useState('');
     const [showContractDetails, setShowContractDetails] = useState(false);
-    const { jsonFiles, setJsonFiles } = useContext(AppContext);
-    const { processZip, loading: fileLoading, error: fileError } = useZipJsonReader();
+    const { jsonFiles } = useContext(AppContext);
     
     const isContract = address.code && address.code !== '0x';
 
@@ -61,14 +59,36 @@ const AddressDisplay: React.FC<AddressDisplayProps> = ({ address, addressHash, c
         }
     };
     
-    function getSourceCodeByAddress<T extends Record<string, any>>(
-        root: T,
-        address: string
-        ): string | undefined {
-            return root[address.toLowerCase()]?.sourceCode
-        }
+    // Check if we have local artifact data for this address
+    const localArtifact = jsonFiles[addressHash.toLowerCase()];
 
-    const sourceCode = getSourceCodeByAddress(jsonFiles, addressHash) || jsonFiles["0x5fbdb2315678afecb367f032d93f642f64180aa3"]?.sourceCode
+    // Parse local artifact to sourcify format if it exists
+    const parsedLocalData = localArtifact ? {
+        name: localArtifact.contractName,
+        compilerVersion: localArtifact.buildInfo?.solcLongVersion,
+        evmVersion: localArtifact.buildInfo?.input?.settings?.evmVersion,
+        abi: localArtifact.abi,
+        files: localArtifact.sourceCode ? [{
+            name: localArtifact.sourceName || 'Contract.sol',
+            path: localArtifact.sourceName || 'Contract.sol',
+            content: localArtifact.sourceCode
+        }] : undefined,
+        metadata: {
+            language: localArtifact.buildInfo?.input?.language,
+            compiler: localArtifact.buildInfo ? {
+                version: localArtifact.buildInfo.solcVersion
+            } : undefined
+        },
+        match: 'perfect' as const,
+        creation_match: null,
+        runtime_match: null,
+        chainId: chainId,
+        address: addressHash,
+        verifiedAt: undefined
+    } : null;
+
+    // Use local artifact data if available and sourcify is not verified, otherwise use sourcify
+    const contractData = (isVerified && sourcifyData) ? sourcifyData : parsedLocalData;
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
@@ -185,16 +205,16 @@ const AddressDisplay: React.FC<AddressDisplayProps> = ({ address, addressHash, c
                                 gap: '6px'
                             }}>
                                 {sourcifyLoading ? (
-                                    <span style={{ 
+                                    <span style={{
                                         color: 'rgba(255, 255, 255, 0.5)',
                                         fontSize: '0.9rem',
                                         fontFamily: 'Outfit, sans-serif'
                                     }}>
                                         Checking...
                                     </span>
-                                ) : isVerified ? (
+                                ) : (isVerified || parsedLocalData) ? (
                                     <>
-                                        <span style={{ 
+                                        <span style={{
                                             color: '#10b981',
                                             fontWeight: '600',
                                             fontSize: '0.95rem',
@@ -202,8 +222,8 @@ const AddressDisplay: React.FC<AddressDisplayProps> = ({ address, addressHash, c
                                         }}>
                                             ✓ Yes
                                         </span>
-                                        {sourcifyData?.match && (
-                                            <span style={{ 
+                                        {contractData?.match && (
+                                            <span style={{
                                                 fontSize: '0.7rem',
                                                 padding: '2px 6px',
                                                 background: 'rgba(16, 185, 129, 0.2)',
@@ -211,12 +231,12 @@ const AddressDisplay: React.FC<AddressDisplayProps> = ({ address, addressHash, c
                                                 color: '#10b981',
                                                 fontWeight: '600'
                                             }}>
-                                                {sourcifyData.match === 'perfect' ? 'Perfect' : 'Partial'}
+                                                {contractData.match === 'perfect' ? parsedLocalData ? 'Local' : 'Perfect' : 'Partial'}
                                             </span>
                                         )}
                                     </>
                                 ) : (
-                                    <span style={{ 
+                                    <span style={{
                                         color: 'rgba(255, 255, 255, 0.5)',
                                         fontSize: '0.9rem',
                                         fontFamily: 'Outfit, sans-serif'
@@ -231,86 +251,86 @@ const AddressDisplay: React.FC<AddressDisplayProps> = ({ address, addressHash, c
             </div>
 
             {/* Contract Verification Details */}
-            {isContract && isVerified && sourcifyData && (
+            {isContract && (isVerified || parsedLocalData) && contractData && (
                 <div className="block-display-card">
                     <div className="block-display-header" style={{ cursor: 'pointer' }} onClick={() => setShowContractDetails(!showContractDetails)}>
                         <span className="block-label">Contract Details</span>
                         <span style={{ fontSize: '1.2rem', color: '#10b981' }}>{showContractDetails ? '▼' : '▶'}</span>
                     </div>
-                    
+
                     {showContractDetails && (
                         <div className="block-display-grid">
-                            {sourcifyData.name && (
+                            {contractData.name && (
                                 <div className="block-detail-item">
                                     <span className="detail-label">Contract Name</span>
                                     <span className="detail-value" style={{ color: '#10b981', fontWeight: '600' }}>
-                                        {sourcifyData.name}
+                                        {contractData.name}
                                     </span>
                                 </div>
                             )}
-                            
-                            {sourcifyData.compilerVersion && (
+
+                            {contractData.compilerVersion && (
                                 <div className="block-detail-item">
                                     <span className="detail-label">Compiler Version</span>
-                                    <span className="detail-value">{sourcifyData.compilerVersion}</span>
+                                    <span className="detail-value">{contractData.compilerVersion}</span>
                                 </div>
                             )}
-                            
-                            {sourcifyData.evmVersion && (
+
+                            {contractData.evmVersion && (
                                 <div className="block-detail-item">
                                     <span className="detail-label">EVM Version</span>
-                                    <span className="detail-value">{sourcifyData.evmVersion}</span>
+                                    <span className="detail-value">{contractData.evmVersion}</span>
                                 </div>
                             )}
-                            
-                            {sourcifyData.chainId && (
+
+                            {contractData.chainId && (
                                 <div className="block-detail-item">
                                     <span className="detail-label">Chain ID</span>
-                                    <span className="detail-value">{sourcifyData.chainId}</span>
+                                    <span className="detail-value">{contractData.chainId}</span>
                                 </div>
                             )}
-                            
-                            {sourcifyData.verifiedAt && (
+
+                            {contractData.verifiedAt && (
                                 <div className="block-detail-item">
                                     <span className="detail-label">Verified At</span>
                                     <span className="detail-value">
-                                        {new Date(sourcifyData.verifiedAt).toLocaleString()}
+                                        {new Date(contractData.verifiedAt).toLocaleString()}
                                     </span>
                                 </div>
                             )}
-                            
-                            {sourcifyData.match && (
+
+                            {contractData.match && (
                                 <div className="block-detail-item">
                                     <span className="detail-label">Match Type</span>
-                                    <span className="detail-value" style={{ 
-                                        color: sourcifyData.match === 'perfect' ? '#10b981' : '#f59e0b',
+                                    <span className="detail-value" style={{
+                                        color: contractData.match === 'perfect' ? '#10b981' : '#f59e0b',
                                         fontWeight: '600'
                                     }}>
-                                        {sourcifyData.match.toUpperCase()}
+                                        {contractData.match.toUpperCase()}
                                     </span>
                                 </div>
                             )}
-                            
-                            {sourcifyData.creation_match && (
+
+                            {contractData.creation_match && (
                                 <div className="block-detail-item">
                                     <span className="detail-label">Creation Match</span>
-                                    <span className="detail-value" style={{ 
-                                        color: sourcifyData.creation_match === 'perfect' ? '#10b981' : '#f59e0b',
+                                    <span className="detail-value" style={{
+                                        color: contractData.creation_match === 'perfect' ? '#10b981' : '#f59e0b',
                                         fontWeight: '600'
                                     }}>
-                                        {sourcifyData.creation_match.toUpperCase()}
+                                        {contractData.creation_match.toUpperCase()}
                                     </span>
                                 </div>
                             )}
-                            
-                            {sourcifyData.runtime_match && (
+
+                            {contractData.runtime_match && (
                                 <div className="block-detail-item">
                                     <span className="detail-label">Runtime Match</span>
-                                    <span className="detail-value" style={{ 
-                                        color: sourcifyData.runtime_match === 'perfect' ? '#10b981' : '#f59e0b',
+                                    <span className="detail-value" style={{
+                                        color: contractData.runtime_match === 'perfect' ? '#10b981' : '#f59e0b',
                                         fontWeight: '600'
                                     }}>
-                                        {sourcifyData.runtime_match.toUpperCase()}
+                                        {contractData.runtime_match.toUpperCase()}
                                     </span>
                                 </div>
                             )}
@@ -335,40 +355,89 @@ const AddressDisplay: React.FC<AddressDisplayProps> = ({ address, addressHash, c
                                 </div>
                             </div>
                             
-                            {/* Source Files */}
-                            {sourcifyData.files && sourcifyData.files.length > 0 && (
-                                <div className="block-detail-item" style={{ gridColumn: '1 / -1' }}>
-                                    <span className="detail-label">Source Files</span>
-                                    <div style={{ 
-                                        marginTop: '8px',
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        gap: '6px'
-                                    }}>
-                                        {sourcifyData.files.map((file: any, idx: number) => (
-                                            <div key={idx} style={{
-                                                padding: '8px 12px',
-                                                background: 'rgba(16, 185, 129, 0.08)',
-                                                border: '1px solid rgba(16, 185, 129, 0.2)',
-                                                borderRadius: '6px',
-                                                fontFamily: 'monospace',
-                                                fontSize: '0.85rem',
-                                                color: '#10b981',
-                                            }}>
-                                                📄 {file.name || file.path}
-                                            </div>
-                                        ))}
+                            {/* Source Code */}
+                            {((contractData.files && contractData.files.length > 0) || (contractData as any).sources) && (() => {
+                                // Prepare source files array - either from files or sources object
+                                const sources = (contractData as any).sources;
+                                const sourceFiles = contractData.files && contractData.files.length > 0
+                                    ? contractData.files
+                                    : sources
+                                        ? Object.entries(sources).map(([path, source]: [string, any]) => ({
+                                            name: path,
+                                            path: path,
+                                            content: source.content || ''
+                                        }))
+                                        : [];
+
+                                return sourceFiles.length > 0 ? (
+                                    <div className="block-detail-item" style={{ gridColumn: '1 / -1' }}>
+                                        <div style={{
+                                            display: 'flex',
+                                            justifyContent: 'space-between',
+                                            alignItems: 'center',
+                                            cursor: 'pointer',
+                                            userSelect: 'none'
+                                        }} onClick={() => {
+                                            const elem = document.getElementById('source-code-content');
+                                            const icon = document.getElementById('source-code-icon');
+                                            if (elem && icon) {
+                                                const isHidden = elem.style.display === 'none';
+                                                elem.style.display = isHidden ? 'block' : 'none';
+                                                icon.textContent = isHidden ? '▼' : '▶';
+                                            }
+                                        }}>
+                                            <span className="detail-label">Source Code</span>
+                                            <span id="source-code-icon" style={{ fontSize: '0.9rem', color: '#10b981' }}>▶</span>
+                                        </div>
+                                        <div id="source-code-content" style={{
+                                            marginTop: '8px',
+                                            display: 'none'
+                                        }}>
+                                            {sourceFiles.map((file: any, idx: number) => (
+                                                <div key={idx} style={{ marginBottom: '16px' }}>
+                                                    <div style={{
+                                                        padding: '8px 12px',
+                                                        background: 'rgba(16, 185, 129, 0.08)',
+                                                        border: '1px solid rgba(16, 185, 129, 0.2)',
+                                                        borderRadius: '6px 6px 0 0',
+                                                        fontFamily: 'monospace',
+                                                        fontSize: '0.85rem',
+                                                        color: '#10b981',
+                                                        fontWeight: '600'
+                                                    }}>
+                                                        📄 {file.name || file.path}
+                                                    </div>
+                                                    <pre style={{
+                                                        margin: 0,
+                                                        padding: '16px',
+                                                        background: 'rgba(0, 0, 0, 0.3)',
+                                                        border: '1px solid rgba(16, 185, 129, 0.2)',
+                                                        borderTop: 'none',
+                                                        borderRadius: '0 0 6px 6px',
+                                                        fontFamily: 'monospace',
+                                                        fontSize: '0.75rem',
+                                                        color: '#e5e7eb',
+                                                        maxHeight: '400px',
+                                                        overflowY: 'auto',
+                                                        overflowX: 'auto',
+                                                        whiteSpace: 'pre'
+                                                    }}>
+                                                        {file.content}
+                                                    </pre>
+                                                </div>
+                                            ))}
+                                        </div>
                                     </div>
-                                </div>
-                            )}
+                                ) : null;
+                            })()}
                             
                             {/* Contract ABI */}
-                            {sourcifyData.abi && sourcifyData.abi.length > 0 && (
+                            {contractData.abi && contractData.abi.length > 0 && (
                                 <div className="block-detail-item" style={{ gridColumn: '1 / -1' }}>
                                     <span className="detail-label">Contract ABI</span>
                                     <div style={{ marginTop: '8px' }}>
                                         {/* Functions */}
-                                        {sourcifyData.abi.filter((item: any) => item.type === 'function').length > 0 && (
+                                        {contractData.abi.filter((item: any) => item.type === 'function').length > 0 && (
                                             <div style={{ marginBottom: '12px' }}>
                                                 <div style={{ 
                                                     fontSize: '0.85rem', 
@@ -376,14 +445,14 @@ const AddressDisplay: React.FC<AddressDisplayProps> = ({ address, addressHash, c
                                                     marginBottom: '6px',
                                                     fontWeight: '600'
                                                 }}>
-                                                    Functions ({sourcifyData.abi.filter((item: any) => item.type === 'function').length})
+                                                    Functions ({contractData.abi.filter((item: any) => item.type === 'function').length})
                                                 </div>
                                                 <div style={{ 
                                                     display: 'flex',
                                                     flexWrap: 'wrap',
                                                     gap: '8px'
                                                 }}>
-                                                    {sourcifyData.abi
+                                                    {contractData.abi
                                                         .filter((item: any) => item.type === 'function')
                                                         .slice(0, 15)
                                                         .map((func: any, idx: number) => (
@@ -398,9 +467,9 @@ const AddressDisplay: React.FC<AddressDisplayProps> = ({ address, addressHash, c
                                                                 {func.name}
                                                             </span>
                                                         ))}
-                                                    {sourcifyData.abi.filter((item: any) => item.type === 'function').length > 15 && (
+                                                    {contractData.abi.filter((item: any) => item.type === 'function').length > 15 && (
                                                         <span style={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: '0.85rem', alignSelf: 'center' }}>
-                                                            +{sourcifyData.abi.filter((item: any) => item.type === 'function').length - 15} more
+                                                            +{contractData.abi.filter((item: any) => item.type === 'function').length - 15} more
                                                         </span>
                                                     )}
                                                 </div>
@@ -408,7 +477,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = ({ address, addressHash, c
                                         )}
                                         
                                         {/* Events */}
-                                        {sourcifyData.abi.filter((item: any) => item.type === 'event').length > 0 && (
+                                        {contractData.abi.filter((item: any) => item.type === 'event').length > 0 && (
                                             <div style={{ marginBottom: '12px' }}>
                                                 <div style={{ 
                                                     fontSize: '0.85rem', 
@@ -416,14 +485,14 @@ const AddressDisplay: React.FC<AddressDisplayProps> = ({ address, addressHash, c
                                                     marginBottom: '6px',
                                                     fontWeight: '600'
                                                 }}>
-                                                    Events ({sourcifyData.abi.filter((item: any) => item.type === 'event').length})
+                                                    Events ({contractData.abi.filter((item: any) => item.type === 'event').length})
                                                 </div>
                                                 <div style={{ 
                                                     display: 'flex',
                                                     flexWrap: 'wrap',
                                                     gap: '8px'
                                                 }}>
-                                                    {sourcifyData.abi
+                                                    {contractData.abi
                                                         .filter((item: any) => item.type === 'event')
                                                         .slice(0, 10)
                                                         .map((event: any, idx: number) => (
@@ -438,9 +507,9 @@ const AddressDisplay: React.FC<AddressDisplayProps> = ({ address, addressHash, c
                                                                 {event.name}
                                                             </span>
                                                         ))}
-                                                    {sourcifyData.abi.filter((item: any) => item.type === 'event').length > 10 && (
+                                                    {contractData.abi.filter((item: any) => item.type === 'event').length > 10 && (
                                                         <span style={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: '0.85rem', alignSelf: 'center' }}>
-                                                            +{sourcifyData.abi.filter((item: any) => item.type === 'event').length - 10} more
+                                                            +{contractData.abi.filter((item: any) => item.type === 'event').length - 10} more
                                                         </span>
                                                     )}
                                                 </div>
@@ -448,7 +517,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = ({ address, addressHash, c
                                         )}
                                         
                                         {/* Constructor */}
-                                        {sourcifyData.abi.find((item: any) => item.type === 'constructor') && (
+                                        {contractData.abi.find((item: any) => item.type === 'constructor') && (
                                             <div>
                                                 <div style={{ 
                                                     fontSize: '0.85rem', 
@@ -476,7 +545,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = ({ address, addressHash, c
                             )}
                             
                             {/* Metadata Info */}
-                            {sourcifyData.metadata && (
+                            {contractData.metadata && (
                                 <div className="block-detail-item" style={{ gridColumn: '1 / -1' }}>
                                     <span className="detail-label">Additional Metadata</span>
                                     <div style={{
@@ -485,7 +554,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = ({ address, addressHash, c
                                         gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
                                         gap: '12px'
                                     }}>
-                                        {sourcifyData.metadata.language && (
+                                        {contractData.metadata.language && (
                                             <div style={{ 
                                                 padding: '8px',
                                                 background: 'rgba(255, 255, 255, 0.03)',
@@ -495,11 +564,11 @@ const AddressDisplay: React.FC<AddressDisplayProps> = ({ address, addressHash, c
                                                     Language
                                                 </div>
                                                 <div style={{ fontSize: '0.85rem', color: '#10b981' }}>
-                                                    {sourcifyData.metadata.language}
+                                                    {contractData.metadata.language}
                                                 </div>
                                             </div>
                                         )}
-                                        {sourcifyData.metadata.compiler && (
+                                        {contractData.metadata.compiler && (
                                             <div style={{ 
                                                 padding: '8px',
                                                 background: 'rgba(255, 255, 255, 0.03)',
@@ -509,7 +578,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = ({ address, addressHash, c
                                                     Compiler
                                                 </div>
                                                 <div style={{ fontSize: '0.85rem', color: '#10b981' }}>
-                                                    {sourcifyData.metadata.compiler.version}
+                                                    {contractData.metadata.compiler.version}
                                                 </div>
                                             </div>
                                         )}
@@ -517,7 +586,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = ({ address, addressHash, c
                                 </div>
                             )}
                             
-                            <div className="block-detail-item" style={{ gridColumn: '1 / -1' }}>
+                            {sourcifyData && (<div className="block-detail-item" style={{ gridColumn: '1 / -1' }}>
                                 <a
                                     href={`https://repo.sourcify.dev/contracts/full_match/${chainId}/${addressHash}/`}
                                     target="_blank"
@@ -533,7 +602,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = ({ address, addressHash, c
                                 >
                                     View Full Contract on Sourcify ↗
                                 </a>
-                            </div>
+                            </div>)}
                         </div>
                     )}
                 </div>
@@ -734,23 +803,6 @@ const AddressDisplay: React.FC<AddressDisplayProps> = ({ address, addressHash, c
                         )}
                     </div>
 
-                </div>
-            )}
-            { isContract && sourceCode && (
-                <div style={{
-                                padding: '12px',
-                                background: 'rgba(16, 185, 129, 0.1)',
-                                border: '1px solid rgba(16, 185, 129, 0.3)',
-                                borderRadius: '8px',
-                                fontFamily: 'monospace',
-                                fontSize: '0.85rem',
-                                wordBreak: 'break-all',
-                                color: '#10b981',
-                            }}>
-                <div className="block-detail-item">
-                    <span className="detail-label">Source Code</span>
-                    <span className="detail-value" title={address.code}>{sourceCode}</span>
-                </div>
                 </div>
             )}
             </div>
