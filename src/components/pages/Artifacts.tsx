@@ -53,7 +53,7 @@ const Artifacts: React.FC = () => {
         if (file.name.endsWith('.zip')) {
           const jsonData = await processZip(file);
           // Merge new JSON files with existing ones
-          setJsonFiles((prev: Record<string, any>) => ({ ...prev, ...jsonData }));
+          setJsonFiles(jsonData);
         }
       }
     }
@@ -80,10 +80,27 @@ const Artifacts: React.FC = () => {
   };
 
   return (
-    <div style={{ padding: 16, maxWidth: 1200, margin: '0 auto' }}>
-      <h2>Artifacts</h2>
-      <p style={{ marginBottom: 24, color: '#666' }}>
-        Upload and manage your files
+    <div style={{
+      background: '#ffffff',
+      borderRadius: '16px',
+      padding: '24px',
+      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)',
+      border: '1px solid rgba(16, 185, 129, 0.1)'
+    }}>
+      <h3 style={{
+        fontSize: '1.1rem',
+        fontWeight: '700',
+        color: '#10b981',
+        marginBottom: '8px',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '8px',
+        marginTop: 0
+      }}>
+        📦 Hardhat Artifacts
+      </h3>
+      <p style={{ marginBottom: 20, color: '#6b7280', fontSize: '0.85rem', marginTop: 0 }}>
+        Upload and manage your Hardhat build artifacts
       </p>
 
       <div
@@ -92,32 +109,33 @@ const Artifacts: React.FC = () => {
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         style={{
-          border: isDragging ? '2px dashed #0066cc' : '2px dashed #ccc',
-          borderRadius: 8,
-          padding: 48,
+          border: isDragging ? '2px dashed #10b981' : '2px dashed rgba(16, 185, 129, 0.3)',
+          borderRadius: 12,
+          padding: 40,
           textAlign: 'center',
-          backgroundColor: isDragging ? '#f0f8ff' : '#f9f9f9',
+          backgroundColor: isDragging ? 'rgba(16, 185, 129, 0.05)' : 'rgba(16, 185, 129, 0.02)',
           transition: 'all 0.3s ease',
           cursor: 'pointer',
-          marginBottom: 24
+          marginBottom: 20
         }}
       >
-        <div style={{ fontSize: 48, marginBottom: 16 }}>📁</div>
-        <h3 style={{ marginBottom: 8 }}>
-          {isDragging ? 'Drop files here' : 'Drag and drop files here'}
-        </h3>
-        <p style={{ color: '#666', marginBottom: 16 }}>or</p>
+        <div style={{ fontSize: 48, marginBottom: 12 }}>📁</div>
+        <h4 style={{ marginBottom: 8, marginTop: 0, fontSize: '0.95rem', fontWeight: '600', color: '#1f2937' }}>
+          {isDragging ? 'Drop files here' : 'Drag and drop ZIP files here'}
+        </h4>
+        <p style={{ color: '#6b7280', marginBottom: 16, fontSize: '0.85rem', margin: '0 0 16px 0' }}>or</p>
         <label
           htmlFor="file-input"
           style={{
             display: 'inline-block',
             padding: '10px 20px',
-            backgroundColor: '#0066cc',
+            background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
             color: 'white',
-            borderRadius: 4,
+            borderRadius: 8,
             cursor: 'pointer',
-            fontSize: 14,
-            fontWeight: 500
+            fontSize: '0.85rem',
+            fontWeight: '600',
+            border: 'none'
           }}
         >
           Browse Files
@@ -139,17 +157,18 @@ const Artifacts: React.FC = () => {
             alignItems: 'center',
             marginBottom: 16
           }}>
-            <h3>Uploaded Files ({files.length})</h3>
+            <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: '600', color: '#1f2937' }}>Uploaded Files ({files.length})</h4>
             <button
               onClick={handleClearAll}
               style={{
-                padding: '8px 16px',
-                backgroundColor: '#dc3545',
+                padding: '6px 12px',
+                background: '#ef4444',
                 color: 'white',
                 border: 'none',
-                borderRadius: 4,
+                borderRadius: 8,
                 cursor: 'pointer',
-                fontSize: 14
+                fontSize: '0.8rem',
+                fontWeight: '600'
               }}
             >
               Clear All
@@ -164,24 +183,26 @@ const Artifacts: React.FC = () => {
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
-                  padding: 16,
-                  backgroundColor: 'white',
-                  border: '1px solid #e0e0e0',
-                  borderRadius: 6,
-                  boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
+                  padding: 12,
+                  backgroundColor: 'rgba(16, 185, 129, 0.02)',
+                  border: '1px solid rgba(16, 185, 129, 0.15)',
+                  borderRadius: 8,
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.03)'
                 }}
               >
                 <div style={{ flex: 1 }}>
                   <div style={{
-                    fontWeight: 500,
+                    fontWeight: 600,
                     marginBottom: 4,
-                    wordBreak: 'break-all'
+                    wordBreak: 'break-all',
+                    fontSize: '0.85rem',
+                    color: '#1f2937'
                   }}>
                     {file.name}
                   </div>
                   <div style={{
-                    fontSize: 12,
-                    color: '#666',
+                    fontSize: '0.75rem',
+                    color: '#6b7280',
                     display: 'flex',
                     gap: 16
                   }}>
@@ -193,13 +214,14 @@ const Artifacts: React.FC = () => {
                   onClick={() => handleRemoveFile(index)}
                   style={{
                     padding: '6px 12px',
-                    backgroundColor: '#f44336',
+                    background: '#ef4444',
                     color: 'white',
                     border: 'none',
-                    borderRadius: 4,
+                    borderRadius: 6,
                     cursor: 'pointer',
-                    fontSize: 12,
-                    marginLeft: 16
+                    fontSize: '0.75rem',
+                    marginLeft: 16,
+                    fontWeight: '600'
                   }}
                 >
                   Remove
@@ -213,10 +235,11 @@ const Artifacts: React.FC = () => {
       {files.length === 0 && !loading && Object.keys(jsonFiles).length === 0 && (
         <div style={{
           textAlign: 'center',
-          padding: 48,
-          color: '#999',
-          backgroundColor: '#f9f9f9',
-          borderRadius: 8
+          padding: 32,
+          color: '#6b7280',
+          backgroundColor: 'rgba(16, 185, 129, 0.02)',
+          borderRadius: 8,
+          fontSize: '0.85rem'
         }}>
           No files uploaded yet. Drag and drop or browse to add files.
         </div>
@@ -225,73 +248,76 @@ const Artifacts: React.FC = () => {
       {loading && (
         <div style={{
           textAlign: 'center',
-          padding: 48,
-          color: '#0066cc',
-          backgroundColor: '#f0f8ff',
+          padding: 32,
+          color: '#10b981',
+          backgroundColor: 'rgba(16, 185, 129, 0.05)',
           borderRadius: 8,
-          marginTop: 24
+          marginTop: 20,
+          border: '1px solid rgba(16, 185, 129, 0.2)'
         }}>
-          <div style={{ fontSize: 32, marginBottom: 16 }}>⏳</div>
-          <div>Processing ZIP file...</div>
+          <div style={{ fontSize: 32, marginBottom: 12 }}>⏳</div>
+          <div style={{ fontSize: '0.9rem', fontWeight: '600' }}>Processing ZIP file...</div>
         </div>
       )}
 
       {error && (
         <div style={{
           textAlign: 'center',
-          padding: 24,
-          color: '#dc3545',
-          backgroundColor: '#ffe5e5',
+          padding: 20,
+          color: '#dc2626',
+          backgroundColor: 'rgba(239, 68, 68, 0.05)',
           borderRadius: 8,
-          marginTop: 24,
-          border: '1px solid #dc3545'
+          marginTop: 20,
+          border: '1px solid rgba(239, 68, 68, 0.2)'
         }}>
           <div style={{ fontSize: 24, marginBottom: 8 }}>⚠️</div>
-          <div style={{ fontWeight: 500 }}>{error}</div>
+          <div style={{ fontWeight: 600, fontSize: '0.9rem' }}>{error}</div>
         </div>
       )}
 
       {Object.keys(jsonFiles).length > 0 && (
-        <div style={{ marginTop: 32 }}>
+        <div style={{ marginTop: 24 }}>
           <div style={{
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
             marginBottom: 16
           }}>
-            <h3>Extracted JSON Files ({Object.keys(jsonFiles).length})</h3>
+            <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: '600', color: '#1f2937' }}>Extracted JSON Files ({Object.keys(jsonFiles).length})</h4>
             <button
               onClick={handleClearArtifacts}
               style={{
-                padding: '8px 16px',
-                backgroundColor: '#dc3545',
+                padding: '6px 12px',
+                background: '#ef4444',
                 color: 'white',
                 border: 'none',
-                borderRadius: 4,
+                borderRadius: 8,
                 cursor: 'pointer',
-                fontSize: 14
+                fontSize: '0.8rem',
+                fontWeight: '600'
               }}
             >
               Clear Artifacts
             </button>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {Object.entries(jsonFiles).map(([path, data]) => (
               <div
                 key={path}
                 style={{
-                  padding: 16,
-                  backgroundColor: 'white',
-                  border: '1px solid #e0e0e0',
-                  borderRadius: 6,
-                  boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
+                  padding: 12,
+                  backgroundColor: 'rgba(16, 185, 129, 0.02)',
+                  border: '1px solid rgba(16, 185, 129, 0.15)',
+                  borderRadius: 8,
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.03)'
                 }}
               >
                 <div style={{
-                  fontWeight: 500,
+                  fontWeight: 600,
                   marginBottom: 8,
-                  color: '#0066cc',
-                  wordBreak: 'break-all'
+                  color: '#10b981',
+                  wordBreak: 'break-all',
+                  fontSize: '0.85rem'
                 }}>
                   {path}
                 </div>
@@ -299,19 +325,24 @@ const Artifacts: React.FC = () => {
                   <summary style={{
                     cursor: 'pointer',
                     padding: '4px 0',
-                    color: '#666',
-                    fontSize: 14
+                    color: '#6b7280',
+                    fontSize: '0.8rem',
+                    fontWeight: '600'
                   }}>
                     View JSON content
                   </summary>
                   <pre style={{
-                    backgroundColor: '#f6f8fa',
+                    backgroundColor: 'rgba(16, 185, 129, 0.04)',
                     padding: 12,
-                    borderRadius: 4,
+                    borderRadius: 8,
                     overflow: 'auto',
                     maxHeight: 400,
-                    fontSize: 12,
-                    marginTop: 8
+                    fontSize: '0.75rem',
+                    marginTop: 8,
+                    border: '1px solid rgba(16, 185, 129, 0.1)',
+                    color: '#1f2937',
+                    fontFamily: 'monospace',
+                    lineHeight: '1.5'
                   }}>
                     {JSON.stringify(data, null, 2)}
                   </pre>

@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { useDataService } from '../../hooks/useDataService';
-import Loader from '../common/Loader';
+import { useParams } from 'react-router-dom';
+import Artifacts from './Artifacts';
 
 const DevTools: React.FC = () => {
   const { chainId } = useParams<{ chainId?: string }>();
@@ -374,11 +373,12 @@ const DevTools: React.FC = () => {
           borderRadius: '16px',
           padding: '24px',
           boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)',
-          border: '1px solid rgba(16, 185, 129, 0.1)'
+          border: '1px solid rgba(16, 185, 129, 0.1)',
+          marginBottom: '24px'
         }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-            <h3 style={{ 
-              fontSize: '1.1rem', 
+            <h3 style={{
+              fontSize: '1.1rem',
               fontWeight: '700',
               color: '#10b981',
               margin: 0,
@@ -404,7 +404,7 @@ const DevTools: React.FC = () => {
               Clear All
             </button>
           </div>
-          <pre style={{ 
+          <pre style={{
             background: 'rgba(16, 185, 129, 0.04)',
             padding: '16px',
             borderRadius: '10px',
@@ -420,6 +420,9 @@ const DevTools: React.FC = () => {
           </pre>
         </div>
       )}
+
+      {/* Hardhat Artifacts Section */}
+      <Artifacts />
     </div>
   );
 };
