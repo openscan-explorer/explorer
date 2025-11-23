@@ -35,7 +35,10 @@ export function loadJsonFilesFromStorage(): JsonFilesMap {
  */
 export function saveJsonFilesToStorage(jsonFiles: JsonFilesMap): void {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(jsonFiles));
+    const raw = localStorage.getItem(STORAGE_KEY) || '{}';
+    const parsed = JSON.parse(raw);
+
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({...parsed, ...jsonFiles}));
   } catch (err) {
     console.warn('Failed to save JSON files to storage', err);
     // Handle quota exceeded errors

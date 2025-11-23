@@ -53,7 +53,7 @@ const Artifacts: React.FC = () => {
         if (file.name.endsWith('.zip')) {
           const jsonData = await processZip(file);
           // Merge new JSON files with existing ones
-          setJsonFiles((prev: Record<string, any>) => ({ ...prev, ...jsonData }));
+          setJsonFiles(jsonData);
         }
       }
     }
