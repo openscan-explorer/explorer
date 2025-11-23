@@ -8,6 +8,7 @@ A trustless, open-source, standalone web-app, multi-chain blockchain explorer fo
 ## Features
 
 ### 🌐 Multi-Chain Support
+
 - **Ethereum Mainnet** - The main Ethereum network
 - **Sepolia Testnet** - Ethereum test network for development
 - **Arbitrum One** - Ethereum Layer 2 scaling solution
@@ -15,6 +16,7 @@ A trustless, open-source, standalone web-app, multi-chain blockchain explorer fo
 - **Localhost** - Local development networks (Hardhat/Anvil)
 
 ### 🔍 Core Functionality
+
 - **Block Explorer** - View detailed block information including transactions, gas usage, and timestamps
 - **Transaction Details** - Inspect transaction data, receipts, logs, and execution details
 - **Address Lookup** - Check balance, transaction history, and contract code
@@ -23,6 +25,7 @@ A trustless, open-source, standalone web-app, multi-chain blockchain explorer fo
 - **Read/Write Operations** - Execute smart contract calls on verified smart contracts.
 
 ### 🎨 User Experience
+
 - **Modern UI** - Clean, card-based design with smooth animations
 - **Dark Mode** - Toggle between light and dark themes
 - **Responsive** - Mobile-friendly interface
@@ -30,20 +33,24 @@ A trustless, open-source, standalone web-app, multi-chain blockchain explorer fo
 - **Real-time Updates** - Live data from RPC endpoints
 
 ### 🛠️ Developer Tools
+
 - **Hex Encoder/Decoder** - Convert between hex and text formats
 - **Unit Converter** - Convert between Wei, Gwei, and ETH
 - **Custom RPC Support** - Configure custom RPC endpoints for each network
+- **HH3 Ignition Support** – Import, inspect, and interact with Hardhat 3 Ignition deployments locally
 - **Multiple Fallback URLs** - Automatic failover to backup RPC providers
 - **Read/Write Operations** - Execute smart contract calls on verified smart contracts.
 
 ### ⚡ Layer 2 Support
+
 - **Arbitrum-Specific Fields** - Display L1 block numbers, send counts, and request IDs
 - **Optimism Fee Data** - Show L1 fee breakdown (l1Fee, l1GasPrice, l1GasUsed, l1FeeScalar)
 
 ## Getting Started
 
 ### Prerequisites
-- Node.js 16+ 
+
+- Node.js 16+
 - npm or yarn
 
 ### Installation
@@ -70,6 +77,18 @@ The app will open at `http://localhost:3000`
 npm run build
 ```
 
+### Type guards
+
+```bash
+npm run typecheck
+```
+
+### Lint and prettier
+
+```bash
+npm run lint:fix
+```
+
 ## Configuration
 
 ### Custom RPC Endpoints
@@ -77,6 +96,7 @@ npm run build
 Navigate to Settings to configure custom RPC endpoints for each network. The app supports multiple fallback URLs for reliability.
 
 Default RPC endpoints:
+
 - **Ethereum**: `https://eth.llamarpc.com`, `https://rpc.ankr.com/eth`
 - **Sepolia**: `https://rpc.sepolia.org`, `https://ethereum-sepolia-rpc.publicnode.com`
 - **Arbitrum**: `https://arb1.arbitrum.io/rpc`, `https://arbitrum-one.publicnode.com`
@@ -96,29 +116,37 @@ Default RPC endpoints:
 ## Architecture
 
 ### Tech Stack
+
 - **React 18** - UI framework
 - **TypeScript** - Type safety
 - **React Router** - Client-side routing
 - **Custom RPC Service** - Direct JSON-RPC calls to blockchain nodes
+- **Biome** – Code formatting and linting
 
 ### Project Structure
-```
+
+```mermaid
 src/
-├── components/        # React components
+├── components/       # React components
 │   ├── common/       # Reusable UI components
 │   └── pages/        # Page components
-├── services/         # Blockchain data services
-│   └── EVM/          # EVM-compatible chain adapters
-│       ├── Arbitrum/ # Arbitrum-specific adapters
-│       └── Optimism/ # Optimism-specific adapters
+├── config/           # Default RPCs configurations
 ├── context/          # React context providers
 ├── hooks/            # Custom React hooks
+├── services/         # Blockchain data services
+│   ├── adapters      # General reusable adapters
+│   └── EVM/          # EVM-compatible chain adapters
+│       ├── Arbitrum/ # Arbitrum-specific adapters
+│       ├── common/   # EVM common resources
+│       ├── L1/       # EVM L1 resources
+│       └── Optimism/ # Optimism-specific adapters
 ├── types/            # TypeScript type definitions
 ├── utils/            # Utility functions
 └── styles/           # CSS stylesheets
 ```
 
 ### Data Flow
+
 1. User selects a network (chain ID)
 2. `DataService` instantiates network-specific adapters
 3. Fetchers make JSON-RPC calls to configured endpoints
@@ -128,7 +156,8 @@ src/
 ## Development
 
 ### Key Components
-- **`DataService`** - Main service layer orchestrating RPC calls
+
+- **DataService** - Main service layer orchestrating RPC calls
 - **Network Adapters** - Transform chain-specific data formats
 - **Type Guards** - Runtime type checking for L2-specific fields
 - **RPC Storage** - Persistent storage for custom RPC configurations
@@ -136,8 +165,8 @@ src/
 ### Adding a New Network
 
 1. Add chain ID to `src/types/index.ts`
-2. Add RPC endpoints to `src/utils/rpcStorage.ts`
-3. Create adapters in `src/services/EVM/[Network]/`
+2. Add default RPC endpoints to `src/utils/rpcStorage.ts`
+3. Create adapters and fetchers in `src/services/EVM/[Network]/`
 4. Update `DataService` conditional logic
 5. Add network card to Home page
 6. Add network logo to assets folder
