@@ -33,3 +33,19 @@ jobs:
           
       - name: Build Production
         run: ./scripts/build-production.sh
+
+      - name: Update IPFS Hash Gist
+        env:
+          GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
+        run: |
+          HASH=$(ipfs add -r -Q --chunker=size-262144 --raw-leaves=false ./dist)
+          echo "IPFS Hash (v0): $HASH"
+          
+          # Update the gist with the new hash (shields.io endpoint format)
+          curl -X PATCH \
+            -H "Authorization: token $GIST_TOKEN" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/gists/${{ vars.IPFS_HASH_GIST_ID }} \
+            -d "{\"files\":{\"ipfs-hash.json\":{\"content\":\"{\\\"schemaVersion\\\": 1, \\\"label\\\": \\\"IPFS\\\", \\\"message\\\": \\\"$HASH\\\", \\\"color\\\": \\\"blue\\\", \\\"namedLogo\\\": \\\"ipfs\\\"}\"}}}"
+          
+          echo "Updated gist with IPFS hash: $HASH"

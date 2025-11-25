@@ -4,6 +4,8 @@
 
 # OpenScan
 
+![Production IPFS Hash](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/AugustoL/GIST_ID/raw/ipfs-hash.json)
+
 A trustless, open-source, standalone web-app, multi-chain blockchain explorer for Ethereum, Layer 2 networks, and local development chains, allowing the direct interaction with verified smart contracts.
 
 **Official URL:** [https://openscan.eth.link/](https://openscan.eth.link/)  
