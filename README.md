@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://openscan.eth.link/openscan-logo.png" alt="OpenScan Logo" width="128" height="128">
+  <img src="https://augustol.github.io/openscan/openscan-logo.png" alt="OpenScan Logo" width="128" height="128">
 </p>
 
 # OpenScan
