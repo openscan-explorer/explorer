@@ -73,6 +73,10 @@
 }
 
 /* Spacing */
+.margin-0 {
+	margin: 0;
+}
+
 .mt-small {
 	margin-top: 8px;
 }
