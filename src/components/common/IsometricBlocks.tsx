@@ -20,7 +20,6 @@ interface CubeData {
 	x: number;
 	y: number;
 	color: string;
-	opacity: number;
 }
 
 interface IsometricCubeProps {
@@ -28,7 +27,6 @@ interface IsometricCubeProps {
 	y: number;
 	size: number;
 	color: string;
-	opacity: number;
 }
 
 const IsometricCube: React.FC<IsometricCubeProps> = ({
@@ -36,7 +34,6 @@ const IsometricCube: React.FC<IsometricCubeProps> = ({
 	y,
 	size,
 	color,
-	opacity,
 }) => {
 	// Isometric cube dimensions
 	const h = size * 0.5; // height offset for 3D effect
@@ -51,7 +48,10 @@ const IsometricCube: React.FC<IsometricCubeProps> = ({
 	const rightPoints = `${x},${y + h} ${x + size},${y} ${x + size},${y + size} ${x},${y + h + size}`;
 
 	return (
-		<g opacity={opacity}>
+		<g 
+			className="isometric-cube"
+			style={{ willChange: "opacity" }}
+		>
 			{/* Right face - darkest */}
 			<polygon
 				points={rightPoints}
@@ -92,8 +92,8 @@ export const IsometricBlocks: React.FC<IsometricBlocksProps> = ({
 	width,
 	height,
 	cubeSize = 24,
-	maxCubes = 100,
-	spawnInterval = 150,
+	maxCubes = 50,
+	spawnInterval = 400,
 }) => {
 	const [cubes, setCubes] = useState<CubeData[]>([]);
 	const nextIdRef = useRef(0);
@@ -129,7 +129,6 @@ export const IsometricBlocks: React.FC<IsometricBlocksProps> = ({
 			x: pos.x,
 			y: pos.y,
 			color: network,
-			opacity: 0,
 		};
 
 		setCubes((prev) => {
@@ -141,20 +140,6 @@ export const IsometricBlocks: React.FC<IsometricBlocksProps> = ({
 			return updated;
 		});
 	}, [gridPositions, maxCubes]);
-
-	// Fade in animation
-	useEffect(() => {
-		const fadeInterval = setInterval(() => {
-			setCubes((prev) =>
-				prev.map((cube) => ({
-					...cube,
-					opacity: Math.min(cube.opacity + 0.1, 0.7),
-				})),
-			);
-		}, 50);
-
-		return () => clearInterval(fadeInterval);
-	}, []);
 
 	// Spawn cubes periodically
 	useEffect(() => {
@@ -173,6 +158,17 @@ export const IsometricBlocks: React.FC<IsometricBlocksProps> = ({
 				pointerEvents: "none",
 			}}
 		>
+			<style>
+				{`
+					.isometric-cube {
+						opacity: 0;
+						animation: fadeInCube 0.8s ease-out forwards;
+					}
+					@keyframes fadeInCube {
+						to { opacity: 0.7; }
+					}
+				`}
+			</style>
 			{cubes.map((cube) => (
 				<IsometricCube
 					key={cube.id}
@@ -180,7 +176,6 @@ export const IsometricBlocks: React.FC<IsometricBlocksProps> = ({
 					y={cube.y}
 					size={cubeSize}
 					color={cube.color}
-					opacity={cube.opacity}
 				/>
 			))}
 		</svg>
