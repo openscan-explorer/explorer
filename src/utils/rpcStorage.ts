@@ -53,6 +53,27 @@ export const RPC_ENDPOINTS: RpcUrlsContextType = {
 		"https://base.llamarpc.com",
 		"https://base.publicnode.com",
 	].filter(Boolean) as string[],
+
+	// BSC Mainnet
+	56: [
+		process.env.REACT_APP_BSC_RPC || "https://bsc-dataseed.binance.org",
+		"https://bsc.publicnode.com",
+		"https://binance.llamarpc.com",
+	].filter(Boolean) as string[],
+
+	// BSC Testnet
+	97: [
+		process.env.REACT_APP_BSC_TESTNET_RPC ||
+			"https://data-seed-prebsc-1-s1.binance.org:8545",
+		"https://bsc-testnet.publicnode.com",
+	].filter(Boolean) as string[],
+
+	// Polygon POS
+	137: [
+		process.env.REACT_APP_POLYGON_RPC || "https://polygon-rpc.com",
+		"https://polygon.llamarpc.com",
+		"https://polygon-bor.publicnode.com",
+	].filter(Boolean) as string[],
 };
 type RpcMap = Record<number, string[]>;
 

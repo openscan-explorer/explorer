@@ -45,6 +45,10 @@ const Settings: React.FC = () => {
 		{ id: 11155111, name: "Sepolia Testnet" },
 		{ id: 42161, name: "Arbitrum One" },
 		{ id: 10, name: "Optimism Mainnet" },
+		{ id: 8453, name: "Base Mainnet" },
+		{ id: 56, name: "BSC Mainnet" },
+		{ id: 97, name: "BSC Testnet" },
+		{ id: 137, name: "Polygon POS" },
 		{ id: 31337, name: "Local Hardhat" },
 	];
 

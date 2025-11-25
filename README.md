@@ -4,7 +4,7 @@
 
 # OpenScan
 
-![Production IPFS Hash](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/AugustoL/GIST_ID/raw/ipfs-hash.json)
+![Production IPFS Hash](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/AugustoL/e3a56e2c5255a748f6334af4c9c58bfc/raw/ipfs-hash.json)
 
 A trustless, open-source, standalone web-app, multi-chain blockchain explorer for Ethereum, Layer 2 networks, and local development chains, allowing the direct interaction with verified smart contracts.
 
@@ -19,6 +19,10 @@ A trustless, open-source, standalone web-app, multi-chain blockchain explorer fo
 - **Sepolia Testnet** - Ethereum test network for development
 - **Arbitrum One** - Ethereum Layer 2 scaling solution
 - **Optimism** - Ethereum Layer 2 with low fees
+- **Base** - Coinbase's Layer 2 network
+- **BSC (BNB Chain)** - Binance Smart Chain mainnet
+- **BSC Testnet** - Binance Smart Chain testnet
+- **Polygon POS** - Polygon proof-of-stake mainnet
 - **Localhost** - Local development networks (Hardhat/Anvil)
 
 ### 🔍 Core Functionality
@@ -115,6 +119,9 @@ Default RPC endpoints:
 - **Sepolia**: `https://rpc.sepolia.org`, `https://ethereum-sepolia-rpc.publicnode.com`
 - **Arbitrum**: `https://arb1.arbitrum.io/rpc`, `https://arbitrum-one.publicnode.com`
 - **Optimism**: `https://mainnet.optimism.io`, `https://optimism.publicnode.com`
+- **BSC**: `https://bsc-dataseed.binance.org`, `https://bsc.publicnode.com`
+- **BSC Testnet**: `https://data-seed-prebsc-1-s1.binance.org:8545`, `https://bsc-testnet.publicnode.com`
+- **Polygon**: `https://polygon-rpc.com`, `https://polygon.llamarpc.com`
 - **Localhost**: `http://localhost:8545`
 
 ### Supported Chain IDs
@@ -125,6 +132,10 @@ Default RPC endpoints:
 | Sepolia Testnet | 11155111 |
 | Arbitrum One | 42161 |
 | Optimism | 10 |
+| Base | 8453 |
+| BSC (BNB Chain) | 56 |
+| BSC Testnet | 97 |
+| Polygon POS | 137 |
 | Localhost | 31337 |
 
 ## Architecture
