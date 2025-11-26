@@ -2464,6 +2464,54 @@
 	border-color: #10b981;
 }
 
+.devtools-select {
+	width: 100%;
+	padding: 10px 12px;
+	border: 2px solid rgba(16, 185, 129, 0.2);
+	border-radius: 8px;
+	font-size: 0.85rem;
+	outline: none;
+	font-family: "JetBrains Mono", monospace;
+	color: #1f2937;
+	background-color: white;
+	cursor: pointer;
+}
+
+.devtools-select:focus {
+	border-color: #10b981;
+}
+
+.devtools-select optgroup {
+	font-weight: 600;
+	color: #374151;
+}
+
+.devtools-select option {
+	padding: 8px;
+}
+
+.keccak-type-selector {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.keccak-input-row {
+	display: flex;
+	gap: 12px;
+	align-items: center;
+}
+
+.keccak-type-select {
+	width: auto;
+	min-width: 120px;
+	flex-shrink: 0;
+}
+
+.keccak-input-row .devtools-input {
+	flex: 1;
+}
+
 .devtools-textarea {
 	width: 100%;
 	padding: 10px 12px;
@@ -2601,6 +2649,96 @@
 
 .devtools-error-dismiss:hover {
 	background: rgba(255, 255, 255, 0.3);
+}
+
+/* Keccak Tool Styles */
+.keccak-mode-toggle {
+	display: flex;
+	gap: 8px;
+}
+
+.keccak-mode-btn {
+	flex: 1;
+	padding: 8px 16px;
+	background: #f3f4f6;
+	border: 2px solid transparent;
+	border-radius: 8px;
+	font-size: 0.85rem;
+	font-weight: 600;
+	color: #6b7280;
+	cursor: pointer;
+	transition: all 0.2s ease;
+}
+
+.keccak-mode-btn:hover {
+	background: #e5e7eb;
+}
+
+.keccak-mode-btn.active {
+	background: rgba(16, 185, 129, 0.1);
+	border-color: #10b981;
+	color: #10b981;
+}
+
+.keccak-results {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.keccak-result-item {
+	padding: 12px;
+	background: rgba(16, 185, 129, 0.04);
+	border-radius: 8px;
+	border: 1px solid rgba(16, 185, 129, 0.15);
+}
+
+.keccak-result-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 8px;
+}
+
+.keccak-result-label {
+	font-size: 0.8rem;
+	font-weight: 600;
+	color: #6b7280;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+}
+
+.keccak-result-value {
+	font-family: "JetBrains Mono", monospace;
+	font-size: 0.85rem;
+	color: #1f2937;
+	word-break: break-all;
+	line-height: 1.5;
+}
+
+.keccak-selector {
+	background: rgba(99, 102, 241, 0.08);
+	border-color: rgba(99, 102, 241, 0.2);
+}
+
+.keccak-selector .keccak-result-label {
+	color: #6366f1;
+}
+
+.keccak-selector-value {
+	color: #6366f1;
+	font-size: 1.1rem;
+	font-weight: 600;
+}
+
+.keccak-error {
+	padding: 12px;
+	background: rgba(239, 68, 68, 0.1);
+	border-radius: 8px;
+	border: 1px solid rgba(239, 68, 68, 0.2);
+	color: #dc2626;
+	font-size: 0.85rem;
+	font-weight: 500;
 }
 
 /* Loader component styles */
