@@ -1,4 +1,4 @@
-name: Hash production build
+name: Hash and Deploy to IPFS
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  build-hash-deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -34,12 +34,18 @@ jobs:
       - name: Build Production
         run: ./scripts/build-production.sh
 
+      - name: Get IPFS Hash
+        id: ipfs-hash
+        run: |
+          HASH=$(ipfs add -r -Q --chunker=size-262144 --raw-leaves=false ./dist)
+          echo "IPFS Hash (v0): $HASH"
+          echo "hash=$HASH" >> $GITHUB_OUTPUT
+
       - name: Update IPFS Hash Gist
         env:
           GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
         run: |
-          HASH=$(ipfs add -r -Q --chunker=size-262144 --raw-leaves=false ./dist)
-          echo "IPFS Hash (v0): $HASH"
+          HASH="${{ steps.ipfs-hash.outputs.hash }}"
           
           # Update the gist with the new hash (shields.io endpoint format)
           curl -X PATCH \
@@ -49,3 +55,15 @@ jobs:
             -d "{\"files\":{\"ipfs-hash.json\":{\"content\":\"{\\\"schemaVersion\\\": 1, \\\"label\\\": \\\"IPFS\\\", \\\"message\\\": \\\"$HASH\\\", \\\"color\\\": \\\"blue\\\", \\\"namedLogo\\\": \\\"ipfs\\\"}\"}}}"
           
           echo "Updated gist with IPFS hash: $HASH"
+
+      - name: Install action dependencies
+        run: |
+          cd .github/actions/deploy-ipfs
+          npm install
+
+      - name: Deploy to IPFS via Pinata
+        uses: ./.github/actions/deploy-ipfs
+        with:
+          pinata-jwt: ${{ secrets.PINATA_JWT }}
+          source-dir: './dist'
+          pin-name: 'openscan - ${{ github.sha }}'
