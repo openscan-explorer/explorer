@@ -1,5 +1,11 @@
 import { network } from "hardhat";
-import { parseEther, formatEther, encodeFunctionData } from "viem";
+import {
+	parseEther,
+	formatEther,
+	encodeFunctionData,
+	Hash,
+	Abi,
+} from "viem";
 
 /**
  * This script deploys all contracts and generates mainnet-like transactions:
@@ -9,6 +15,27 @@ import { parseEther, formatEther, encodeFunctionData } from "viem";
  * - Vault deposits/withdrawals
  * - Failed transactions (insufficient balance, reverts, etc.)
  */
+
+// Helper to log transaction hash
+function logTx(label: string, hash: Hash) {
+	console.log(`    📝 ${label}: ${hash}`);
+}
+
+// Helper to send a transaction that may revert, bypassing simulation
+async function sendRawTx(
+	wallet: any,
+	to: `0x${string}`,
+	data: `0x${string}`,
+	label: string,
+): Promise<Hash> {
+	const tx = await wallet.sendTransaction({
+		to,
+		data,
+		gas: 500000n, // Fixed gas to bypass estimation
+	});
+	logTx(label, tx);
+	return tx;
+}
 
 async function main() {
 	console.log("🚀 Starting mainnet-like transaction generator...\n");
@@ -91,30 +118,41 @@ async function main() {
 
 	// Distribute tokens to users
 	console.log("  Distributing tokens to users...");
-	await tokenA.write.transfer([user1.account.address, parseEther("50000")]);
-	await tokenA.write.transfer([user2.account.address, parseEther("30000")]);
-	await tokenA.write.transfer([user3.account.address, parseEther("20000")]);
+	let tx: Hash;
+	tx = await tokenA.write.transfer([user1.account.address, parseEther("50000")]);
+	logTx("ALPHA -> user1", tx);
+	tx = await tokenA.write.transfer([user2.account.address, parseEther("30000")]);
+	logTx("ALPHA -> user2", tx);
+	tx = await tokenA.write.transfer([user3.account.address, parseEther("20000")]);
+	logTx("ALPHA -> user3", tx);
 
-	await tokenB.write.transfer([user1.account.address, parseEther("40000")]);
-	await tokenB.write.transfer([user2.account.address, parseEther("35000")]);
-	await tokenB.write.transfer([user4.account.address, parseEther("25000")]);
+	tx = await tokenB.write.transfer([user1.account.address, parseEther("40000")]);
+	logTx("BETA -> user1", tx);
+	tx = await tokenB.write.transfer([user2.account.address, parseEther("35000")]);
+	logTx("BETA -> user2", tx);
+	tx = await tokenB.write.transfer([user4.account.address, parseEther("25000")]);
+	logTx("BETA -> user4", tx);
 
-	await stableToken.write.transfer([
+	tx = await stableToken.write.transfer([
 		user1.account.address,
 		parseEther("100000"),
 	]);
-	await stableToken.write.transfer([
+	logTx("USDT -> user1", tx);
+	tx = await stableToken.write.transfer([
 		user2.account.address,
 		parseEther("80000"),
 	]);
-	await stableToken.write.transfer([
+	logTx("USDT -> user2", tx);
+	tx = await stableToken.write.transfer([
 		user3.account.address,
 		parseEther("60000"),
 	]);
-	await stableToken.write.transfer([
+	logTx("USDT -> user3", tx);
+	tx = await stableToken.write.transfer([
 		user4.account.address,
 		parseEther("40000"),
 	]);
+	logTx("USDT -> user4", tx);
 
 	// User transfers
 	console.log("  User-to-user transfers...");
@@ -128,15 +166,21 @@ async function main() {
 		client: { wallet: user1 },
 	});
 
-	await tokenAUser1.write.transfer([user2.account.address, parseEther("5000")]);
-	await tokenAUser2.write.transfer([user3.account.address, parseEther("2500")]);
-	await tokenBUser1.write.transfer([user3.account.address, parseEther("1000")]);
+	tx = await tokenAUser1.write.transfer([user2.account.address, parseEther("5000")]);
+	logTx("user1 ALPHA -> user2", tx);
+	tx = await tokenAUser2.write.transfer([user3.account.address, parseEther("2500")]);
+	logTx("user2 ALPHA -> user3", tx);
+	tx = await tokenBUser1.write.transfer([user3.account.address, parseEther("1000")]);
+	logTx("user1 BETA -> user3", tx);
 
 	// Approvals
 	console.log("  Setting approvals...");
-	await tokenAUser1.write.approve([simpleSwap.address, parseEther("100000")]);
-	await tokenAUser2.write.approve([simpleSwap.address, parseEther("100000")]);
-	await tokenBUser1.write.approve([simpleSwap.address, parseEther("100000")]);
+	tx = await tokenAUser1.write.approve([simpleSwap.address, parseEther("100000")]);
+	logTx("user1 approve ALPHA", tx);
+	tx = await tokenAUser2.write.approve([simpleSwap.address, parseEther("100000")]);
+	logTx("user2 approve ALPHA", tx);
+	tx = await tokenBUser1.write.approve([simpleSwap.address, parseEther("100000")]);
+	logTx("user1 approve BETA", tx);
 
 	const stableUser1 = await viem.getContractAt(
 		"TestToken",
@@ -148,20 +192,25 @@ async function main() {
 		stableToken.address,
 		{ client: { wallet: user2 } },
 	);
-	await stableUser1.write.approve([vault.address, parseEther("1000000")]);
-	await stableUser2.write.approve([vault.address, parseEther("1000000")]);
+	tx = await stableUser1.write.approve([vault.address, parseEther("1000000")]);
+	logTx("user1 approve USDT", tx);
+	tx = await stableUser2.write.approve([vault.address, parseEther("1000000")]);
+	logTx("user2 approve USDT", tx);
 
 	// Mint more tokens
 	console.log("  Minting additional tokens...");
-	await tokenA.write.mint([user4.account.address, parseEther("15000")]);
-	await tokenB.write.mint([user4.account.address, parseEther("12000")]);
+	tx = await tokenA.write.mint([user4.account.address, parseEther("15000")]);
+	logTx("mint ALPHA -> user4", tx);
+	tx = await tokenB.write.mint([user4.account.address, parseEther("12000")]);
+	logTx("mint BETA -> user4", tx);
 
 	// Burn tokens
 	console.log("  Burning tokens...");
 	const tokenAUser3 = await viem.getContractAt("TestToken", tokenA.address, {
 		client: { wallet: user3 },
 	});
-	await tokenAUser3.write.burn([parseEther("500")]);
+	tx = await tokenAUser3.write.burn([parseEther("500")]);
+	logTx("user3 burn ALPHA", tx);
 
 	console.log("  ✅ ERC20 transactions complete\n");
 
@@ -170,55 +219,67 @@ async function main() {
 
 	// Mint NFTs to different users
 	console.log("  Minting NFTs...");
-	await testNFT.write.mint([deployer.account.address]); // Token 0
-	await testNFT.write.mint([user1.account.address]); // Token 1
-	await testNFT.write.mint([user1.account.address]); // Token 2
-	await testNFT.write.mint([user2.account.address]); // Token 3
-	await testNFT.write.mintWithURI([
+	tx = await testNFT.write.mint([deployer.account.address]); // Token 0
+	logTx("mint NFT #0 -> deployer", tx);
+	tx = await testNFT.write.mint([user1.account.address]); // Token 1
+	logTx("mint NFT #1 -> user1", tx);
+	tx = await testNFT.write.mint([user1.account.address]); // Token 2
+	logTx("mint NFT #2 -> user1", tx);
+	tx = await testNFT.write.mint([user2.account.address]); // Token 3
+	logTx("mint NFT #3 -> user2", tx);
+	tx = await testNFT.write.mintWithURI([
 		user3.account.address,
 		"ipfs://QmSpecialNFT",
 	]); // Token 4
+	logTx("mint NFT #4 -> user3", tx);
 
 	// Batch mint
 	console.log("  Batch minting NFTs...");
-	await testNFT.write.batchMint([user4.account.address, 5n]); // Tokens 5-9
+	tx = await testNFT.write.batchMint([user4.account.address, 5n]); // Tokens 5-9
+	logTx("batch mint NFT #5-9 -> user4", tx);
 
 	// NFT transfers
 	console.log("  Transferring NFTs...");
 	const nftUser1 = await viem.getContractAt("TestNFT", testNFT.address, {
 		client: { wallet: user1 },
 	});
-	await nftUser1.write.transferFrom([
+	tx = await nftUser1.write.transferFrom([
 		user1.account.address,
 		user2.account.address,
 		1n,
 	]);
+	logTx("transfer NFT #1 user1 -> user2", tx);
 
 	// NFT approvals
 	console.log("  Setting NFT approvals...");
-	await nftUser1.write.approve([user3.account.address, 2n]);
-	await nftUser1.write.setApprovalForAll([user4.account.address, true]);
+	tx = await nftUser1.write.approve([user3.account.address, 2n]);
+	logTx("approve NFT #2 -> user3", tx);
+	tx = await nftUser1.write.setApprovalForAll([user4.account.address, true]);
+	logTx("setApprovalForAll -> user4", tx);
 
 	// Burn NFT
 	console.log("  Burning NFT...");
 	const nftUser4 = await viem.getContractAt("TestNFT", testNFT.address, {
 		client: { wallet: user4 },
 	});
-	await nftUser4.write.burn([9n]);
+	tx = await nftUser4.write.burn([9n]);
+	logTx("burn NFT #9", tx);
 
 	console.log("  ✅ NFT transactions complete\n");
 
 	// ========== DEX TRANSACTIONS ==========
 	console.log("🔄 Generating DEX transactions...\n");
-
 	// Add liquidity (deployer)
 	console.log("  Adding initial liquidity...");
-	await tokenA.write.approve([simpleSwap.address, parseEther("100000")]);
-	await tokenB.write.approve([simpleSwap.address, parseEther("100000")]);
-	await simpleSwap.write.addLiquidity([
+	tx = await tokenA.write.approve([simpleSwap.address, parseEther("100000")]);
+	logTx("deployer approve ALPHA for swap", tx);
+	tx = await tokenB.write.approve([simpleSwap.address, parseEther("100000")]);
+	logTx("deployer approve BETA for swap", tx);
+	tx = await simpleSwap.write.addLiquidity([
 		parseEther("50000"),
 		parseEther("50000"),
 	]);
+	logTx("deployer addLiquidity", tx);
 
 	// Swaps
 	console.log("  Executing swaps...");
@@ -230,10 +291,12 @@ async function main() {
 	});
 
 	// User1 swaps A for B
-	await swapUser1.write.swapAForB([parseEther("1000"), parseEther("900")]);
+	tx = await swapUser1.write.swapAForB([parseEther("1000"), parseEther("900")]);
+	logTx("user1 swapAForB", tx);
 
 	// User2 swaps A for B
-	await swapUser2.write.swapAForB([parseEther("500"), parseEther("400")]);
+	tx = await swapUser2.write.swapAForB([parseEther("500"), parseEther("400")]);
+	logTx("user2 swapAForB", tx);
 
 	// User1 swaps B for A
 	const tokenBUser1Again = await viem.getContractAt(
@@ -241,11 +304,13 @@ async function main() {
 		tokenB.address,
 		{ client: { wallet: user1 } },
 	);
-	await tokenBUser1Again.write.approve([
+	tx = await tokenBUser1Again.write.approve([
 		simpleSwap.address,
 		parseEther("100000"),
 	]);
-	await swapUser1.write.swapBForA([parseEther("2000"), parseEther("1800")]);
+	logTx("user1 approve BETA for swap", tx);
+	tx = await swapUser1.write.swapBForA([parseEther("2000"), parseEther("1800")]);
+	logTx("user1 swapBForA", tx);
 
 	// More liquidity
 	console.log("  Adding more liquidity...");
@@ -257,18 +322,21 @@ async function main() {
 	const tokenBUser2 = await viem.getContractAt("TestToken", tokenB.address, {
 		client: { wallet: user2 },
 	});
-	await tokenAUser1Again.write.approve([
+	tx = await tokenAUser1Again.write.approve([
 		simpleSwap.address,
 		parseEther("100000"),
 	]);
-	await tokenBUser1Again.write.approve([
+	logTx("user1 approve ALPHA for swap", tx);
+	tx = await tokenBUser1Again.write.approve([
 		simpleSwap.address,
 		parseEther("100000"),
 	]);
-	await swapUser1.write.addLiquidity([
+	logTx("user1 approve BETA for swap", tx);
+	tx = await swapUser1.write.addLiquidity([
 		parseEther("10000"),
 		parseEther("10000"),
 	]);
+	logTx("user1 addLiquidity", tx);
 
 	console.log("  ✅ DEX transactions complete\n");
 
@@ -284,28 +352,38 @@ async function main() {
 		client: { wallet: user2 },
 	});
 
-	await vaultUser1.write.deposit([parseEther("5000")]);
-	await vaultUser2.write.deposit([parseEther("3000")]);
-	await vaultUser1.write.deposit([parseEther("2000")]); // Additional deposit
+	tx = await vaultUser1.write.deposit([parseEther("5000")]);
+	logTx("user1 deposit 5000", tx);
+	tx = await vaultUser2.write.deposit([parseEther("3000")]);
+	logTx("user2 deposit 3000", tx);
+	tx = await vaultUser1.write.deposit([parseEther("2000")]); // Additional deposit
+	logTx("user1 deposit 2000", tx);
 
 	// Withdrawals
 	console.log("  Making withdrawals...");
-	await vaultUser1.write.withdraw([parseEther("1000")]);
-	await vaultUser2.write.withdrawAll();
+	tx = await vaultUser1.write.withdraw([parseEther("1000")]);
+	logTx("user1 withdraw 1000", tx);
+	tx = await vaultUser2.write.withdrawAll();
+	logTx("user2 withdrawAll", tx);
 
 	// Admin actions
 	console.log("  Admin actions...");
-	await vault.write.collectFees([deployer.account.address]);
+	tx = await vault.write.collectFees([deployer.account.address]);
+	logTx("collectFees", tx);
 
 	console.log("  ✅ Vault transactions complete\n");
 
 	// ========== COUNTER TRANSACTIONS ==========
 	console.log("🔢 Generating Counter transactions...\n");
 
-	await counter.write.inc();
-	await counter.write.inc();
-	await counter.write.incBy([5n]);
-	await counter.write.incBy([10n]);
+	tx = await counter.write.inc();
+	logTx("counter inc", tx);
+	tx = await counter.write.inc();
+	logTx("counter inc", tx);
+	tx = await counter.write.incBy([5n]);
+	logTx("counter incBy 5", tx);
+	tx = await counter.write.incBy([10n]);
+	logTx("counter incBy 10", tx);
 
 	console.log("  ✅ Counter transactions complete\n");
 
@@ -340,98 +418,129 @@ async function main() {
 		},
 	];
 
-	await multicall.write.aggregate([calls]);
+	tx = await multicall.write.aggregate([calls]);
+	logTx("multicall aggregate", tx);
 
 	console.log("  ✅ Multicall transactions complete\n");
 
 	// ========== FAILED TRANSACTIONS ==========
 	console.log("❌ Generating failed transactions...\n");
 
+	// Use raw sendTransaction with fixed gas to bypass simulation
+	// These transactions will be mined but revert on-chain
+
 	// Insufficient balance transfer
 	console.log("  Attempting insufficient balance transfer...");
-	try {
-		const tokenAUser4 = await viem.getContractAt("TestToken", tokenA.address, {
-			client: { wallet: user4 },
-		});
-		await tokenAUser4.write.transfer([
-			user1.account.address,
-			parseEther("999999999"),
-		]);
-	} catch (e: any) {
-		console.log(`    ✅ Failed as expected: insufficient balance`);
-	}
+	const tokenAUser4 = await viem.getContractAt("TestToken", tokenA.address, {
+		client: { wallet: user4 },
+	});
+	await sendRawTx(
+		user4,
+		tokenA.address,
+		encodeFunctionData({
+			abi: tokenA.abi,
+			functionName: "transfer",
+			args: [user1.account.address, parseEther("999999999")],
+		}),
+		"insufficient balance transfer (reverted)",
+	);
 
 	// Transfer to zero address
 	console.log("  Attempting transfer to zero address...");
-	try {
-		await tokenAUser1.write.transfer([
-			"0x0000000000000000000000000000000000000000",
-			parseEther("100"),
-		]);
-	} catch (e: any) {
-		console.log(`    ✅ Failed as expected: zero address`);
-	}
+	await sendRawTx(
+		user1,
+		tokenA.address,
+		encodeFunctionData({
+			abi: tokenA.abi,
+			functionName: "transfer",
+			args: ["0x0000000000000000000000000000000000000000", parseEther("100")],
+		}),
+		"zero address transfer (reverted)",
+	);
 
 	// Vault deposit below minimum
 	console.log("  Attempting vault deposit below minimum...");
-	try {
-		const stableUser3 = await viem.getContractAt(
-			"TestToken",
-			stableToken.address,
-			{ client: { wallet: user3 } },
-		);
-		await stableUser3.write.approve([vault.address, parseEther("1000000")]);
-		const vaultUser3 = await viem.getContractAt("Vault", vault.address, {
-			client: { wallet: user3 },
-		});
-		await vaultUser3.write.deposit([parseEther("10")]); // Below 100 minimum
-	} catch (e: any) {
-		console.log(`    ✅ Failed as expected: below minimum deposit`);
-	}
+	const stableUser3 = await viem.getContractAt(
+		"TestToken",
+		stableToken.address,
+		{ client: { wallet: user3 } },
+	);
+	await stableUser3.write.approve([vault.address, parseEther("1000000")]);
+	await sendRawTx(
+		user3,
+		vault.address,
+		encodeFunctionData({
+			abi: vault.abi,
+			functionName: "deposit",
+			args: [parseEther("10")], // Below 100 minimum
+		}),
+		"below minimum deposit (reverted)",
+	);
 
 	// Vault deposit above maximum
 	console.log("  Attempting vault deposit above maximum...");
-	try {
-		await vaultUser1.write.deposit([parseEther("50000")]); // Above 10000 maximum
-	} catch (e: any) {
-		console.log(`    ✅ Failed as expected: above maximum deposit`);
-	}
+	await sendRawTx(
+		user1,
+		vault.address,
+		encodeFunctionData({
+			abi: vault.abi,
+			functionName: "deposit",
+			args: [parseEther("50000")], // Above 10000 maximum
+		}),
+		"above maximum deposit (reverted)",
+	);
 
 	// Swap with high slippage (minAmountOut too high)
 	console.log("  Attempting swap with high slippage requirement...");
-	try {
-		await swapUser1.write.swapAForB([parseEther("100"), parseEther("9999")]); // Impossible output
-	} catch (e: any) {
-		console.log(`    ✅ Failed as expected: insufficient output amount`);
-	}
+	await sendRawTx(
+		user1,
+		simpleSwap.address,
+		encodeFunctionData({
+			abi: simpleSwap.abi,
+			functionName: "swapAForB",
+			args: [parseEther("100"), parseEther("9999")], // Impossible output
+		}),
+		"high slippage swap (reverted)",
+	);
 
 	// Counter incBy with zero
 	console.log("  Attempting counter incBy with zero...");
-	try {
-		await counter.write.incBy([0n]);
-	} catch (e: any) {
-		console.log(`    ✅ Failed as expected: increment should be positive`);
-	}
+	await sendRawTx(
+		deployer,
+		counter.address,
+		encodeFunctionData({
+			abi: counter.abi,
+			functionName: "incBy",
+			args: [0n],
+		}),
+		"counter incBy zero (reverted)",
+	);
 
 	// Withdraw more than deposited
 	console.log("  Attempting to withdraw more than deposited...");
-	try {
-		await vaultUser1.write.withdraw([parseEther("999999")]);
-	} catch (e: any) {
-		console.log(`    ✅ Failed as expected: insufficient balance`);
-	}
+	await sendRawTx(
+		user1,
+		vault.address,
+		encodeFunctionData({
+			abi: vault.abi,
+			functionName: "withdraw",
+			args: [parseEther("999999")],
+		}),
+		"excessive withdraw (reverted)",
+	);
 
 	// NFT transfer of non-owned token
 	console.log("  Attempting NFT transfer of non-owned token...");
-	try {
-		await nftUser1.write.transferFrom([
-			user1.account.address,
-			user2.account.address,
-			0n,
-		]); // Token 0 is owned by deployer
-	} catch (e: any) {
-		console.log(`    ✅ Failed as expected: not owner nor approved`);
-	}
+	await sendRawTx(
+		user1,
+		testNFT.address,
+		encodeFunctionData({
+			abi: testNFT.abi,
+			functionName: "transferFrom",
+			args: [user1.account.address, user2.account.address, 0n], // Token 0 is owned by deployer
+		}),
+		"non-owned NFT transfer (reverted)",
+	);
 
 	console.log("\n  ✅ Failed transaction tests complete\n");
 
@@ -439,26 +548,30 @@ async function main() {
 	console.log("💸 Generating ETH transfers...\n");
 
 	// Send ETH between accounts
-	await deployer.sendTransaction({
+	tx = await deployer.sendTransaction({
 		to: user1.account.address,
 		value: parseEther("10"),
 	});
+	logTx("ETH transfer deployer → user1 (10 ETH)", tx);
 
-	await user1.sendTransaction({
+	tx = await user1.sendTransaction({
 		to: user2.account.address,
 		value: parseEther("2"),
 	});
+	logTx("ETH transfer user1 → user2 (2 ETH)", tx);
 
-	await user2.sendTransaction({
+	tx = await user2.sendTransaction({
 		to: user3.account.address,
 		value: parseEther("0.5"),
 	});
+	logTx("ETH transfer user2 → user3 (0.5 ETH)", tx);
 
 	// Send ETH to contracts
-	await deployer.sendTransaction({
+	tx = await deployer.sendTransaction({
 		to: multicall.address,
 		value: parseEther("1"),
 	});
+	logTx("ETH transfer to multicall contract (1 ETH)", tx);
 
 	console.log("  ✅ ETH transfers complete\n");
 
