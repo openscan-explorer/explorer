@@ -44,7 +44,7 @@ jobs:
         with:
           script: |
             const deployUrl = '${{ steps.netlify.outputs.deploy-url }}';
-            const body = `## 🚀 Preview Deployment Ready!\n\n**Preview URL:** ${deployUrl}\n\n_This preview was automatically deployed from commit ${{ github.sha }}_`;
+            const body = `🚀 **Preview:** ${deployUrl}\n📝 **Commit:** \`${{ github.sha }}\``;
             
             // Find existing comment
             const { data: comments } = await github.rest.issues.listComments({
@@ -55,7 +55,7 @@ jobs:
             
             const botComment = comments.find(comment => 
               comment.user.type === 'Bot' && 
-              comment.body.includes('Preview Deployment Ready')
+              comment.body.includes('Preview:')
             );
             
             if (botComment) {
