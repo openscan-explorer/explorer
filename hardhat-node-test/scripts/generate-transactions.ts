@@ -318,9 +318,6 @@ async function main() {
 		tokenA.address,
 		{ client: { wallet: user1 } },
 	);
-	const tokenBUser2 = await viem.getContractAt("TestToken", tokenB.address, {
-		client: { wallet: user2 },
-	});
 	tx = await tokenAUser1Again.write.approve([
 		simpleSwap.address,
 		parseEther("100000"),
