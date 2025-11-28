@@ -1,15 +1,16 @@
 import { useParams } from "react-router-dom";
 import { useDataService } from "../../hooks/useDataService";
-import { useContext, useEffect, useState } from "react";
-import {
+import { useEffect, useState } from "react";
+import type {
 	Address as AddressType,
 	AddressTransactionsResult,
 	Transaction,
+	DataWithMetadata,
 } from "../../types";
 import AddressDisplay from "../common/AddressDisplay";
 import Loader from "../common/Loader";
-import { useZipJsonReader } from "../../hooks/useZipJsonReader";
-import { AppContext } from "../../context";
+import { useProviderSelection } from "../../hooks/useProviderSelection";
+import { useSelectedData } from "../../hooks/useSelectedData";
 
 export default function Address() {
 	const { chainId, address } = useParams<{
@@ -18,7 +19,8 @@ export default function Address() {
 	}>();
 	const numericChainId = Number(chainId) || 1;
 	const dataService = useDataService(numericChainId);
-	const [addressData, setAddressData] = useState<AddressType | null>(null);
+	const [addressResult, setAddressResult] =
+		useState<DataWithMetadata<AddressType> | null>(null);
 	const [transactionsResult, setTransactionsResult] =
 		useState<AddressTransactionsResult | null>(null);
 	const [transactionDetails, setTransactionDetails] = useState<Transaction[]>(
@@ -27,6 +29,14 @@ export default function Address() {
 	const [loadingTxDetails, setLoadingTxDetails] = useState(false);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
+
+	// Provider selection state
+	const [selectedProvider, setSelectedProvider] = useProviderSelection(
+		`address_${numericChainId}_${address}`,
+	);
+
+	// Extract actual address data based on selected provider
+	const addressData = useSelectedData(addressResult, selectedProvider);
 
 	useEffect(() => {
 		if (!dataService || !address) {
@@ -46,9 +56,9 @@ export default function Address() {
 		// Fetch address data
 		dataService
 			.getAddress(address)
-			.then((fetchedAddress) => {
-				console.log("Fetched address:", fetchedAddress);
-				setAddressData(fetchedAddress);
+			.then((result) => {
+				console.log("Fetched address:", result);
+				setAddressResult(result);
 			})
 			.catch((err) => {
 				console.error("Error fetching address:", err);
@@ -67,7 +77,7 @@ export default function Address() {
 				if (result.transactions.length > 0) {
 					setLoadingTxDetails(true);
 					const txsToFetch = result.transactions.slice(0, 25);
-					const details = await Promise.all(
+					const txResults = await Promise.all(
 						txsToFetch.map((hash) =>
 							dataService.getTransaction(hash).catch((err) => {
 								console.error(`Failed to fetch tx ${hash}:`, err);
@@ -76,7 +86,9 @@ export default function Address() {
 						),
 					);
 					setTransactionDetails(
-						details.filter((tx): tx is Transaction => tx !== null),
+						txResults
+							.filter((result): result is DataWithMetadata<Transaction> => result !== null)
+							.map((result) => result.data),
 					);
 					setLoadingTxDetails(false);
 				}
@@ -143,16 +155,17 @@ export default function Address() {
 	return (
 		<div className="container-wide container-padded">
 			{addressData ? (
-				<>
-					<AddressDisplay
-						address={addressData}
-						addressHash={address}
-						chainId={chainId}
-						transactionsResult={transactionsResult}
-						transactionDetails={transactionDetails}
-						loadingTxDetails={loadingTxDetails}
-					/>
-				</>
+				<AddressDisplay
+					address={addressData}
+					addressHash={address}
+					chainId={chainId}
+					transactionsResult={transactionsResult}
+					transactionDetails={transactionDetails}
+					loadingTxDetails={loadingTxDetails}
+					metadata={addressResult?.metadata}
+					selectedProvider={selectedProvider}
+					onProviderSelect={setSelectedProvider}
+				/>
 			) : (
 				<p>Address data not found</p>
 			)}

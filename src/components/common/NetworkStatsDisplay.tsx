@@ -1,15 +1,27 @@
 import React from "react";
-import { NetworkStats } from "../../types";
+import type { NetworkStats, RPCMetadata } from "../../types";
+import { RPCIndicator } from "./RPCIndicator";
 
 interface NetworkStatsDisplayProps {
 	networkStats: NetworkStats | null;
 	loading?: boolean;
 	error?: string | null;
 	chainId?: number;
+	metadata?: RPCMetadata;
+	selectedProvider?: string | null;
+	onProviderSelect?: (provider: string) => void;
 }
 
 const NetworkStatsDisplay: React.FC<NetworkStatsDisplayProps> = React.memo(
-	({ networkStats, loading = false, error = null, chainId }) => {
+	({
+		networkStats,
+		loading = false,
+		error = null,
+		chainId,
+		metadata,
+		selectedProvider,
+		onProviderSelect,
+	}) => {
 		if (loading) {
 			return (
 				<div className="container-wide network-stats-container">
@@ -104,7 +116,25 @@ const NetworkStatsDisplay: React.FC<NetworkStatsDisplayProps> = React.memo(
 		return (
 			<div className="container-wide network-stats-container">
 				<div className="block-display-card">
-					<h2 className="network-stats-title">Network Statistics</h2>
+					<div
+						style={{
+							display: "flex",
+							justifyContent: "space-between",
+							alignItems: "center",
+							marginBottom: "1rem",
+						}}
+					>
+						<h2 className="network-stats-title" style={{ margin: 0 }}>
+							Network Statistics
+						</h2>
+						{metadata && selectedProvider !== undefined && onProviderSelect && (
+							<RPCIndicator
+								metadata={metadata}
+								selectedProvider={selectedProvider}
+								onProviderSelect={onProviderSelect}
+							/>
+						)}
+					</div>
 
 					<div className="data-grid-3">
 						<div className="block-detail-item">

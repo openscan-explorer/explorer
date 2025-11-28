@@ -6,11 +6,12 @@ import React, {
 	useCallback,
 } from "react";
 import { Link } from "react-router-dom";
-import {
+import type {
 	Transaction,
 	TransactionArbitrum,
 	TransactionReceiptArbitrum,
 	TransactionReceiptOptimism,
+	RPCMetadata,
 } from "../../types";
 import LongString from "./LongString";
 import { DataService } from "../../services/DataService";
@@ -21,16 +22,28 @@ import {
 	formatDecodedValue,
 	getEventTypeColor,
 } from "../../utils/eventDecoder";
+import { RPCIndicator } from "./RPCIndicator";
 
 interface TransactionDisplayProps {
 	transaction: Transaction | TransactionArbitrum;
 	chainId?: string;
 	currentBlockNumber?: number;
 	dataService?: DataService;
+	metadata?: RPCMetadata;
+	selectedProvider?: string | null;
+	onProviderSelect?: (provider: string) => void;
 }
 
 const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
-	({ transaction, chainId, currentBlockNumber, dataService }) => {
+	({
+		transaction,
+		chainId,
+		currentBlockNumber,
+		dataService,
+		metadata,
+		selectedProvider,
+		onProviderSelect,
+	}) => {
 		const [showRawData, setShowRawData] = useState(false);
 		const [showLogs, setShowLogs] = useState(false);
 		const [showTrace, setShowTrace] = useState(false);
@@ -215,8 +228,22 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
 
 		return (
 			<div className="block-display-card">
-				<div className="block-display-header">
+				<div
+					className="block-display-header"
+					style={{
+						display: "flex",
+						justifyContent: "space-between",
+						alignItems: "center",
+					}}
+				>
 					<span className="block-label">Transaction Details</span>
+					{metadata && selectedProvider !== undefined && onProviderSelect && (
+						<RPCIndicator
+							metadata={metadata}
+							selectedProvider={selectedProvider}
+							onProviderSelect={onProviderSelect}
+						/>
+					)}
 				</div>
 
 				{/* Row-based layout like Etherscan */}

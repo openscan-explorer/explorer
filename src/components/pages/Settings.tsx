@@ -92,6 +92,39 @@ const Settings: React.FC = () => {
 				</div>
 			</div>
 
+			{/* RPC Strategy Section */}
+			<div className="settings-section">
+				<h2 className="settings-section-title">⚡ RPC Request Strategy</h2>
+				<p className="settings-section-description">
+					Choose how requests are sent to multiple RPC endpoints.
+				</p>
+
+				<div className="settings-item">
+					<div>
+						<div className="settings-item-label">Request Strategy</div>
+						<div className="settings-item-description">
+							<strong>Fallback:</strong> Try endpoints one by one until one
+							succeeds (reliable, slower).
+							<br />
+							<strong>Parallel:</strong> Query all endpoints simultaneously and
+							use the first successful response (faster, more bandwidth).
+						</div>
+					</div>
+					<select
+						value={settings.rpcStrategy || "fallback"}
+						onChange={(e) =>
+							updateSettings({
+								rpcStrategy: e.target.value as "fallback" | "parallel",
+							})
+						}
+						className="settings-select"
+					>
+						<option value="fallback">Fallback (Default)</option>
+						<option value="parallel">Parallel</option>
+					</select>
+				</div>
+			</div>
+
 			{/* RPC Configuration Section */}
 			<div className="settings-section">
 				<h2 className="settings-section-title">🔗 RPC Endpoints</h2>

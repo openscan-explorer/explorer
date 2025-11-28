@@ -1,9 +1,11 @@
 import { useParams } from "react-router-dom";
 import { useDataService } from "../../hooks/useDataService";
 import { useEffect, useState } from "react";
-import { Transaction } from "../../types";
+import type { Transaction, DataWithMetadata } from "../../types";
 import TransactionDisplay from "../common/TransactionDisplay";
 import Loader from "../common/Loader";
+import { useProviderSelection } from "../../hooks/useProviderSelection";
+import { useSelectedData } from "../../hooks/useSelectedData";
 
 export default function Tx() {
 	const { chainId, filter } = useParams<{
@@ -15,12 +17,21 @@ export default function Tx() {
 	const numericChainId = Number(chainId) || 1;
 
 	const dataService = useDataService(numericChainId);
-	const [transaction, setTransaction] = useState<Transaction | null>(null);
+	const [transactionResult, setTransactionResult] =
+		useState<DataWithMetadata<Transaction> | null>(null);
 	const [currentBlockNumber, setCurrentBlockNumber] = useState<number | null>(
 		null,
 	);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
+
+	// Provider selection state
+	const [selectedProvider, setSelectedProvider] = useProviderSelection(
+		`tx_${numericChainId}_${txHash}`,
+	);
+
+	// Extract actual transaction data based on selected provider
+	const transaction = useSelectedData(transactionResult, selectedProvider);
 
 	useEffect(() => {
 		if (!dataService || !txHash) {
@@ -36,10 +47,10 @@ export default function Tx() {
 			dataService.getTransaction(txHash),
 			dataService.getLatestBlockNumber(),
 		])
-			.then(([fetchedTransaction, latestBlock]) => {
-				console.log("Fetched transaction:", fetchedTransaction);
+			.then(([result, latestBlock]) => {
+				console.log("Fetched transaction:", result);
 				console.log("Latest block number:", latestBlock);
-				setTransaction(fetchedTransaction);
+				setTransactionResult(result);
 				setCurrentBlockNumber(latestBlock);
 			})
 			.catch((err) => {
@@ -84,14 +95,15 @@ export default function Tx() {
 	return (
 		<div className="container-wide container-padded">
 			{transaction ? (
-				<>
-					<TransactionDisplay
-						transaction={transaction}
-						chainId={chainId}
-						currentBlockNumber={currentBlockNumber || undefined}
-						dataService={dataService}
-					/>
-				</>
+				<TransactionDisplay
+					transaction={transaction}
+					chainId={chainId}
+					currentBlockNumber={currentBlockNumber || undefined}
+					dataService={dataService}
+					metadata={transactionResult?.metadata}
+					selectedProvider={selectedProvider}
+					onProviderSelect={setSelectedProvider}
+				/>
 			) : (
 				<div className="block-display-card">
 					<div className="block-display-header">

@@ -1,14 +1,18 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { Block, BlockArbitrum } from "../../types";
+import type { Block, BlockArbitrum, RPCMetadata } from "../../types";
+import { RPCIndicator } from "./RPCIndicator";
 
 interface BlockDisplayProps {
 	block: Block | BlockArbitrum;
 	chainId?: string;
+	metadata?: RPCMetadata;
+	selectedProvider?: string | null;
+	onProviderSelect?: (provider: string) => void;
 }
 
 const BlockDisplay: React.FC<BlockDisplayProps> = React.memo(
-	({ block, chainId }) => {
+	({ block, chainId, metadata, selectedProvider, onProviderSelect }) => {
 		const [showWithdrawals, setShowWithdrawals] = useState(false);
 		const [showTransactions, setShowTransactions] = useState(false);
 		const [showMoreDetails, setShowMoreDetails] = useState(false);
@@ -102,8 +106,22 @@ const BlockDisplay: React.FC<BlockDisplayProps> = React.memo(
 
 		return (
 			<div className="block-display-card">
-				<div className="block-display-header">
+				<div
+					className="block-display-header"
+					style={{
+						display: "flex",
+						justifyContent: "space-between",
+						alignItems: "center",
+					}}
+				>
 					<span className="block-label">Block Details</span>
+					{metadata && selectedProvider !== undefined && onProviderSelect && (
+						<RPCIndicator
+							metadata={metadata}
+							selectedProvider={selectedProvider}
+							onProviderSelect={onProviderSelect}
+						/>
+					)}
 				</div>
 
 				<div className="tx-details">

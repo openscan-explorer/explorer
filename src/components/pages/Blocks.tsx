@@ -6,7 +6,7 @@ import {
 } from "react-router-dom";
 import { useDataService } from "../../hooks/useDataService";
 import { useEffect, useState } from "react";
-import { Block } from "../../types";
+import type { Block } from "../../types";
 import Loader from "../common/Loader";
 
 const BLOCKS_PER_PAGE = 10;
@@ -53,12 +53,13 @@ export default function Blocks() {
 				).filter((num) => num >= 0);
 
 				// Fetch blocks in parallel
-				const fetchedBlocks = await Promise.all(
+				const blockResults = await Promise.all(
 					blockNumbers.map((num) => dataService.getBlock(num)),
 				);
 
-				console.log("Fetched blocks:", fetchedBlocks);
-				setBlocks(fetchedBlocks);
+				console.log("Fetched blocks:", blockResults);
+				// Extract data from results
+				setBlocks(blockResults.map((result) => result.data));
 			} catch (err: any) {
 				console.error("Error fetching blocks:", err);
 				setError(err.message || "Failed to fetch blocks");
@@ -68,7 +69,7 @@ export default function Blocks() {
 		};
 
 		fetchBlocks();
-	}, [dataService, numericChainId, fromBlock]);
+	}, [dataService, fromBlock]);
 
 	const truncate = (str: string, start = 10, end = 8) => {
 		if (!str) return "";
