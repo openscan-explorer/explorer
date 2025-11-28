@@ -19,7 +19,7 @@ const Footer: React.FC<FooterProps> = ({ className = "" }) => {
 
 	// Get the GitHub repository URL from package.json or environment
 	const repoUrl =
-		process.env.REACT_APP_GITHUB_REPO || "https://github.com/AugustoL/openscan";
+		process.env.REACT_APP_GITHUB_REPO || "https://github.com/openscan-explorer/explorer";
 
 	return (
 		<footer className={`app-footer ${className}`}>

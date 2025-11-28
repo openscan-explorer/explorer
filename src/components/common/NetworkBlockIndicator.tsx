@@ -50,7 +50,13 @@ const EthereumIcon = ({ color }: { color: string }) => (
 );
 
 // BSC/BNB SVG icon
-const BscIcon = ({ color, opacity = 1 }: { color: string; opacity?: number }) => (
+const BscIcon = ({
+	color,
+	opacity = 1,
+}: {
+	color: string;
+	opacity?: number;
+}) => (
 	<svg
 		width="20"
 		height="20"

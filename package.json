@@ -21,6 +21,7 @@
 		"build": "webpack --config webpack.config.js --mode production",
 		"test": "vitest",
 		"test:run": "vitest run",
+		"dev": "bash scripts/run-test-env.sh",
 		"eject": "react-scripts eject",
 		"typecheck": "tsc --noEmit",
 		"format:fix": "npx @biomejs/biome format --write"

@@ -131,6 +131,15 @@ export class AddressFetcher {
 		const paddedAddress =
 			"0x" + address.toLowerCase().slice(2).padStart(64, "0");
 
+		// Get logs emitted BY this address (for contracts)
+		const logsFromContract = await this.rpcClient.call<LogEntry[]>("eth_getLogs", [
+			{
+				fromBlock: fromBlockParam,
+				toBlock: toBlockParam,
+				address: address,
+			},
+		]);
+
 		// Get logs where address is in topic1 (common for from/owner in Transfer/Approval)
 		const logsAsTopic1 = await this.rpcClient.call<LogEntry[]>("eth_getLogs", [
 			{
@@ -149,8 +158,15 @@ export class AddressFetcher {
 			},
 		]);
 
-		// Combine all logs
-		return [...logsAsTopic1, ...logsAsTopic2];
+		// Combine all logs and deduplicate
+		const allLogs = [...logsFromContract, ...logsAsTopic1, ...logsAsTopic2];
+		const seen = new Set<string>();
+		return allLogs.filter(log => {
+			const key = `${log.transactionHash}-${log.logIndex}`;
+			if (seen.has(key)) return false;
+			seen.add(key);
+			return true;
+		});
 	}
 
 	/**

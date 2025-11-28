@@ -9,7 +9,7 @@ const STORAGE_KEY = "OPENSCAN_RPC_URLS_V1";
 export const RPC_ENDPOINTS: RpcUrlsContextType = {
 	// Mainnet - with fallback URLs
 	1: [
-		process.env.REACT_APP_MAINNET_RPC || "https://eth.llamarpc.com",
+		"https://eth.llamarpc.com",
 		"https://rpc.ankr.com/eth",
 		"https://ethereum.publicnode.com",
 		"https://1rpc.io/eth",
@@ -17,60 +17,55 @@ export const RPC_ENDPOINTS: RpcUrlsContextType = {
 
 	// Sepolia - with fallback URLs
 	11155111: [
-		process.env.REACT_APP_SEPOLIA_RPC || "https://sepolia.infura.io",
+		"https://sepolia.infura.io",
 		"https://rpc.sepolia.org",
 		"https://rpc2.sepolia.org",
 		"https://ethereum-sepolia.publicnode.com",
 	].filter(Boolean) as string[],
 
 	// Hardhat/Localhost
-	31337: [process.env.REACT_APP_LOCAL_RPC || "http://127.0.0.1:8545"].filter(
-		Boolean,
-	) as string[],
+	31337: ["http://127.0.0.1:8545"].filter(Boolean) as string[],
 
 	// Aztec Sandbox
-	677868: [process.env.REACT_APP_AZTEC_RPC || "http://localhost:8080"].filter(
-		Boolean,
-	) as string[],
+	677868: ["http://localhost:8080"].filter(Boolean) as string[],
 
 	// Arbitrum One
 	42161: [
-		process.env.REACT_APP_ARBITRUM_RPC || "https://arb1.arbitrum.io/rpc",
+		"https://arb1.arbitrum.io/rpc",
 		"https://arbitrum.llamarpc.com",
 		"https://arbitrum-one.publicnode.com",
 	].filter(Boolean) as string[],
 
 	// Optimism Mainnet
 	10: [
-		process.env.REACT_APP_OPTIMISM_RPC || "https://mainnet.optimism.io",
+		"https://mainnet.optimism.io",
 		"https://optimism.llamarpc.com",
 		"https://optimism.publicnode.com",
 	].filter(Boolean) as string[],
 
 	// Base Mainnet
 	8453: [
-		process.env.REACT_APP_BASE_RPC || "https://mainnet.base.org",
+		"https://mainnet.base.org",
 		"https://base.llamarpc.com",
 		"https://base.publicnode.com",
 	].filter(Boolean) as string[],
 
 	// BSC Mainnet
 	56: [
-		process.env.REACT_APP_BSC_RPC || "https://bsc-dataseed.binance.org",
+		"https://bsc-dataseed.binance.org",
 		"https://bsc.publicnode.com",
 		"https://binance.llamarpc.com",
 	].filter(Boolean) as string[],
 
 	// BSC Testnet
 	97: [
-		process.env.REACT_APP_BSC_TESTNET_RPC ||
-			"https://data-seed-prebsc-1-s1.binance.org:8545",
+		"https://data-seed-prebsc-1-s1.binance.org:8545",
 		"https://bsc-testnet.publicnode.com",
 	].filter(Boolean) as string[],
 
 	// Polygon POS
 	137: [
-		process.env.REACT_APP_POLYGON_RPC || "https://polygon-rpc.com",
+		"https://polygon-rpc.com",
 		"https://polygon.llamarpc.com",
 		"https://polygon-bor.publicnode.com",
 	].filter(Boolean) as string[],

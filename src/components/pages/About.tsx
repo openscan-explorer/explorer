@@ -107,7 +107,7 @@ const About: React.FC = () => {
 						and feature requests are welcome!
 					</p>
 					<a
-						href="https://github.com/AugustoL/openscan"
+						href="https://github.com/openscan-explorer/explorer"
 						target="_blank"
 						rel="noopener noreferrer"
 						className="button-primary-inline"

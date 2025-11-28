@@ -1,6 +1,7 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useMemo } from "react";
 import { AppContext } from "../../context/AppContext";
 import { useSettings } from "../../context/SettingsContext";
+import { getEnabledNetworks } from "../../config/networks";
 import type { RpcUrlsContextType, RPCUrls } from "../../types";
 
 const Settings: React.FC = () => {
@@ -40,17 +41,13 @@ const Settings: React.FC = () => {
 		setTimeout(() => setSaveSuccess(false), 3000);
 	};
 
-	const chainConfigs = [
-		{ id: 1, name: "Ethereum Mainnet" },
-		{ id: 11155111, name: "Sepolia Testnet" },
-		{ id: 42161, name: "Arbitrum One" },
-		{ id: 10, name: "Optimism Mainnet" },
-		{ id: 8453, name: "Base Mainnet" },
-		{ id: 56, name: "BSC Mainnet" },
-		{ id: 97, name: "BSC Testnet" },
-		{ id: 137, name: "Polygon POS" },
-		{ id: 31337, name: "Local Hardhat" },
-	];
+	// Get enabled networks from config
+	const chainConfigs = useMemo(() => {
+		return getEnabledNetworks().map((network) => ({
+			id: network.chainId,
+			name: network.name,
+		}));
+	}, []);
 
 	return (
 		<div className="container-wide settings-container">

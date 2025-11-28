@@ -22,7 +22,7 @@ module.exports = {
 	output: {
 		path: path.resolve(__dirname, "dist"),
 		filename: "bundle.js",
-		publicPath: isGhPages ? "/openscan/" : "/", // key for GH Pages
+		publicPath: isGhPages ? "/explorer/" : "/", // key for GH Pages
 		clean: true,
 		charset: false,
 	},
@@ -108,7 +108,6 @@ module.exports = {
 				},
 			],
 		}),
-		new DotenvWebpackPlugin(),
 		...(process.env.NODE_ENV !== "production"
 			? [new webpack.HotModuleReplacementPlugin()]
 			: []),
@@ -118,10 +117,16 @@ module.exports = {
 			),
 			"process.env.REACT_APP_GITHUB_REPO": JSON.stringify(
 				process.env.REACT_APP_GITHUB_REPO ||
-					"https://github.com/AugustoL/openscan",
+					"https://github.com/openscan-explorer/explorer",
 			),
 			"process.env.REACT_APP_VERSION": JSON.stringify(
 				process.env.REACT_APP_VERSION || packageJson.version,
+			),
+			"process.env.REACT_APP_OPENSCAN_NETWORKS": JSON.stringify(
+				process.env.REACT_APP_OPENSCAN_NETWORKS || "",
+			),
+			"process.env.REACT_APP_ENVIRONMENT": JSON.stringify(
+				process.env.NODE_ENV || "production",
 			),
 		}),
 	],

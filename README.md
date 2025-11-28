@@ -1,15 +1,15 @@
 <p align="center">
-  <img src="https://augustol.github.io/openscan/openscan-logo.png" alt="OpenScan Logo" width="128" height="128">
+  <img src="https://openscan.github.io/explorer/openscan-logo.png" alt="OpenScan Logo" width="128" height="128">
 </p>
 
 # OpenScan
 
-![Production IPFS Hash](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/AugustoL/e3a56e2c5255a748f6334af4c9c58bfc/raw/ipfs-hash.json)
+![Production IPFS Hash](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/openscan-explorer/explorer/meta/ipfs-hash.json)
 
 A trustless, open-source, standalone web-app, multi-chain blockchain explorer for Ethereum, Layer 2 networks, and local development chains, allowing the direct interaction with verified smart contracts.
 
 **Official URL:** [https://openscan.eth.link/](https://openscan.eth.link/)  
-**GitHub Pages:** [https://augustol.github.io/openscan/](https://augustol.github.io/openscan/)
+**GitHub Pages:** [https://openscan.github.io/explorer/](https://openscan.github.io/explorer/)
 
 ## Features
 
@@ -88,6 +88,24 @@ After following the installation steps here https://getfoundry.sh/introduction/i
 ### Use with Hardhat node
 
 If you run any Hardhat node instance on the port 8545 it would be automatically detected by Openscan, if you run hardhat node on a different port make sure to change the RPC on the app settings.
+
+### Test Environment Script
+
+For development and testing, use the included script that starts a local node with sample transactions and OpenScan:
+
+```bash
+# Run with npm script
+npm run dev
+
+# Run the script directly
+bash scripts/run-test-hardhat-env.sh
+```
+
+This script will:
+1. Start a Hardhat or Anvil node on port 8545.
+2. Deploy test contracts and generate sample transactions
+3. Start OpenScan with only Ethereum Mainnet and Localhost networks enabled
+4. Create a `hardhat-test-artifacts.zip` for importing contract ABIs
 
 ### Build for Production
 
