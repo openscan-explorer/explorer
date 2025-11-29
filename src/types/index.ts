@@ -468,3 +468,40 @@ export interface AddressTransactionsResult {
 	isComplete: boolean; // true if we have full history (trace_filter)
 	message?: string; // Optional message about limitations
 }
+
+// ==================== ENS TYPES ====================
+
+/**
+ * ENS records for a name
+ */
+export interface ENSRecords {
+	name?: string;
+	address?: string;
+	contenthash?: string;
+	textRecords: Record<string, string>;
+}
+
+/**
+ * Result of ENS forward resolution
+ */
+export interface ENSResolveResult {
+	address: string;
+	ensName: string;
+	records?: ENSRecords;
+}
+
+/**
+ * Result of ENS reverse resolution
+ */
+export interface ENSReverseResult {
+	ensName: string | null;
+	verified: boolean; // true if forward resolution matches the original address
+}
+
+/**
+ * Decoded contenthash
+ */
+export interface DecodedContenthash {
+	type: string;
+	url: string;
+}

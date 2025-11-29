@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import { useDataService } from "../../hooks/useDataService";
 import { useEffect, useState } from "react";
 import type {
@@ -11,12 +11,14 @@ import AddressDisplay from "../common/AddressDisplay";
 import Loader from "../common/Loader";
 import { useProviderSelection } from "../../hooks/useProviderSelection";
 import { useSelectedData } from "../../hooks/useSelectedData";
+import { useENS } from "../../hooks/useENS";
 
 export default function Address() {
 	const { chainId, address } = useParams<{
 		chainId?: string;
 		address?: string;
 	}>();
+	const location = useLocation();
 	const numericChainId = Number(chainId) || 1;
 	const dataService = useDataService(numericChainId);
 	const [addressResult, setAddressResult] =
@@ -37,6 +39,19 @@ export default function Address() {
 
 	// Extract actual address data based on selected provider
 	const addressData = useSelectedData(addressResult, selectedProvider);
+
+	// Get ENS name from navigation state (if user searched by ENS name)
+	const initialEnsName = (location.state as { ensName?: string })?.ensName;
+
+	// Use ENS hook to get reverse lookup and records
+	const {
+		ensName,
+		reverseResult,
+		records: ensRecords,
+		decodedContenthash,
+		loading: ensLoading,
+		isMainnet,
+	} = useENS(address, numericChainId, initialEnsName);
 
 	useEffect(() => {
 		if (!dataService || !address) {
@@ -165,6 +180,12 @@ export default function Address() {
 					metadata={addressResult?.metadata}
 					selectedProvider={selectedProvider}
 					onProviderSelect={setSelectedProvider}
+					ensName={ensName}
+					reverseResult={reverseResult}
+					ensRecords={ensRecords}
+					decodedContenthash={decodedContenthash}
+					ensLoading={ensLoading}
+					isMainnet={isMainnet}
 				/>
 			) : (
 				<p>Address data not found</p>

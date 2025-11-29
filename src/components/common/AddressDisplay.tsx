@@ -6,6 +6,9 @@ import type {
 	AddressTransactionsResult,
 	Transaction,
 	RPCMetadata,
+	ENSRecords,
+	ENSReverseResult,
+	DecodedContenthash,
 } from "../../types";
 import { AppContext } from "../../context";
 import {
@@ -14,6 +17,7 @@ import {
 } from "wagmi";
 import { parseEther, encodeFunctionData } from "viem";
 import { RPCIndicator } from "./RPCIndicator";
+import ENSRecordsDisplay from "./ENSRecordsDisplay";
 
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 
@@ -27,6 +31,13 @@ interface AddressDisplayProps {
 	metadata?: RPCMetadata;
 	selectedProvider?: string | null;
 	onProviderSelect?: (provider: string) => void;
+	// ENS props
+	ensName?: string | null;
+	reverseResult?: ENSReverseResult | null;
+	ensRecords?: ENSRecords | null;
+	decodedContenthash?: DecodedContenthash | null;
+	ensLoading?: boolean;
+	isMainnet?: boolean;
 }
 
 const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
@@ -40,6 +51,12 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
 		metadata,
 		selectedProvider,
 		onProviderSelect,
+		ensName,
+		reverseResult,
+		ensRecords,
+		decodedContenthash,
+		ensLoading = false,
+		isMainnet = true,
 	}) => {
 		const [storageSlot, setStorageSlot] = useState("");
 		const [storageValue, setStorageValue] = useState("");
@@ -331,6 +348,18 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
 				>
 					<div>
 						<span className="block-label">Address</span>
+						{(ensName || reverseResult?.ensName) && (
+							<span
+								style={{
+									marginLeft: "12px",
+									fontSize: "1rem",
+									fontWeight: "600",
+									color: "#10b981",
+								}}
+							>
+								{ensName || reverseResult?.ensName}
+							</span>
+						)}
 						<span className="tx-mono header-subtitle">{addressHash}</span>
 					</div>
 					{metadata && selectedProvider !== undefined && onProviderSelect && (
@@ -434,6 +463,18 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
 							</div>
 						)}
 					</div>
+
+					{/* ENS Records Section */}
+					{(ensName || reverseResult?.ensName || ensLoading) && (
+						<ENSRecordsDisplay
+							ensName={ensName || null}
+							reverseResult={reverseResult}
+							records={ensRecords}
+							decodedContenthash={decodedContenthash}
+							loading={ensLoading}
+							isMainnet={isMainnet}
+						/>
+					)}
 
 					{/* Contract Verification Details */}
 					{isContract && (isVerified || parsedLocalData) && contractData && (
