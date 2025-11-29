@@ -15,6 +15,37 @@
 	margin-bottom: 16px;
 }
 
+.unit-converter-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+	gap: 12px;
+}
+
+.unit-converter-list {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	max-width: 500px;
+}
+
+.unit-converter-row {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.unit-converter-label {
+	font-size: 0.85rem;
+	font-weight: 600;
+	color: #6b7280;
+	min-width: 110px;
+	flex-shrink: 0;
+}
+
+.unit-converter-row .devtools-input {
+	flex: 1;
+}
+
 .data-grid-auto {
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));

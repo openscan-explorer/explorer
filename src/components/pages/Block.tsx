@@ -1,11 +1,13 @@
 import { useParams } from "react-router-dom";
 import { useDataService } from "../../hooks/useDataService";
 import { useEffect, useState } from "react";
-import { Block } from "../../types";
+import type { Block, DataWithMetadata } from "../../types";
 import BlockDisplay from "../common/BlockDisplay";
 import Loader from "../common/Loader";
+import { useProviderSelection } from "../../hooks/useProviderSelection";
+import { useSelectedData } from "../../hooks/useSelectedData";
 
-export default function Block() {
+export default function BlockPage() {
 	const { chainId, filter } = useParams<{
 		chainId?: string;
 		filter?: string;
@@ -15,13 +17,23 @@ export default function Block() {
 		blockNumber: string;
 	}>();
 
-	const blockNumber = filter == "latest" ? "latest" : Number(filter);
+	const blockNumber = filter === "latest" ? "latest" : Number(filter);
 	const numericChainId = Number(chainId) || 1;
 
 	const dataService = useDataService(numericChainId);
-	const [block, setBlock] = useState<Block | null>(null);
+	const [blockResult, setBlockResult] = useState<DataWithMetadata<Block> | null>(
+		null,
+	);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
+
+	// Provider selection state
+	const [selectedProvider, setSelectedProvider] = useProviderSelection(
+		`block_${numericChainId}_${blockNumber}`,
+	);
+
+	// Extract actual block data based on selected provider
+	const block = useSelectedData(blockResult, selectedProvider);
 
 	useEffect(() => {
 		if (!dataService || blockNumber === undefined) {
@@ -35,9 +47,9 @@ export default function Block() {
 
 		dataService
 			.getBlock(blockNumber)
-			.then((fetchedBlock) => {
-				console.log("Fetched block:", fetchedBlock);
-				setBlock(fetchedBlock);
+			.then((result) => {
+				console.log("Fetched block:", result);
+				setBlockResult(result);
 			})
 			.catch((err) => {
 				console.error("Error fetching block:", err);
@@ -81,9 +93,13 @@ export default function Block() {
 	return (
 		<div className="container-wide container-padded">
 			{block ? (
-				<>
-					<BlockDisplay block={block} chainId={chainId} />
-				</>
+				<BlockDisplay
+					block={block}
+					chainId={chainId}
+					metadata={blockResult?.metadata}
+					selectedProvider={selectedProvider}
+					onProviderSelect={setSelectedProvider}
+				/>
 			) : (
 				<div className="block-display-card">
 					<div className="block-display-header">

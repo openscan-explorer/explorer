@@ -17,14 +17,39 @@ export interface RPCResponse<T = any> {
 	};
 }
 
+export interface ParallelRequestResult<T = any> {
+	url: string;
+	status: "fulfilled" | "rejected";
+	response?: T;
+	error?: any;
+}
+
+export type RPCStrategy = "fallback" | "parallel";
+
+export interface RPCClientConfig {
+	rpcUrls: string | string[];
+	strategy?: RPCStrategy;
+}
+
 export class RPCClient {
 	private requestId = 0;
 	private rpcUrls: string[];
 	private currentUrlIndex = 0;
+	private strategy: RPCStrategy = "fallback";
 
-	constructor(rpcUrls: string | string[]) {
-		// Support both single URL (backwards compatibility) and array of URLs
-		this.rpcUrls = Array.isArray(rpcUrls) ? rpcUrls : [rpcUrls];
+	constructor(config: string | string[] | RPCClientConfig) {
+		// Support multiple constructor signatures for backwards compatibility
+		if (typeof config === "string" || Array.isArray(config)) {
+			// Legacy: just URLs provided
+			this.rpcUrls = Array.isArray(config) ? config : [config];
+			this.strategy = "fallback";
+		} else {
+			// New config object
+			this.rpcUrls = Array.isArray(config.rpcUrls)
+				? config.rpcUrls
+				: [config.rpcUrls];
+			this.strategy = config.strategy || "fallback";
+		}
 
 		if (this.rpcUrls.length === 0) {
 			throw new Error("At least one RPC URL must be provided");
@@ -46,6 +71,65 @@ export class RPCClient {
 	}
 
 	/**
+	 * Get the current request strategy
+	 */
+	getStrategy(): RPCStrategy {
+		return this.strategy;
+	}
+
+	/**
+	 * Set the request strategy
+	 * @param strategy - "fallback" for sequential fallback or "parallel" for parallel requests
+	 */
+	setStrategy(strategy: RPCStrategy): void {
+		this.strategy = strategy;
+	}
+
+	/**
+	 * Make a single RPC request to a specific URL without fallback
+	 */
+	private async makeRequest<T = any>(
+		url: string,
+		method: string,
+		params: any[] = [],
+	): Promise<T> {
+		const request: RPCRequest = {
+			jsonrpc: "2.0",
+			id: ++this.requestId,
+			method,
+			params,
+		};
+
+		const response = await fetch(url, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify(request),
+		});
+
+		if (!response.ok) {
+			throw new Error(
+				`RPC request failed: ${response.status} ${response.statusText}`,
+			);
+		}
+
+		const data: RPCResponse<T> = await response.json();
+
+		if (data.error) {
+			throw new Error(
+				`RPC error: ${data.error.message} (code: ${data.error.code})`,
+			);
+		}
+
+		if (data.result === undefined) {
+			throw new Error("RPC response missing result");
+		}
+
+		return data.result;
+	}
+
+	/**
 	 * Attempt an RPC call with automatic fallback to other URLs on failure
 	 */
 	private async callWithFallback<T = any>(
@@ -62,46 +146,17 @@ export class RPCClient {
 			throw new Error(`All RPC endpoints failed:\n${errorMessages}`);
 		}
 
-		const rpcUrl = this.rpcUrls[urlIndex]!;
-
+		const rpcUrl = this.rpcUrls[urlIndex];
+		if (!rpcUrl) {
+			throw new Error(`RPC URL at index ${urlIndex} is undefined`);
+		}
 		try {
-			const request: RPCRequest = {
-				jsonrpc: "2.0",
-				id: ++this.requestId,
-				method,
-				params,
-			};
-
-			const response = await fetch(rpcUrl, {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify(request),
-			});
-
-			if (!response.ok) {
-				throw new Error(
-					`RPC request failed: ${response.status} ${response.statusText}`,
-				);
-			}
-
-			const data: RPCResponse<T> = await response.json();
-
-			if (data.error) {
-				throw new Error(
-					`RPC error: ${data.error.message} (code: ${data.error.code})`,
-				);
-			}
-
-			if (data.result === undefined) {
-				throw new Error("RPC response missing result");
-			}
+			const result = await this.makeRequest<T>(rpcUrl, method, params);
 
 			// Success! Update the current URL index for future calls
 			this.currentUrlIndex = urlIndex;
 
-			return data.result;
+			return result;
 		} catch (error) {
 			const err = error instanceof Error ? error : new Error(String(error));
 			errors.push(err);
@@ -116,9 +171,37 @@ export class RPCClient {
 			`RPCClient.call: ${method}`,
 			"params:",
 			params,
+			"strategy:",
+			this.strategy,
 			"using URLs:",
 			this.rpcUrls,
 		);
+
+		// Use parallel strategy if configured
+		if (this.strategy === "parallel") {
+			const results = await this.parallelCall<T>(method, params);
+
+			// Find the first successful result
+			const successful = results.find((r) => r.status === "fulfilled");
+			if (successful && successful.response !== undefined) {
+				return successful.response;
+			}
+
+			// All failed - throw error with details
+			const errorMessages = results
+				.map((r) =>
+					r.status === "rejected"
+						? `  ${r.url}: ${r.error?.message || "Unknown error"}`
+						: null,
+				)
+				.filter(Boolean)
+				.join("\n");
+			throw new Error(
+				`All RPC endpoints failed (parallel strategy):\n${errorMessages}`,
+			);
+		}
+
+		// Use fallback strategy (default)
 		// Start with the current working URL, then try others if it fails
 		const orderedIndices = [
 			this.currentUrlIndex,
@@ -162,7 +245,13 @@ export class RPCClient {
 		const allErrors: Error[] = [];
 
 		for (const urlIndex of orderedIndices) {
-			const rpcUrl = this.rpcUrls[urlIndex]!;
+			const rpcUrl = this.rpcUrls[urlIndex];
+			if (!rpcUrl) {
+				allErrors.push(
+					new Error(`RPC URL at index ${urlIndex} is undefined`),
+				);
+				continue;
+			}
 
 			try {
 				const requests: RPCRequest[] = calls.map((call) => ({
@@ -194,7 +283,7 @@ export class RPCClient {
 							`RPC error: ${item.error.message} (code: ${item.error.code})`,
 						);
 					}
-					return item.result!;
+					return item.result as T;
 				});
 
 				// Success! Update current URL index
@@ -217,5 +306,60 @@ export class RPCClient {
 		throw new Error(
 			`All RPC endpoints failed for batch call:\n${errorMessages}`,
 		);
+	}
+
+	/**
+	 * Send the same RPC request to all configured URLs in parallel
+	 * Returns detailed results for each endpoint including success/failure status
+	 *
+	 * @param method - The RPC method to call
+	 * @param params - The parameters for the RPC method
+	 * @returns Array of results containing the status and response/error for each URL
+	 */
+	async parallelCall<T = any>(
+		method: string,
+		params: any[] = [],
+	): Promise<ParallelRequestResult<T>[]> {
+		console.log(
+			`RPCClient.parallelCall: ${method}`,
+			"params:",
+			params,
+			"to all URLs:",
+			this.rpcUrls,
+		);
+
+		// Create a promise for each URL
+		const promises = this.rpcUrls.map((url) =>
+			this.makeRequest<T>(url, method, params),
+		);
+
+		// Execute all requests in parallel and wait for all to settle
+		const results = await Promise.allSettled(promises);
+
+		// Map the results to our typed format
+		return results.map((result, index) => {
+			const url = this.rpcUrls[index]!;
+
+			if (result.status === "fulfilled") {
+				return {
+					url,
+					status: "fulfilled",
+					response: result.value,
+				};
+			} else {
+				return {
+					url,
+					status: "rejected",
+					error:
+						result.reason instanceof Error
+							? {
+									message: result.reason.message,
+									name: result.reason.name,
+									stack: result.reason.stack,
+								}
+							: result.reason,
+				};
+			}
+		});
 	}
 }

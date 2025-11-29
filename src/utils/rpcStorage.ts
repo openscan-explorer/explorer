@@ -1,4 +1,4 @@
-import { RpcUrlsContextType } from "../types";
+import type { RpcUrlsContextType } from "../types";
 
 const STORAGE_KEY = "OPENSCAN_RPC_URLS_V1";
 /**
@@ -7,15 +7,14 @@ const STORAGE_KEY = "OPENSCAN_RPC_URLS_V1";
  * Multiple URLs per network are supported for fallback functionality
  */
 export const RPC_ENDPOINTS: RpcUrlsContextType = {
-	// Mainnet - with fallback URLs
+	// Mainnet
 	1: [
 		"https://eth.llamarpc.com",
-		"https://rpc.ankr.com/eth",
 		"https://ethereum.publicnode.com",
 		"https://1rpc.io/eth",
 	].filter(Boolean) as string[],
 
-	// Sepolia - with fallback URLs
+	// Sepolia
 	11155111: [
 		"https://sepolia.infura.io",
 		"https://rpc.sepolia.org",
@@ -25,9 +24,6 @@ export const RPC_ENDPOINTS: RpcUrlsContextType = {
 
 	// Hardhat/Localhost
 	31337: ["http://127.0.0.1:8545"].filter(Boolean) as string[],
-
-	// Aztec Sandbox
-	677868: ["http://localhost:8080"].filter(Boolean) as string[],
 
 	// Arbitrum One
 	42161: [

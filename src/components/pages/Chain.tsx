@@ -4,15 +4,26 @@ import { useEffect, useState } from "react";
 import SearchBox from "../common/SearchBox";
 import NetworkStatsDisplay from "../common/NetworkStatsDisplay";
 import Loader from "../common/Loader";
-import { NetworkStats } from "../../types";
+import type { NetworkStats, DataWithMetadata } from "../../types";
+import { useProviderSelection } from "../../hooks/useProviderSelection";
+import { useSelectedData } from "../../hooks/useSelectedData";
 
 export default function Chain() {
 	const { chainId } = useParams<{ chainId?: string }>();
 	const numericChainId = Number(chainId) || 1;
 	const dataService = useDataService(numericChainId);
-	const [networkStats, setNetworkStats] = useState<NetworkStats | null>(null);
+	const [networkStatsResult, setNetworkStatsResult] =
+		useState<DataWithMetadata<NetworkStats> | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
+
+	// Provider selection state
+	const [selectedProvider, setSelectedProvider] = useProviderSelection(
+		`networkStats_${numericChainId}`,
+	);
+
+	// Extract actual network stats based on selected provider
+	const networkStats = useSelectedData(networkStatsResult, selectedProvider);
 
 	useEffect(() => {
 		if (!dataService) {
@@ -25,14 +36,14 @@ export default function Chain() {
 
 		dataService
 			.getNetworkStats()
-			.then((stats) => {
-				setNetworkStats(stats);
+			.then((result) => {
+				setNetworkStatsResult(result);
 			})
 			.catch((err) => {
 				setError(err.message || "Failed to fetch network stats");
 			})
 			.finally(() => setLoading(false));
-	}, [dataService, numericChainId]);
+	}, [dataService]);
 
 	return (
 		<div className="home-container">
@@ -45,6 +56,9 @@ export default function Chain() {
 					<NetworkStatsDisplay
 						networkStats={networkStats}
 						chainId={numericChainId}
+						metadata={networkStatsResult?.metadata}
+						selectedProvider={selectedProvider}
+						onProviderSelect={setSelectedProvider}
 					/>
 				)}
 			</div>

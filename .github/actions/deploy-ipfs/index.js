@@ -50,7 +50,10 @@ async function run() {
 		// Upload directory to IPFS
 		console.log("🚀 Uploading to IPFS...");
 
-		const result = await pinata.upload.public.fileArray(files).name(pinName);
+		const result = await pinata.upload.public
+			.fileArray(files)
+			.name(pinName)
+			.cidVersion(0); // Use CIDv0 format (Qm...)
 
 		console.log("✅ Upload successful!");
 		console.log(`📍 IPFS Hash: ${result.cid}`);

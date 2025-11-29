@@ -5,10 +5,11 @@ import { BlockFetcher } from "./EVM/L1/fetchers/block";
 import { TransactionFetcher } from "./EVM/L1/fetchers/transaction";
 import { AddressFetcher } from "./EVM/L1/fetchers/address";
 import { NetworkStatsFetcher } from "./EVM/L1/fetchers/networkStats";
-import { TraceFetcher, TraceResult } from "./EVM/L1/fetchers/trace";
+import { TraceFetcher, type TraceResult } from "./EVM/L1/fetchers/trace";
 import { BlockAdapter } from "./EVM/L1/adapters/block";
 import { TransactionAdapter } from "./EVM/L1/adapters/transaction";
 import { AddressAdapter } from "./EVM/L1/adapters/address";
+import { RPCMetadataService } from "./RPCMetadataService";
 // Arbitrum imports
 import { BlockFetcher as BlockFetcherArbitrum } from "./EVM/Arbitrum/fetchers/block";
 import { TransactionFetcher as TransactionFetcherArbitrum } from "./EVM/Arbitrum/fetchers/transaction";
@@ -32,6 +33,9 @@ import type {
 	NetworkStats,
 	RpcUrlsContextType,
 	AddressTransactionsResult,
+	RPCStrategy,
+	DataWithMetadata,
+	RPCMetadata,
 } from "../types";
 
 interface CacheEntry<T> {
@@ -69,11 +73,20 @@ export class DataService {
 	constructor(
 		private chainId: number,
 		rpcUrlsMap: RpcUrlsContextType,
+		strategy?: RPCStrategy,
 	) {
-		console.log("DataService constructor called with chainId:", chainId);
+		console.log(
+			"DataService constructor called with chainId:",
+			chainId,
+			"strategy:",
+			strategy,
+		);
 		const rpcUrls = getRPCUrls(chainId, rpcUrlsMap);
 		console.log("RPC URLs for chain", chainId, ":", rpcUrls);
-		this.rpcClient = new RPCClient(rpcUrls);
+		this.rpcClient = new RPCClient({
+			rpcUrls,
+			strategy: strategy || "fallback",
+		});
 
 		// Check which network we're on
 		this.isArbitrum = chainId === 42161;
@@ -138,26 +151,79 @@ export class DataService {
 		return `${this.chainId}:${prefix}:${identifier}`;
 	}
 
-	async getBlock(blockNumber: number | "latest"): Promise<Block> {
+	async getBlock(
+		blockNumber: number | "latest",
+	): Promise<DataWithMetadata<Block>> {
 		const cacheKey = this.getCacheKey("block", blockNumber);
 		const cached = this.getCached<Block>(cacheKey);
-		if (cached) return cached;
+		if (cached) return { data: cached };
 
-		const rpcBlock = await this.blockFetcher.getBlock(blockNumber);
-		if (!rpcBlock) throw new Error("Block not found");
+		// Check if parallel strategy is enabled
+		if (this.rpcClient.getStrategy() === "parallel") {
+			// Use parallel call to get all responses
+			const results = await this.rpcClient.parallelCall(
+				"eth_getBlockByNumber",
+				[
+					typeof blockNumber === "number"
+						? `0x${blockNumber.toString(16)}`
+						: blockNumber,
+					true,
+				],
+			);
 
-		const block = this.isArbitrum
-			? BlockArbitrumAdapter.fromRPCBlock(rpcBlock, this.chainId)
-			: this.isOptimism
-				? BlockOptimismAdapter.fromRPCBlock(rpcBlock, this.chainId)
-				: BlockAdapter.fromRPCBlock(rpcBlock, this.chainId);
+			// Build complete block objects for each provider
+			const enrichedResults = results.map((result) => {
+				if (result.status === "fulfilled" && result.response) {
+					const block = this.isArbitrum
+						? BlockArbitrumAdapter.fromRPCBlock(result.response, this.chainId)
+						: this.isOptimism
+							? BlockOptimismAdapter.fromRPCBlock(result.response, this.chainId)
+							: BlockAdapter.fromRPCBlock(result.response, this.chainId);
 
-		// Only cache non-latest blocks
-		if (blockNumber !== "latest") {
-			this.setCache(cacheKey, block);
+					return {
+						...result,
+						response: block,
+					};
+				}
+				return result;
+			});
+
+			// Create metadata with enriched block objects
+			const metadata = RPCMetadataService.createMetadata(enrichedResults, "parallel");
+
+			// Get the default block (first successful)
+			const defaultBlock = enrichedResults.find(
+				(r) => r.status === "fulfilled" && r.response
+			)?.response;
+
+			if (!defaultBlock) {
+				throw new Error("All RPC endpoints failed");
+			}
+
+			// Only cache non-latest blocks
+			if (blockNumber !== "latest") {
+				this.setCache(cacheKey, defaultBlock);
+			}
+
+			return { data: defaultBlock, metadata };
+		} else {
+			// Fallback strategy - use existing logic
+			const rpcBlock = await this.blockFetcher.getBlock(blockNumber);
+			if (!rpcBlock) throw new Error("Block not found");
+
+			const block = this.isArbitrum
+				? BlockArbitrumAdapter.fromRPCBlock(rpcBlock, this.chainId)
+				: this.isOptimism
+					? BlockOptimismAdapter.fromRPCBlock(rpcBlock, this.chainId)
+					: BlockAdapter.fromRPCBlock(rpcBlock, this.chainId);
+
+			// Only cache non-latest blocks
+			if (blockNumber !== "latest") {
+				this.setCache(cacheKey, block);
+			}
+
+			return { data: block };
 		}
-
-		return block;
 	}
 
 	async getBlockWithTransactions(
@@ -195,85 +261,268 @@ export class DataService {
 		return { ...block, transactionDetails };
 	}
 
-	async getTransaction(txHash: string): Promise<Transaction> {
+	async getTransaction(
+		txHash: string,
+	): Promise<DataWithMetadata<Transaction>> {
 		const cacheKey = this.getCacheKey("tx", txHash);
 		const cached = this.getCached<Transaction>(cacheKey);
-		if (cached) return cached;
+		if (cached) return { data: cached };
 
-		const [rpcTx, receipt] = await Promise.all([
-			this.transactionFetcher.getTransaction(txHash),
-			this.transactionFetcher.getTransactionReceipt(txHash),
-		]);
+		// Check if parallel strategy is enabled
+		if (this.rpcClient.getStrategy() === "parallel") {
+			// Use parallel call for transaction
+			const results = await this.rpcClient.parallelCall("eth_getTransactionByHash", [
+				txHash,
+			]);
 
-		if (!rpcTx) throw new Error("Transaction not found");
+			// Find first successful response
+			const successfulResult = results.find((r) => r.status === "fulfilled");
+			if (!successfulResult || !successfulResult.response) {
+				throw new Error("All RPC endpoints failed");
+			}
 
-		// Get timestamp from block if available
-		let timestamp: string = "";
-		let baseFeePerGas: string | undefined;
-		if (rpcTx.blockNumber) {
-			const block = await this.getBlock(parseInt(rpcTx.blockNumber, 16));
-			timestamp = block.timestamp.toString();
-			baseFeePerGas = block.baseFeePerGas;
-		}
+			const rpcTx = successfulResult.response;
 
-		const transaction = this.isArbitrum
-			? TransactionArbitrumAdapter.fromRPCTransaction(
-					rpcTx,
-					this.chainId,
-					receipt,
-				)
-			: this.isOptimism
-				? TransactionOptimismAdapter.fromRPCTransaction(
+			// Get receipt (use same strategy)
+			const receiptResults = await this.rpcClient.parallelCall(
+				"eth_getTransactionReceipt",
+				[txHash],
+			);
+
+			// Get timestamp from block if available
+			let timestamp: string = "";
+			let baseFeePerGas: string | undefined;
+			if (rpcTx.blockNumber) {
+				const blockResult = await this.getBlock(parseInt(rpcTx.blockNumber, 16));
+				const block = blockResult.data;
+				timestamp = block.timestamp.toString();
+				baseFeePerGas = block.baseFeePerGas;
+			}
+
+			// Build complete transaction objects for each provider
+			// This includes receipts so that when users switch providers, they see complete data
+			const enrichedResults = results.map((txResult) => {
+				if (txResult.status === "fulfilled" && txResult.response) {
+					// Find matching receipt for this provider
+					const matchingReceipt = receiptResults.find(
+						(r) => r.url === txResult.url && r.status === "fulfilled"
+					);
+					const receipt = matchingReceipt?.response;
+
+					// Create adapted transaction with receipt
+					const transaction = this.isArbitrum
+						? TransactionArbitrumAdapter.fromRPCTransaction(
+								txResult.response,
+								this.chainId,
+								receipt,
+							)
+						: this.isOptimism
+							? TransactionOptimismAdapter.fromRPCTransaction(
+									txResult.response,
+									this.chainId,
+									receipt,
+								)
+							: TransactionAdapter.fromRPCTransaction(
+									txResult.response,
+									this.chainId,
+									receipt,
+								);
+
+					// Add timestamp and base fee
+					if (timestamp) {
+						transaction.timestamp = timestamp;
+					}
+					if (baseFeePerGas) {
+						transaction.blockBaseFeePerGas = baseFeePerGas;
+					}
+
+					return {
+						...txResult,
+						response: transaction,
+					};
+				}
+				return txResult;
+			});
+
+			// Create metadata with enriched transaction objects (including receipts)
+			const metadata = RPCMetadataService.createMetadata(enrichedResults, "parallel");
+
+			// Get the default transaction (first successful)
+			const defaultTransaction = enrichedResults.find(
+				(r) => r.status === "fulfilled" && r.response
+			)?.response;
+
+			if (!defaultTransaction) {
+				throw new Error("Failed to create transaction object");
+			}
+
+			this.setCache(cacheKey, defaultTransaction);
+			return { data: defaultTransaction, metadata };
+		} else {
+			// Fallback strategy
+			const [rpcTx, receipt] = await Promise.all([
+				this.transactionFetcher.getTransaction(txHash),
+				this.transactionFetcher.getTransactionReceipt(txHash),
+			]);
+
+			if (!rpcTx) throw new Error("Transaction not found");
+
+			// Get timestamp from block if available
+			let timestamp: string = "";
+			let baseFeePerGas: string | undefined;
+			if (rpcTx.blockNumber) {
+				const blockResult = await this.getBlock(parseInt(rpcTx.blockNumber, 16));
+				const block = blockResult.data;
+				timestamp = block.timestamp.toString();
+				baseFeePerGas = block.baseFeePerGas;
+			}
+
+			const transaction = this.isArbitrum
+				? TransactionArbitrumAdapter.fromRPCTransaction(
 						rpcTx,
 						this.chainId,
 						receipt,
 					)
-				: TransactionAdapter.fromRPCTransaction(rpcTx, this.chainId, receipt);
-		if (timestamp) {
-			transaction.timestamp = timestamp;
-		}
-		if (baseFeePerGas) {
-			transaction.blockBaseFeePerGas = baseFeePerGas;
-		}
+				: this.isOptimism
+					? TransactionOptimismAdapter.fromRPCTransaction(
+							rpcTx,
+							this.chainId,
+							receipt,
+						)
+					: TransactionAdapter.fromRPCTransaction(rpcTx, this.chainId, receipt);
 
-		this.setCache(cacheKey, transaction);
-		return transaction;
+			if (timestamp) {
+				transaction.timestamp = timestamp;
+			}
+			if (baseFeePerGas) {
+				transaction.blockBaseFeePerGas = baseFeePerGas;
+			}
+
+			this.setCache(cacheKey, transaction);
+			return { data: transaction };
+		}
 	}
 
-	async getAddress(address: string): Promise<Address> {
+	async getAddress(address: string): Promise<DataWithMetadata<Address>> {
 		const cacheKey = this.getCacheKey("address", address);
 		const cached = this.getCached<Address>(cacheKey);
-		if (cached) return cached;
+		if (cached) return { data: cached };
 
-		const [balance, code, txCount] = await Promise.all([
-			this.addressFetcher.getBalance(address),
-			this.addressFetcher.getCode(address),
-			this.addressFetcher.getTransactionCount(address),
-		]);
+		let metadata: RPCMetadata | undefined;
+		let addressData: Address;
 
-		const addressData = this.isArbitrum
-			? AddressAdapterArbitrum.fromRawData(
-					address,
-					balance,
-					code,
-					txCount,
-					this.chainId,
-				)
-			: this.isOptimism
-				? AddressAdapterOptimism.fromRawData(
+		if (this.rpcClient.getStrategy() === "parallel") {
+			// Parallel strategy: query all providers simultaneously
+			const [balanceResults, codeResults, txCountResults] = await Promise.all([
+				this.rpcClient.parallelCall<string>("eth_getBalance", [
+					address.toLowerCase(),
+					"latest",
+				]),
+				this.rpcClient.parallelCall<string>("eth_getCode", [
+					address.toLowerCase(),
+					"latest",
+				]),
+				this.rpcClient.parallelCall<string>("eth_getTransactionCount", [
+					address.toLowerCase(),
+					"latest",
+				]),
+			]);
+
+			// Build complete address objects for each provider
+			const enrichedResults = balanceResults.map((balanceResult, index) => {
+				if (balanceResult.status === "fulfilled" && balanceResult.response) {
+					const codeResult = codeResults[index];
+					const txCountResult = txCountResults[index];
+
+					// Check if all data is available for this provider
+					if (
+						codeResult?.status === "fulfilled" &&
+						codeResult.response &&
+						txCountResult?.status === "fulfilled" &&
+						txCountResult.response
+					) {
+						const balance = BigInt(balanceResult.response);
+						const code = codeResult.response;
+						const txCount = Number.parseInt(txCountResult.response, 16);
+
+						const addressData = this.isArbitrum
+							? AddressAdapterArbitrum.fromRawData(
+									address,
+									balance,
+									code,
+									txCount,
+									this.chainId,
+								)
+							: this.isOptimism
+								? AddressAdapterOptimism.fromRawData(
+										address,
+										balance,
+										code,
+										txCount,
+										this.chainId,
+									)
+								: AddressAdapter.fromRawData(
+										address,
+										balance,
+										code,
+										txCount,
+										this.chainId,
+									);
+
+						return {
+							...balanceResult,
+							response: addressData,
+						};
+					}
+				}
+				return balanceResult;
+			});
+
+			// Create metadata with enriched address objects
+			metadata = RPCMetadataService.createMetadata(enrichedResults, "parallel");
+
+			// Get the default address (first successful)
+			const defaultAddressResult = enrichedResults.find(
+				(r) => r.status === "fulfilled" && r.response
+			);
+
+			if (!defaultAddressResult || typeof defaultAddressResult.response === 'string') {
+				throw new Error("Failed to fetch address data from all providers");
+			}
+
+			addressData = defaultAddressResult.response as Address;
+		} else {
+			// Fallback strategy: use sequential fetching
+			const [balance, code, txCount] = await Promise.all([
+				this.addressFetcher.getBalance(address),
+				this.addressFetcher.getCode(address),
+				this.addressFetcher.getTransactionCount(address),
+			]);
+
+			addressData = this.isArbitrum
+				? AddressAdapterArbitrum.fromRawData(
 						address,
 						balance,
 						code,
 						txCount,
 						this.chainId,
 					)
-				: AddressAdapter.fromRawData(
-						address,
-						balance,
-						code,
-						txCount,
-						this.chainId,
-					);
+				: this.isOptimism
+					? AddressAdapterOptimism.fromRawData(
+							address,
+							balance,
+							code,
+							txCount,
+							this.chainId,
+						)
+					: AddressAdapter.fromRawData(
+							address,
+							balance,
+							code,
+							txCount,
+							this.chainId,
+						);
+		}
 
 		// Fetch recent transactions for this address
 		try {
@@ -292,7 +541,7 @@ export class DataService {
 				const block = await this.getBlockWithTransactions(blockNum);
 				if (block.transactionDetails) {
 					const addressTxs = block.transactionDetails.filter(
-						(tx) =>
+						(tx: Transaction) =>
 							tx.from?.toLowerCase() === address.toLowerCase() ||
 							tx.to?.toLowerCase() === address.toLowerCase(),
 					);
@@ -308,7 +557,7 @@ export class DataService {
 		}
 
 		this.setCache(cacheKey, addressData);
-		return addressData;
+		return { data: addressData, metadata };
 	}
 
 	/**
@@ -349,16 +598,101 @@ export class DataService {
 		return await this.blockFetcher.getLatestBlockNumber();
 	}
 
-	async getNetworkStats(): Promise<NetworkStats> {
+	async getNetworkStats(): Promise<DataWithMetadata<NetworkStats>> {
 		const cacheKey = this.getCacheKey("networkStats", "current");
 		const cached = this.getCached<NetworkStats>(cacheKey);
-		if (cached) return cached;
+		if (cached) return { data: cached };
 
-		const stats = await this.networkStatsFetcher.getNetworkStats();
+		let metadata: RPCMetadata | undefined;
 
-		this.cache.set(cacheKey, { data: stats, timestamp: Date.now() });
+		if (this.rpcClient.getStrategy() === "parallel") {
+			// Parallel strategy: query all providers simultaneously
+			const [gasPriceResults, syncingResults, blockNumberResults, clientVersionResults] =
+				await Promise.all([
+					this.rpcClient.parallelCall<string>("eth_gasPrice", []),
+					this.rpcClient.parallelCall<boolean | object>("eth_syncing", []),
+					this.rpcClient.parallelCall<string>("eth_blockNumber", []),
+					this.rpcClient.parallelCall<string>("web3_clientVersion", []),
+				]);
 
-		return stats;
+			// Hardhat metadata (only for localhost)
+			let metadataResults: Array<{
+				url: string;
+				status: "fulfilled" | "rejected";
+				response?: string;
+				error?: Error;
+			}> = [];
+
+			if (this.chainId === 31337) {
+				metadataResults = await this.rpcClient.parallelCall<string>(
+					"hardhat_metadata",
+					[],
+				);
+			}
+
+			// Build complete NetworkStats objects for EACH provider
+			const enrichedResults = gasPriceResults.map((gasPriceResult, index) => {
+				if (gasPriceResult.status === "fulfilled" && gasPriceResult.response) {
+					const syncingResult = syncingResults[index];
+					const blockNumberResult = blockNumberResults[index];
+					const clientVersionResult = clientVersionResults[index];
+
+					// Verify all calls from same provider succeeded
+					if (
+						syncingResult?.status === "fulfilled" &&
+						blockNumberResult?.status === "fulfilled" &&
+						blockNumberResult.response
+					) {
+						// Get hardhat metadata for this provider (localhost only)
+						const hardhatMetadata =
+							this.chainId === 31337
+								? metadataResults[index]?.status === "fulfilled"
+									? metadataResults[index].response || ""
+									: ""
+								: "";
+
+						// Build complete NetworkStats object for this provider
+						const networkStats: NetworkStats = {
+							currentGasPrice: gasPriceResult.response,
+							isSyncing: typeof syncingResult.response === "object",
+							currentBlockNumber: blockNumberResult.response,
+							clientVersion: clientVersionResult?.response || "Unknown",
+							metadata: hardhatMetadata,
+						};
+
+						return {
+							...gasPriceResult,
+							response: networkStats, // Now contains complete domain object
+						};
+					}
+				}
+				// If any call failed for this provider, preserve the error
+				return gasPriceResult;
+			});
+
+			// Create metadata with enriched NetworkStats objects
+			metadata = RPCMetadataService.createMetadata(
+				enrichedResults,
+				"parallel",
+			);
+
+			// Extract default stats (first successful provider)
+			const defaultStats = enrichedResults.find(
+				(r) => r.status === "fulfilled" && r.response,
+			)?.response as NetworkStats | undefined;
+
+			if (!defaultStats) {
+				throw new Error("Failed to fetch network stats from all providers");
+			}
+
+			this.cache.set(cacheKey, { data: defaultStats, timestamp: Date.now() });
+			return { data: defaultStats, metadata };
+		} else {
+			// Fallback strategy: use sequential fetching
+			const stats = await this.networkStatsFetcher.getNetworkStats();
+			this.cache.set(cacheKey, { data: stats, timestamp: Date.now() });
+			return { data: stats };
+		}
 	}
 
 	async getLatestBlocks(count: number = 10): Promise<Block[]> {
@@ -368,11 +702,11 @@ export class DataService {
 			(_, i) => latestBlockNumber - i,
 		).filter((num) => num >= 0); // Don't go below block 0
 
-		const blocks = await Promise.all(
+		const blockResults = await Promise.all(
 			blockNumbers.map((num) => this.getBlock(num)),
 		);
 
-		return blocks;
+		return blockResults.map((result) => result.data);
 	}
 
 	async getTransactionsFromLatestBlocks(
@@ -451,7 +785,7 @@ export class DataService {
 				keysToDelete.push(key);
 			}
 		});
-		keysToDelete.forEach((key) => this.cache.delete(key));
+		keysToDelete.forEach((key) => {this.cache.delete(key)});
 	}
 
 	// Trace methods (available for localhost networks)

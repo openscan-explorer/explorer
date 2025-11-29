@@ -1,0 +1,90 @@
+name: Hash and Deploy to IPFS
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-hash-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: './package-lock.json'
+      
+      - name: Update npm to v11
+        run: npm install -g npm@11
+
+      - name: Install IPFS CLI
+        run: |
+          wget https://dist.ipfs.io/kubo/v0.37.0/kubo_v0.37.0_linux-amd64.tar.gz
+          tar -xzf kubo_v0.37.0_linux-amd64.tar.gz
+          sudo cp kubo/ipfs /usr/local/bin/
+          sudo chmod +x /usr/local/bin/ipfs
+          ipfs version
+          ipfs init
+          
+      - name: Build Production
+        run: ./scripts/build-production.sh
+
+      - name: Get IPFS Hash
+        id: ipfs-hash
+        run: |
+          HASH=$(ipfs add -r -Q --chunker=size-262144 --raw-leaves=false ./dist)
+          echo "IPFS Hash (v0): $HASH"
+          echo "hash=$HASH" >> $GITHUB_OUTPUT
+
+      - name: Update IPFS Hash in Repo
+        run: |
+          HASH="${{ steps.ipfs-hash.outputs.hash }}"
+          
+          # Create shields.io endpoint format JSON
+          mkdir -p /tmp/ipfs-meta
+          echo "{\"schemaVersion\": 1, \"label\": \"IPFS\", \"message\": \"$HASH\", \"color\": \"blue\", \"namedLogo\": \"ipfs\"}" > /tmp/ipfs-meta/ipfs-hash.json
+          
+          # Configure git
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Fetch or create the meta branch
+          git fetch origin meta:meta 2>/dev/null || git checkout --orphan meta
+          git checkout meta || git checkout --orphan meta
+          
+          # Clean and add only the hash file
+          git rm -rf . 2>/dev/null || true
+          cp /tmp/ipfs-meta/ipfs-hash.json .
+          git add ipfs-hash.json
+          
+          if git diff --staged --quiet; then
+            echo "No changes to IPFS hash"
+          else
+            git commit -m "chore: update IPFS hash to $HASH"
+            git push origin meta
+          fi
+          
+          # Switch back to main
+          git checkout main
+          
+          echo "Updated meta branch with IPFS hash: $HASH"
+
+      - name: Install action dependencies
+        run: |
+          cd .github/actions/deploy-ipfs
+          npm install
+
+      - name: Deploy to IPFS via Pinata
+        uses: ./.github/actions/deploy-ipfs
+        with:
+          pinata-jwt: ${{ secrets.PINATA_JWT }}
+          source-dir: './dist'
+          pin-name: 'openscan - ${{ github.sha }}'

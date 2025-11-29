@@ -1,15 +1,15 @@
 <p align="center">
-  <img src="https://augustol.github.io/openscan/openscan-logo.png" alt="OpenScan Logo" width="128" height="128">
+  <img src="https://openscan.github.io/explorer/openscan-logo.png" alt="OpenScan Logo" width="128" height="128">
 </p>
 
 # OpenScan
 
-![Production IPFS Hash](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/AugustoL/e3a56e2c5255a748f6334af4c9c58bfc/raw/ipfs-hash.json)
+![Production IPFS Hash](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/openscan-explorer/explorer/meta/ipfs-hash.json)
 
 A trustless, open-source, standalone web-app, multi-chain blockchain explorer for Ethereum, Layer 2 networks, and local development chains, allowing the direct interaction with verified smart contracts.
 
 **Official URL:** [https://openscan.eth.link/](https://openscan.eth.link/)  
-**GitHub Pages:** [https://augustol.github.io/openscan/](https://augustol.github.io/openscan/)
+**GitHub Pages:** [https://openscan.github.io/explorer/](https://openscan.github.io/explorer/)
 
 ## Features
 
@@ -127,19 +127,45 @@ npm run lint:fix
 
 ## Configuration
 
+### Environment Variables
+
+#### `REACT_APP_OPENSCAN_NETWORKS`
+
+Controls which networks are displayed in the application. This is useful for limiting the explorer to specific chains.
+
+**Format:** Comma-separated list of chain IDs
+
+**Default:** If not set, all supported networks are enabled.
+
+**Examples:**
+
+```bash
+# Show only Ethereum Mainnet and Localhost
+REACT_APP_OPENSCAN_NETWORKS="1,31337" npm start
+
+# Show only Layer 2 networks
+REACT_APP_OPENSCAN_NETWORKS="42161,10,8453" npm start
+
+# Show only testnets
+REACT_APP_OPENSCAN_NETWORKS="11155111,97" npm start
+```
+
+The networks will be displayed in the order specified in the environment variable.
+
 ### Custom RPC Endpoints
 
 Navigate to Settings to configure custom RPC endpoints for each network. The app supports multiple fallback URLs for reliability.
 
 Default RPC endpoints:
 
-- **Ethereum**: `https://eth.llamarpc.com`, `https://rpc.ankr.com/eth`
-- **Sepolia**: `https://rpc.sepolia.org`, `https://ethereum-sepolia-rpc.publicnode.com`
-- **Arbitrum**: `https://arb1.arbitrum.io/rpc`, `https://arbitrum-one.publicnode.com`
-- **Optimism**: `https://mainnet.optimism.io`, `https://optimism.publicnode.com`
+- **Ethereum**: `https://eth.llamarpc.com`, `https://ethereum.publicnode.com`, `https://1rpc.io/eth`
+- **Sepolia**: `https://sepolia.infura.io`, `https://rpc.sepolia.org`, `"https://rpc2.sepolia.org`, `https://ethereum-sepolia.publicnode.com`
+- **Arbitrum**: `https://arb1.arbitrum.io/rpc`, `https://arbitrum.llamarpc.com`, `https://arbitrum-one.publicnode.com`
+- **Optimism**: `https://mainnet.optimism.io`, `https://optimism.llamarpc.com`, `https://optimism.publicnode.com`
+- **Base**: `https://mainnet.base.org`, `https://base.llamarpc.com`, `https://base.publicnode.com`
 - **BSC**: `https://bsc-dataseed.binance.org`, `https://bsc.publicnode.com`
 - **BSC Testnet**: `https://data-seed-prebsc-1-s1.binance.org:8545`, `https://bsc-testnet.publicnode.com`
-- **Polygon**: `https://polygon-rpc.com`, `https://polygon.llamarpc.com`
+- **Polygon**: `https://polygon-rpc.com`, `https://polygon.llamarpc.com`, `https://polygon-bor.publicnode.com`
 - **Localhost**: `http://localhost:8545`
 
 ### Supported Chain IDs

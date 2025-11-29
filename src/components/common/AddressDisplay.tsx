@@ -1,16 +1,20 @@
 import React, { useContext, useState, useMemo, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { useSourcify } from "../../hooks/useSourcify";
-import { Address, AddressTransactionsResult, Transaction } from "../../types";
+import type {
+	Address,
+	AddressTransactionsResult,
+	Transaction,
+	RPCMetadata,
+} from "../../types";
 import { AppContext } from "../../context";
 import {
 	useWriteContract,
 	useWaitForTransactionReceipt,
-	useReadContract,
 } from "wagmi";
 import { parseEther, encodeFunctionData } from "viem";
+import { RPCIndicator } from "./RPCIndicator";
 
-// @ts-ignore
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 interface AddressDisplayProps {
@@ -20,6 +24,9 @@ interface AddressDisplayProps {
 	transactionsResult?: AddressTransactionsResult | null;
 	transactionDetails?: Transaction[];
 	loadingTxDetails?: boolean;
+	metadata?: RPCMetadata;
+	selectedProvider?: string | null;
+	onProviderSelect?: (provider: string) => void;
 }
 
 const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
@@ -30,6 +37,9 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
 		transactionsResult,
 		transactionDetails = [],
 		loadingTxDetails = false,
+		metadata,
+		selectedProvider,
+		onProviderSelect,
 	}) => {
 		const [storageSlot, setStorageSlot] = useState("");
 		const [storageValue, setStorageValue] = useState("");
@@ -104,7 +114,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
 
 		const handleGetStorage = useCallback(() => {
 			// Check if the slot exists in the storeageAt object
-			if (address.storeageAt && address.storeageAt[storageSlot]) {
+			if (address.storeageAt?.[storageSlot]) {
 				setStorageValue(address.storeageAt[storageSlot]);
 			} else {
 				setStorageValue(
@@ -311,9 +321,25 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
 
 		return (
 			<div className="block-display-card">
-				<div className="block-display-header">
-					<span className="block-label">Address</span>
-					<span className="tx-mono header-subtitle">{addressHash}</span>
+				<div
+					className="block-display-header"
+					style={{
+						display: "flex",
+						justifyContent: "space-between",
+						alignItems: "center",
+					}}
+				>
+					<div>
+						<span className="block-label">Address</span>
+						<span className="tx-mono header-subtitle">{addressHash}</span>
+					</div>
+					{metadata && selectedProvider !== undefined && onProviderSelect && (
+						<RPCIndicator
+							metadata={metadata}
+							selectedProvider={selectedProvider}
+							onProviderSelect={onProviderSelect}
+						/>
+					)}
 				</div>
 
 				<div className="address-section-content">
