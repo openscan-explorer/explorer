@@ -50,7 +50,24 @@ const NetworkCard: React.FC<NetworkCardProps> = ({ network }) => {
 };
 
 export default function Home() {
-	const enabledNetworks = useMemo(() => getEnabledNetworks(), []);
+	const enabledNetworks = useMemo(() => {
+		const allNetworks = getEnabledNetworks();
+		const environment = process.env.REACT_APP_ENVIRONMENT;
+		const isDevelopment = environment === "development";
+		const envNetworks = process.env.REACT_APP_OPENSCAN_NETWORKS;
+
+		// Check if Hardhat (31337) is explicitly enabled in REACT_APP_OPENSCAN_NETWORKS
+		const hardhatChainId = 31337;
+		const isHardhatExplicitlyEnabled = envNetworks &&
+			envNetworks.split(",").map(id => parseInt(id.trim(), 10)).includes(hardhatChainId);
+
+		// Filter out Hardhat from home page if not in development and not explicitly enabled
+		if (!isDevelopment && !isHardhatExplicitlyEnabled) {
+			return allNetworks.filter((n) => n.chainId !== hardhatChainId);
+		}
+
+		return allNetworks;
+	}, []);
 
 	return (
 		<div className="home-container">
