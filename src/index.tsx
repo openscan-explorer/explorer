@@ -9,20 +9,18 @@ import { AppContextProvider } from "./context/AppContext";
 
 const queryClient = new QueryClient();
 
-const root = ReactDOM.createRoot(
-	document.getElementById("root") as HTMLElement,
-);
+const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
 
 root.render(
-	<React.StrictMode>
-		<WagmiProvider config={networkConfig}>
-			<QueryClientProvider client={queryClient}>
-				<NotificationProvider>
-					<AppContextProvider>
-						<App />
-					</AppContextProvider>
-				</NotificationProvider>
-			</QueryClientProvider>
-		</WagmiProvider>
-	</React.StrictMode>,
+  <React.StrictMode>
+    <WagmiProvider config={networkConfig}>
+      <QueryClientProvider client={queryClient}>
+        <NotificationProvider>
+          <AppContextProvider>
+            <App />
+          </AppContextProvider>
+        </NotificationProvider>
+      </QueryClientProvider>
+    </WagmiProvider>
+  </React.StrictMode>,
 );

@@ -16,13 +16,13 @@ const About = lazy(() => import("./pages/About"));
 
 // Higher-order component to wrap lazy components with Suspense
 export const withSuspense = (Component: React.ComponentType<any>) => {
-	return function SuspenseWrapper(props: any) {
-		return (
-			<Suspense fallback={<Loading />}>
-				<Component {...props} />
-			</Suspense>
-		);
-	};
+  return function SuspenseWrapper(props: any) {
+    return (
+      <Suspense fallback={<Loading />}>
+        <Component {...props} />
+      </Suspense>
+    );
+  };
 };
 
 // Export lazy components wrapped with Suspense
