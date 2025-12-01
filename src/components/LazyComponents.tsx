@@ -15,14 +15,16 @@ const DevTools = lazy(() => import("./pages/DevTools"));
 const About = lazy(() => import("./pages/About"));
 
 // Higher-order component to wrap lazy components with Suspense
+// biome-ignore lint/suspicious/noExplicitAny: <TODO>
 export const withSuspense = (Component: React.ComponentType<any>) => {
-	return function SuspenseWrapper(props: any) {
-		return (
-			<Suspense fallback={<Loading />}>
-				<Component {...props} />
-			</Suspense>
-		);
-	};
+  // biome-ignore lint/suspicious/noExplicitAny: <TODO>
+  return function SuspenseWrapper(props: any) {
+    return (
+      <Suspense fallback={<Loading />}>
+        <Component {...props} />
+      </Suspense>
+    );
+  };
 };
 
 // Export lazy components wrapped with Suspense
