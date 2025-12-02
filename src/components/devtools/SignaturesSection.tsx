@@ -18,6 +18,7 @@ const SignaturesSection: React.FC = () => {
   const [sigMessage, setSigMessage] = useState("");
   const [sigSignature, setSigSignature] = useState("");
   const [sigExpectedAddress] = useState("");
+  const [sigMessageType, setSigMessageType] = useState<"message" | "hash">("message");
   const [sigResults, setSigResults] = useState<{
     format?: string;
     messageFormat?: string;
@@ -119,12 +120,16 @@ const SignaturesSection: React.FC = () => {
       const s = signature.s;
       const v = signature.v;
 
-      // Determine message hash based on input format
+      // Determine message hash based on input type toggle
       let messageHash: string = "";
       let detectedMessageFormat: string;
 
-      if (sigMessage.startsWith("0x") && sigMessage.length === 66) {
-        // Already a hash
+      if (sigMessageType === "hash") {
+        // User explicitly selected pre-hashed - use raw hash
+        if (!sigMessage.startsWith("0x") || sigMessage.length !== 66) {
+          setSigResults({ error: "Pre-hashed input must be a 32-byte hex string (0x + 64 chars)" });
+          return;
+        }
         messageHash = sigMessage;
         detectedMessageFormat = "Pre-hashed (32 bytes)";
       } else if (sigMessage.trim().startsWith("{")) {
@@ -132,8 +137,10 @@ const SignaturesSection: React.FC = () => {
         try {
           const parsed = JSON.parse(sigMessage);
           if (parsed.domain && parsed.types && parsed.message) {
-            // EIP-712 typed data
-            messageHash = TypedDataEncoder.hash(parsed.domain, parsed.types, parsed.message);
+            // EIP-712 typed data - remove EIP712Domain from types if present
+            const typesWithoutDomain = { ...parsed.types };
+            delete typesWithoutDomain.EIP712Domain;
+            messageHash = TypedDataEncoder.hash(parsed.domain, typesWithoutDomain, parsed.message);
             detectedMessageFormat = "EIP-712 Typed Data";
           } else {
             // Not valid EIP-712, treat as string
@@ -304,11 +311,36 @@ const SignaturesSection: React.FC = () => {
         </div>
         {showSignatureInspector && (
           <div className="devtools-flex-column devtools-gap-12">
+            {/* Message Type Toggle */}
+            <div className="keccak-mode-toggle">
+              {/** biome-ignore lint/a11y/useButtonType: mode toggle */}
+              <button
+                className={`keccak-mode-btn ${sigMessageType === "message" ? "active" : ""}`}
+                onClick={() => setSigMessageType("message")}
+              >
+                EIP-191 Personal Signature
+              </button>
+              {/** biome-ignore lint/a11y/useButtonType: mode toggle */}
+              <button
+                className={`keccak-mode-btn ${sigMessageType === "hash" ? "active" : ""}`}
+                onClick={() => setSigMessageType("hash")}
+              >
+                Raw Message Signature
+              </button>
+            </div>
             <div className="devtools-flex-column devtools-gap-4">
               {/** biome-ignore lint/a11y/noLabelWithoutControl: <TODO> */}
-              <label className="input-label">Message (string, hex hash, or EIP-712 JSON)</label>
+              <label className="input-label">
+                {sigMessageType === "message"
+                  ? "Message (string or EIP-712 JSON)"
+                  : "Pre-hashed value (32-byte hex)"}
+              </label>
               <textarea
-                placeholder='Hello World, 0x1234...abcd, or {"domain":...}'
+                placeholder={
+                  sigMessageType === "message"
+                    ? 'Hello World, 0x1234...abcd, or {"domain":...}'
+                    : "0x..."
+                }
                 value={sigMessage}
                 onChange={(e) => setSigMessage(e.target.value)}
                 className="devtools-input sig-message-textarea"
