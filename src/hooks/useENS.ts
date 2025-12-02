@@ -33,7 +33,7 @@ export function useENS(
   const [decodedContenthash, setDecodedContenthash] = useState<DecodedContenthash | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [fetchTrigger, setFetchTrigger] = useState(0);
+  const [_fetchTrigger, setFetchTrigger] = useState(0);
 
   // Check if we're on mainnet (ENS only works on Ethereum mainnet)
   const isMainnet = chainId === 1;
@@ -105,7 +105,7 @@ export function useENS(
     };
 
     fetchENSData();
-  }, [address, rpcUrls, initialEnsName, fetchTrigger]);
+  }, [address, rpcUrls, initialEnsName]);
 
   return {
     ensName,

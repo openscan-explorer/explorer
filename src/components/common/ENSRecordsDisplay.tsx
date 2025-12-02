@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import type React from "react";
+import { useState } from "react";
 import type { ENSRecords, ENSReverseResult, DecodedContenthash } from "../../types";
 
 interface ENSRecordsDisplayProps {
@@ -157,7 +158,7 @@ const ENSRecordsDisplay: React.FC<ENSRecordsDisplayProps> = ({
                   style={{ color: "#3b82f6", textDecoration: "none" }}
                 >
                   {records.textRecords.avatar.length > 50
-                    ? records.textRecords.avatar.slice(0, 50) + "..."
+                    ? `${records.textRecords.avatar.slice(0, 50)}...`
                     : records.textRecords.avatar}
                 </a>
               </div>
@@ -194,7 +195,7 @@ const ENSRecordsDisplay: React.FC<ENSRecordsDisplayProps> = ({
                   style={{ color: "#3b82f6", textDecoration: "none" }}
                 >
                   {decodedContenthash.url.length > 60
-                    ? decodedContenthash.url.slice(0, 60) + "..."
+                    ? `${decodedContenthash.url.slice(0, 60)}...`
                     : decodedContenthash.url}
                 </a>
               </div>
@@ -246,7 +247,7 @@ const ENSRecordsDisplay: React.FC<ENSRecordsDisplayProps> = ({
                           rel="noopener noreferrer"
                           style={{ color: "#3b82f6", textDecoration: "none" }}
                         >
-                          {value.length > 50 ? value.slice(0, 50) + "..." : value}
+                          {value.length > 50 ? `${value.slice(0, 50)}...` : value}
                         </a>
                       ) : key === "com.twitter" ? (
                         <a

@@ -1,4 +1,5 @@
-import React, { useState, useContext } from "react";
+import type React from "react";
+import { useState, useContext } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { AppContext } from "../../context";
 import { ENSService } from "../../services/ENS/ENSService";
@@ -65,7 +66,7 @@ const SearchBox = () => {
       } else if (term.length === 66) {
         navigate(`/${chainId}/tx/${term}`);
       }
-    } else if (!isNaN(Number(term))) {
+    } else if (!Number.isNaN(Number(term))) {
       navigate(`/${chainId}/block/${term}`);
     }
   };

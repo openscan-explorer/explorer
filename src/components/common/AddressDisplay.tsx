@@ -90,7 +90,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
       try {
         const eth = Number(balance) / 1e18;
         return `${eth.toFixed(6)} ETH`;
-      } catch (e) {
+      } catch (_e) {
         return balance;
       }
     }, []);
@@ -99,13 +99,13 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
       try {
         const eth = Number(value) / 1e18;
         return `${eth.toFixed(6)} ETH`;
-      } catch (e) {
+      } catch (_e) {
         return "0 ETH";
       }
     }, []);
 
     // Memoized formatted balance
-    const formattedBalance = useMemo(
+    const _formattedBalance = useMemo(
       () => formatBalance(address.balance),
       [address.balance, formatBalance],
     );
@@ -184,10 +184,11 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
 
         // Prepare transaction value for payable functions
         let txValue: bigint | undefined;
-        if (selectedWriteFunction.stateMutability === "payable" && functionInputs["_value"]) {
+        const valueKey = "_value";
+        if (selectedWriteFunction.stateMutability === "payable" && functionInputs[valueKey]) {
           try {
-            txValue = parseEther(functionInputs["_value"]);
-          } catch (e) {
+            txValue = parseEther(functionInputs[valueKey]);
+          } catch (_e) {
             alert("Invalid ETH value");
             return;
           }
@@ -284,7 +285,14 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
       } finally {
         setIsReadingFunction(false);
       }
-    }, [selectedReadFunction, contractData, chainId, functionInputs, addressHash]);
+    }, [
+      selectedReadFunction,
+      contractData,
+      chainId,
+      functionInputs,
+      addressHash,
+      rpcUrls,
+    ]);
 
     return (
       <div className="block-display-card">
@@ -302,6 +310,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
               <span
                 style={{
                   marginLeft: "12px",
+                  marginRight: "8px",
                   fontSize: "1rem",
                   fontWeight: "600",
                   color: "#10b981",
@@ -356,31 +365,29 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
 
             {/* Verification Status (only for contracts) */}
             {isContract && (
-              <>
-                <div className="tx-row">
-                  <span className="tx-label">Contract Verified:</span>
-                  <span className="tx-value">
-                    {sourcifyLoading ? (
-                      <span className="verification-checking">Checking Sourcify...</span>
-                    ) : isVerified || parsedLocalData ? (
-                      <span className="flex-align-center-gap-8">
-                        <span className="tx-value-highlight">✓ Verified</span>
-                        {contractData?.match && (
-                          <span className="match-badge match-badge-full">
-                            {contractData.match === "perfect"
-                              ? parsedLocalData
-                                ? "Local JSON"
-                                : "Perfect Match"
-                              : "Partial Match"}
-                          </span>
-                        )}
-                      </span>
-                    ) : (
-                      <span className="verification-not-verified">Not Verified</span>
-                    )}
-                  </span>
-                </div>
-              </>
+              <div className="tx-row">
+                <span className="tx-label">Contract Verified:</span>
+                <span className="tx-value">
+                  {sourcifyLoading ? (
+                    <span className="verification-checking">Checking Sourcify...</span>
+                  ) : isVerified || parsedLocalData ? (
+                    <span className="flex-align-center-gap-8">
+                      <span className="tx-value-highlight">✓ Verified</span>
+                      {contractData?.match && (
+                        <span className="match-badge match-badge-full">
+                          {contractData.match === "perfect"
+                            ? parsedLocalData
+                              ? "Local JSON"
+                              : "Perfect Match"
+                            : "Partial Match"}
+                        </span>
+                      )}
+                    </span>
+                  ) : (
+                    <span className="verification-not-verified">Not Verified</span>
+                  )}
+                </span>
+              </div>
             )}
 
             {/* Contract Name (if verified) */}
@@ -1261,6 +1268,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
                                 </label>
                                 <input
                                   type="text"
+                                  // biome-ignore lint/complexity/useLiteralKeys: _value is a special key for ETH value
                                   value={functionInputs["_value"] || ""}
                                   onChange={(e) =>
                                     setFunctionInputs({

@@ -1,9 +1,9 @@
 // src/services/ENS/ENSService.ts
-import { keccak256, toUtf8Bytes, AbiCoder, concat, zeroPadValue } from "ethers";
+import { keccak256, toUtf8Bytes, AbiCoder, concat } from "ethers";
 
 // ENS Contract addresses on Ethereum Mainnet
 const ENS_REGISTRY_ADDRESS = "0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e";
-const PUBLIC_RESOLVER_ADDRESS = "0xD4416b13d2b3a9aBae7AcD5D6C2BbDBE25686401";
+const _PUBLIC_RESOLVER_ADDRESS = "0xD4416b13d2b3a9aBae7AcD5D6C2BbDBE25686401";
 
 // Function selectors
 const SELECTORS = {
@@ -73,7 +73,7 @@ export class ENSService {
    */
   namehash(name: string): string {
     if (!name || name === "") {
-      return "0x" + "0".repeat(64);
+      return `0x${"0".repeat(64)}`;
     }
 
     const normalized = this.normalize(name);
@@ -132,7 +132,6 @@ export class ENSService {
       } catch (err) {
         console.error("ENS ethCall fetch error:", err);
         errors.push(err instanceof Error ? err : new Error(String(err)));
-        continue; // Try next RPC
       }
     }
 
@@ -160,7 +159,7 @@ export class ENSService {
         return null;
       }
 
-      const resolverAddress = "0x" + result.slice(-40);
+      const resolverAddress = `0x${result.slice(-40)}`;
       console.log("ENS getResolver: found resolver", resolverAddress);
       return resolverAddress;
     } catch (err) {
@@ -193,7 +192,7 @@ export class ENSService {
       }
 
       // Extract address from result
-      const address = "0x" + result.slice(-40);
+      const address = `0x${result.slice(-40)}`;
       return address;
     } catch {
       return null;
@@ -404,7 +403,7 @@ export class ENSService {
       // Extract the bytes
       const bytesHex = data.slice(offset + 64, offset + 64 + length * 2);
 
-      return "0x" + bytesHex;
+      return `0x${bytesHex}`;
     } catch {
       return null;
     }
@@ -466,7 +465,7 @@ export class ENSService {
     // For production, use a proper base58 library
     const ALPHABET = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
-    let num = BigInt("0x" + hex);
+    let num = BigInt(`0x${hex}`);
     let result = "";
 
     const fifty8 = BigInt(58);
@@ -481,7 +480,7 @@ export class ENSService {
     // Add leading zeros
     for (let i = 0; i < hex.length; i += 2) {
       if (hex.slice(i, i + 2) === "00") {
-        result = "1" + result;
+        result = `1${result}`;
       } else {
         break;
       }
