@@ -1,6 +1,6 @@
 import React from "react";
-import type { NetworkSubscription } from "../../types";
 import { getSubscriptionTierName, isSubscriptionActive } from "../../services/MetadataService";
+import type { NetworkSubscription } from "../../types";
 
 interface TierBadgeProps {
   subscription: NetworkSubscription | undefined;

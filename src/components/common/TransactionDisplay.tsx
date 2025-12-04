@@ -531,7 +531,10 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
                           className={`tx-param-value ${param.type === "address" ? "tx-mono" : ""}`}
                         >
                           {param.type === "address" && networkId ? (
-                            <Link to={`/${networkId}/address/${param.value}`} className="link-accent">
+                            <Link
+                              to={`/${networkId}/address/${param.value}`}
+                              className="link-accent"
+                            >
                               {param.value}
                             </Link>
                           ) : (

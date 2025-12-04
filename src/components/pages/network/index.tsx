@@ -7,8 +7,8 @@ import { useSelectedData } from "../../../hooks/useSelectedData";
 import type { DataWithMetadata, NetworkStats } from "../../../types";
 import Loader from "../../common/Loader";
 import SearchBox from "../../common/SearchBox";
-import NetworkStatsDisplay from "./NetworkStatsDisplay";
 import ProfileDisplay from "./NetworkProfileDisplay";
+import NetworkStatsDisplay from "./NetworkStatsDisplay";
 
 export default function Network() {
   const { networkId } = useParams<{ networkId?: string }>();

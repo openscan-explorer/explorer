@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import Markdown from "react-markdown";
-import type { NetworkConfig } from "../../../types";
 import { fetchNetworkProfile, isSubscriptionActive } from "../../../services/MetadataService";
+import type { NetworkConfig } from "../../../types";
 import TierBadge from "../../common/TierBadge";
 
 interface ProfileDisplayProps {
@@ -122,12 +122,7 @@ const ProfileDisplay: React.FC<ProfileDisplayProps> = React.memo(({ network }) =
                 h6: ({ children }) => <h6 className="profile-h6">{children}</h6>,
                 p: ({ children }) => <p className="profile-p">{children}</p>,
                 a: ({ href, children }) => (
-                  <a
-                    href={href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="profile-link"
-                  >
+                  <a href={href} target="_blank" rel="noopener noreferrer" className="profile-link">
                     {children}
                   </a>
                 ),
