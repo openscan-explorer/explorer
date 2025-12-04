@@ -6,7 +6,7 @@ import type { RPCClient } from "../../common/RPCClient";
 export class NetworkStatsFetcher {
   constructor(
     private rpcClient: RPCClient,
-    private chainId: number,
+    private networkId: number,
   ) {}
 
   async getNetworkStats(): Promise<NetworkStats> {
@@ -18,7 +18,7 @@ export class NetworkStatsFetcher {
     ]);
 
     const metadata =
-      this.chainId === 31337 ? await this.rpcClient.call<string>("hardhat_metadata", []) : "";
+      this.networkId === 31337 ? await this.rpcClient.call<string>("hardhat_metadata", []) : "";
 
     // eth_syncing returns false when not syncing, or an object with sync status when syncing
     const isSyncing = typeof syncing === "object";
@@ -45,7 +45,7 @@ export class NetworkStatsFetcher {
     return await this.rpcClient.call<string>("eth_blockNumber", []);
   }
 
-  getChainId(): number {
-    return this.chainId;
+  getNetworkId(): number {
+    return this.networkId;
   }
 }

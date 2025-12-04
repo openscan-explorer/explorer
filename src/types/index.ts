@@ -198,30 +198,55 @@ export interface IAppContext {
   enabledNetworks: NetworkConfig[];
   networksLoading: boolean;
   networksError: string | null;
-  getNetwork: (chainId: number) => NetworkConfig | undefined;
+  getNetwork: (networkId: number) => NetworkConfig | undefined;
   reloadNetworks: () => Promise<void>;
+}
+
+/**
+ * Network subscription tier
+ */
+export interface NetworkSubscription {
+  tier: 1 | 2 | 3; // 1: Backer, 2: Partner, 3: Ally
+  expiresAt: string; // YYYY-MM-DD format
+}
+
+/**
+ * Network explorer configuration
+ */
+export interface NetworkExplorer {
+  subdomain?: string;
+  features?: string[];
+  priority?: number;
+}
+
+/**
+ * Network link
+ */
+export interface NetworkLink {
+  name: string;
+  url: string;
+  description?: string;
 }
 
 /**
  * Network configuration interface
  */
 export interface NetworkConfig {
-  chainId: number;
+  networkId: number;
   name: string;
   shortName: string;
-  description: string;
-  color: string;
+  description?: string;
+  color?: string;
   currency: string;
-  isTestnet: boolean;
-  logo: string;
-  rpc: {
+  isTestnet?: boolean;
+  subscription?: NetworkSubscription;
+  logo?: string;
+  profile?: string;
+  explorer?: NetworkExplorer;
+  rpc?: {
     public: string[];
   };
-  links: {
-    name: string;
-    url: string;
-    description: string;
-  }[];
+  links?: NetworkLink[];
 }
 
 /**

@@ -8,7 +8,7 @@ export class AddressAdapter {
     balance: bigint,
     code: string,
     txCount: number,
-    _chainId: number,
+    _networkId: number,
   ): Address {
     return {
       address,

@@ -8,22 +8,36 @@ const METADATA_BASE_URL =
 export interface NetworkLink {
   name: string;
   url: string;
-  description: string;
+  description?: string;
+}
+
+export interface NetworkSubscription {
+  tier: 1 | 2 | 3; // 1: Backer, 2: Partner, 3: Ally
+  expiresAt: string; // YYYY-MM-DD format
+}
+
+export interface NetworkExplorer {
+  subdomain?: string;
+  features?: string[];
+  priority?: number;
 }
 
 export interface NetworkMetadata {
   chainId: number;
   name: string;
   shortName: string;
-  description: string;
+  description?: string;
   currency: string;
-  color: string;
-  isTestnet: boolean;
-  logo: string;
-  rpc: {
+  color?: string;
+  isTestnet?: boolean;
+  subscription?: NetworkSubscription;
+  logo?: string;
+  profile?: string;
+  explorer?: NetworkExplorer;
+  rpc?: {
     public: string[];
   };
-  links: NetworkLink[];
+  links?: NetworkLink[];
 }
 
 export interface NetworksResponse {
@@ -89,4 +103,58 @@ export function getNetworkLogoUrl(logoPath: string): string {
 export function clearNetworksCache(): void {
   networksCache = null;
   networksCacheTime = 0;
+}
+
+/**
+ * Fetch network profile markdown content
+ */
+export async function fetchNetworkProfile(profilePath: string): Promise<string | null> {
+  if (!profilePath) {
+    return null;
+  }
+
+  try {
+    const url = profilePath.startsWith("http")
+      ? profilePath
+      : `${METADATA_BASE_URL}/${profilePath}`;
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      console.warn(`Failed to fetch network profile: ${response.statusText}`);
+      return null;
+    }
+
+    return await response.text();
+  } catch (error) {
+    console.error("Error fetching network profile:", error);
+    return null;
+  }
+}
+
+/**
+ * Check if a network subscription is active
+ */
+export function isSubscriptionActive(subscription?: NetworkSubscription): boolean {
+  if (!subscription) {
+    return false;
+  }
+
+  const expiresAt = new Date(subscription.expiresAt);
+  return expiresAt > new Date();
+}
+
+/**
+ * Get subscription tier name
+ */
+export function getSubscriptionTierName(tier: 1 | 2 | 3): string {
+  switch (tier) {
+    case 1:
+      return "Backer";
+    case 2:
+      return "Partner";
+    case 3:
+      return "Ally";
+    default:
+      return "Unknown";
+  }
 }

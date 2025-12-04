@@ -8,22 +8,22 @@ import BlockDisplay from "../common/BlockDisplay";
 import Loader from "../common/Loader";
 
 export default function BlockPage() {
-  const { chainId, filter } = useParams<{
-    chainId?: string;
+  const { networkId, filter } = useParams<{
+    networkId?: string;
     filter?: string;
   }>();
 
   const blockNumber = filter === "latest" ? "latest" : Number(filter);
-  const numericChainId = Number(chainId) || 1;
+  const numericNetworkId = Number(networkId) || 1;
 
-  const dataService = useDataService(numericChainId);
+  const dataService = useDataService(numericNetworkId);
   const [blockResult, setBlockResult] = useState<DataWithMetadata<Block> | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   // Provider selection state
   const [selectedProvider, setSelectedProvider] = useProviderSelection(
-    `block_${numericChainId}_${blockNumber}`,
+    `block_${numericNetworkId}_${blockNumber}`,
   );
 
   // Extract actual block data based on selected provider
@@ -35,7 +35,7 @@ export default function BlockPage() {
       return;
     }
 
-    console.log("Fetching block:", blockNumber, "for chain:", numericChainId);
+    console.log("Fetching block:", blockNumber, "for chain:", numericNetworkId);
     setLoading(true);
     setError(null);
 
@@ -50,7 +50,7 @@ export default function BlockPage() {
         setError(err.message || "Failed to fetch block");
       })
       .finally(() => setLoading(false));
-  }, [dataService, blockNumber, numericChainId]);
+  }, [dataService, blockNumber, numericNetworkId]);
 
   if (loading) {
     return (
@@ -89,7 +89,7 @@ export default function BlockPage() {
       {block ? (
         <BlockDisplay
           block={block}
-          chainId={chainId}
+          networkId={networkId}
           metadata={blockResult?.metadata}
           selectedProvider={selectedProvider}
           onProviderSelect={setSelectedProvider}

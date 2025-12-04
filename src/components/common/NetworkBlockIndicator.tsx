@@ -16,18 +16,18 @@ export function NetworkBlockIndicator({ className }: NetworkBlockIndicatorProps)
   const [blockNumber, setBlockNumber] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Extract chainId from the pathname (e.g., /1/blocks -> 1)
-  const chainId = useMemo(() => {
+  // Extract networkId from the pathname (e.g., /1/blocks -> 1)
+  const networkId = useMemo(() => {
     const pathSegments = location.pathname.split("/").filter(Boolean);
     return pathSegments[0] && !Number.isNaN(Number(pathSegments[0]))
       ? Number(pathSegments[0])
       : null;
   }, [location.pathname]);
 
-  const network = chainId ? getNetwork(chainId) : undefined;
+  const network = networkId ? getNetwork(networkId) : undefined;
 
   useEffect(() => {
-    if (!chainId) {
+    if (!networkId) {
       setBlockNumber(null);
       return;
     }
@@ -37,7 +37,7 @@ export function NetworkBlockIndicator({ className }: NetworkBlockIndicatorProps)
 
     const fetchBlockNumber = async () => {
       try {
-        const urls = getRPCUrls(chainId, rpcUrls);
+        const urls = getRPCUrls(networkId, rpcUrls);
         const client = new RPCClient(urls);
         const result = await client.call<string>("eth_blockNumber", []);
         if (isMounted) {
@@ -64,9 +64,9 @@ export function NetworkBlockIndicator({ className }: NetworkBlockIndicatorProps)
         clearInterval(intervalId);
       }
     };
-  }, [chainId, rpcUrls]);
+  }, [networkId, rpcUrls]);
 
-  if (!chainId || !network) return null;
+  if (!networkId || !network) return null;
 
   return (
     <div

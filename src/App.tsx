@@ -93,14 +93,14 @@ function AppContent() {
               <Route path="settings" element={<LazySettings />} />
               <Route path="about" element={<LazyAbout />} />
               <Route path="devtools" element={<LazyDevTools />} />
-              <Route path=":chainId" element={<LazyChain />} />
-              <Route path=":chainId/blocks" element={<LazyBlocks />} />
-              <Route path=":chainId/block/:filter" element={<LazyBlock />} />
-              <Route path=":chainId/txs" element={<LazyTxs />} />
-              <Route path=":chainId/tx/:filter" element={<LazyTx />} />
-              <Route path=":chainId/address/:address" element={<LazyAddress />} />
-              <Route path=":chainId/mempool" element={<LazyMempool />} />
-              <Route path=":chainId/mempool/:filter" element={<LazyTx />} />
+              <Route path=":networkId" element={<LazyChain />} />
+              <Route path=":networkId/blocks" element={<LazyBlocks />} />
+              <Route path=":networkId/block/:filter" element={<LazyBlock />} />
+              <Route path=":networkId/txs" element={<LazyTxs />} />
+              <Route path=":networkId/tx/:filter" element={<LazyTx />} />
+              <Route path=":networkId/address/:address" element={<LazyAddress />} />
+              <Route path=":networkId/mempool" element={<LazyMempool />} />
+              <Route path=":networkId/mempool/:filter" element={<LazyTx />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
             <Footer />

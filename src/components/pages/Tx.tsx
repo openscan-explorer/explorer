@@ -8,15 +8,15 @@ import Loader from "../common/Loader";
 import TransactionDisplay from "../common/TransactionDisplay";
 
 export default function Tx() {
-  const { chainId, filter } = useParams<{
-    chainId?: string;
+  const { networkId, filter } = useParams<{
+    networkId?: string;
     filter?: string;
   }>();
 
   const txHash = filter;
-  const numericChainId = Number(chainId) || 1;
+  const numericNetworkId = Number(networkId) || 1;
 
-  const dataService = useDataService(numericChainId);
+  const dataService = useDataService(numericNetworkId);
   const [transactionResult, setTransactionResult] = useState<DataWithMetadata<Transaction> | null>(
     null,
   );
@@ -26,7 +26,7 @@ export default function Tx() {
 
   // Provider selection state
   const [selectedProvider, setSelectedProvider] = useProviderSelection(
-    `tx_${numericChainId}_${txHash}`,
+    `tx_${numericNetworkId}_${txHash}`,
   );
 
   // Extract actual transaction data based on selected provider
@@ -38,7 +38,7 @@ export default function Tx() {
       return;
     }
 
-    console.log("Fetching transaction:", txHash, "for chain:", numericChainId);
+    console.log("Fetching transaction:", txHash, "for chain:", numericNetworkId);
     setLoading(true);
     setError(null);
 
@@ -54,7 +54,7 @@ export default function Tx() {
         setError(err.message || "Failed to fetch transaction");
       })
       .finally(() => setLoading(false));
-  }, [dataService, txHash, numericChainId]);
+  }, [dataService, txHash, numericNetworkId]);
 
   if (loading) {
     return (
@@ -93,7 +93,7 @@ export default function Tx() {
       {transaction ? (
         <TransactionDisplay
           transaction={transaction}
-          chainId={chainId}
+          networkId={networkId}
           currentBlockNumber={currentBlockNumber || undefined}
           dataService={dataService}
           metadata={transactionResult?.metadata}

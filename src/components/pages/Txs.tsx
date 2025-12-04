@@ -7,11 +7,11 @@ import Loader from "../common/Loader";
 const BLOCKS_PER_PAGE = 10;
 
 export default function Txs() {
-  const { chainId } = useParams<{ chainId?: string }>();
+  const { networkId } = useParams<{ networkId?: string }>();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const numericChainId = Number(chainId) || 1;
-  const dataService = useDataService(numericChainId);
+  const numericNetworkId = Number(networkId) || 1;
+  const dataService = useDataService(numericNetworkId);
   const [transactions, setTransactions] = useState<Array<Transaction & { blockNumber: string }>>(
     [],
   );
@@ -100,9 +100,9 @@ export default function Txs() {
 
     if (newFromBlock >= latestBlockNumber) {
       // Go to latest (remove fromBlock param)
-      navigate(`/${chainId}/txs`);
+      navigate(`/${networkId}/txs`);
     } else {
-      navigate(`/${chainId}/txs?fromBlock=${newFromBlock}`);
+      navigate(`/${networkId}/txs?fromBlock=${newFromBlock}`);
     }
   };
 
@@ -111,12 +111,12 @@ export default function Txs() {
     const newFromBlock = blockRange.from - 1;
 
     if (newFromBlock >= 0) {
-      navigate(`/${chainId}/txs?fromBlock=${newFromBlock}`);
+      navigate(`/${networkId}/txs?fromBlock=${newFromBlock}`);
     }
   };
 
   const goToLatest = () => {
-    navigate(`/${chainId}/txs`);
+    navigate(`/${networkId}/txs`);
   };
 
   // Determine if we can navigate
@@ -213,7 +213,7 @@ export default function Txs() {
                 <tr key={transaction.hash}>
                   <td>
                     <Link
-                      to={`/${chainId}/tx/${transaction.hash}`}
+                      to={`/${networkId}/tx/${transaction.hash}`}
                       className="table-cell-hash"
                       title={transaction.hash}
                     >
@@ -222,7 +222,7 @@ export default function Txs() {
                   </td>
                   <td>
                     <Link
-                      to={`/${chainId}/block/${transaction.blockNumber}`}
+                      to={`/${networkId}/block/${transaction.blockNumber}`}
                       className="table-cell-value"
                     >
                       {transaction.blockNumber}
@@ -230,7 +230,7 @@ export default function Txs() {
                   </td>
                   <td className="table-cell-mono" title={transaction.from}>
                     <Link
-                      to={`/${chainId}/address/${transaction.from}`}
+                      to={`/${networkId}/address/${transaction.from}`}
                       className="table-cell-address"
                     >
                       {truncate(transaction.from)}
@@ -239,7 +239,7 @@ export default function Txs() {
                   <td className="table-cell-mono" title={transaction.to}>
                     {transaction.to ? (
                       <Link
-                        to={`/${chainId}/address/${transaction.to}`}
+                        to={`/${networkId}/address/${transaction.to}`}
                         className="table-cell-address"
                       >
                         {truncate(transaction.to)}

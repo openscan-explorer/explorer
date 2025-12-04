@@ -6,7 +6,7 @@ import type { RPCClient } from "../../common/RPCClient";
 export class BlockFetcher {
   constructor(
     private rpcClient: RPCClient,
-    private chainId: number,
+    private networkId: number,
   ) {}
 
   async getBlock(blockNumber: number | "latest"): Promise<RPCBlock | null> {
@@ -40,7 +40,7 @@ export class BlockFetcher {
     return await this.rpcClient.call<RPCBlock>("eth_getBlockByHash", [blockHash, fullTransactions]);
   }
 
-  getChainId(): number {
-    return this.chainId;
+  getNetworkId(): number {
+    return this.networkId;
   }
 }

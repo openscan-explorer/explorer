@@ -61,48 +61,48 @@ export class DataService {
   private isOptimism: boolean;
   private isLocalhost: boolean;
 
-  // Simple in-memory cache with chainId in key
+  // Simple in-memory cache with networkId in key
   // biome-ignore lint/suspicious/noExplicitAny: <TODO>
   private cache = new Map<string, CacheEntry<any>>();
   private cacheTimeout = 30000; // 30 seconds
 
   constructor(
-    private chainId: number,
+    private networkId: number,
     rpcUrlsMap: RpcUrlsContextType,
     strategy?: RPCStrategy,
   ) {
-    console.log("DataService constructor called with chainId:", chainId, "strategy:", strategy);
-    const rpcUrls = getRPCUrls(chainId, rpcUrlsMap);
-    console.log("RPC URLs for chain", chainId, ":", rpcUrls);
+    console.log("DataService constructor called with networkId:", networkId, "strategy:", strategy);
+    const rpcUrls = getRPCUrls(networkId, rpcUrlsMap);
+    console.log("RPC URLs for network", networkId, ":", rpcUrls);
     this.rpcClient = new RPCClient({
       rpcUrls,
       strategy: strategy || "fallback",
     });
 
     // Check which network we're on
-    this.isArbitrum = chainId === 42161;
+    this.isArbitrum = networkId === 42161;
     // OP Stack chains: Optimism (10), Base (8453)
-    this.isOptimism = chainId === 10 || chainId === 8453;
-    this.isLocalhost = chainId === 31337;
+    this.isOptimism = networkId === 10 || networkId === 8453;
+    this.isLocalhost = networkId === 31337;
 
     // Initialize trace fetcher for all networks (will check availability when used)
     this.traceFetcher = new TraceFetcher(this.rpcClient);
 
     if (this.isArbitrum) {
-      this.blockFetcher = new BlockFetcherArbitrum(this.rpcClient, chainId);
-      this.transactionFetcher = new TransactionFetcherArbitrum(this.rpcClient, chainId);
-      this.addressFetcher = new AddressFetcherArbitrum(this.rpcClient, chainId);
-      this.networkStatsFetcher = new NetworkStatsFetcherArbitrum(this.rpcClient, chainId);
+      this.blockFetcher = new BlockFetcherArbitrum(this.rpcClient, networkId);
+      this.transactionFetcher = new TransactionFetcherArbitrum(this.rpcClient, networkId);
+      this.addressFetcher = new AddressFetcherArbitrum(this.rpcClient, networkId);
+      this.networkStatsFetcher = new NetworkStatsFetcherArbitrum(this.rpcClient, networkId);
     } else if (this.isOptimism) {
-      this.blockFetcher = new BlockFetcherOptimism(this.rpcClient, chainId);
-      this.transactionFetcher = new TransactionFetcherOptimism(this.rpcClient, chainId);
-      this.addressFetcher = new AddressFetcherOptimism(this.rpcClient, chainId);
-      this.networkStatsFetcher = new NetworkStatsFetcherOptimism(this.rpcClient, chainId);
+      this.blockFetcher = new BlockFetcherOptimism(this.rpcClient, networkId);
+      this.transactionFetcher = new TransactionFetcherOptimism(this.rpcClient, networkId);
+      this.addressFetcher = new AddressFetcherOptimism(this.rpcClient, networkId);
+      this.networkStatsFetcher = new NetworkStatsFetcherOptimism(this.rpcClient, networkId);
     } else {
-      this.blockFetcher = new BlockFetcher(this.rpcClient, chainId);
-      this.transactionFetcher = new TransactionFetcher(this.rpcClient, chainId);
-      this.addressFetcher = new AddressFetcher(this.rpcClient, chainId);
-      this.networkStatsFetcher = new NetworkStatsFetcher(this.rpcClient, chainId);
+      this.blockFetcher = new BlockFetcher(this.rpcClient, networkId);
+      this.transactionFetcher = new TransactionFetcher(this.rpcClient, networkId);
+      this.addressFetcher = new AddressFetcher(this.rpcClient, networkId);
+      this.networkStatsFetcher = new NetworkStatsFetcher(this.rpcClient, networkId);
     }
   }
 
@@ -124,7 +124,7 @@ export class DataService {
   }
 
   private getCacheKey(prefix: string, identifier: string | number): string {
-    return `${this.chainId}:${prefix}:${identifier}`;
+    return `${this.networkId}:${prefix}:${identifier}`;
   }
 
   async getBlock(blockNumber: number | "latest"): Promise<DataWithMetadata<Block>> {
@@ -144,10 +144,10 @@ export class DataService {
       const enrichedResults = results.map((result) => {
         if (result.status === "fulfilled" && result.response) {
           const block = this.isArbitrum
-            ? BlockArbitrumAdapter.fromRPCBlock(result.response, this.chainId)
+            ? BlockArbitrumAdapter.fromRPCBlock(result.response, this.networkId)
             : this.isOptimism
-              ? BlockOptimismAdapter.fromRPCBlock(result.response, this.chainId)
-              : BlockAdapter.fromRPCBlock(result.response, this.chainId);
+              ? BlockOptimismAdapter.fromRPCBlock(result.response, this.networkId)
+              : BlockAdapter.fromRPCBlock(result.response, this.networkId);
 
           return {
             ...result,
@@ -181,10 +181,10 @@ export class DataService {
       if (!rpcBlock) throw new Error("Block not found");
 
       const block = this.isArbitrum
-        ? BlockArbitrumAdapter.fromRPCBlock(rpcBlock, this.chainId)
+        ? BlockArbitrumAdapter.fromRPCBlock(rpcBlock, this.networkId)
         : this.isOptimism
-          ? BlockOptimismAdapter.fromRPCBlock(rpcBlock, this.chainId)
-          : BlockAdapter.fromRPCBlock(rpcBlock, this.chainId);
+          ? BlockOptimismAdapter.fromRPCBlock(rpcBlock, this.networkId)
+          : BlockAdapter.fromRPCBlock(rpcBlock, this.networkId);
 
       // Only cache non-latest blocks
       if (blockNumber !== "latest") {
@@ -202,10 +202,10 @@ export class DataService {
     if (!rpcBlock) throw new Error("Block not found");
 
     const block = this.isArbitrum
-      ? BlockArbitrumAdapter.fromRPCBlock(rpcBlock, this.chainId)
+      ? BlockArbitrumAdapter.fromRPCBlock(rpcBlock, this.networkId)
       : this.isOptimism
-        ? BlockOptimismAdapter.fromRPCBlock(rpcBlock, this.chainId)
-        : BlockAdapter.fromRPCBlock(rpcBlock, this.chainId);
+        ? BlockOptimismAdapter.fromRPCBlock(rpcBlock, this.networkId)
+        : BlockAdapter.fromRPCBlock(rpcBlock, this.networkId);
 
     // Transform transaction objects
     const transactionDetails = (Array.isArray(rpcBlock.transactions) ? rpcBlock.transactions : [])
@@ -213,12 +213,12 @@ export class DataService {
       .map((tx) =>
         this.isArbitrum
           ? // biome-ignore lint/suspicious/noExplicitAny: <TODO>
-            TransactionArbitrumAdapter.fromRPCTransaction(tx as any, this.chainId)
+            TransactionArbitrumAdapter.fromRPCTransaction(tx as any, this.networkId)
           : this.isOptimism
             ? // biome-ignore lint/suspicious/noExplicitAny: <TODO>
-              TransactionOptimismAdapter.fromRPCTransaction(tx as any, this.chainId)
+              TransactionOptimismAdapter.fromRPCTransaction(tx as any, this.networkId)
             : // biome-ignore lint/suspicious/noExplicitAny: <TODO>
-              TransactionAdapter.fromRPCTransaction(tx as any, this.chainId),
+              TransactionAdapter.fromRPCTransaction(tx as any, this.networkId),
       );
 
     return { ...block, transactionDetails };
@@ -271,16 +271,16 @@ export class DataService {
           const transaction = this.isArbitrum
             ? TransactionArbitrumAdapter.fromRPCTransaction(
                 txResult.response,
-                this.chainId,
+                this.networkId,
                 receipt,
               )
             : this.isOptimism
               ? TransactionOptimismAdapter.fromRPCTransaction(
                   txResult.response,
-                  this.chainId,
+                  this.networkId,
                   receipt,
                 )
-              : TransactionAdapter.fromRPCTransaction(txResult.response, this.chainId, receipt);
+              : TransactionAdapter.fromRPCTransaction(txResult.response, this.networkId, receipt);
 
           // Add timestamp and base fee
           if (timestamp) {
@@ -332,10 +332,10 @@ export class DataService {
       }
 
       const transaction = this.isArbitrum
-        ? TransactionArbitrumAdapter.fromRPCTransaction(rpcTx, this.chainId, receipt)
+        ? TransactionArbitrumAdapter.fromRPCTransaction(rpcTx, this.networkId, receipt)
         : this.isOptimism
-          ? TransactionOptimismAdapter.fromRPCTransaction(rpcTx, this.chainId, receipt)
-          : TransactionAdapter.fromRPCTransaction(rpcTx, this.chainId, receipt);
+          ? TransactionOptimismAdapter.fromRPCTransaction(rpcTx, this.networkId, receipt)
+          : TransactionAdapter.fromRPCTransaction(rpcTx, this.networkId, receipt);
 
       if (timestamp) {
         transaction.timestamp = timestamp;
@@ -386,10 +386,16 @@ export class DataService {
             const txCount = Number.parseInt(txCountResult.response, 16);
 
             const addressData = this.isArbitrum
-              ? AddressAdapterArbitrum.fromRawData(address, balance, code, txCount, this.chainId)
+              ? AddressAdapterArbitrum.fromRawData(address, balance, code, txCount, this.networkId)
               : this.isOptimism
-                ? AddressAdapterOptimism.fromRawData(address, balance, code, txCount, this.chainId)
-                : AddressAdapter.fromRawData(address, balance, code, txCount, this.chainId);
+                ? AddressAdapterOptimism.fromRawData(
+                    address,
+                    balance,
+                    code,
+                    txCount,
+                    this.networkId,
+                  )
+                : AddressAdapter.fromRawData(address, balance, code, txCount, this.networkId);
 
             return {
               ...balanceResult,
@@ -422,10 +428,10 @@ export class DataService {
       ]);
 
       addressData = this.isArbitrum
-        ? AddressAdapterArbitrum.fromRawData(address, balance, code, txCount, this.chainId)
+        ? AddressAdapterArbitrum.fromRawData(address, balance, code, txCount, this.networkId)
         : this.isOptimism
-          ? AddressAdapterOptimism.fromRawData(address, balance, code, txCount, this.chainId)
-          : AddressAdapter.fromRawData(address, balance, code, txCount, this.chainId);
+          ? AddressAdapterOptimism.fromRawData(address, balance, code, txCount, this.networkId)
+          : AddressAdapter.fromRawData(address, balance, code, txCount, this.networkId);
     }
 
     // Fetch recent transactions for this address
@@ -523,7 +529,7 @@ export class DataService {
         error?: Error;
       }> = [];
 
-      if (this.chainId === 31337) {
+      if (this.networkId === 31337) {
         metadataResults = await this.rpcClient.parallelCall<string>("hardhat_metadata", []);
       }
 
@@ -542,7 +548,7 @@ export class DataService {
           ) {
             // Get hardhat metadata for this provider (localhost only)
             const hardhatMetadata =
-              this.chainId === 31337
+              this.networkId === 31337
                 ? metadataResults[index]?.status === "fulfilled"
                   ? metadataResults[index].response || ""
                   : ""
@@ -658,18 +664,18 @@ export class DataService {
     return transactions;
   }
 
-  getChainId(): number {
-    return this.chainId;
+  getNetworkId(): number {
+    return this.networkId;
   }
 
   clearCache(): void {
     this.cache.clear();
   }
 
-  clearCacheForChain(chainId: number): void {
+  clearCacheForNetwork(networkId: number): void {
     const keysToDelete: string[] = [];
     this.cache.forEach((_, key) => {
-      if (key.startsWith(`${chainId}:`)) {
+      if (key.startsWith(`${networkId}:`)) {
         keysToDelete.push(key);
       }
     });

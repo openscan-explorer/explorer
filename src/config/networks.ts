@@ -19,17 +19,21 @@ let networksUpdatedAt: string | null = null;
 
 /**
  * Convert metadata network to NetworkConfig
+ * Maps chainId from metadata to networkId internally
  */
 function metadataToNetworkConfig(network: NetworkMetadata): NetworkConfig {
   return {
-    chainId: network.chainId,
+    networkId: network.chainId, // Map chainId from metadata to networkId
     name: network.name,
     shortName: network.shortName,
     description: network.description,
     color: network.color,
     currency: network.currency,
     isTestnet: network.isTestnet,
+    subscription: network.subscription,
     logo: network.logo,
+    profile: network.profile,
+    explorer: network.explorer,
     rpc: network.rpc,
     links: network.links,
   };
@@ -63,7 +67,7 @@ export function getAllNetworks(): NetworkConfig[] {
 
 /**
  * Get the list of enabled networks based on environment variable
- * REACT_APP_OPENSCAN_NETWORKS can be a comma-separated list of chain IDs
+ * REACT_APP_OPENSCAN_NETWORKS can be a comma-separated list of network IDs
  * If not set, all networks are enabled
  */
 export function getEnabledNetworks(): NetworkConfig[] {
@@ -74,20 +78,20 @@ export function getEnabledNetworks(): NetworkConfig[] {
     return allNetworks;
   }
 
-  // Parse comma-separated chain IDs
-  const enabledChainIds = envNetworks
+  // Parse comma-separated network IDs
+  const enabledNetworkIds = envNetworks
     .split(",")
     .map((id) => parseInt(id.trim(), 10))
     .filter((id) => !Number.isNaN(id));
 
-  if (enabledChainIds.length === 0) {
+  if (enabledNetworkIds.length === 0) {
     return allNetworks;
   }
 
-  // Filter networks by enabled chain IDs, maintaining order from env var
+  // Filter networks by enabled network IDs, maintaining order from env var
   const enabledNetworks: NetworkConfig[] = [];
-  for (const chainId of enabledChainIds) {
-    const network = allNetworks.find((n) => n.chainId === chainId);
+  for (const networkId of enabledNetworkIds) {
+    const network = allNetworks.find((n) => n.networkId === networkId);
     if (network) {
       enabledNetworks.push(network);
     }
@@ -97,32 +101,32 @@ export function getEnabledNetworks(): NetworkConfig[] {
 }
 
 /**
- * Get enabled chain IDs as an array
+ * Get enabled network IDs as an array
  */
-export function getEnabledChainIds(): number[] {
-  return getEnabledNetworks().map((n) => n.chainId);
+export function getEnabledNetworkIds(): number[] {
+  return getEnabledNetworks().map((n) => n.networkId);
 }
 
 /**
- * Check if a chain ID is enabled
+ * Check if a network ID is enabled
  */
-export function isChainEnabled(chainId: number): boolean {
-  return getEnabledChainIds().includes(chainId);
+export function isNetworkEnabled(networkId: number): boolean {
+  return getEnabledNetworkIds().includes(networkId);
 }
 
 /**
- * Get network config by chain ID
+ * Get network config by network ID
  */
-export function getNetworkByChainId(chainId: number): NetworkConfig | undefined {
-  return getAllNetworks().find((n) => n.chainId === chainId);
+export function getNetworkById(networkId: number): NetworkConfig | undefined {
+  return getAllNetworks().find((n) => n.networkId === networkId);
 }
 
 /**
  * Get the full URL for a network logo
  */
-export function getNetworkLogoUrlByChainId(chainId: number): string | undefined {
-  const network = getNetworkByChainId(chainId);
-  if (!network) return undefined;
+export function getNetworkLogoUrlById(networkId: number): string | undefined {
+  const network = getNetworkById(networkId);
+  if (!network?.logo) return undefined;
   return getNetworkLogoUrl(network.logo);
 }
 

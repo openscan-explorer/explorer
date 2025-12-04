@@ -5,7 +5,7 @@ import type { RPCClient } from "../../common/RPCClient";
 export class AddressFetcher {
   constructor(
     private rpcClient: RPCClient,
-    private chainId: number,
+    private networkId: number,
   ) {}
 
   async getBalance(address: string, blockNumber: number | "latest" = "latest"): Promise<bigint> {
@@ -188,7 +188,7 @@ export class AddressFetcher {
     };
   }
 
-  getChainId(): number {
-    return this.chainId;
+  getNetworkId(): number {
+    return this.networkId;
   }
 }

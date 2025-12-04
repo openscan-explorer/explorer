@@ -5,7 +5,7 @@ import type { RPCTransaction, RPCTransactionReceipt, Transaction } from "../../.
 export class TransactionAdapter {
   static fromRPCTransaction(
     rpcTx: RPCTransaction,
-    _chainId: number,
+    _networkId: number,
     receipt?: RPCTransactionReceipt | null,
   ): Transaction {
     const transaction: Transaction = {

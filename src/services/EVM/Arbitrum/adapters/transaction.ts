@@ -6,7 +6,7 @@ export class TransactionArbitrumAdapter {
   static fromRPCTransaction(
     // biome-ignore lint/suspicious/noExplicitAny: <TODO>
     rpcTx: any,
-    _chainId: number,
+    _networkId: number,
     // biome-ignore lint/suspicious/noExplicitAny: <TODO>
     receipt?: any | null,
   ): TransactionArbitrum {

@@ -45,7 +45,7 @@ const Settings: React.FC = () => {
   // Get enabled networks from config
   const chainConfigs = useMemo(() => {
     return getEnabledNetworks().map((network) => ({
-      id: network.chainId,
+      id: network.networkId,
       name: network.name,
     }));
   }, []);

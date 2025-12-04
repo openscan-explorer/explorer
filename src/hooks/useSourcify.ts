@@ -4,7 +4,7 @@ export interface SourcifyMatch {
   match: "perfect" | "partial" | null;
   creation_match: "perfect" | "partial" | null;
   runtime_match: "perfect" | "partial" | null;
-  chainId: string;
+  chainId: string; // This is the Sourcify API response field - keep as chainId
   address: string;
   verifiedAt?: string;
 }
@@ -35,12 +35,12 @@ const SOURCIFY_API_V2_BASE = "https://sourcify.dev/server";
 
 /**
  * Hook to fetch verified contract data from Sourcify API
- * @param chainId - The chain ID
+ * @param networkId - The network ID
  * @param address - The contract address
  * @param enabled - Whether to fetch data (default: true)
  */
 export const useSourcify = (
-  chainId: number,
+  networkId: number,
   address: string | undefined,
   enabled: boolean = true,
 ) => {
@@ -50,7 +50,7 @@ export const useSourcify = (
   const [isVerified, setIsVerified] = useState<boolean>(false);
 
   useEffect(() => {
-    if (!enabled || !address || !chainId) {
+    if (!enabled || !address || !networkId) {
       return;
     }
 
@@ -64,7 +64,8 @@ export const useSourcify = (
         params.append("fields", "all");
 
         const queryString = params.toString();
-        const url = `${SOURCIFY_API_V2_BASE}/v2/contract/${chainId}/${address}${queryString ? `?${queryString}` : ""}`;
+        // Sourcify API uses chainId in the URL path
+        const url = `${SOURCIFY_API_V2_BASE}/v2/contract/${networkId}/${address}${queryString ? `?${queryString}` : ""}`;
 
         const response = await fetch(url);
 
@@ -93,7 +94,7 @@ export const useSourcify = (
     };
 
     fetchContractData();
-  }, [chainId, address, enabled]);
+  }, [networkId, address, enabled]);
 
   return {
     data,
@@ -105,13 +106,13 @@ export const useSourcify = (
 
 /**
  * Hook to fetch contract source files from Sourcify
- * @param chainId - The chain ID
+ * @param networkId - The network ID
  * @param address - The contract address
  * @param matchType - Type of match to fetch: 'full_match' | 'partial_match'
  * @param enabled - Whether to fetch data (default: true)
  */
 export const useSourcifyFiles = (
-  chainId: number,
+  networkId: number,
   address: string | undefined,
   matchType: "full_match" | "partial_match" = "full_match",
   enabled: boolean = true,
@@ -121,7 +122,7 @@ export const useSourcifyFiles = (
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!enabled || !address || !chainId) {
+    if (!enabled || !address || !networkId) {
       return;
     }
 
@@ -130,8 +131,8 @@ export const useSourcifyFiles = (
       setError(null);
 
       try {
-        // Fetch the file tree first
-        const treeUrl = `${SOURCIFY_API_BASE}/${matchType}/${chainId}/${address}/`;
+        // Fetch the file tree first (Sourcify API uses chainId in URL)
+        const treeUrl = `${SOURCIFY_API_BASE}/${matchType}/${networkId}/${address}/`;
         const treeResponse = await fetch(treeUrl);
 
         if (!treeResponse.ok) {
@@ -175,7 +176,7 @@ export const useSourcifyFiles = (
     };
 
     fetchFiles();
-  }, [chainId, address, matchType, enabled]);
+  }, [networkId, address, matchType, enabled]);
 
   return {
     files,
@@ -186,16 +187,17 @@ export const useSourcifyFiles = (
 
 /**
  * Utility function to check if a contract is verified on Sourcify
- * @param chainId - The chain ID
+ * @param networkId - The network ID
  * @param address - The contract address
  * @returns Promise<boolean>
  */
 export const checkSourcifyVerification = async (
-  chainId: number,
+  networkId: number,
   address: string,
 ): Promise<boolean> => {
   try {
-    const url = `${SOURCIFY_API_V2_BASE}/v2/contract/${chainId}/${address}`;
+    // Sourcify API uses chainId in URL path
+    const url = `${SOURCIFY_API_V2_BASE}/v2/contract/${networkId}/${address}`;
     const response = await fetch(url);
 
     if (response.ok) {

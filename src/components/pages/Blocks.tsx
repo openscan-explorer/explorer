@@ -7,11 +7,11 @@ import Loader from "../common/Loader";
 const BLOCKS_PER_PAGE = 10;
 
 export default function Blocks() {
-  const { chainId } = useParams<{ chainId?: string }>();
+  const { networkId } = useParams<{ networkId?: string }>();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const numericChainId = Number(chainId) || 1;
-  const dataService = useDataService(numericChainId);
+  const numericNetworkId = Number(networkId) || 1;
+  const dataService = useDataService(numericNetworkId);
   const [blocks, setBlocks] = useState<Block[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -88,9 +88,9 @@ export default function Blocks() {
 
     if (newFromBlock >= latestBlockNumber) {
       // Go to latest (remove fromBlock param)
-      navigate(`/${chainId}/blocks`);
+      navigate(`/${networkId}/blocks`);
     } else {
-      navigate(`/${chainId}/blocks?fromBlock=${newFromBlock}`);
+      navigate(`/${networkId}/blocks?fromBlock=${newFromBlock}`);
     }
   };
 
@@ -102,12 +102,12 @@ export default function Blocks() {
     const newFromBlock = oldestBlockInPage - 1;
 
     if (newFromBlock >= 0) {
-      navigate(`/${chainId}/blocks?fromBlock=${newFromBlock}`);
+      navigate(`/${networkId}/blocks?fromBlock=${newFromBlock}`);
     }
   };
 
   const goToLatest = () => {
-    navigate(`/${chainId}/blocks`);
+    navigate(`/${networkId}/blocks`);
   };
 
   // Determine if we can navigate
@@ -163,7 +163,7 @@ export default function Blocks() {
               <tr key={block.number}>
                 <td>
                   <Link
-                    to={`/${chainId}/block/${Number(block.number).toString()}`}
+                    to={`/${networkId}/block/${Number(block.number).toString()}`}
                     className="table-cell-number"
                   >
                     {Number(block.number).toLocaleString()}
@@ -174,7 +174,7 @@ export default function Blocks() {
                   {block.transactions ? block.transactions.length : 0}
                 </td>
                 <td className="table-cell-mono" title={block.miner}>
-                  <Link to={`/${chainId}/address/${block.miner}`} className="table-cell-address">
+                  <Link to={`/${networkId}/address/${block.miner}`} className="table-cell-address">
                     {truncate(block.miner)}
                   </Link>
                 </td>

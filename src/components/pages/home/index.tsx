@@ -1,8 +1,9 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import type { NetworkConfig } from "../../config/networks";
-import { useNetworks } from "../../context/AppContext";
-import NetworkIcon from "../common/NetworkIcon";
+import type { NetworkConfig } from "../../../config/networks";
+import { useNetworks } from "../../../context/AppContext";
+import NetworkIcon from "../../common/NetworkIcon";
+import TierBadge from "../../common/TierBadge";
 
 interface NetworkCardProps {
   network: NetworkConfig;
@@ -13,7 +14,7 @@ const NetworkCard: React.FC<NetworkCardProps> = ({ network }) => {
 
   return (
     <Link
-      to={`/${network.chainId}`}
+      to={`/${network.networkId}`}
       className="network-card-link"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -36,11 +37,13 @@ const NetworkCard: React.FC<NetworkCardProps> = ({ network }) => {
             <NetworkIcon network={network} size={32} />
           </div>
           <div className="network-card-info">
-            <h3 className="network-card-title">{network.name}</h3>
-            <div className="network-card-chain-id">Chain ID: {network.chainId}</div>
+            <div className="network-card-title-row">
+              <h3 className="network-card-title">{network.name}</h3>
+              <TierBadge subscription={network.subscription} size="small" />
+            </div>
+            <div className="network-card-chain-id">Network ID: {network.networkId}</div>
           </div>
         </div>
-        <p className="network-card-description">{network.description}</p>
       </div>
     </Link>
   );
@@ -55,15 +58,15 @@ export default function Home() {
     const envNetworks = process.env.REACT_APP_OPENSCAN_NETWORKS;
 
     // Check if Hardhat (31337) is explicitly enabled in REACT_APP_OPENSCAN_NETWORKS
-    const hardhatChainId = 31337;
+    const hardhatNetworkId = 31337;
     const isHardhatExplicitlyEnabled = envNetworks
       ?.split(",")
       .map((id) => parseInt(id.trim(), 10))
-      .includes(hardhatChainId);
+      .includes(hardhatNetworkId);
 
     // Filter out Hardhat from home page if not in development and not explicitly enabled
     if (!isDevelopment && !isHardhatExplicitlyEnabled) {
-      return allNetworks.filter((n) => n.chainId !== hardhatChainId);
+      return allNetworks.filter((n) => n.networkId !== hardhatNetworkId);
     }
 
     return allNetworks;
@@ -80,7 +83,7 @@ export default function Home() {
             <p className="loading-text">Loading networks...</p>
           ) : (
             displayNetworks.map((network) => (
-              <NetworkCard key={network.chainId} network={network} />
+              <NetworkCard key={network.networkId} network={network} />
             ))
           )}
         </div>

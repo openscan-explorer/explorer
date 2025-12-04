@@ -5,14 +5,14 @@ import { RPCIndicator } from "./RPCIndicator";
 
 interface BlockDisplayProps {
   block: Block | BlockArbitrum;
-  chainId?: string;
+  networkId?: string;
   metadata?: RPCMetadata;
   selectedProvider?: string | null;
   onProviderSelect?: (provider: string) => void;
 }
 
 const BlockDisplay: React.FC<BlockDisplayProps> = React.memo(
-  ({ block, chainId, metadata, selectedProvider, onProviderSelect }) => {
+  ({ block, networkId, metadata, selectedProvider, onProviderSelect }) => {
     const [showWithdrawals, setShowWithdrawals] = useState(false);
     const [showTransactions, setShowTransactions] = useState(false);
     const [showMoreDetails, setShowMoreDetails] = useState(false);
@@ -125,11 +125,11 @@ const BlockDisplay: React.FC<BlockDisplayProps> = React.memo(
             <span className="tx-label">Block Height:</span>
             <span className="tx-value">
               <span className="block-height-value">{blockNumber.toLocaleString()}</span>
-              {chainId && (
+              {networkId && (
                 <span className="block-nav">
                   {blockNumber > 0 && (
                     <Link
-                      to={`/${chainId}/block/${blockNumber - 1}`}
+                      to={`/${networkId}/block/${blockNumber - 1}`}
                       className="block-nav-btn"
                       title="Previous block"
                     >
@@ -137,7 +137,7 @@ const BlockDisplay: React.FC<BlockDisplayProps> = React.memo(
                     </Link>
                   )}
                   <Link
-                    to={`/${chainId}/block/${blockNumber + 1}`}
+                    to={`/${networkId}/block/${blockNumber + 1}`}
                     className="block-nav-btn"
                     title="Next block"
                   >
@@ -183,8 +183,8 @@ const BlockDisplay: React.FC<BlockDisplayProps> = React.memo(
           <div className="tx-row">
             <span className="tx-label">Fee Recipient:</span>
             <span className="tx-value tx-mono">
-              {chainId ? (
-                <Link to={`/${chainId}/address/${block.miner}`} className="link-accent">
+              {networkId ? (
+                <Link to={`/${networkId}/address/${block.miner}`} className="link-accent">
                   {block.miner}
                 </Link>
               ) : (
@@ -293,10 +293,10 @@ const BlockDisplay: React.FC<BlockDisplayProps> = React.memo(
                 <div className="detail-row">
                   <span className="detail-label">Parent Hash:</span>
                   <span className="detail-value tx-mono">
-                    {chainId &&
+                    {networkId &&
                     block.parentHash !==
                       "0x0000000000000000000000000000000000000000000000000000000000000000" ? (
-                      <Link to={`/${chainId}/block/${blockNumber - 1}`} className="link-accent">
+                      <Link to={`/${networkId}/block/${blockNumber - 1}`} className="link-accent">
                         {block.parentHash}
                       </Link>
                     ) : (
@@ -364,8 +364,8 @@ const BlockDisplay: React.FC<BlockDisplayProps> = React.memo(
                   <div key={txHash} className="tx-list-item">
                     <span className="tx-list-index">{index}</span>
                     <span className="tx-list-hash tx-mono">
-                      {chainId ? (
-                        <Link to={`/${chainId}/tx/${txHash}`} className="link-accent">
+                      {networkId ? (
+                        <Link to={`/${networkId}/tx/${txHash}`} className="link-accent">
                           {txHash}
                         </Link>
                       ) : (
@@ -414,9 +414,9 @@ const BlockDisplay: React.FC<BlockDisplayProps> = React.memo(
                       <div className="tx-log-row">
                         <span className="tx-log-label">Address</span>
                         <span className="tx-log-value tx-mono">
-                          {chainId ? (
+                          {networkId ? (
                             <Link
-                              to={`/${chainId}/address/${withdrawal.address}`}
+                              to={`/${networkId}/address/${withdrawal.address}`}
                               className="link-accent"
                             >
                               {withdrawal.address}

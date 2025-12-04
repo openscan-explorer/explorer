@@ -13,7 +13,7 @@ export function getDefaultRpcEndpoints(): RpcUrlsContextType {
 
   for (const network of networks) {
     if (network.rpc?.public && network.rpc.public.length > 0) {
-      endpoints[network.chainId] = network.rpc.public;
+      endpoints[network.networkId] = network.rpc.public;
     }
   }
 
@@ -56,7 +56,7 @@ export function loadRpcUrlsFromStorage(): RpcUrlsContextType | null {
 }
 
 /**
- * Save RPC urls to localStorage. Keys should be numeric chain ids.
+ * Save RPC urls to localStorage. Keys should be numeric network ids.
  */
 export function saveRpcUrlsToStorage(map: RpcUrlsContextType): void {
   try {
@@ -76,7 +76,7 @@ export function saveRpcUrlsToStorage(map: RpcUrlsContextType): void {
 
 /**
  * Return the effective rpc urls by merging defaults with any stored overrides.
- * Stored values override default for a chainId; missing chains fall back to defaults.
+ * Stored values override default for a networkId; missing networks fall back to defaults.
  * Defaults are fetched from loaded network metadata.
  */
 export function getEffectiveRpcUrls(): RpcUrlsContextType {

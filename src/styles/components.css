@@ -685,7 +685,6 @@
 	display: flex;
 	align-items: center;
 	gap: 12px;
-	margin-bottom: 8px;
 	justify-content: flex-start;
 }
 
@@ -711,6 +710,13 @@
 	flex: 1;
 }
 
+.network-card-title-row {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	flex-wrap: wrap;
+}
+
 .network-card-title {
 	margin: 0;
 	font-family: "Outfit", sans-serif;
@@ -725,15 +731,6 @@
 	font-size: 0.75rem;
 	color: #059669;
 	font-weight: 500;
-}
-
-.network-card-description {
-	margin: 0;
-	font-family: "Outfit", sans-serif;
-	font-size: 0.85rem;
-	color: #0da978ff;
-	line-height: 1.4;
-	text-align: center;
 }
 
 /* Buttons */

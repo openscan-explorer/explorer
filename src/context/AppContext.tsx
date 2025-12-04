@@ -1,6 +1,6 @@
 import { createContext, type ReactNode, useContext, useEffect, useMemo, useState } from "react";
 import { useAccount } from "wagmi";
-import { getAllNetworks, getNetworkByChainId, loadNetworks } from "../config/networks";
+import { getAllNetworks, getNetworkById, loadNetworks } from "../config/networks";
 import { useWagmiConnection } from "../hooks/useWagmiConnection";
 import type { IAppContext, NetworkConfig, RpcUrlsContextType } from "../types";
 import { loadJsonFilesFromStorage, saveJsonFilesToStorage } from "../utils/artifactsStorage";
@@ -49,20 +49,20 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
       return networks;
     }
 
-    // Parse comma-separated chain IDs
-    const enabledChainIds = envNetworks
+    // Parse comma-separated network IDs
+    const enabledNetworkIds = envNetworks
       .split(",")
       .map((id) => parseInt(id.trim(), 10))
       .filter((id) => !Number.isNaN(id));
 
-    if (enabledChainIds.length === 0) {
+    if (enabledNetworkIds.length === 0) {
       return networks;
     }
 
-    // Filter networks by enabled chain IDs, maintaining order from env var
+    // Filter networks by enabled network IDs, maintaining order from env var
     const filtered: NetworkConfig[] = [];
-    for (const chainId of enabledChainIds) {
-      const network = networks.find((n) => n.chainId === chainId);
+    for (const networkId of enabledNetworkIds) {
+      const network = networks.find((n) => n.networkId === networkId);
       if (network) {
         filtered.push(network);
       }
@@ -194,7 +194,7 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
         enabledNetworks,
         networksLoading,
         networksError,
-        getNetwork: getNetworkByChainId,
+        getNetwork: getNetworkById,
         reloadNetworks: loadNetworkData,
       }}
     >
@@ -216,7 +216,7 @@ export function useNetworks() {
   };
 }
 
-export function useNetwork(chainId: number): NetworkConfig | undefined {
+export function useNetwork(networkId: number): NetworkConfig | undefined {
   const { getNetwork } = useNetworks();
-  return getNetwork(chainId);
+  return getNetwork(networkId);
 }

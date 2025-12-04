@@ -1,12 +1,12 @@
 import React from "react";
-import type { NetworkStats, RPCMetadata } from "../../types";
-import { RPCIndicator } from "./RPCIndicator";
+import type { NetworkStats, RPCMetadata } from "../../../types";
+import { RPCIndicator } from "../../common/RPCIndicator";
 
 interface NetworkStatsDisplayProps {
   networkStats: NetworkStats | null;
   loading?: boolean;
   error?: string | null;
-  chainId?: number;
+  networkId?: number;
   metadata?: RPCMetadata;
   selectedProvider?: string | null;
   onProviderSelect?: (provider: string) => void;
@@ -17,7 +17,7 @@ const NetworkStatsDisplay: React.FC<NetworkStatsDisplayProps> = React.memo(
     networkStats,
     loading = false,
     error = null,
-    chainId,
+    networkId,
     metadata,
     selectedProvider,
     onProviderSelect,
@@ -69,7 +69,7 @@ const NetworkStatsDisplay: React.FC<NetworkStatsDisplayProps> = React.memo(
 
     // Parse protocol version from metadata (localhost/Hardhat only)
     const getProtocolVersion = (): string | null => {
-      if (chainId !== 31337 || !networkStats.metadata) {
+      if (networkId !== 31337 || !networkStats.metadata) {
         return null;
       }
 
@@ -83,18 +83,18 @@ const NetworkStatsDisplay: React.FC<NetworkStatsDisplayProps> = React.memo(
 
     // Get forked network info (localhost/Hardhat only)
     const getForkedNetworkInfo = (): {
-      chainId: number;
+      networkId: number;
       blockNumber: number;
       blockHash: string;
     } | null => {
-      if (chainId !== 31337 || !networkStats.metadata || !networkStats.metadata.forkedNetwork) {
+      if (networkId !== 31337 || !networkStats.metadata || !networkStats.metadata.forkedNetwork) {
         return null;
       }
 
       try {
         const forked = networkStats.metadata.forkedNetwork;
         return {
-          chainId: forked.chainId,
+          networkId: forked.chainId,
           blockNumber: forked.forkBlockNumber,
           blockHash: forked.forkBlockHash,
         };
@@ -156,7 +156,7 @@ const NetworkStatsDisplay: React.FC<NetworkStatsDisplayProps> = React.memo(
             </div>
 
             {networkStats.clientVersion && (
-              <div className="block-detail-item network-stat-full-width">
+              <div className="block-detail-item">
                 <span className="detail-label">Client Version</span>
                 <span className="detail-value tx-mono">{networkStats.clientVersion}</span>
               </div>
@@ -173,7 +173,7 @@ const NetworkStatsDisplay: React.FC<NetworkStatsDisplayProps> = React.memo(
               <>
                 <div className="block-detail-item">
                   <span className="detail-label">Forked Network</span>
-                  <span className="detail-value">Chain ID: {forkedNetwork.chainId}</span>
+                  <span className="detail-value">Chain ID: {forkedNetwork.networkId}</span>
                 </div>
 
                 <div className="block-detail-item">

@@ -3,7 +3,7 @@ import { arbitrum, base, hardhat, mainnet, optimism, polygon, sepolia } from "wa
 import jsonConfig from "./config.json";
 
 export interface Network {
-  chainId: number;
+  networkId: number;
   name: string;
   currency: string;
 }
@@ -16,31 +16,38 @@ export interface Config {
  * Get the configuration with the contracts and networks
  */
 export function getConfig(): Config {
-  return jsonConfig;
+  // Map chainId from config.json to networkId internally
+  return {
+    networks: jsonConfig.networks.map((n) => ({
+      networkId: n.chainId,
+      name: n.name,
+      currency: n.currency,
+    })),
+  };
 }
 
 /**
- * Get network configuration by chain ID
- * @param chainId - Chain ID
+ * Get network configuration by network ID
+ * @param networkId - Network ID
  * @returns Network configuration or null if not found
  */
-export function getNetworkConfig(chainId: number): Network | null {
+export function getNetworkConfig(networkId: number): Network | null {
   const config = getConfig();
-  return config.networks.find((n) => n.chainId === chainId) || null;
+  return config.networks.find((n) => n.networkId === networkId) || null;
 }
 
 /**
  * Get all supported networks
  * @returns Array of all supported networks
  */
-export function getAllNetworks(): Network[] {
+export function getAllNetworksFromConfig(): Network[] {
   const config = getConfig();
   return config.networks;
 }
 
 /**
  * Get supported wagmi chains based on the configuration
- * Maps chain IDs from config to wagmi chain objects
+ * Maps network IDs from config to wagmi chain objects
  * @returns Array of wagmi Chain objects
  */
 export function getSupportedChains(): Chain[] {
@@ -56,6 +63,6 @@ export function getSupportedChains(): Chain[] {
   };
 
   return config.networks
-    .map((network) => chainMap[network.chainId])
+    .map((network) => chainMap[network.networkId])
     .filter((chain): chain is Chain => chain !== undefined);
 }

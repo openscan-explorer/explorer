@@ -24,7 +24,7 @@ export const NetworkIcon: React.FC<NetworkIconProps> = ({ network, size = 32 }) 
 
   // If logo failed to load, show fallback
   if (imageError || !network.logo) {
-    return <EthereumIcon color={network.color} size={size} />;
+    return <EthereumIcon color={network.color ?? "#627EEA"} size={size} />;
   }
 
   const logoUrl = getNetworkLogoUrl(network.logo);

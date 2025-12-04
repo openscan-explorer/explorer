@@ -4,7 +4,7 @@ import type { BlockArbitrum } from "../../../../types";
 // biome-ignore lint/complexity/noStaticOnlyClass: <TODO>
 export class BlockArbitrumAdapter {
   // biome-ignore lint/suspicious/noExplicitAny: <TODO>
-  static fromRPCBlock(rpcBlock: any, _chainId: number): BlockArbitrum {
+  static fromRPCBlock(rpcBlock: any, _networkId: number): BlockArbitrum {
     console.log("Arbitrum block:", rpcBlock);
     const timestamp = rpcBlock.timestamp
       ? parseInt(rpcBlock.timestamp, rpcBlock.timestamp.startsWith("0x") ? 16 : 10).toString()

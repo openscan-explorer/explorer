@@ -2,8 +2,8 @@ import { lazy, Suspense } from "react";
 import Loading from "./common/Loading";
 
 // Lazy load page components
-const Home = lazy(() => import("./pages/Home"));
-const Chain = lazy(() => import("./pages/Chain"));
+const Home = lazy(() => import("./pages/home"));
+const Chain = lazy(() => import("./pages/network"));
 const Blocks = lazy(() => import("./pages/Blocks"));
 const Block = lazy(() => import("./pages/Block"));
 const Txs = lazy(() => import("./pages/Txs"));

@@ -4,7 +4,7 @@ import type { Transaction, TransactionReceiptOptimism } from "../../../../types"
 // biome-ignore lint/complexity/noStaticOnlyClass: <TODO>
 export class TransactionOptimismAdapter {
   // biome-ignore lint/suspicious/noExplicitAny: <TODO>
-  static fromRPCTransaction(rpcTx: any, _chainId: number, receipt?: any | null): Transaction {
+  static fromRPCTransaction(rpcTx: any, _networkId: number, receipt?: any | null): Transaction {
     const transaction: Transaction = {
       hash: rpcTx.hash,
       from: rpcTx.from,

@@ -3,7 +3,7 @@ import type { Block, RPCBlock } from "../../../../types";
 
 // biome-ignore lint/complexity/noStaticOnlyClass: <TODO>
 export class BlockOptimismAdapter {
-  static fromRPCBlock(rpcBlock: RPCBlock, _chainId: number): Block {
+  static fromRPCBlock(rpcBlock: RPCBlock, _networkId: number): Block {
     console.log("Optimism block:", rpcBlock);
     const timestamp = rpcBlock.timestamp
       ? parseInt(rpcBlock.timestamp, rpcBlock.timestamp.startsWith("0x") ? 16 : 10).toString()

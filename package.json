@@ -12,6 +12,7 @@
 		"jszip": "^3.10.1",
 		"react": "^19.1.0",
 		"react-dom": "^19.1.0",
+		"react-markdown": "^10.1.0",
 		"react-router-dom": "^7.4.1",
 		"vitest": "^4.0.14",
 		"wagmi": "^2.15.6",

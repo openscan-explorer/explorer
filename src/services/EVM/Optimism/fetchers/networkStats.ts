@@ -6,7 +6,7 @@ import type { RPCClient } from "../../common/RPCClient";
 export class NetworkStatsFetcher {
   constructor(
     private rpcClient: RPCClient,
-    private chainId: number,
+    private networkId: number,
   ) {}
 
   async getNetworkStats(): Promise<NetworkStats> {
@@ -44,7 +44,7 @@ export class NetworkStatsFetcher {
     return await this.rpcClient.call<string>("eth_blockNumber", []);
   }
 
-  getChainId(): number {
-    return this.chainId;
+  getNetworkId(): number {
+    return this.networkId;
   }
 }

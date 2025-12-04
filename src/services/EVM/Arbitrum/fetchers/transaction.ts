@@ -6,7 +6,7 @@ import type { RPCClient } from "../../common/RPCClient";
 export class TransactionFetcher {
   constructor(
     private rpcClient: RPCClient,
-    private chainId: number,
+    private networkId: number,
   ) {}
 
   async getTransaction(txHash: string): Promise<RPCTransaction | null> {
@@ -29,7 +29,7 @@ export class TransactionFetcher {
     return parseInt(result, 16);
   }
 
-  getChainId(): number {
-    return this.chainId;
+  getNetworkId(): number {
+    return this.networkId;
   }
 }
