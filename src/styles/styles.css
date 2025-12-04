@@ -1340,6 +1340,7 @@ body {
 .footer-left {
   display: flex;
   align-items: center;
+  gap: 16px;
 }
 
 .footer-link {
@@ -4017,6 +4018,7 @@ code {
 .footer-left {
   display: flex;
   align-items: center;
+  gap: 16px;
 }
 
 .footer-link {

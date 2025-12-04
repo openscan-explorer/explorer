@@ -2781,3 +2781,151 @@
 	cursor: pointer;
 }
 
+/* ============================================
+   Supporters Page Styles
+   ============================================ */
+
+.supporters-container {
+	display: flex;
+	flex-direction: column;
+	gap: 32px;
+	margin-bottom: 32px;
+}
+
+.supporters-tier-section {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+}
+
+.supporters-tier-title {
+	font-family: "Outfit", sans-serif;
+	font-size: 2rem;
+	font-weight: 700;
+	color: #10b981;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 10px;
+	margin: 0;
+	text-align: center;
+}
+
+.tier-icon {
+	font-size: 1.75rem;
+}
+
+.supporters-grid {
+	display: grid;
+	gap: 16px;
+	justify-content: center;
+}
+
+.supporters-grid-allies {
+	grid-template-columns: repeat(auto-fit, minmax(280px, 320px));
+}
+
+.supporters-grid-partners {
+	grid-template-columns: repeat(auto-fit, minmax(240px, 280px));
+}
+
+.supporters-grid-backers {
+	grid-template-columns: repeat(auto-fit, minmax(200px, 240px));
+}
+
+.supporter-card {
+	display: block;
+	background: rgba(255, 255, 255, 0.05);
+	border: 2px solid rgba(255, 255, 255, 0.1);
+	border-radius: 12px;
+	padding: 16px;
+	text-decoration: none;
+	transition: all 0.3s ease;
+}
+
+.supporter-card:hover {
+	transform: translateY(-4px);
+	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.supporter-card-content {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.supporter-logo {
+	width: 48px;
+	height: 48px;
+	border-radius: 10px;
+	object-fit: contain;
+}
+
+.supporter-logo-placeholder {
+	width: 48px;
+	height: 48px;
+	border-radius: 10px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-family: "Outfit", sans-serif;
+	font-size: 1.5rem;
+	font-weight: 700;
+	color: white;
+}
+
+.supporter-info {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.supporter-name {
+	font-family: "Outfit", sans-serif;
+	font-size: 1rem;
+	font-weight: 600;
+	color: #10b981;
+}
+
+.supporter-meta {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.supporter-type {
+	font-family: "Outfit", sans-serif;
+	font-size: 0.75rem;
+	color: #6b7280;
+	text-transform: capitalize;
+}
+
+.supporter-card-no-link {
+	cursor: default;
+}
+
+.supporter-card-no-link:hover {
+	transform: none;
+	box-shadow: none;
+}
+
+.supporters-empty {
+	font-family: "Outfit", sans-serif;
+	font-size: 1.1rem;
+	color: #6b7280;
+	margin-bottom: 16px;
+}
+
+.supporters-cta {
+	margin-top: 32px;
+	padding-top: 24px;
+	border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.supporters-cta p {
+	font-family: "Outfit", sans-serif;
+	font-size: 1rem;
+	color: #6b7280;
+	margin-bottom: 12px;
+}
+
