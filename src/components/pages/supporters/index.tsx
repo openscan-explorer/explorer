@@ -109,13 +109,24 @@ interface SupporterCardProps {
 }
 
 const SupporterCard: React.FC<SupporterCardProps> = ({ supporter }) => {
-  // Determine link based on supporter type
+  // Link based on supporter type - tokens link to address page, others to profile
   const getLink = () => {
-    if (supporter.type === "network" && supporter.chainId) {
-      return `/${supporter.chainId}`;
+    switch (supporter.type) {
+      case "token":
+        // Token id is the token address, link to address page on the network
+        if (supporter.chainId) {
+          return `/${supporter.chainId}/address/${supporter.id}`;
+        }
+        return undefined;
+      case "network":
+        return `/profile/network/${supporter.chainId || supporter.id}`;
+      case "app":
+        return `/profile/app/${supporter.id}`;
+      case "organization":
+        return `/profile/organization/${supporter.id}`;
+      default:
+        return undefined;
     }
-    // For non-network supporters, don't link anywhere for now
-    return undefined;
   };
 
   const link = getLink();

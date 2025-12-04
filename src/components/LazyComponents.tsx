@@ -14,6 +14,7 @@ const Settings = lazy(() => import("./pages/settings"));
 const DevTools = lazy(() => import("./pages/devtools"));
 const About = lazy(() => import("./pages/about"));
 const Subscriptions = lazy(() => import("./pages/subscriptions"));
+const Profile = lazy(() => import("./pages/profile"));
 const Supporters = lazy(() => import("./pages/supporters"));
 
 // Higher-order component to wrap lazy components with Suspense
@@ -42,6 +43,7 @@ export const LazySettings = withSuspense(Settings);
 export const LazyDevTools = withSuspense(DevTools);
 export const LazyAbout = withSuspense(About);
 export const LazySubscriptions = withSuspense(Subscriptions);
+export const LazyProfile = withSuspense(Profile);
 export const LazySupporters = withSuspense(Supporters);
 // Default exports for backward compatibility
 export { Home };

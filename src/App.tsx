@@ -43,6 +43,7 @@ import {
   LazyDevTools,
   LazyHome,
   LazyMempool,
+  LazyProfile,
   LazySettings,
   LazySubscriptions,
   LazySupporters,
@@ -96,6 +97,7 @@ function AppContent() {
               <Route path="about" element={<LazyAbout />} />
               <Route path="devtools" element={<LazyDevTools />} />
               <Route path="subscriptions" element={<LazySubscriptions />} />
+              <Route path="profile/:profileType/:profileId" element={<LazyProfile />} />
               <Route path="supporters" element={<LazySupporters />} />
               <Route path=":networkId" element={<LazyChain />} />
               <Route path=":networkId/blocks" element={<LazyBlocks />} />
