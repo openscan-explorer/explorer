@@ -1,9 +1,9 @@
 import type React from "react";
 import { useContext, useMemo, useState } from "react";
-import { getEnabledNetworks } from "../../config/networks";
-import { AppContext } from "../../context/AppContext";
-import { useSettings } from "../../context/SettingsContext";
-import type { RPCUrls, RpcUrlsContextType } from "../../types";
+import { getEnabledNetworks } from "../../../config/networks";
+import { AppContext } from "../../../context/AppContext";
+import { useSettings } from "../../../context/SettingsContext";
+import type { RPCUrls, RpcUrlsContextType } from "../../../types";
 
 const Settings: React.FC = () => {
   const { rpcUrls, setRpcUrls } = useContext(AppContext);

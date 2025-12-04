@@ -3,8 +3,8 @@ import React, { useCallback, useContext, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { encodeFunctionData, parseEther, toFunctionSelector } from "viem";
 import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
-import { AppContext } from "../../context";
-import { useSourcify } from "../../hooks/useSourcify";
+import { AppContext } from "../../../context";
+import { useSourcify } from "../../../hooks/useSourcify";
 import type {
   ABI,
   ABIParameter,
@@ -17,9 +17,9 @@ import type {
   FunctionABI,
   RPCMetadata,
   Transaction,
-} from "../../types";
+} from "../../../types";
+import { RPCIndicator } from "../../common/RPCIndicator";
 import ENSRecordsDisplay from "./ENSRecordsDisplay";
-import { RPCIndicator } from "./RPCIndicator";
 
 interface AddressDisplayProps {
   address: Address;

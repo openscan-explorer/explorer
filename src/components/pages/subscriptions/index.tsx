@@ -1,10 +1,10 @@
 import type React from "react";
 import { useState } from "react";
-import paymentHelp1 from "../../assets/paymentHelp1.png";
-import paymentHelp2 from "../../assets/paymentHelp2.png";
-import paymentHelp3 from "../../assets/paymentHelp3.png";
-import { OPENSCAN_PAYMENT_ADDRESS } from "../../config/index";
-import "../../styles/subscriptions.css";
+import paymentHelp1 from "../../../assets/paymentHelp1.png";
+import paymentHelp2 from "../../../assets/paymentHelp2.png";
+import paymentHelp3 from "../../../assets/paymentHelp3.png";
+import { OPENSCAN_PAYMENT_ADDRESS } from "../../../config/index";
+import "../../../styles/subscriptions.css";
 
 type SubscriptionCategory = "tokens" | "networks" | "apps" | "companies";
 

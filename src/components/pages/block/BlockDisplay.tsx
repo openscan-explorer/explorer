@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import type { Block, BlockArbitrum, RPCMetadata } from "../../types";
-import { RPCIndicator } from "./RPCIndicator";
+import type { Block, BlockArbitrum, RPCMetadata } from "../../../types";
+import { RPCIndicator } from "../../common/RPCIndicator";
 
 interface BlockDisplayProps {
   block: Block | BlockArbitrum;

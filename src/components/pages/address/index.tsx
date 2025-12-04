@@ -1,17 +1,17 @@
 import { useEffect, useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
-import { useDataService } from "../../hooks/useDataService";
-import { useENS } from "../../hooks/useENS";
-import { useProviderSelection } from "../../hooks/useProviderSelection";
-import { useSelectedData } from "../../hooks/useSelectedData";
+import { useDataService } from "../../../hooks/useDataService";
+import { useENS } from "../../../hooks/useENS";
+import { useProviderSelection } from "../../../hooks/useProviderSelection";
+import { useSelectedData } from "../../../hooks/useSelectedData";
 import type {
   AddressTransactionsResult,
   Address as AddressType,
   DataWithMetadata,
   Transaction,
-} from "../../types";
-import AddressDisplay from "../common/AddressDisplay";
-import Loader from "../common/Loader";
+} from "../../../types";
+import Loader from "../../common/Loader";
+import AddressDisplay from "./AddressDisplay";
 
 export default function Address() {
   const { networkId, address } = useParams<{
@@ -115,7 +115,7 @@ export default function Address() {
 
   if (loading) {
     return (
-      <div className="container-wide container-padded">
+      <div className="container-wide">
         <div className="block-display-card">
           <div className="block-display-header">
             <span className="block-label">Address</span>
@@ -131,7 +131,7 @@ export default function Address() {
 
   if (error) {
     return (
-      <div className="container-wide container-padded">
+      <div className="container-wide">
         <div className="block-display-card">
           <div className="block-display-header">
             <span className="block-label">Address</span>
@@ -147,7 +147,7 @@ export default function Address() {
 
   if (!address) {
     return (
-      <div className="container-wide container-padded">
+      <div className="container-wide">
         <div className="block-display-card">
           <div className="block-display-header">
             <span className="block-label">Address</span>
@@ -161,7 +161,7 @@ export default function Address() {
   }
 
   return (
-    <div className="container-wide container-padded">
+    <div className="container-wide">
       {addressData ? (
         <AddressDisplay
           address={addressData}

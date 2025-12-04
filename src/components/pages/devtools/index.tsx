@@ -1,12 +1,12 @@
 import type React from "react";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import ContractsSection from "../devtools/ContractsSection";
-import DevelopmentSection from "../devtools/DevelopmentSection";
-import SignaturesSection from "../devtools/SignaturesSection";
-import TransactionsSection from "../devtools/TransactionsSection";
-import UtilsSection from "../devtools/UtilsSection";
-import "../../styles/devtools.css";
+import ContractsSection from "./ContractsSection";
+import DevelopmentSection from "./DevelopmentSection";
+import SignaturesSection from "./SignaturesSection";
+import TransactionsSection from "./TransactionsSection";
+import UtilsSection from "./UtilsSection";
+import "../../../styles/devtools.css";
 
 const DevTools: React.FC = () => {
   const location = useLocation();

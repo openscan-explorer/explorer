@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { useDataService } from "../../hooks/useDataService";
-import type { Block } from "../../types";
-import Loader from "../common/Loader";
+import { useDataService } from "../../../hooks/useDataService";
+import type { Block } from "../../../types";
+import Loader from "../../common/Loader";
 
 const BLOCKS_PER_PAGE = 10;
 

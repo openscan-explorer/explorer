@@ -1,8 +1,8 @@
 import type React from "react";
 import { useCallback, useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { AppContext } from "../../context/AppContext";
-import { useZipJsonReader } from "../../hooks/useZipJsonReader";
+import { AppContext } from "../../../context/AppContext";
+import { useZipJsonReader } from "../../../hooks/useZipJsonReader";
 
 const DevelopmentSection: React.FC = () => {
   const [files, setFiles] = useState<File[]>([]);

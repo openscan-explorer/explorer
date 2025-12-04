@@ -1355,6 +1355,7 @@ body {
   background: rgba(255, 255, 255, 0.2);
   color: #ffffff;
   transform: translateY(-1px);
+  cursor: pointer;
 }
 
 .footer-version {

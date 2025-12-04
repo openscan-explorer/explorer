@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { useDataService } from "../../hooks/useDataService";
-import { useProviderSelection } from "../../hooks/useProviderSelection";
-import { useSelectedData } from "../../hooks/useSelectedData";
-import type { Block, DataWithMetadata } from "../../types";
-import BlockDisplay from "../common/BlockDisplay";
-import Loader from "../common/Loader";
+import { useDataService } from "../../../hooks/useDataService";
+import { useProviderSelection } from "../../../hooks/useProviderSelection";
+import { useSelectedData } from "../../../hooks/useSelectedData";
+import type { Block, DataWithMetadata } from "../../../types";
+import Loader from "../../common/Loader";
+import BlockDisplay from "./BlockDisplay";
 
 export default function BlockPage() {
   const { networkId, filter } = useParams<{
@@ -54,7 +54,7 @@ export default function BlockPage() {
 
   if (loading) {
     return (
-      <div className="container-wide container-padded">
+      <div className="container-wide">
         <div className="block-display-card">
           <div className="block-display-header">
             <span className="block-label">Block</span>
@@ -70,7 +70,7 @@ export default function BlockPage() {
 
   if (error) {
     return (
-      <div className="container-wide container-padded">
+      <div className="container-wide">
         <div className="block-display-card">
           <div className="block-display-header">
             <span className="block-label">Block</span>
@@ -85,7 +85,7 @@ export default function BlockPage() {
   }
 
   return (
-    <div className="container-wide container-padded">
+    <div className="container-wide">
       {block ? (
         <BlockDisplay
           block={block}

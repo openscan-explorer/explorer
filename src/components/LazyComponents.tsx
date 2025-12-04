@@ -4,16 +4,16 @@ import Loading from "./common/Loading";
 // Lazy load page components
 const Home = lazy(() => import("./pages/home"));
 const Chain = lazy(() => import("./pages/network"));
-const Blocks = lazy(() => import("./pages/Blocks"));
-const Block = lazy(() => import("./pages/Block"));
-const Txs = lazy(() => import("./pages/Txs"));
-const Tx = lazy(() => import("./pages/Tx"));
-const Address = lazy(() => import("./pages/Address"));
-const Mempool = lazy(() => import("./pages/Mempool"));
-const Settings = lazy(() => import("./pages/Settings"));
-const DevTools = lazy(() => import("./pages/DevTools"));
-const About = lazy(() => import("./pages/About"));
-const Subscriptions = lazy(() => import("./pages/Subscriptions"));
+const Blocks = lazy(() => import("./pages/blocks"));
+const Block = lazy(() => import("./pages/block"));
+const Txs = lazy(() => import("./pages/txs"));
+const Tx = lazy(() => import("./pages/tx"));
+const Address = lazy(() => import("./pages/address"));
+const Mempool = lazy(() => import("./pages/mempool"));
+const Settings = lazy(() => import("./pages/settings"));
+const DevTools = lazy(() => import("./pages/devtools"));
+const About = lazy(() => import("./pages/about"));
+const Subscriptions = lazy(() => import("./pages/subscriptions"));
 
 // Higher-order component to wrap lazy components with Suspense
 // biome-ignore lint/suspicious/noExplicitAny: <TODO>

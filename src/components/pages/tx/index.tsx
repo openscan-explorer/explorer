@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { useDataService } from "../../hooks/useDataService";
-import { useProviderSelection } from "../../hooks/useProviderSelection";
-import { useSelectedData } from "../../hooks/useSelectedData";
-import type { DataWithMetadata, Transaction } from "../../types";
-import Loader from "../common/Loader";
-import TransactionDisplay from "../common/TransactionDisplay";
+import { useDataService } from "../../../hooks/useDataService";
+import { useProviderSelection } from "../../../hooks/useProviderSelection";
+import { useSelectedData } from "../../../hooks/useSelectedData";
+import type { DataWithMetadata, Transaction } from "../../../types";
+import Loader from "../../common/Loader";
+import TransactionDisplay from "./TransactionDisplay";
 
 export default function Tx() {
   const { networkId, filter } = useParams<{
@@ -58,7 +58,7 @@ export default function Tx() {
 
   if (loading) {
     return (
-      <div className="container-wide container-padded">
+      <div className="container-wide">
         <div className="block-display-card">
           <div className="block-display-header">
             <span className="block-label">Transaction</span>
@@ -74,7 +74,7 @@ export default function Tx() {
 
   if (error) {
     return (
-      <div className="container-wide container-padded">
+      <div className="container-wide">
         <div className="block-display-card">
           <div className="block-display-header">
             <span className="block-label">Transaction</span>
@@ -89,7 +89,7 @@ export default function Tx() {
   }
 
   return (
-    <div className="container-wide container-padded">
+    <div className="container-wide">
       {transaction ? (
         <TransactionDisplay
           transaction={transaction}

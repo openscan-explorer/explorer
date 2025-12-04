@@ -3,7 +3,7 @@ import { useLocation } from "react-router-dom";
 import { getRPCUrls } from "../../config/rpcConfig";
 import { AppContext, useNetworks } from "../../context/AppContext";
 import { RPCClient } from "../../services/EVM/common/RPCClient";
-import { NetworkIcon } from "./NetworkIcon";
+import { NetworkIcon } from "../common/NetworkIcon";
 
 interface NetworkBlockIndicatorProps {
   className?: string;

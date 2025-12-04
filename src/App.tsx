@@ -26,8 +26,8 @@ function getBasename(): string {
 import ErrorBoundary from "./components/common/ErrorBoundary";
 import Footer from "./components/common/Footer";
 import { IsometricBlocks } from "./components/common/IsometricBlocks";
-import Navbar from "./components/common/Navbar";
 import NotificationDisplay from "./components/common/NotificationDisplay";
+import Navbar from "./components/navbar";
 import "./styles/styles.css";
 import "./styles/layouts.css";
 import "./styles/components.css";

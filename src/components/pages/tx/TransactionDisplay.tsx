@@ -1,29 +1,29 @@
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { AppContext } from "../../context";
-import { useSourcify } from "../../hooks/useSourcify";
-import type { DataService } from "../../services/DataService";
-import type { TraceResult } from "../../services/EVM/L1/fetchers/trace";
+import LongString from "../../../components/common/LongString";
+import { RPCIndicator } from "../../../components/common/RPCIndicator";
+import { AppContext } from "../../../context";
+import { useSourcify } from "../../../hooks/useSourcify";
+import type { DataService } from "../../../services/DataService";
+import type { TraceResult } from "../../../services/EVM/L1/fetchers/trace";
 import type {
   RPCMetadata,
   Transaction,
   TransactionArbitrum,
   TransactionReceiptArbitrum,
   TransactionReceiptOptimism,
-} from "../../types";
+} from "../../../types";
 import {
   type DecodedEvent,
   decodeEventLog,
   formatDecodedValue,
   getEventTypeColor,
-} from "../../utils/eventDecoder";
+} from "../../../utils/eventDecoder";
 import {
   type DecodedInput,
   decodeEventWithAbi,
   decodeFunctionCall,
-} from "../../utils/inputDecoder";
-import LongString from "./LongString";
-import { RPCIndicator } from "./RPCIndicator";
+} from "../../../utils/inputDecoder";
 
 interface TransactionDisplayProps {
   transaction: Transaction | TransactionArbitrum;

@@ -11,7 +11,7 @@ import {
   parseInputValue,
   parseSignatureComponents,
   stringToHex,
-} from "../../utils/devtools";
+} from "../../../utils/devtools";
 
 describe("DevTools Utils", () => {
   describe("convertEthUnits", () => {

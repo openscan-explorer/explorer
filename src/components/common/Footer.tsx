@@ -1,4 +1,5 @@
 import type React from "react";
+import { useNavigate } from "react-router";
 import { ENVIRONMENT } from "../../utils/constants";
 
 interface FooterProps {
@@ -6,6 +7,8 @@ interface FooterProps {
 }
 
 const Footer: React.FC<FooterProps> = ({ className = "" }) => {
+  const navigate = useNavigate();
+
   // Get commit hash from environment variable, fallback to 'development'
   const commitHash = process.env.REACT_APP_COMMIT_HASH || "development";
 
@@ -25,13 +28,17 @@ const Footer: React.FC<FooterProps> = ({ className = "" }) => {
     if (ENVIRONMENT === "development") return "footer-version-development";
     return "";
   };
+
+  const goToSubscriptions = () => {
+    navigate("/subscriptions");
+  };
   return (
     <footer className={`app-footer ${className}`}>
       <div className="footer-content">
         <div className="footer-left">
-          <a href="/subscriptions" className="footer-link">
+          <button type="button" onClick={goToSubscriptions} className="footer-link btn-reset">
             Subscribe
-          </a>
+          </button>
         </div>
         <div className={`footer-version ${getVersionClass()}`}>
           <span className="version-label">Version:</span>

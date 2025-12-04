@@ -6,7 +6,7 @@ import {
   type EthUnit,
   hexToString,
   stringToHex,
-} from "../../utils/devtools";
+} from "../../../utils/devtools";
 
 type SolidityType =
   | "string"
