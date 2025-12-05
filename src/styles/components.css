@@ -3789,3 +3789,88 @@
 	color: #10b981;
 }
 
+/* Address Type Display Components */
+.address-type-indicator {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin-bottom: 4px;
+}
+
+.address-type-icon {
+	font-size: 1.2rem;
+}
+
+.address-type-label {
+	font-size: 0.85rem;
+	font-weight: 600;
+	color: var(--text-secondary, #6b7280);
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+}
+
+.address-token-symbol {
+	font-size: 0.85rem;
+	font-weight: 700;
+	color: #10b981;
+	padding: 2px 8px;
+	background: rgba(16, 185, 129, 0.1);
+	border-radius: 4px;
+}
+
+/* Token Info Row */
+.token-info-row {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.token-logo {
+	width: 32px;
+	height: 32px;
+	border-radius: 50%;
+	object-fit: cover;
+	background: rgba(0, 0, 0, 0.1);
+}
+
+.token-name-symbol {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.token-name {
+	font-weight: 600;
+	color: var(--text-color, #1f2937);
+}
+
+.token-symbol {
+	font-size: 0.85rem;
+	color: var(--text-secondary, #6b7280);
+}
+
+/* Token Standard Badges */
+.token-standard-badge {
+	display: inline-block;
+	padding: 4px 10px;
+	border-radius: 4px;
+	font-size: 0.8rem;
+	font-weight: 600;
+	text-transform: uppercase;
+}
+
+.token-standard-erc20 {
+	background: rgba(59, 130, 246, 0.1);
+	color: #3b82f6;
+}
+
+.token-standard-erc721 {
+	background: rgba(139, 92, 246, 0.1);
+	color: #8b5cf6;
+}
+
+.token-standard-erc1155 {
+	background: rgba(236, 72, 153, 0.1);
+	color: #ec4899;
+}
+
