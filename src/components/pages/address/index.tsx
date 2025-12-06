@@ -1,17 +1,24 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
+import { AppContext } from "../../../context";
 import { useDataService } from "../../../hooks/useDataService";
 import { useENS } from "../../../hooks/useENS";
-import { useProviderSelection } from "../../../hooks/useProviderSelection";
-import { useSelectedData } from "../../../hooks/useSelectedData";
 import type {
+  Address as AddressData,
   AddressTransactionsResult,
-  Address as AddressType,
+  AddressType,
   DataWithMetadata,
   Transaction,
 } from "../../../types";
+import { fetchAddressWithType } from "../../../utils/addressTypeDetection";
 import Loader from "../../common/Loader";
-import AddressDisplay from "./AddressDisplay";
+import {
+  AccountDisplay,
+  ContractDisplay,
+  ERC20Display,
+  ERC721Display,
+  ERC1155Display,
+} from "./displays";
 
 export default function Address() {
   const { networkId, address } = useParams<{
@@ -21,7 +28,9 @@ export default function Address() {
   const location = useLocation();
   const numericNetworkId = Number(networkId) || 1;
   const dataService = useDataService(numericNetworkId);
-  const [addressResult, setAddressResult] = useState<DataWithMetadata<AddressType> | null>(null);
+  const { rpcUrls } = useContext(AppContext);
+  const [addressData, setAddressData] = useState<AddressData | null>(null);
+  const [addressType, setAddressType] = useState<AddressType>("account");
   const [transactionsResult, setTransactionsResult] = useState<AddressTransactionsResult | null>(
     null,
   );
@@ -29,14 +38,6 @@ export default function Address() {
   const [loadingTxDetails, setLoadingTxDetails] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  // Provider selection state
-  const [selectedProvider, setSelectedProvider] = useProviderSelection(
-    `address_${numericNetworkId}_${address}`,
-  );
-
-  // Extract actual address data based on selected provider
-  const addressData = useSelectedData(addressResult, selectedProvider);
 
   // Get ENS name from navigation state (if user searched by ENS name)
   const initialEnsName = (location.state as { ensName?: string })?.ensName;
@@ -51,37 +52,58 @@ export default function Address() {
     isMainnet,
   } = useENS(address, numericNetworkId, initialEnsName);
 
+  // Fetch address data and detect type in a single flow
   useEffect(() => {
-    if (!dataService || !address) {
+    if (!address) {
       setLoading(false);
       return;
     }
 
-    console.log("Fetching address data for:", address, "on chain:", numericNetworkId);
+    const rpcUrlsForChain = rpcUrls[numericNetworkId as keyof typeof rpcUrls];
+    if (!rpcUrlsForChain) {
+      setError("No RPC URL configured for this network");
+      setLoading(false);
+      return;
+    }
+
+    const rpcUrl = Array.isArray(rpcUrlsForChain) ? rpcUrlsForChain[0] : rpcUrlsForChain;
+    if (!rpcUrl) {
+      setError("No RPC URL configured for this network");
+      setLoading(false);
+      return;
+    }
+
+    console.log("Fetching address data and type for:", address, "on chain:", numericNetworkId);
     setLoading(true);
     setError(null);
 
-    // Fetch address data
-    dataService
-      .getAddress(address)
+    fetchAddressWithType({
+      addressHash: address,
+      chainId: numericNetworkId,
+      rpcUrl,
+    })
       .then((result) => {
-        console.log("Fetched address:", result);
-        setAddressResult(result);
+        console.log("Fetched address with type:", result);
+        setAddressData(result.address);
+        setAddressType(result.addressType);
       })
       .catch((err) => {
         console.error("Error fetching address:", err);
         setError(err.message || "Failed to fetch address data");
       })
       .finally(() => setLoading(false));
+  }, [address, numericNetworkId, rpcUrls]);
 
-    // Fetch transactions separately using new trace_filter/logs method
+  // Fetch transactions separately (still uses dataService for caching benefits)
+  useEffect(() => {
+    if (!dataService || !address) return;
+
     dataService
       .getAddressTransactions(address)
       .then(async (result) => {
         console.log("Fetched transactions result:", result);
         setTransactionsResult(result);
 
-        // Fetch full transaction details for first 25 transactions
         if (result.transactions.length > 0) {
           setLoadingTxDetails(true);
           const txsToFetch = result.transactions.slice(0, 25);
@@ -103,7 +125,6 @@ export default function Address() {
       })
       .catch((err) => {
         console.error("Error fetching address transactions:", err);
-        // Non-critical error, don't set main error state
         setTransactionsResult({
           transactions: [],
           source: "none",
@@ -111,7 +132,7 @@ export default function Address() {
           message: `Failed to fetch transaction history: ${err.message}`,
         });
       });
-  }, [dataService, address, numericNetworkId]);
+  }, [dataService, address]);
 
   if (loading) {
     return (
@@ -160,29 +181,38 @@ export default function Address() {
     );
   }
 
+  if (!addressData) {
+    return (
+      <div className="container-wide">
+        <p>Address data not found</p>
+      </div>
+    );
+  }
+
+  // Common props for all display components
+  const displayProps = {
+    address: addressData,
+    addressHash: address,
+    networkId: networkId || "1",
+    transactionsResult,
+    transactionDetails,
+    loadingTxDetails,
+    ensName,
+    reverseResult,
+    ensRecords,
+    decodedContenthash,
+    ensLoading,
+    isMainnet,
+  };
+
+  // Render appropriate display component based on detected type
   return (
     <div className="container-wide">
-      {addressData ? (
-        <AddressDisplay
-          address={addressData}
-          addressHash={address}
-          networkId={networkId}
-          transactionsResult={transactionsResult}
-          transactionDetails={transactionDetails}
-          loadingTxDetails={loadingTxDetails}
-          metadata={addressResult?.metadata}
-          selectedProvider={selectedProvider}
-          onProviderSelect={setSelectedProvider}
-          ensName={ensName}
-          reverseResult={reverseResult}
-          ensRecords={ensRecords}
-          decodedContenthash={decodedContenthash}
-          ensLoading={ensLoading}
-          isMainnet={isMainnet}
-        />
-      ) : (
-        <p>Address data not found</p>
-      )}
+      {addressType === "account" && <AccountDisplay {...displayProps} />}
+      {addressType === "contract" && <ContractDisplay {...displayProps} />}
+      {addressType === "erc20" && <ERC20Display {...displayProps} />}
+      {addressType === "erc721" && <ERC721Display {...displayProps} />}
+      {addressType === "erc1155" && <ERC1155Display {...displayProps} />}
     </div>
   );
 }

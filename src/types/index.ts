@@ -119,6 +119,11 @@ export interface Address {
   recentTransactions?: Transaction[];
 }
 
+/**
+ * Address type classification
+ */
+export type AddressType = "account" | "contract" | "erc20" | "erc721" | "erc1155";
+
 export type StoreageAt = Record<string, string>;
 
 export interface MempoolTransaction {

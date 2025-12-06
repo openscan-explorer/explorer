@@ -47,6 +47,7 @@ import {
   LazySettings,
   LazySubscriptions,
   LazySupporters,
+  LazyTokenDetails,
   LazyTx,
   LazyTxs,
 } from "./components/LazyComponents";
@@ -105,6 +106,7 @@ function AppContent() {
               <Route path=":networkId/txs" element={<LazyTxs />} />
               <Route path=":networkId/tx/:filter" element={<LazyTx />} />
               <Route path=":networkId/address/:address" element={<LazyAddress />} />
+              <Route path=":networkId/address/:address/:tokenId" element={<LazyTokenDetails />} />
               <Route path=":networkId/mempool" element={<LazyMempool />} />
               <Route path=":networkId/mempool/:filter" element={<LazyTx />} />
               <Route path="*" element={<Navigate to="/" replace />} />
