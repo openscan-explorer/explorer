@@ -32,12 +32,19 @@ const Footer: React.FC<FooterProps> = ({ className = "" }) => {
   const goToSubscriptions = () => {
     navigate("/subscriptions");
   };
+
+  const goToSupporters = () => {
+    navigate("/supporters");
+  };
   return (
     <footer className={`app-footer ${className}`}>
       <div className="footer-content">
         <div className="footer-left">
           <button type="button" onClick={goToSubscriptions} className="footer-link btn-reset">
             Subscribe
+          </button>
+          <button type="button" onClick={goToSupporters} className="footer-link btn-reset">
+            Our Supporters ❤️
           </button>
         </div>
         <div className={`footer-version ${getVersionClass()}`}>

@@ -1,18 +1,21 @@
-name: Build PR Preview
+name: Build and Deploy PR Preview
 
 on:
-  pull_request:
+  pull_request_target:
     types: [opened, synchronize, reopened]
 
 permissions:
   contents: read
+  pull-requests: write
 
 jobs:
-  build-preview:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout PR head
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -27,19 +30,53 @@ jobs:
       - name: Build Staging
         run: ./scripts/build-staging.sh
 
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v4
+      - name: Deploy to Netlify
+        id: netlify
+        uses: nwtgck/actions-netlify@v3
         with:
-          name: pr-preview-${{ github.event.pull_request.number }}
-          path: ./dist
-          retention-days: 1
+          publish-dir: './dist'
+          production-deploy: false
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          deploy-message: "PR Preview #${{ github.event.pull_request.number }}"
+          alias: pr-${{ github.event.pull_request.number }}
+          enable-pull-request-comment: false
+          enable-commit-comment: false
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
 
-      - name: Save PR number
-        run: echo "${{ github.event.pull_request.number }}" > pr_number.txt
-
-      - name: Upload PR number
-        uses: actions/upload-artifact@v4
+      - name: Comment PR with Preview URL
+        uses: actions/github-script@v7
         with:
-          name: pr-number-${{ github.event.pull_request.number }}
-          path: pr_number.txt
-          retention-days: 1
+          script: |
+            const prNumber = ${{ github.event.pull_request.number }};
+            const deployUrl = '${{ steps.netlify.outputs.deploy-url }}';
+            const body = `🚀 **Preview:** ${deployUrl}\n📝 **Commit:** \`${{ github.event.pull_request.head.sha }}\``;
+
+            // Find existing comment
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+            });
+
+            const botComment = comments.find(comment =>
+              comment.user.type === 'Bot' &&
+              comment.body.includes('Preview:')
+            );
+
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: body
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body: body
+              });
+            }
