@@ -1,9 +1,10 @@
-import { darkTheme, lightTheme, RainbowKitProvider } from "@rainbow-me/rainbowkit";
+import { RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { HashRouter, Navigate, Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import { WagmiProvider } from "wagmi";
 import { networkConfig } from "./utils/networkConfig";
+import { cssVariables, getRainbowKitTheme } from "./theme";
 import "@rainbow-me/rainbowkit/styles.css";
 
 // Detect if we're running on GitHub Pages and get the correct basename
@@ -148,11 +149,22 @@ function App() {
 function RainbowKitProviderWrapper({ children }: { children: React.ReactNode }) {
   const { isDarkMode } = useTheme();
 
-  return (
-    <RainbowKitProvider theme={isDarkMode ? darkTheme() : lightTheme()}>
-      {children}
-    </RainbowKitProvider>
-  );
+  // Inject CSS variables and set data-theme attribute
+  useEffect(() => {
+    // Inject CSS variables if not already present
+    const styleId = "openscan-theme-variables";
+    if (!document.getElementById(styleId)) {
+      const style = document.createElement("style");
+      style.id = styleId;
+      style.textContent = cssVariables;
+      document.head.appendChild(style);
+    }
+
+    // Set data-theme attribute for CSS variable switching
+    document.documentElement.setAttribute("data-theme", isDarkMode ? "dark" : "light");
+  }, [isDarkMode]);
+
+  return <RainbowKitProvider theme={getRainbowKitTheme(isDarkMode)}>{children}</RainbowKitProvider>;
 }
 
 export default App;

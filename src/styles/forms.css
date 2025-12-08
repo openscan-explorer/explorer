@@ -19,9 +19,9 @@
 	flex: 1;
 	padding: 8px 16px;
 	border-radius: 8px;
-	border: 1px solid rgba(0, 98, 65, 0.3);
-	background: #1b2537;
-	color: #f1f5f9;
+	border: 1px solid var(--border-primary);
+	background: var(--input-bg);
+	color: var(--input-text);
 	font-family: "Outfit", sans-serif;
 	font-size: 0.9rem;
 	outline: none;
@@ -29,16 +29,16 @@
 }
 
 .search-input:focus {
-	border-color: #10b981;
-	box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.1);
+	border-color: var(--color-primary);
+	box-shadow: 0 0 0 2px var(--color-primary-alpha-10);
 }
 
 .search-button {
 	padding: 8px 16px;
 	border-radius: 8px;
 	border: none;
-	background: #10b981;
-	color: white;
+	background: var(--btn-primary-bg);
+	color: var(--btn-primary-text);
 	font-family: "Outfit", sans-serif;
 	font-weight: 600;
 	font-size: 0.9rem;
@@ -50,7 +50,7 @@
 }
 
 .search-button:hover {
-	background: #059669;
+	background: var(--btn-primary-bg-hover);
 }
 
 .search-button:active {
@@ -61,9 +61,9 @@
 .input-primary {
 	padding: 8px 16px;
 	border-radius: 8px;
-	border: 1px solid rgba(0, 98, 65, 0.3);
-	background: #1b2537;
-	color: #f1f5f9;
+	border: 1px solid var(--border-primary);
+	background: var(--input-bg);
+	color: var(--input-text);
 	font-family: "Outfit", sans-serif;
 	font-size: 0.9rem;
 	outline: none;
@@ -71,17 +71,17 @@
 }
 
 .input-primary:focus {
-	border-color: #10b981;
-	box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.1);
+	border-color: var(--color-primary);
+	box-shadow: 0 0 0 2px var(--color-primary-alpha-10);
 }
 
 /* Textarea */
 .textarea-primary {
 	padding: 12px 16px;
 	border-radius: 8px;
-	border: 1px solid rgba(0, 98, 65, 0.3);
-	background: #1b2537;
-	color: #f1f5f9;
+	border: 1px solid var(--border-primary);
+	background: var(--input-bg);
+	color: var(--input-text);
 	font-family: "Outfit", sans-serif;
 	font-size: 0.9rem;
 	outline: none;
@@ -91,17 +91,17 @@
 }
 
 .textarea-primary:focus {
-	border-color: #10b981;
-	box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.1);
+	border-color: var(--color-primary);
+	box-shadow: 0 0 0 2px var(--color-primary-alpha-10);
 }
 
 /* Select/Dropdown */
 .select-primary {
 	padding: 8px 16px;
 	border-radius: 8px;
-	border: 1px solid rgba(0, 98, 65, 0.3);
-	background: #1b2537;
-	color: #f1f5f9;
+	border: 1px solid var(--border-primary);
+	background: var(--input-bg);
+	color: var(--input-text);
 	font-family: "Outfit", sans-serif;
 	font-size: 0.9rem;
 	outline: none;
@@ -110,8 +110,8 @@
 }
 
 .select-primary:focus {
-	border-color: #10b981;
-	box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.1);
+	border-color: var(--color-primary);
+	box-shadow: 0 0 0 2px var(--color-primary-alpha-10);
 }
 
 /* Form Labels */
@@ -120,7 +120,7 @@
 	font-family: "Outfit", sans-serif;
 	font-size: 0.9rem;
 	font-weight: 600;
-	color: #10b981;
+	color: var(--color-primary);
 	margin-bottom: 8px;
 }
 

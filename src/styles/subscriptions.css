@@ -1,8 +1,8 @@
 /* Subscriptions Page Styles */
 
 .subscriptions-intro {
-	background: rgba(16, 185, 129, 0.04);
-	border: 1px solid rgba(16, 185, 129, 0.2);
+	background: var(--color-primary-alpha-4);
+	border: 1px solid var(--color-primary-alpha-20);
 	border-radius: 12px;
 	padding: 24px;
 	margin-bottom: 32px;
@@ -11,14 +11,14 @@
 
 .subscriptions-intro p {
 	font-size: 1.1rem;
-	color: rgba(255, 255, 255, 0.8);
+	color: var(--text-secondary);
 	font-family: "Outfit", sans-serif;
 	line-height: 1.6;
 	margin: 0;
 }
 
 .subscriptions-intro strong {
-	color: #10b981;
+	color: var(--color-primary);
 }
 
 /* Category Tabs */
@@ -32,10 +32,10 @@
 
 .subscriptions-tab {
 	padding: 12px 24px;
-	background: rgba(16, 185, 129, 0.1);
-	border: 1px solid rgba(16, 185, 129, 0.3);
+	background: var(--color-primary-alpha-10);
+	border: 1px solid var(--color-primary-alpha-30);
 	border-radius: 8px;
-	color: #10b981;
+	color: var(--color-primary);
 	font-family: "Outfit", sans-serif;
 	font-weight: 600;
 	font-size: 0.95rem;
@@ -44,14 +44,14 @@
 }
 
 .subscriptions-tab:hover {
-	background: rgba(16, 185, 129, 0.2);
+	background: var(--color-primary-alpha-20);
 	transform: translateY(-2px);
 }
 
 .subscriptions-tab.active {
-	background: #10b981;
-	color: white;
-	border-color: #10b981;
+	background: var(--color-primary);
+	color: var(--btn-primary-text);
+	border-color: var(--color-primary);
 }
 
 /* Category Info */
@@ -62,7 +62,7 @@
 
 .subscriptions-category-description {
 	font-size: 1rem;
-	color: rgba(255, 255, 255, 0.7);
+	color: var(--text-secondary);
 	font-family: "Outfit", sans-serif;
 	line-height: 1.5;
 	max-width: 700px;
@@ -78,8 +78,8 @@
 }
 
 .subscriptions-tier-card {
-	background: rgba(255, 255, 255, 0.03);
-	border: 1px solid rgba(255, 255, 255, 0.1);
+	background: var(--overlay-light-3);
+	border: 1px solid var(--overlay-light-10);
 	border-radius: 16px;
 	padding: 24px;
 	transition: all 0.3s ease;
@@ -88,43 +88,43 @@
 }
 
 .subscriptions-tier-card:hover {
-	background: rgba(16, 185, 129, 0.08);
-	border-color: rgba(16, 185, 129, 0.3);
+	background: var(--color-primary-alpha-8);
+	border-color: var(--color-primary-alpha-30);
 	transform: translateY(-4px);
 }
 
 .subscriptions-tier-card:nth-child(2) {
-	border-color: rgba(16, 185, 129, 0.4);
-	background: rgba(16, 185, 129, 0.05);
+	border-color: var(--color-primary-alpha-30);
+	background: var(--color-primary-alpha-4);
 }
 
 .subscriptions-tier-card:nth-child(3) {
-	border-color: rgba(245, 158, 11, 0.4);
-	background: rgba(245, 158, 11, 0.05);
+	border-color: var(--color-warning-alpha-15);
+	background: var(--color-warning-alpha-4);
 }
 
 .subscriptions-tier-card:nth-child(3):hover {
-	background: rgba(245, 158, 11, 0.1);
-	border-color: rgba(245, 158, 11, 0.5);
+	background: var(--color-warning-alpha-10);
+	border-color: var(--color-warning-alpha-15);
 }
 
 .subscriptions-tier-header {
 	text-align: center;
 	margin-bottom: 20px;
 	padding-bottom: 20px;
-	border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+	border-bottom: 1px solid var(--overlay-light-10);
 }
 
 .subscriptions-tier-name {
 	font-size: 1.2rem;
 	font-family: "Outfit", sans-serif;
 	font-weight: 700;
-	color: #10b981;
+	color: var(--color-primary);
 	margin: 0 0 12px 0;
 }
 
 .subscriptions-tier-card:nth-child(3) .subscriptions-tier-name {
-	color: #f59e0b;
+	color: var(--color-warning);
 }
 
 .subscriptions-tier-price {
@@ -138,12 +138,12 @@
 	font-size: 2rem;
 	font-family: "Outfit", sans-serif;
 	font-weight: 800;
-	color: white;
+	color: var(--text-primary);
 }
 
 .subscriptions-price-period {
 	font-size: 0.9rem;
-	color: rgba(255, 255, 255, 0.5);
+	color: var(--text-tertiary);
 	font-family: "Outfit", sans-serif;
 }
 
@@ -160,29 +160,29 @@
 	font-size: 1.1rem;
 	font-family: "Outfit", sans-serif;
 	font-weight: 600;
-	color: rgba(255, 255, 255, 0.7);
+	color: var(--text-secondary);
 }
 
 .subscriptions-price-annual-period {
 	font-size: 0.8rem;
-	color: rgba(255, 255, 255, 0.4);
+	color: var(--text-tertiary);
 	font-family: "Outfit", sans-serif;
 }
 
 .subscriptions-price-annual-discount {
 	font-size: 0.7rem;
-	color: #10b981;
+	color: var(--color-primary);
 	font-family: "Outfit", sans-serif;
 	font-weight: 600;
-	background: rgba(16, 185, 129, 0.15);
+	background: var(--color-primary-alpha-15);
 	padding: 2px 6px;
 	border-radius: 4px;
 	margin-left: 6px;
 }
 
 .subscriptions-tier-card:nth-child(3) .subscriptions-price-annual-discount {
-	color: #f59e0b;
-	background: rgba(245, 158, 11, 0.15);
+	color: var(--color-warning);
+	background: var(--color-warning-alpha-15);
 }
 
 .subscriptions-tier-benefits {
@@ -200,7 +200,7 @@
 	padding-left: 24px;
 	margin-bottom: 12px;
 	font-size: 0.95rem;
-	color: rgba(255, 255, 255, 0.8);
+	color: var(--text-secondary);
 	font-family: "Outfit", sans-serif;
 	line-height: 1.4;
 }
@@ -212,21 +212,21 @@
 	top: 6px;
 	width: 12px;
 	height: 12px;
-	background: #10b981;
+	background: var(--color-primary);
 	border-radius: 50%;
 	opacity: 0.8;
 }
 
 .subscriptions-tier-card:nth-child(3) .subscriptions-tier-benefits li::before {
-	background: #f59e0b;
+	background: var(--color-warning);
 }
 
 .subscriptions-tier-note {
 	margin-top: 16px;
 	padding-top: 16px;
-	border-top: 1px solid rgba(255, 255, 255, 0.1);
+	border-top: 1px solid var(--overlay-light-10);
 	font-size: 0.85rem;
-	color: rgba(255, 255, 255, 0.5);
+	color: var(--text-tertiary);
 	font-family: "Outfit", sans-serif;
 	font-style: italic;
 	text-align: center;
@@ -244,7 +244,7 @@
 .subscriptions-table {
 	width: 100%;
 	border-collapse: collapse;
-	background: rgba(255, 255, 255, 0.02);
+	background: var(--overlay-light-2);
 	border-radius: 12px;
 	overflow: hidden;
 }
@@ -257,8 +257,8 @@
 }
 
 .subscriptions-table th {
-	background: rgba(16, 185, 129, 0.1);
-	color: #10b981;
+	background: var(--color-primary-alpha-10);
+	color: var(--color-primary);
 	font-weight: 600;
 	font-size: 0.9rem;
 	text-transform: uppercase;
@@ -270,15 +270,15 @@
 }
 
 .subscriptions-table td {
-	border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-	color: rgba(255, 255, 255, 0.8);
+	border-bottom: 1px solid var(--overlay-light-5);
+	color: var(--text-secondary);
 	font-size: 0.95rem;
 }
 
 .subscriptions-table-type {
 	text-align: left !important;
 	font-weight: 600;
-	color: white !important;
+	color: var(--text-primary) !important;
 }
 
 .subscriptions-table tr:last-child td {
@@ -286,18 +286,18 @@
 }
 
 .subscriptions-table tr:hover td {
-	background: rgba(16, 185, 129, 0.05);
+	background: var(--color-primary-alpha-4);
 }
 
 .subscriptions-table-annual {
 	font-size: 0.8rem;
-	color: rgba(255, 255, 255, 0.5);
+	color: var(--text-tertiary);
 	margin-top: 4px;
 }
 
 /* Table price display with early adopter */
 .subscriptions-table-monthly {
-	color: rgba(255, 255, 255, 0.8);
+	color: var(--text-secondary);
 	font-size: 0.95rem;
 	font-weight: 600;
 	margin-bottom: 6px;
@@ -319,15 +319,15 @@
 }
 
 .subscriptions-table-ea-price {
-	color: #fbbf24;
+	color: var(--color-warning-hover);
 	font-weight: 500;
 }
 
 .subscriptions-table-ea-discount {
-	color: #10b981;
+	color: var(--color-primary);
 	font-size: 0.7rem;
 	font-weight: 600;
-	background: rgba(16, 185, 129, 0.15);
+	background: var(--color-primary-alpha-15);
 	padding: 1px 4px;
 	border-radius: 3px;
 }
@@ -336,10 +336,10 @@
 .subscriptions-early-adopter {
 	background: linear-gradient(
 		135deg,
-		rgba(245, 158, 11, 0.15),
-		rgba(251, 191, 36, 0.1)
+		var(--color-warning-alpha-15),
+		var(--color-warning-alpha-10)
 	);
-	border: 2px solid rgba(245, 158, 11, 0.4);
+	border: 2px solid var(--color-warning-alpha-15);
 	border-radius: 12px;
 	padding: 20px 24px;
 	margin-bottom: 24px;
@@ -351,7 +351,7 @@
 }
 
 .subscriptions-early-adopter-badge {
-	background: #f59e0b;
+	background: var(--color-warning);
 	color: #000;
 	font-family: "Outfit", sans-serif;
 	font-weight: 700;
@@ -371,7 +371,7 @@
 	font-family: "Outfit", sans-serif;
 	font-weight: 700;
 	font-size: 1.1rem;
-	color: #fbbf24;
+	color: var(--color-warning-hover);
 	margin: 0 0 12px 0;
 }
 
@@ -386,16 +386,16 @@
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	background: rgba(255, 255, 255, 0.05);
-	border: 1px solid rgba(255, 255, 255, 0.1);
+	background: var(--overlay-light-5);
+	border: 1px solid var(--overlay-light-10);
 	border-radius: 8px;
 	padding: 10px 16px;
 	min-width: 100px;
 }
 
 .subscriptions-early-adopter-tier.active {
-	background: rgba(16, 185, 129, 0.15);
-	border-color: #10b981;
+	background: var(--color-primary-alpha-15);
+	border-color: var(--color-primary);
 }
 
 .subscriptions-early-adopter-tier.past {
@@ -406,29 +406,29 @@
 	font-family: "Outfit", sans-serif;
 	font-weight: 700;
 	font-size: 1.1rem;
-	color: #fbbf24;
+	color: var(--color-warning-hover);
 }
 
 .subscriptions-early-adopter-tier.active .subscriptions-early-adopter-tier-discount {
-	color: #10b981;
+	color: var(--color-primary);
 }
 
 .subscriptions-early-adopter-tier-month {
 	font-family: "Outfit", sans-serif;
 	font-size: 0.75rem;
-	color: rgba(255, 255, 255, 0.6);
+	color: var(--text-tertiary);
 	margin-top: 2px;
 }
 
 .subscriptions-early-adopter-status {
 	font-family: "Outfit", sans-serif;
 	font-size: 0.9rem;
-	color: rgba(255, 255, 255, 0.7);
+	color: var(--text-secondary);
 	margin: 12px 0 0 0;
 }
 
 .subscriptions-early-adopter-active {
-	color: #10b981;
+	color: var(--color-primary);
 	font-weight: 600;
 }
 
@@ -436,10 +436,10 @@
 .subscriptions-how-to {
 	background: linear-gradient(
 		135deg,
-		rgba(16, 185, 129, 0.08),
-		rgba(5, 150, 105, 0.05)
+		var(--color-primary-alpha-8),
+		var(--color-primary-alpha-4)
 	);
-	border: 1px solid rgba(16, 185, 129, 0.3);
+	border: 1px solid var(--color-primary-alpha-30);
 	border-radius: 16px;
 	padding: 40px;
 	margin-bottom: 12px;
@@ -465,8 +465,8 @@
 	flex-shrink: 0;
 	width: 40px;
 	height: 40px;
-	background: #10b981;
-	color: white;
+	background: var(--color-primary);
+	color: var(--btn-primary-text);
 	font-family: "Outfit", sans-serif;
 	font-weight: 700;
 	font-size: 1.2rem;
@@ -480,20 +480,20 @@
 	font-family: "Outfit", sans-serif;
 	font-weight: 600;
 	font-size: 1.1rem;
-	color: white;
+	color: var(--text-primary);
 	margin: 0 0 6px 0;
 }
 
 .subscriptions-step-content p {
 	font-family: "Outfit", sans-serif;
 	font-size: 0.95rem;
-	color: rgba(255, 255, 255, 0.7);
+	color: var(--text-secondary);
 	line-height: 1.5;
 	margin: 0;
 }
 
 .subscriptions-step-content strong {
-	color: #10b981;
+	color: var(--color-primary);
 }
 
 /* Collapsible Help Images Section */
@@ -509,10 +509,10 @@
 	gap: 8px;
 	width: 100%;
 	padding: 12px 20px;
-	background: rgba(16, 185, 129, 0.1);
-	border: 1px solid rgba(16, 185, 129, 0.3);
+	background: var(--color-primary-alpha-10);
+	border: 1px solid var(--color-primary-alpha-30);
 	border-radius: 8px;
-	color: #10b981;
+	color: var(--color-primary);
 	font-family: "Outfit", sans-serif;
 	font-weight: 600;
 	font-size: 0.95rem;
@@ -521,8 +521,8 @@
 }
 
 .subscriptions-help-toggle:hover {
-	background: rgba(16, 185, 129, 0.15);
-	border-color: rgba(16, 185, 129, 0.5);
+	background: var(--color-primary-alpha-15);
+	border-color: var(--color-primary-alpha-30);
 }
 
 .subscriptions-help-toggle-icon {
@@ -537,8 +537,8 @@
 }
 
 .subscriptions-help-image-wrapper {
-	background: rgba(0, 0, 0, 0.2);
-	border: 1px solid rgba(16, 185, 129, 0.2);
+	background: var(--overlay-dark-20);
+	border: 1px solid var(--color-primary-alpha-20);
 	border-radius: 12px;
 	padding: 20px;
 }
@@ -547,25 +547,25 @@
 	font-family: "Outfit", sans-serif;
 	font-weight: 600;
 	font-size: 1rem;
-	color: #10b981;
+	color: var(--color-primary);
 	margin: 0 0 16px 0;
 }
 
 .subscriptions-help-image-wrapper h4 a {
-	color: white;
+	color: var(--text-primary);
 	text-decoration: underline;
 }
 
 .subscriptions-help-image-wrapper h4 a:hover {
-	color: #10b981;
+	color: var(--color-primary);
 }
 
 .subscriptions-help-image {
 	width: 100%;
 	max-width: 100%;
 	border-radius: 8px;
-	border: 1px solid rgba(16, 185, 129, 0.3);
-	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+	border: 1px solid var(--color-primary-alpha-30);
+	box-shadow: var(--shadow-lg);
 }
 
 .subscriptions-cta-buttons {
@@ -580,7 +580,7 @@
 	background: linear-gradient(
 		135deg,
 		rgba(139, 92, 246, 0.1),
-		rgba(16, 185, 129, 0.1)
+		var(--color-primary-alpha-10)
 	);
 	border: 1px solid rgba(139, 92, 246, 0.3);
 	border-radius: 16px;
@@ -590,7 +590,7 @@
 
 .subscriptions-governance > p {
 	font-size: 1.1rem;
-	color: rgba(255, 255, 255, 0.8);
+	color: var(--text-secondary);
 	font-family: "Outfit", sans-serif;
 	line-height: 1.6;
 	text-align: center;
@@ -605,7 +605,7 @@
 }
 
 .subscriptions-roadmap-item {
-	background: rgba(255, 255, 255, 0.03);
+	background: var(--overlay-light-3);
 	border-radius: 12px;
 	padding: 20px;
 	text-align: center;
@@ -621,7 +621,7 @@
 
 .subscriptions-roadmap-item p {
 	font-size: 0.9rem;
-	color: rgba(255, 255, 255, 0.7);
+	color: var(--text-secondary);
 	font-family: "Outfit", sans-serif;
 	line-height: 1.5;
 	margin: 0;

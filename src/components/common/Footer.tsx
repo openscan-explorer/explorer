@@ -1,7 +1,6 @@
 import type React from "react";
 import { useNavigate } from "react-router";
 import { ENVIRONMENT } from "../../utils/constants";
-import About from '../pages/about/index';
 
 interface FooterProps {
   className?: string;
