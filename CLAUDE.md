@@ -89,11 +89,11 @@ OpenScan follows a layered architecture with clear separation between data fetch
    - Returns `DataWithMetadata<T>` when using parallel strategy, containing:
      - `data`: The primary result (from first successful provider)
      - `metadata`: Optional RPCMetadata with all provider responses, hashes, and inconsistency flags
-   - 30-second in-memory cache keyed by `chainId:type:identifier`
+   - 30-second in-memory cache keyed by `networkId:type:identifier`
    - Supports trace operations (debug_traceTransaction, etc.) for localhost networks only
 
 5. **Hook Layer** (`hooks/`) - React integration
-   - `useDataService(chainId)`: Creates DataService instance with strategy from settings
+   - `useDataService(networkId)`: Creates DataService instance with strategy from settings
    - `useProviderSelection`: Manages user's selected RPC provider in parallel mode
    - `useSelectedData`: Extracts data from specific provider based on user selection
 
@@ -184,6 +184,7 @@ OpenScan includes special support for localhost development:
   - Use `npm run lint:fix` to auto-fix linting issues (max 1024 diagnostics shown)
 - **TypeScript** with strict mode (`noImplicitAny`, `noImplicitReturns`, `noUncheckedIndexedAccess`)
 - **React 19** with functional components and hooks
+- **CSS** All styles should be on `src/styles` folder, avoid using in line component styles.
 
 ## Coding Standards and Workflow
 
@@ -205,6 +206,11 @@ npm run typecheck
 npm run test:run
 ```
 
+### Commits
+
+- Follow the convetional commit standard v1.0.0
+- Commit without claude attribution
+
 ### Code Quality Requirements
 
 - All code must pass Biome formatting and linting checks
@@ -212,6 +218,7 @@ npm run test:run
 - Follow the 100-character line width limit
 - Use 2-space indentation consistently
 - Adhere to Biome's recommended linting rules
+- Keep documentation up to date.
 
 ### When Claude Code Modifies Files
 
@@ -238,9 +245,9 @@ npm run test:run
 
 ### When Working with Cache
 
-- Cache keys format: `${chainId}:${type}:${identifier}`
+- Cache keys format: `${networkId}:${type}:${identifier}`
 - Don't cache "latest" block queries
-- Clear cache when switching networks using `clearCacheForChain(chainId)`
+- Clear cache when switching networks using `clearCacheForChain(networkId)`
 - Default timeout: 30 seconds
 
 ### RPC Strategy Switching
