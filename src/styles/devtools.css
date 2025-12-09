@@ -1052,7 +1052,7 @@
 
 [data-theme="light"] .devtools-card,
 [data-theme="light"] .dev-section-container {
-	background: var(--bg-gradient-start);
+	background: var(--bg-primary);
 	border-color: var(--overlay-light-15);
 }
 

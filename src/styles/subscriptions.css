@@ -352,7 +352,7 @@
 
 .subscriptions-early-adopter-badge {
 	background: var(--color-warning);
-	color: #000;
+	color: var(--text-inverse);
 	font-family: "Outfit", sans-serif;
 	font-weight: 700;
 	font-size: 0.8rem;

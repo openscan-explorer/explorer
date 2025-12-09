@@ -22,7 +22,7 @@ export const colors = {
 
   // Dark Mode
   dark: {
-    bgPrimary: "#1a1d26",
+    bgPrimary: "#0f172a",
     bgSecondary: "#242833",
     bgTertiary: "#2e3340",
     textPrimary: "#ffffff",
@@ -34,7 +34,7 @@ export const colors = {
 
   // Light Mode
   light: {
-    bgPrimary: "#f5f7fa",
+    bgPrimary: "#3a4a76",
     bgSecondary: "#ffffff",
     bgTertiary: "#e5e7eb",
     textPrimary: "#1a1d26",
