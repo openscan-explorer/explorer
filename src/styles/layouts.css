@@ -1,4 +1,7 @@
-/* Layout Utilities */
+/* Layout Utilities
+   Note: Base flex and spacing utilities are in base.css.
+   This file contains semantic spacing (small/medium/large) and grid layouts.
+*/
 
 /* Grid Layouts */
 .data-grid-2 {

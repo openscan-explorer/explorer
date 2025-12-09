@@ -29,6 +29,7 @@ import Footer from "./components/common/Footer";
 import { IsometricBlocks } from "./components/common/IsometricBlocks";
 import NotificationDisplay from "./components/common/NotificationDisplay";
 import Navbar from "./components/navbar";
+import "./styles/base.css";
 import "./styles/styles.css";
 import "./styles/layouts.css";
 import "./styles/components.css";

@@ -1,0 +1,608 @@
+/* ==========================================================================
+   Base CSS - Consolidated Styles
+   This file contains unified base classes to reduce duplication across stylesheets.
+   ========================================================================== */
+
+/* ==========================================================================
+   CARDS - Unified card system
+   Base card class with modifiers for different contexts
+   ========================================================================== */
+
+.card {
+	background: var(--bg-primary);
+	backdrop-filter: blur(10px);
+	-webkit-backdrop-filter: blur(10px);
+	border: 1px solid var(--color-primary-alpha-15);
+	border-radius: 16px;
+	padding: 20px;
+	box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+/* Page card - larger padding and border-radius */
+.card--page {
+	border-radius: 20px;
+	padding: 24px;
+}
+
+/* Block display card - full width */
+.card--block {
+	width: 100%;
+}
+
+/* Devtools card - uses card background variable, smaller shadow */
+.card--devtools {
+	background: var(--bg-card);
+	box-shadow: var(--shadow-sm);
+	border-color: var(--color-primary-alpha-10);
+	margin-bottom: 24px;
+}
+
+/* Table wrapper card - uses card background, primary border */
+.card--table {
+	background: var(--bg-card);
+	border-color: var(--color-primary);
+	box-shadow: 0 4px 20px var(--color-primary-alpha-10);
+}
+
+/* Container-wide card variant */
+.card.container-wide {
+	max-width: 1352px;
+	padding: 0px 12px;
+}
+
+/* ==========================================================================
+   INFO BOXES - Unified info box system
+   Base info box class with color modifiers and layout variants
+   ========================================================================== */
+
+.info-box {
+	display: flex;
+	justify-content: space-between;
+	padding: 8px 12px;
+	background: var(--color-primary-alpha-4);
+	border-radius: 8px;
+	border-left: 3px solid var(--color-primary);
+}
+
+/* Vertical layout variant */
+.info-box--vertical {
+	flex-direction: column;
+	gap: 4px;
+	padding: 10px 12px;
+}
+
+/* Color variants */
+.info-box--arbitrum {
+	background: var(--color-info-alpha-10);
+	border-left-color: var(--color-info);
+}
+
+.info-box--optimism {
+	background: var(--color-error-alpha-10);
+	border-left-color: var(--color-error);
+}
+
+.info-box--success {
+	background: var(--color-success-alpha-10);
+	border-left-color: var(--color-success);
+}
+
+.info-box--warning {
+	background: var(--color-warning-alpha-10);
+	border-left-color: var(--color-warning);
+}
+
+/* Full width span for grids */
+.info-box--full-width {
+	grid-column: 1 / -1;
+}
+
+/* Info box content elements */
+.info-box__label {
+	font-size: 0.85rem;
+	color: var(--color-primary);
+	font-weight: 600;
+	font-family: "Outfit", sans-serif;
+}
+
+.info-box__label--arbitrum {
+	color: var(--color-info);
+}
+
+.info-box__label--optimism {
+	color: var(--color-error);
+}
+
+.info-box__value {
+	font-weight: 500;
+	color: var(--text-primary);
+	font-family: "Outfit", sans-serif;
+	font-size: 0.95rem;
+}
+
+.info-box__value--mono {
+	font-size: 0.9rem;
+	word-break: break-all;
+}
+
+.info-box__value--small {
+	font-size: 0.85rem;
+}
+
+.info-box__value--accent {
+	font-weight: 600;
+	color: var(--color-primary-muted);
+}
+
+.info-box__subtext {
+	font-weight: 500;
+	color: var(--text-secondary);
+	font-family: "Outfit", sans-serif;
+	font-size: 0.8rem;
+	margin-top: 2px;
+}
+
+/* ==========================================================================
+   FORM INPUTS - Unified input system
+   Base input class with variants for different contexts
+   ========================================================================== */
+
+.input {
+	padding: 8px 16px;
+	border-radius: 8px;
+	border: 1px solid var(--border-primary);
+	background: var(--input-bg);
+	color: var(--input-text);
+	font-family: "Outfit", sans-serif;
+	font-size: 0.9rem;
+	outline: none;
+	transition: all 0.2s ease;
+}
+
+.input:focus {
+	border-color: var(--color-primary);
+	box-shadow: 0 0 0 2px var(--color-primary-alpha-10);
+}
+
+/* Search input - flex grow */
+.input--search {
+	flex: 1;
+}
+
+/* Large search input (home page) */
+.input--search-lg {
+	padding: 16px 24px;
+	font-size: 1.1rem;
+	border-radius: 12px;
+	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+/* Devtools input - monospace font, thicker border */
+.input--devtools {
+	width: 100%;
+	padding: 10px 12px;
+	border-width: 2px;
+	border-color: var(--color-primary-alpha-20);
+	font-family: "JetBrains Mono", monospace;
+	font-size: 0.85rem;
+}
+
+.input--devtools:focus {
+	border-color: var(--color-primary);
+	box-shadow: none;
+}
+
+/* Full width input */
+.input--full {
+	width: 100%;
+}
+
+/* Select dropdown */
+.select {
+	padding: 8px 16px;
+	border-radius: 8px;
+	border: 1px solid var(--border-primary);
+	background: var(--input-bg);
+	color: var(--input-text);
+	font-family: "Outfit", sans-serif;
+	font-size: 0.9rem;
+	outline: none;
+	transition: all 0.2s ease;
+	cursor: pointer;
+}
+
+.select:focus {
+	border-color: var(--color-primary);
+	box-shadow: 0 0 0 2px var(--color-primary-alpha-10);
+}
+
+.select--devtools {
+	width: 100%;
+	padding: 10px 12px;
+	border-width: 2px;
+	border-color: var(--color-primary-alpha-20);
+	font-family: "JetBrains Mono", monospace;
+	font-size: 0.85rem;
+	background-color: var(--input-bg);
+}
+
+.select--devtools:focus {
+	border-color: var(--color-primary);
+	box-shadow: none;
+}
+
+/* Textarea */
+.textarea {
+	padding: 12px 16px;
+	border-radius: 8px;
+	border: 1px solid var(--border-primary);
+	background: var(--input-bg);
+	color: var(--input-text);
+	font-family: "Outfit", sans-serif;
+	font-size: 0.9rem;
+	outline: none;
+	transition: all 0.2s ease;
+	resize: vertical;
+	min-height: 100px;
+}
+
+.textarea:focus {
+	border-color: var(--color-primary);
+	box-shadow: 0 0 0 2px var(--color-primary-alpha-10);
+}
+
+.textarea--devtools {
+	width: 100%;
+	padding: 10px 12px;
+	border-width: 2px;
+	border-color: var(--color-primary-alpha-20);
+	font-family: "JetBrains Mono", monospace;
+	font-size: 0.85rem;
+	min-height: 80px;
+}
+
+.textarea--devtools:focus {
+	border-color: var(--color-primary);
+	box-shadow: none;
+}
+
+/* ==========================================================================
+   FORM LAYOUT - Form groups and labels
+   ========================================================================== */
+
+.form-group {
+	margin-bottom: 16px;
+}
+
+.form-label {
+	display: block;
+	font-family: "Outfit", sans-serif;
+	font-size: 0.9rem;
+	font-weight: 600;
+	color: var(--color-primary);
+	margin-bottom: 8px;
+}
+
+.form-label--devtools {
+	font-size: 0.85rem;
+	color: var(--text-secondary);
+	margin-bottom: 6px;
+}
+
+.form-row {
+	display: flex;
+	gap: 16px;
+	margin-bottom: 16px;
+}
+
+.form-row > * {
+	flex: 1;
+}
+
+/* ==========================================================================
+   BUTTONS - Unified button system
+   Base button class with variants
+   ========================================================================== */
+
+.btn {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 8px 16px;
+	border: none;
+	border-radius: 8px;
+	cursor: pointer;
+	font-family: "Outfit", sans-serif;
+	font-weight: 600;
+	font-size: 0.9rem;
+	transition: all 0.2s ease;
+}
+
+.btn:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+}
+
+/* Primary button */
+.btn--primary {
+	background: var(--color-primary);
+	color: white;
+}
+
+.btn--primary:hover:not(:disabled) {
+	background: var(--color-primary-muted);
+}
+
+/* Primary button with gradient */
+.btn--primary-gradient {
+	background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-muted) 100%);
+	color: white;
+	box-shadow: 0 4px 12px var(--color-primary-alpha-30);
+}
+
+.btn--primary-gradient:hover:not(:disabled) {
+	opacity: 0.9;
+	transform: translateY(-1px);
+	box-shadow: 0 6px 16px var(--color-primary-alpha-40);
+}
+
+.btn--primary-gradient:active {
+	transform: translateY(0);
+}
+
+/* Secondary button (outline) */
+.btn--secondary {
+	background: transparent;
+	color: var(--color-primary);
+	border: 1px solid var(--color-primary);
+}
+
+.btn--secondary:hover:not(:disabled) {
+	background: var(--color-primary-alpha-10);
+}
+
+/* Large button */
+.btn--lg {
+	padding: 12px 24px;
+	border-radius: 10px;
+}
+
+/* Search button (home page) */
+.btn--search {
+	padding: 16px 32px;
+	font-size: 1.1rem;
+	border-radius: 12px;
+	box-shadow: 0 4px 6px var(--color-primary-alpha-20);
+}
+
+/* Small button */
+.btn--sm {
+	padding: 4px 8px;
+	font-size: 0.75rem;
+	border-radius: 6px;
+}
+
+/* Inline button (for links) */
+.btn--inline {
+	display: inline-flex;
+	text-decoration: none;
+}
+
+/* Flex grow button (for button groups) */
+.btn--flex {
+	flex: 1;
+}
+
+/* ==========================================================================
+   BADGES - Unified badge system
+   Base badge class with status variants
+   ========================================================================== */
+
+.badge {
+	display: inline-flex;
+	align-items: center;
+	padding: 4px 10px;
+	border-radius: 6px;
+	font-size: 0.8rem;
+	font-weight: 600;
+}
+
+/* Status badges */
+.badge--success {
+	background: var(--badge-success-bg, var(--color-success-alpha-15));
+	color: var(--badge-success-text, var(--color-success));
+}
+
+.badge--error,
+.badge--failed {
+	background: var(--badge-error-bg, var(--color-error-alpha-15));
+	color: var(--badge-error-text, var(--color-error));
+}
+
+.badge--warning,
+.badge--pending {
+	background: var(--badge-warning-bg, var(--color-warning-alpha-15));
+	color: var(--badge-warning-text, var(--color-warning));
+}
+
+.badge--info {
+	background: var(--badge-info-bg, var(--color-info-alpha-15));
+	color: var(--badge-info-text, var(--color-info));
+}
+
+.badge--neutral {
+	background: var(--badge-neutral-bg);
+	color: var(--text-tertiary);
+}
+
+/* Block status badge - uppercase */
+.badge--block-status {
+	font-size: 0.75rem;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+}
+
+/* Method badge - monospace */
+.badge--method {
+	font-family: monospace;
+	font-size: 0.75rem;
+	padding: 4px 8px;
+	border-radius: 4px;
+	max-width: 100px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.badge--method-decoded {
+	background: var(--color-primary-alpha-15);
+	color: var(--color-primary);
+	border: 1px solid var(--color-primary-alpha-30);
+}
+
+.badge--method-selector {
+	background: var(--badge-neutral-bg);
+	color: var(--text-tertiary);
+	border: 1px solid var(--border-secondary);
+}
+
+.badge--method-transfer {
+	background: var(--color-info-alpha-15);
+	color: var(--color-info);
+	border: 1px solid var(--color-info-alpha-30);
+}
+
+/* Pill badge - more rounded */
+.badge--pill {
+	border-radius: 12px;
+	padding: 0.25rem 0.5rem;
+}
+
+/* ==========================================================================
+   TITLES - Unified title system
+   ========================================================================== */
+
+.title {
+	font-family: "Outfit", sans-serif;
+	font-weight: 700;
+	color: var(--text-primary);
+	margin: 0;
+}
+
+.title--primary {
+	color: var(--color-primary);
+}
+
+.title--muted {
+	color: var(--color-primary-muted);
+}
+
+/* Title sizes */
+.title--xs {
+	font-size: 0.85rem;
+}
+
+.title--sm {
+	font-size: 1rem;
+}
+
+.title--md {
+	font-size: 1.1rem;
+}
+
+.title--lg {
+	font-size: 1.25rem;
+}
+
+.title--xl {
+	font-size: 1.5rem;
+}
+
+.title--2xl {
+	font-size: clamp(1.3rem, 3.5vw, 2rem);
+	letter-spacing: -1px;
+}
+
+.title--hero {
+	font-size: 4.5rem;
+	font-weight: 800;
+	letter-spacing: -2px;
+	background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-muted) 100%);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+	text-shadow: 0 10px 30px var(--color-primary-alpha-20);
+}
+
+/* Section title with icon */
+.title--with-icon {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+/* ==========================================================================
+   UTILITY CLASSES
+   ========================================================================== */
+
+/* Text utilities */
+.text-mono {
+	font-family: "JetBrains Mono", monospace;
+}
+
+.text-break {
+	word-break: break-all;
+}
+
+.text-ellipsis {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+/* ==========================================================================
+   SPACING UTILITIES
+   Note: Additional spacing utilities (mt-small, mb-medium, p-large, etc.)
+   are defined in layouts.css. Use those for semantic naming.
+   These numeric utilities provide a consistent scale.
+   ========================================================================== */
+
+/* Margin utilities - numeric scale (8px increments) */
+.mb-0 { margin-bottom: 0; }
+.mb-1 { margin-bottom: 8px; }
+.mb-2 { margin-bottom: 16px; }
+.mb-3 { margin-bottom: 24px; }
+
+.mt-0 { margin-top: 0; }
+.mt-1 { margin-top: 8px; }
+.mt-2 { margin-top: 16px; }
+.mt-3 { margin-top: 24px; }
+
+.ml-1 { margin-left: 8px; }
+.ml-2 { margin-left: 16px; }
+
+.mr-1 { margin-right: 8px; }
+.mr-2 { margin-right: 16px; }
+
+/* Gap utilities - varied scale for common use cases */
+.gap-0 { gap: 0; }
+.gap-1 { gap: 4px; }
+.gap-2 { gap: 8px; }
+.gap-3 { gap: 12px; }
+.gap-4 { gap: 16px; }
+.gap-5 { gap: 24px; }
+
+/* Flex utilities */
+.flex { display: flex; }
+.flex-column { display: flex; flex-direction: column; }
+.flex-row { display: flex; flex-direction: row; }
+.flex-wrap { flex-wrap: wrap; }
+.flex-1 { flex: 1; }
+.flex-center { display: flex; align-items: center; justify-content: center; }
+.flex-between { display: flex; align-items: center; justify-content: space-between; }
+.items-center { align-items: center; }
+.items-start { align-items: flex-start; }
+.items-end { align-items: flex-end; }
+.justify-center { justify-content: center; }
+.justify-between { justify-content: space-between; }
+.justify-end { justify-content: flex-end; }

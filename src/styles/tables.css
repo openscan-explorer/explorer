@@ -125,14 +125,23 @@
 	font-style: italic;
 }
 
-/* Status Badges in Tables */
+/* ==========================================================================
+   Status Badges in Tables
+   Note: These extend the base badge system in base.css.
+   For new code, consider using base classes: badge--success, badge--error, etc.
+   ========================================================================== */
+
+/* Base table status badge */
 .table-status-badge {
+	display: inline-flex;
+	align-items: center;
 	padding: 4px 10px;
 	border-radius: 6px;
 	font-size: 0.8rem;
 	font-weight: 600;
 }
 
+/* Status variants - use CSS variables for theming */
 .table-status-success {
 	background: var(--badge-success-bg);
 	color: var(--badge-success-text);
@@ -262,7 +271,12 @@
 	text-align: center;
 }
 
-/* Method Badges */
+/* ==========================================================================
+   Method Badges
+   Note: These extend the base badge system with monospace font styling.
+   ========================================================================== */
+
+/* Base method badge */
 .method-badge {
 	display: inline-block;
 	padding: 4px 8px;
@@ -276,6 +290,7 @@
 	white-space: nowrap;
 }
 
+/* Method badge variants */
 .method-badge-decoded {
 	background: var(--color-primary-alpha-15);
 	color: var(--color-primary);

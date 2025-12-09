@@ -403,11 +403,38 @@
 	border-bottom: 1px solid var(--color-primary-alpha-15);
 }
 
-.tx-section-title {
+/* ==========================================================================
+   TITLES - Section title classes
+   All section titles share base typography
+   ========================================================================== */
+
+/* Base section title styles */
+.tx-section-title,
+.abi-section-title,
+.profile-section-title,
+.functions-section-title,
+.trace-title,
+.legend-title,
+.network-stats-title {
 	font-family: "Outfit", sans-serif;
 	font-weight: 600;
-	font-size: 0.95rem;
 	color: var(--color-primary);
+}
+
+/* Specific title sizes */
+.tx-section-title {
+	font-size: 0.95rem;
+}
+
+.abi-section-title,
+.functions-section-title {
+	font-size: 0.85rem;
+	margin-bottom: 6px;
+}
+
+.profile-section-title {
+	font-size: 1.1rem;
+	margin: 0 0 16px 0;
 }
 
 .tx-logs {
@@ -630,53 +657,106 @@
 	}
 }
 
-/* Info Boxes - Green bordered data display boxes */
-.info-box {
+/* ==========================================================================
+   INFO BOXES - Consolidated info box system
+   All info boxes share base styles with color/layout variants
+   ========================================================================== */
+
+/* Base info-box styles - shared by all variants */
+.info-box,
+.info-box-vertical,
+.info-box-arbitrum,
+.info-box-arbitrum-vertical,
+.info-box-optimism {
 	display: flex;
-	justify-content: space-between;
 	padding: 8px 12px;
 	background: var(--color-primary-alpha-4);
 	border-radius: 8px;
 	border-left: 3px solid var(--color-primary);
 }
 
-.info-box-vertical {
-	display: flex;
+/* Default horizontal layout */
+.info-box,
+.info-box-arbitrum,
+.info-box-optimism {
+	justify-content: space-between;
+}
+
+/* Vertical layout variant */
+.info-box-vertical,
+.info-box-arbitrum-vertical {
 	flex-direction: column;
 	gap: 4px;
 	padding: 10px 12px;
-	background: var(--color-primary-alpha-4);
-	border-radius: 8px;
-	border-left: 3px solid var(--color-primary);
 }
 
-.info-box-label {
+/* Arbitrum color variant (blue theme) */
+.info-box-arbitrum,
+.info-box-arbitrum-vertical {
+	background: var(--color-info-alpha-10);
+	border-left-color: var(--color-info);
+}
+
+/* Full width for grid layouts */
+.info-box-arbitrum-vertical {
+	grid-column: 1 / -1;
+}
+
+/* Optimism color variant (red theme) - styles defined below */
+.info-box-optimism {
+	background: var(--color-error-alpha-10);
+	border-left-color: var(--color-error);
+}
+
+/* Info box content elements - shared base styles */
+.info-box-label,
+.info-box-arbitrum-label,
+.info-box-optimism-label {
 	font-size: 0.85rem;
-	color: var(--color-primary);
 	font-weight: 600;
 	font-family: "Outfit", sans-serif;
 }
 
-.info-box-value {
+/* Label color variants */
+.info-box-label {
+	color: var(--color-primary);
+}
+
+.info-box-arbitrum-label {
+	color: var(--color-info);
+}
+
+.info-box-optimism-label {
+	color: var(--color-error);
+}
+
+/* Info box value styles - shared base */
+.info-box-value,
+.info-box-value-mono,
+.info-box-value-small,
+.info-box-value-accent {
 	font-weight: 500;
 	color: var(--text-primary);
 	font-family: "Outfit", sans-serif;
+}
+
+.info-box-value {
 	font-size: 0.95rem;
 }
 
 .info-box-value-mono {
-	font-weight: 500;
-	color: var(--text-primary);
-	font-family: "Outfit", sans-serif;
 	font-size: 0.9rem;
 	word-break: break-all;
 }
 
 .info-box-value-small {
-	font-weight: 500;
-	color: var(--text-primary);
-	font-family: "Outfit", sans-serif;
 	font-size: 0.85rem;
+}
+
+.info-box-value-accent {
+	font-weight: 600;
+	color: var(--color-primary-muted);
+	font-size: 0.95rem;
 }
 
 .info-box-subtext {
@@ -685,41 +765,6 @@
 	font-family: "Outfit", sans-serif;
 	font-size: 0.8rem;
 	margin-top: 2px;
-}
-
-.info-box-value-accent {
-	font-weight: 600;
-	color: var(--color-primary-muted);
-	font-family: "Outfit", sans-serif;
-	font-size: 0.95rem;
-}
-
-/* Arbitrum-specific info boxes (blue theme) */
-.info-box-arbitrum {
-	display: flex;
-	justify-content: space-between;
-	padding: 8px 12px;
-	background: var(--color-info-alpha-10);
-	border-radius: 8px;
-	border-left: 3px solid var(--color-info);
-}
-
-.info-box-arbitrum-vertical {
-	display: flex;
-	flex-direction: column;
-	gap: 4px;
-	padding: 10px 12px;
-	background: var(--color-info-alpha-10);
-	border-radius: 8px;
-	border-left: 3px solid var(--color-info);
-	grid-column: 1 / -1;
-}
-
-.info-box-arbitrum-label {
-	font-size: 0.85rem;
-	color: var(--color-info);
-	font-weight: 600;
-	font-family: "Outfit", sans-serif;
 }
 
 /* Network Cards - Home page */
@@ -795,24 +840,41 @@
 	font-weight: 500;
 }
 
-/* Buttons */
-.button-primary {
-	background: var(--color-primary);
-	color: white;
-	border: none;
-	padding: 8px 16px;
+/* ==========================================================================
+   BUTTONS - Consolidated button classes
+   All buttons share base styles with variants
+   ========================================================================== */
+
+/* Base button styles - shared by all button variants */
+.button-primary,
+.collapsible-button,
+.button-primary-inline,
+.button-secondary-inline {
 	border-radius: 8px;
 	cursor: pointer;
 	font-family: "Outfit", sans-serif;
 	font-weight: 600;
 	font-size: 0.9rem;
 	transition: all 0.2s ease;
+}
+
+/* Primary button styles */
+.button-primary,
+.collapsible-button {
+	background: var(--color-primary);
+	color: white;
+	border: none;
+	padding: 8px 16px;
+}
+
+.button-primary {
 	display: flex;
 	align-items: center;
 	justify-content: center;
 }
 
-.button-primary:hover {
+.button-primary:hover,
+.collapsible-button:hover {
 	background: var(--color-primary-muted);
 }
 
@@ -822,20 +884,7 @@
 }
 
 .collapsible-button {
-	background: var(--color-primary);
-	color: white;
-	border: none;
-	padding: 8px 16px;
-	border-radius: 8px;
-	cursor: pointer;
-	font-family: "Outfit", sans-serif;
-	font-weight: 600;
-	font-size: 0.9rem;
 	margin-bottom: 10px;
-}
-
-.collapsible-button:hover {
-	background: var(--color-primary-muted);
 }
 
 .collapsible-content {
@@ -1132,21 +1181,20 @@
 	margin: 0 auto 24px;
 }
 
-.button-primary-inline {
+/* Inline button variants - larger padding, can be used as links */
+.button-primary-inline,
+.button-secondary-inline {
 	display: inline-flex;
 	padding: 12px 24px;
-	background: var(--color-primary);
-	color: white;
-	border: none;
-	border-radius: 8px;
-	cursor: pointer;
-	font-family: "Outfit", sans-serif;
-	font-weight: 600;
-	font-size: 0.9rem;
 	text-decoration: none;
 	align-items: center;
 	justify-content: center;
-	transition: all 0.2s ease;
+}
+
+.button-primary-inline {
+	background: var(--color-primary);
+	color: white;
+	border: none;
 }
 
 .button-primary-inline:hover {
@@ -1154,18 +1202,9 @@
 }
 
 .button-secondary-inline {
-	display: inline-flex;
-	padding: 12px 24px;
 	background: transparent;
 	color: var(--color-primary);
 	border: 1px solid var(--color-primary);
-	border-radius: 8px;
-	cursor: pointer;
-	font-family: "Outfit", sans-serif;
-	font-weight: 600;
-	font-size: 0.9rem;
-	text-decoration: none;
-	transition: all 0.2s ease;
 }
 
 .button-secondary-inline:hover {
@@ -1188,23 +1227,29 @@
 	margin-top: 8px;
 }
 
-/* Transaction Status Badges */
-.status-badge-success {
-	background: #d1fae5;
-	color: #065f46;
+/* ==========================================================================
+   BADGES - Consolidated badge classes
+   All badges share base styles with color variants
+   ========================================================================== */
+
+/* Base badge styles - shared by all status badges */
+.status-badge-success,
+.status-badge-failed {
 	padding: 4px 12px;
 	border-radius: 6px;
 	font-size: 0.85rem;
 	font-weight: 600;
 }
 
+/* Use CSS variables for badge colors for theming support */
+.status-badge-success {
+	background: var(--badge-success-bg, #d1fae5);
+	color: var(--badge-success-text, #065f46);
+}
+
 .status-badge-failed {
-	background: #fee2e2;
-	color: #991b1b;
-	padding: 4px 12px;
-	border-radius: 6px;
-	font-size: 0.85rem;
-	font-weight: 600;
+	background: var(--badge-error-bg, #fee2e2);
+	color: var(--badge-error-text, #991b1b);
 }
 
 /* Storage Input */
@@ -1290,12 +1335,7 @@
 	white-space: pre;
 }
 
-.abi-section-title {
-	font-size: 0.85rem;
-	color: var(--color-primary);
-	margin-bottom: 6px;
-	font-weight: 600;
-}
+/* .abi-section-title - styles consolidated in TITLES section above */
 
 .abi-badge-container {
 	display: flex;
@@ -1737,22 +1777,7 @@
 	margin-top: 16px;
 }
 
-/* Optimism-specific info boxes (red theme) */
-.info-box-optimism {
-	display: flex;
-	justify-content: space-between;
-	padding: 8px 12px;
-	background: var(--color-error-alpha-10);
-	border-radius: 8px;
-	border-left: 3px solid var(--color-error);
-}
-
-.info-box-optimism-label {
-	font-size: 0.85rem;
-	color: var(--color-error);
-	font-weight: 600;
-	font-family: "Outfit", sans-serif;
-}
+/* Optimism info boxes - styles consolidated above with other info-box variants */
 
 /* Network Block Indicator */
 .network-block-indicator {
@@ -3056,13 +3081,7 @@
 	padding: 20px;
 }
 
-.profile-section-title {
-	font-family: "Outfit", sans-serif;
-	font-size: 1.1rem;
-	font-weight: 600;
-	color: var(--color-primary);
-	margin: 0 0 16px 0;
-}
+/* .profile-section-title - styles consolidated in TITLES section above */
 
 /* Profile Actions */
 .profile-actions {
@@ -3316,22 +3335,16 @@
 	margin-bottom: 12px;
 }
 
-.functions-section-title {
-	font-size: 0.85rem;
-	font-weight: 600;
-	margin-bottom: 6px;
-}
+/* .functions-section-title base - styles consolidated in TITLES section above */
 
-.functions-section-title-read {
+/* Color variants for functions section titles */
+.functions-section-title-read,
+.functions-section-title-events {
 	color: var(--color-primary);
 }
 
 .functions-section-title-write {
 	color: var(--color-warning);
-}
-
-.functions-section-title-events {
-	color: var(--color-primary);
 }
 
 .functions-list {

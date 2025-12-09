@@ -557,36 +557,7 @@ body {
   justify-content: space-around;
 }
 
-/* Form Input Styles */
-.form-group {
-  margin-bottom: 16px;
-}
-
-.form-label {
-  display: block;
-  margin-bottom: 6px;
-}
-
-.form-input {
-  width: 100%;
-  padding: 12px 16px;
-  box-sizing: border-box;
-}
-
-.form-input:disabled {
-  cursor: not-allowed;
-}
-
-.form-select {
-  padding: 12px 16px;
-  box-sizing: border-box;
-  cursor: pointer;
-  min-width: 200px;
-}
-
-.form-select:disabled {
-  cursor: not-allowed;
-}
+/* Form Input Styles - consolidated below in Form Styles section */
 
 .dropdown-container {
   display: flex;
@@ -2574,7 +2545,11 @@ body {
   justify-content: space-around;
 }
 
-/* Form Input Styles */
+/* ==========================================================================
+   FORM STYLES - Consolidated form classes
+   All form inputs share base styles
+   ========================================================================== */
+
 .form-group {
   margin-bottom: 16px;
 }
@@ -2587,30 +2562,8 @@ body {
   font-size: 0.875rem;
 }
 
-.form-input {
-  width: 100%;
-  padding: 12px 16px;
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-sm);
-  background: var(--surface-2);
-  color: var(--text-primary);
-  font-size: 1rem;
-  transition: border-color 0.2s, box-shadow 0.2s;
-  box-sizing: border-box;
-}
-
-.form-input:focus {
-  outline: none;
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(0, 200, 83, 0.1);
-}
-
-.form-input:disabled {
-  background: var(--panel-alt);
-  color: var(--text-sec);
-  cursor: not-allowed;
-}
-
+/* Shared base styles for form inputs and selects */
+.form-input,
 .form-select {
   padding: 12px 16px;
   border: 1px solid var(--border-color);
@@ -2620,20 +2573,31 @@ body {
   font-size: 1rem;
   transition: border-color 0.2s, box-shadow 0.2s;
   box-sizing: border-box;
-  cursor: pointer;
-  min-width: 200px;
 }
 
+.form-input:focus,
 .form-select:focus {
   outline: none;
   border-color: var(--accent);
   box-shadow: 0 0 0 3px rgba(0, 200, 83, 0.1);
 }
 
+.form-input:disabled,
 .form-select:disabled {
   background: var(--panel-alt);
   color: var(--text-sec);
   cursor: not-allowed;
+}
+
+/* Input-specific styles */
+.form-input {
+  width: 100%;
+}
+
+/* Select-specific styles */
+.form-select {
+  cursor: pointer;
+  min-width: 200px;
 }
 
 .dropdown-container {
@@ -4113,22 +4077,7 @@ code {
   background: transparent;
 }
 
-/* Page card with semi-transparent background */
-.page-card {
-  background: var(--bg-primary);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border-radius: 20px;
-  border: 1px solid var(--color-primary-alpha-15);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  padding: 24px;
-}
-
-/* When page-card is used with container-wide, adjust for alignment with navbar */
-.container-wide.page-card {
-  max-width: 1352px;
-  padding: 0px 12px;
-}
+/* Card classes are consolidated below with block-display-card */
 
 .home-title {
   font-family: 'Outfit', sans-serif;
@@ -4265,15 +4214,37 @@ code {
   }
 }
 
-/* Block Display Component - extends page-card */
+/* ==========================================================================
+   CARD STYLES - Consolidated card classes
+   page-card and block-display-card share base styles
+   ========================================================================== */
+
+/* Shared base styles for all card variants */
+.page-card,
 .block-display-card {
   background: var(--bg-primary);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid var(--color-primary-alpha-15);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+/* page-card - larger padding and border-radius */
+.page-card {
+  border-radius: 20px;
+  padding: 24px;
+}
+
+/* When page-card is used with container-wide, adjust for alignment with navbar */
+.container-wide.page-card {
+  max-width: 1352px;
+  padding: 0px 12px;
+}
+
+/* block-display-card - full width variant */
+.block-display-card {
   border-radius: 16px;
   padding: 20px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   width: 100%;
 }
 

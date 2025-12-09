@@ -1,7 +1,9 @@
 /* DevTools Specific Styles */
 
 /* ================================================
-   Layout Classes
+   Layout Classes - DevTools Specific
+   Note: These classes mirror base utilities for backward compatibility.
+   Consider using base utilities (flex-column, gap-2, etc.) for new code.
    ================================================ */
 
 .devtools-container {
@@ -16,79 +18,43 @@
 	padding: 20px 0;
 }
 
-.devtools-flex-column {
+/* Flex utilities - consolidated with base system */
+.devtools-flex-column,
+.devtools-flex-row {
 	display: flex;
+}
+
+.devtools-flex-column {
 	flex-direction: column;
 }
 
 .devtools-flex-row {
-	display: flex;
 	flex-direction: row;
 }
 
-.devtools-gap-4 {
-	gap: 4px;
-}
+/* Gap utilities - maps to: 4px, 8px, 10px, 12px, 16px */
+.devtools-gap-4 { gap: 4px; }
+.devtools-gap-8 { gap: 8px; }
+.devtools-gap-10 { gap: 10px; }
+.devtools-gap-12 { gap: 12px; }
+.devtools-gap-16 { gap: 16px; }
 
-.devtools-gap-8 {
-	gap: 8px;
-}
+/* Alignment utilities */
+.devtools-align-center { align-items: center; }
+.devtools-align-end { align-items: flex-end; }
+.devtools-justify-center { justify-content: center; }
+.devtools-justify-between { justify-content: space-between; }
+.devtools-flex-wrap { flex-wrap: wrap; }
+.devtools-flex-1 { flex: 1; }
 
-.devtools-gap-10 {
-	gap: 10px;
-}
+/* Sizing utilities */
+.devtools-width-220 { width: 220px; }
 
-.devtools-gap-12 {
-	gap: 12px;
-}
-
-.devtools-gap-16 {
-	gap: 16px;
-}
-
-.devtools-align-center {
-	align-items: center;
-}
-
-.devtools-align-end {
-	align-items: flex-end;
-}
-
-.devtools-justify-center {
-	justify-content: center;
-}
-
-.devtools-justify-between {
-	justify-content: space-between;
-}
-
-.devtools-flex-wrap {
-	flex-wrap: wrap;
-}
-
-.devtools-flex-1 {
-	flex: 1;
-}
-
-.devtools-width-220 {
-	width: 220px;
-}
-
-.devtools-margin-top-8 {
-	margin-top: 8px;
-}
-
-.devtools-margin-top-12 {
-	margin-top: 12px;
-}
-
-.devtools-margin-left-8 {
-	margin-left: 8px;
-}
-
-.devtools-margin-right-8 {
-	margin-right: 8px;
-}
+/* Margin utilities */
+.devtools-margin-top-8 { margin-top: 8px; }
+.devtools-margin-top-12 { margin-top: 12px; }
+.devtools-margin-left-8 { margin-left: 8px; }
+.devtools-margin-right-8 { margin-right: 8px; }
 
 /* ================================================
    Transaction Builder Section
@@ -416,15 +382,28 @@
 
 /* ================================================
    Card & Tool Header
+   Note: devtools-card and dev-section-container share base styles
    ================================================ */
 
-.devtools-card {
+/* Shared card base styles */
+.devtools-card,
+.dev-section-container {
 	background: var(--bg-card);
 	border-radius: 16px;
-	box-shadow: var(--shadow-sm);
 	border: 1px solid var(--color-primary-alpha-10);
 	padding: 24px;
+}
+
+/* devtools-card specific */
+.devtools-card {
+	box-shadow: var(--shadow-sm);
 	margin-bottom: 24px;
+}
+
+/* dev-section-container specific */
+.dev-section-container {
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+	display: block;
 }
 
 .devtools-tool-title {
@@ -1031,16 +1010,8 @@
 }
 /* ================================================
    Development Section (Hardhat Ignition)
+   Note: dev-section-container styles consolidated above with devtools-card
    ================================================ */
-
-.dev-section-container {
-	background: var(--bg-card);
-	border-radius: 16px;
-	padding: 24px;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-	border: 1px solid var(--color-primary-alpha-10);
-	display: block;
-}
 
 .dev-section-title {
 	font-size: 1.1rem;
