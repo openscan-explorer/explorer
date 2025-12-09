@@ -2,6 +2,7 @@ import type { NetworkAdapter } from "./NetworkAdapter";
 import { EVMAdapter } from "./EVMAdapter/EVMAdapter";
 import { OptimismAdapter } from "./OptimismAdapter/OptimismAdapter";
 import { BNBAdapter } from "./BNBAdapter/BNBAdapter";
+import { PolygonAdapter } from "./PolygonAdapter/PolygonAdapter";
 import type {
   ArbitrumClient,
   AztecClient,
@@ -33,6 +34,8 @@ export class AdapterFactory {
         return new OptimismAdapter(networkId, client as OptimismClient);
       case 56:
         return new BNBAdapter(networkId, client as BNBClient);
+      case 137:
+        return new PolygonAdapter(networkId, client as PolygonClient);
       default:
         throw new Error(`Unknown adapter for networkId: ${networkId}`);
     }
