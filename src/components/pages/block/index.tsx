@@ -39,7 +39,7 @@ export default function BlockPage() {
     setLoading(true);
     setError(null);
 
-    dataService
+    dataService.networkAdapter
       .getBlock(blockNumber)
       .then((result) => {
         console.log("Fetched block:", result);

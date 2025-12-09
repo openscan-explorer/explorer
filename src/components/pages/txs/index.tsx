@@ -39,7 +39,7 @@ export default function Txs() {
 
       try {
         // Get the latest block number first
-        const latestBlock = await dataService.getLatestBlockNumber();
+        const latestBlock = await dataService.networkAdapter.getLatestBlockNumber();
         setLatestBlockNumber(latestBlock);
 
         // Determine starting block
@@ -50,7 +50,7 @@ export default function Txs() {
         setBlockRange({ from: endBlock, to: startBlock });
 
         // Fetch transactions from block range
-        const fetchedTransactions = await dataService.getTransactionsFromBlockRange(
+        const fetchedTransactions = await dataService.networkAdapter.getTransactionsFromBlockRange(
           startBlock,
           BLOCKS_PER_PAGE,
         );

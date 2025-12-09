@@ -98,7 +98,7 @@ export default function Address() {
   useEffect(() => {
     if (!dataService || !address) return;
 
-    dataService
+    dataService.networkAdapter
       .getAddressTransactions(address)
       .then(async (result) => {
         console.log("Fetched transactions result:", result);
@@ -109,7 +109,7 @@ export default function Address() {
           const txsToFetch = result.transactions.slice(0, 25);
           const txResults = await Promise.all(
             txsToFetch.map((hash) =>
-              dataService.getTransaction(hash).catch((err) => {
+              dataService.networkAdapter.getTransaction(hash).catch((err) => {
                 console.error(`Failed to fetch tx ${hash}:`, err);
                 return null;
               }),

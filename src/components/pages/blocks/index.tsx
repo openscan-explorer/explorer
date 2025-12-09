@@ -33,7 +33,7 @@ export default function Blocks() {
 
       try {
         // Get the latest block number first
-        const latestBlock = await dataService.getLatestBlockNumber();
+        const latestBlock = await dataService.networkAdapter.getLatestBlockNumber();
         setLatestBlockNumber(latestBlock);
 
         // Determine starting block
@@ -47,7 +47,7 @@ export default function Blocks() {
 
         // Fetch blocks in parallel
         const blockResults = await Promise.all(
-          blockNumbers.map((num) => dataService.getBlock(num)),
+          blockNumbers.map((num) => dataService.networkAdapter.getBlock(num)),
         );
 
         console.log("Fetched blocks:", blockResults);

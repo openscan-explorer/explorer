@@ -37,7 +37,7 @@ export default function Network() {
     setLoading(true);
     setError(null);
 
-    dataService
+    dataService.networkAdapter
       .getNetworkStats()
       .then((result) => {
         setNetworkStatsResult(result);

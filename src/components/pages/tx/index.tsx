@@ -42,7 +42,10 @@ export default function Tx() {
     setLoading(true);
     setError(null);
 
-    Promise.all([dataService.getTransaction(txHash), dataService.getLatestBlockNumber()])
+    Promise.all([
+      dataService.networkAdapter.getTransaction(txHash),
+      dataService.networkAdapter.getLatestBlockNumber(),
+    ])
       .then(([result, latestBlock]) => {
         console.log("Fetched transaction:", result);
         console.log("Latest block number:", latestBlock);

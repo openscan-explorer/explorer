@@ -5,7 +5,7 @@ import { RPCIndicator } from "../../../components/common/RPCIndicator";
 import { AppContext } from "../../../context";
 import { useSourcify } from "../../../hooks/useSourcify";
 import type { DataService } from "../../../services/DataService";
-import type { TraceResult } from "../../../services/EVM/L1/fetchers/trace";
+import type { TraceResult } from "../../../services/adapters/NetworkAdapter";
 import type {
   RPCMetadata,
   Transaction,
@@ -115,15 +115,15 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
     }, [contractData?.abi, transaction.data]);
 
     // Check if trace is available (localhost only)
-    const isTraceAvailable = dataService?.isTraceAvailable() || false;
+    const isTraceAvailable = dataService?.networkAdapter.isTraceAvailable() || false;
 
     // Load trace data when trace section is expanded
     useEffect(() => {
       if (showTrace && isTraceAvailable && dataService && !traceData && !callTrace) {
         setLoadingTrace(true);
         Promise.all([
-          dataService.getTransactionTrace(transaction.hash),
-          dataService.getCallTrace(transaction.hash),
+          dataService.networkAdapter.getTransactionTrace(transaction.hash),
+          dataService.networkAdapter.getCallTrace(transaction.hash),
         ])
           .then(([trace, call]) => {
             setTraceData(trace);
