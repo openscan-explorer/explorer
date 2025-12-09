@@ -2,7 +2,7 @@ import { useContext, useEffect, useMemo, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { getRPCUrls } from "../../config/rpcConfig";
 import { AppContext, useNetworks } from "../../context/AppContext";
-import { RPCClient } from "../../services/EVM/common/RPCClient";
+import { RpcClient } from "explorer-network-connectors";
 import { NetworkIcon } from "../common/NetworkIcon";
 
 interface NetworkBlockIndicatorProps {
@@ -38,7 +38,7 @@ export function NetworkBlockIndicator({ className }: NetworkBlockIndicatorProps)
     const fetchBlockNumber = async () => {
       try {
         const urls = getRPCUrls(networkId, rpcUrls);
-        const client = new RPCClient(urls);
+        const client = new RpcClient(urls[0] || "");
         const result = await client.call<string>("eth_blockNumber", []);
         if (isMounted) {
           setBlockNumber(parseInt(result, 16));
