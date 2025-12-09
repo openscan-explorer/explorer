@@ -46,9 +46,9 @@ export abstract class NetworkAdapter {
   networkId: number;
   isLocalHost: boolean;
 
-  constructor(networkId: SupportedChainId | 31337 | 1337) {
+  constructor(networkId: SupportedChainId | 31337 | 11155111) {
     this.networkId = networkId;
-    this.isLocalHost = networkId === 31337 || networkId === 1337;
+    this.isLocalHost = networkId === 31337;
   }
   /**
    * Get block by number or tag

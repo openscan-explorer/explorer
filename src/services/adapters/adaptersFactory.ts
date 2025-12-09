@@ -19,7 +19,7 @@ import type {
 // biome-ignore lint/complexity/noStaticOnlyClass: <TODO>
 export class AdapterFactory {
   static createAdapter(
-    networkId: SupportedChainId,
+    networkId: SupportedChainId | 11155111 | 31337,
     client:
       | EthereumClient
       | OptimismClient
@@ -31,6 +31,7 @@ export class AdapterFactory {
   ): NetworkAdapter {
     switch (networkId) {
       case 1:
+      case 11155111:
         return new EVMAdapter(networkId, client as EthereumClient);
       case 10:
         return new OptimismAdapter(networkId, client as OptimismClient);
