@@ -35,12 +35,8 @@ body {
   width: 100vw;
   height: 100vh;
   pointer-events: none;
-  opacity: 0.2;
+  opacity: 0.3;
   z-index: 0;
-}
-
-[data-theme="light"] .app-background-blocks {
-  opacity: 0.6;
 }
 
 .app-content {
@@ -699,12 +695,6 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
-}
-
-/* Settings Page */
-.settings-container {
-  max-width: 800px;
-  margin: 0 auto;
 }
 
 .settings-header {
@@ -2816,11 +2806,6 @@ body {
 
 /* ==================== SETTINGS PAGE ==================== */
 
-.settings-container {
-  max-width: 800px;
-  margin: 0 auto;
-}
-
 .settings-header {
   display: flex;
   justify-content: space-between;
@@ -3915,8 +3900,8 @@ code {
 
 .app-footer {
   padding: 12px 24px;
-  border-top: 1px solid var(--border-color);
-  background: rgba(30, 30, 30, 0.9);
+  border-top: 1px solid var(--border-secondary);
+  background: var(--bg-secondary);
   backdrop-filter: blur(8px);
   position: fixed;
   bottom: 0;
@@ -3941,7 +3926,7 @@ code {
 }
 
 .footer-link {
-  color: var(--text-sec);
+  color: var(--text-primary);
   text-decoration: none;
   font-size: 0.75rem;
   font-weight: 500;
@@ -3965,12 +3950,6 @@ code {
 .version-label {
   color: var(--text-sec);
   font-weight: 500;
-}
-
-[data-theme="light"] .footer-link,
-[data-theme="light"] .footer-right,
-[data-theme="light"] .version-label {
-  color: rgba(255, 255, 255, 0.8);
 }
 
 .commit-link {
@@ -4136,16 +4115,13 @@ code {
 
 /* Page card with semi-transparent background */
 .page-card {
-  background: rgba(15, 23, 42, 0.85);
+  background: var(--bg-primary);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border-radius: 20px;
   border: 1px solid var(--color-primary-alpha-15);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   padding: 24px;
-}
-[data-theme="light"] .page-card {
-  background: rgb(58 74 118);
 }
 
 /* When page-card is used with container-wide, adjust for alignment with navbar */
@@ -4291,7 +4267,7 @@ code {
 
 /* Block Display Component */
 .block-display-card {
-  background: rgba(15, 23, 42, 0.85);
+  background: var(--bg-primary);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid var(--color-primary-alpha-15);
@@ -4301,10 +4277,6 @@ code {
   width: 100%;
   margin: 0;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-[data-theme="light"] .block-display-card {
-  background: rgb(58, 74, 118);
 }
 
 .block-display-header {
@@ -4649,6 +4621,8 @@ code {
    ======================================== */
 
 .settings-container {
+  max-width: 800px;
+  margin: 0 auto;
   font-family: 'Outfit', sans-serif;
   text-align: center;
 }
@@ -4914,7 +4888,6 @@ code {
   border-radius: 8px;
   border: 1px solid var(--color-primary-alpha-30);
   background: white;
-  color: var(--text-primary);
   font-size: 0.9rem;
   font-weight: 500;
   cursor: pointer;
@@ -5118,61 +5091,6 @@ code {
 .settings-save-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 16px var(--color-primary-alpha-40);
-}
-
-/* Settings Light Mode Overrides */
-[data-theme="light"] .settings-section {
-  background: rgb(58, 74, 118);
-  border-color: var(--overlay-light-20);
-}
-
-[data-theme="light"] .settings-section-description {
-  color: var(--text-secondary);
-}
-
-[data-theme="light"] .settings-item,
-[data-theme="light"] .settings-chain-item,
-[data-theme="light"] .chain-config-item {
-  background: var(--overlay-light-10);
-  border-color: var(--overlay-light-20);
-}
-
-[data-theme="light"] .settings-chain-name {
-  color: var(--text-primary);
-}
-
-[data-theme="light"] .settings-chain-id-badge,
-[data-theme="light"] .chain-id-badge {
-  color: white;
-  background: rgba(255, 255, 255, 0.15);
-}
-
-[data-theme="light"] .settings-rpc-input,
-[data-theme="light"] .settings-input {
-  background: rgb(58, 74, 118);
-  border-color: var(--overlay-light-20);
-  color: var(--text-primary);
-}
-
-[data-theme="light"] .settings-rpc-input:focus,
-[data-theme="light"] .settings-input:focus {
-  border-color: rgba(255, 255, 255, 0.6);
-}
-
-[data-theme="light"] .settings-help-text,
-[data-theme="light"] .settings-item-description,
-[data-theme="light"] .settings-rpc-list-label {
-  color: var(--text-secondary);
-}
-
-[data-theme="light"] .settings-select {
-  background: rgb(58, 74, 118);
-  border-color: var(--overlay-light-20);
-  color: var(--text-primary);
-}
-
-[data-theme="light"] .settings-select:focus {
-  border-color: rgba(255, 255, 255, 0.6);
 }
 
 /* ==================== Profile Display ==================== */
