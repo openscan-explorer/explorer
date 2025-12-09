@@ -74,20 +74,10 @@ export const SettingsProvider = React.memo<SettingsProviderProps>(({ children })
   }, []);
 
   const toggleTheme = React.useCallback(() => {
-    const currentTheme = settings.theme || "auto";
-    let newTheme: "light" | "dark" | "auto";
-
-    // Cycle through: auto -> light -> dark -> auto
-    if (currentTheme === "auto") {
-      newTheme = "light";
-    } else if (currentTheme === "light") {
-      newTheme = "dark";
-    } else {
-      newTheme = "auto";
-    }
-
+    // Simple toggle between light and dark based on current visual state
+    const newTheme = isDarkMode ? "light" : "dark";
     updateSettings({ theme: newTheme });
-  }, [settings.theme, updateSettings]);
+  }, [isDarkMode, updateSettings]);
 
   const value = React.useMemo(
     () => ({
