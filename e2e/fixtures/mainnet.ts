@@ -1,4 +1,4 @@
-// cspell:ignore vitalik beaverbuild dencun
+// cspell:ignore vitalik beaverbuild dencun bayc rarible rari
 export const MAINNET = {
   chainId: "1",
 
@@ -275,6 +275,152 @@ export const MAINNET = {
       address: "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D",
       type: "contract" as const,
       name: "Uniswap V2: Router 2",
+    },
+    // Bored Ape Yacht Club - ERC721 NFT collection
+    bayc: {
+      address: "0xBC4CA0EdA7647A8aB7C2061c2E118A18a936f13D",
+      type: "erc721" as const,
+      name: "BoredApeYachtClub",
+      fullName: "Bored Ape Yacht Club",
+      symbol: "BAYC",
+      // NFT Collection Details
+      totalMinted: "10,000 NFTs",
+      // Contract Details
+      verified: true,
+      verifiedAt: "8/8/2024",
+      matchType: "Partial Match",
+      compiler: "0.7.0+commit.9e61f92b",
+      // Read Functions (21 total)
+      readFunctions: [
+        "BAYC_PROVENANCE",
+        "MAX_APES",
+        "REVEAL_TIMESTAMP",
+        "apePrice",
+        "balanceOf",
+        "baseURI",
+        "getApproved",
+        "isApprovedForAll",
+        "maxApePurchase",
+        "name",
+        "owner",
+        "ownerOf",
+        "saleIsActive",
+        "startingIndex",
+        "startingIndexBlock",
+        "supportsInterface",
+        "symbol",
+        "tokenByIndex",
+        "tokenOfOwnerByIndex",
+        "tokenURI",
+        "totalSupply",
+      ],
+      // Write Functions (16 total)
+      writeFunctions: [
+        "approve",
+        "emergencySetStartingIndexBlock",
+        "flipSaleState",
+        "mintApe",
+        "renounceOwnership",
+        "reserveApes",
+        "safeTransferFrom",
+        "setApprovalForAll",
+        "setBaseURI",
+        "setProvenanceHash",
+        "setRevealTimestamp",
+        "setStartingIndex",
+        "transferFrom",
+        "transferOwnership",
+        "withdraw",
+      ],
+      // Events (4 total)
+      events: ["Approval", "ApprovalForAll", "OwnershipTransferred", "Transfer"],
+    },
+    // Rarible - ERC1155 multi-token collection
+    rarible: {
+      address: "0xd07dc4262BCDbf85190C01c996b4C06a461d2430",
+      type: "erc1155" as const,
+      name: "Rarible",
+      symbol: "RARI",
+      // Multi-Token Collection Details
+      metadataUri: "ipfs:/",
+      // Contract Details
+      verified: true,
+      verifiedAt: "8/8/2024",
+      matchType: "MATCH",
+      compiler: "0.5.17+commit.d19bba13",
+      // Read Functions (16 total)
+      readFunctions: [
+        "balanceOf",
+        "balanceOfBatch",
+        "contractURI",
+        "creators",
+        "fees",
+        "getFeeBps",
+        "getFeeRecipients",
+        "isApprovedForAll",
+        "isOwner",
+        "isSigner",
+        "name",
+        "owner",
+        "supportsInterface",
+        "symbol",
+        "tokenURIPrefix",
+        "uri",
+      ],
+      // Write Functions (12 total)
+      writeFunctions: [
+        "addSigner",
+        "burn",
+        "mint",
+        "removeSigner",
+        "renounceOwnership",
+        "renounceSigner",
+        "safeBatchTransferFrom",
+        "safeTransferFrom",
+        "setApprovalForAll",
+        "setContractURI",
+        "setTokenURIPrefix",
+        "transferOwnership",
+      ],
+      // Events (8 total)
+      events: [
+        "ApprovalForAll",
+        "OwnershipTransferred",
+        "SecondarySaleFees",
+        "SignerAdded",
+        "SignerRemoved",
+        "TransferBatch",
+        "TransferSingle",
+        "URI",
+      ],
+    },
+  },
+
+  // Specific NFT tokens for token detail page tests
+  tokens: {
+    // BAYC #1 - First Bored Ape
+    baycToken1: {
+      contractAddress: "0xBC4CA0EdA7647A8aB7C2061c2E118A18a936f13D",
+      tokenId: "1",
+      standard: "erc721" as const,
+      collectionName: "BoredApeYachtClub",
+      collectionSymbol: "BAYC",
+    },
+    // BAYC #100 - Another well-known Bored Ape
+    baycToken100: {
+      contractAddress: "0xBC4CA0EdA7647A8aB7C2061c2E118A18a936f13D",
+      tokenId: "100",
+      standard: "erc721" as const,
+      collectionName: "BoredApeYachtClub",
+      collectionSymbol: "BAYC",
+    },
+    // Rarible token - ERC1155
+    raribleToken: {
+      contractAddress: "0xd07dc4262BCDbf85190C01c996b4C06a461d2430",
+      tokenId: "1",
+      standard: "erc1155" as const,
+      collectionName: "Rarible",
+      collectionSymbol: "RARI",
     },
   },
 };
