@@ -53,3 +53,9 @@ ehthumbs.db
 
 # Dev files
 src/config/dev.json
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
