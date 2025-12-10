@@ -25,7 +25,7 @@ import type { BNBClient } from "explorer-network-connectors";
 export class BNBAdapter extends NetworkAdapter {
   private client: BNBClient;
 
-  constructor(networkId: 56, client: BNBClient) {
+  constructor(networkId: 56 | 97, client: BNBClient) {
     super(networkId);
     this.client = client;
   }

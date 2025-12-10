@@ -46,7 +46,7 @@ export abstract class NetworkAdapter {
   networkId: number;
   isLocalHost: boolean;
 
-  constructor(networkId: SupportedChainId | 31337 | 11155111) {
+  constructor(networkId: SupportedChainId | 31337 | 11155111 | 97) {
     this.networkId = networkId;
     this.isLocalHost = networkId === 31337;
   }
