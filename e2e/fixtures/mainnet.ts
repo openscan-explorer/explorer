@@ -405,6 +405,16 @@ export const MAINNET = {
       standard: "erc721" as const,
       collectionName: "BoredApeYachtClub",
       collectionSymbol: "BAYC",
+      collectionSize: "10,000 NFTs",
+      tokenUri: "ipfs://QmeSjSinHpPnmXmspMjwiXyN6zS4E9zccariGR3jxcaWtq/1",
+      // Properties (5 total for token #1)
+      properties: [
+        { trait: "MOUTH", value: "Grin" },
+        { trait: "CLOTHES", value: "Vietnam Jacket" },
+        { trait: "BACKGROUND", value: "Orange" },
+        { trait: "EYES", value: "Blue Beams" },
+        { trait: "FUR", value: "Robot" },
+      ],
     },
     // BAYC #100 - Another well-known Bored Ape
     baycToken100: {
@@ -413,6 +423,16 @@ export const MAINNET = {
       standard: "erc721" as const,
       collectionName: "BoredApeYachtClub",
       collectionSymbol: "BAYC",
+      collectionSize: "10,000 NFTs",
+      tokenUri: "ipfs://QmeSjSinHpPnmXmspMjwiXyN6zS4E9zccariGR3jxcaWtq/100",
+      // Properties (5 total for token #100)
+      properties: [
+        { trait: "BACKGROUND", value: "Yellow" },
+        { trait: "MOUTH", value: "Bored Cigarette" },
+        { trait: "HAT", value: "Party Hat 2" },
+        { trait: "FUR", value: "Dark Brown" },
+        { trait: "EYES", value: "Wide Eyed" },
+      ],
     },
     // Rarible token - ERC1155
     raribleToken: {
