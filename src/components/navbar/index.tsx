@@ -1,6 +1,7 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTheme } from "../../context/SettingsContext";
 import { useSearch } from "../../hooks/useSearch";
+import NavbarLogo from "./NavbarLogo";
 import { NetworkBlockIndicator } from "./NetworkBlockIndicator";
 import VersionWarningIcon from "./VersionWarningIcon";
 
@@ -27,23 +28,7 @@ const Navbar = () => {
       <div className="navbar-inner">
         <ul>
           <li>
-            <Link to="/" className="home-cube-link" title="Home">
-              {/** biome-ignore lint/a11y/noSvgWithoutTitle: <TODO> */}
-              <svg
-                width="32"
-                height="32"
-                viewBox="0 0 36 36"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                {/* Top face - brightest */}
-                <polygon points="20,6 34,14 20,22 6,14" fill="#067455ff" />
-                {/* Left face - medium */}
-                <polygon points="6,14 20,22 20,36 6,28" fill="#07634aff" />
-                {/* Right face - darkest */}
-                <polygon points="20,22 34,14 34,28 20,36" fill="#065743ff" />
-              </svg>
-            </Link>
+            <NavbarLogo />
           </li>
           {networkId && (
             <>

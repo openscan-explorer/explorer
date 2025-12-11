@@ -1,10 +1,19 @@
 import { RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useCallback, useEffect } from "react";
-import { HashRouter, Navigate, Route, BrowserRouter as Router, Routes } from "react-router-dom";
+import {
+  HashRouter,
+  Navigate,
+  Route,
+  BrowserRouter as Router,
+  Routes,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 import { WagmiProvider } from "wagmi";
 import { cssVariables, getRainbowKitTheme } from "./theme";
 import { networkConfig } from "./utils/networkConfig";
+import { getBaseDomainUrl, getSubdomain, getSubdomainRedirect } from "./utils/subdomainUtils";
 import "@rainbow-me/rainbowkit/styles.css";
 
 // Detect if we're running on GitHub Pages and get the correct basename
@@ -63,6 +72,36 @@ const isGhPages = typeof window !== "undefined" && window.location.hostname.incl
 // Create a client for React Query
 const queryClient = new QueryClient();
 
+// Component that handles subdomain redirects
+function SubdomainRedirect() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    const subdomain = getSubdomain();
+
+    // If there's a subdomain, check if it's valid
+    if (subdomain) {
+      const redirectPath = getSubdomainRedirect();
+
+      if (redirectPath) {
+        // Valid subdomain - redirect to configured path (only on root)
+        if (location.pathname === "/") {
+          navigate(redirectPath, { replace: true });
+        }
+      } else {
+        // Invalid subdomain - redirect to base domain
+        const baseDomainUrl = getBaseDomainUrl();
+        if (baseDomainUrl) {
+          window.location.href = baseDomainUrl;
+        }
+      }
+    }
+  }, [location.pathname, navigate]);
+
+  return null;
+}
+
 // Separate component that uses the theme context
 function AppContent() {
   const onAppReadyCallback = useCallback(async () => {}, []);
@@ -94,6 +133,7 @@ function AppContent() {
           <div className="app-content">
             <Navbar />
             <NotificationDisplay />
+            <SubdomainRedirect />
             <Routes>
               <Route path="/" element={<LazyHome />} />
               <Route path="settings" element={<LazySettings />} />
