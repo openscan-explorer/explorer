@@ -90,6 +90,20 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  // Hardhat network config for local development
+  const hardhatNetwork: NetworkConfig = {
+    networkId: 31337,
+    name: "Hardhat",
+    shortName: "hardhat",
+    description: "Local development network",
+    color: "#FFF100",
+    currency: "ETH",
+    isTestnet: true,
+    rpc: {
+      public: ["http://127.0.0.1:8545"],
+    },
+  };
+
   // Load networks from metadata
   const loadNetworkData = async () => {
     setNetworksLoading(true);
@@ -97,6 +111,17 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
 
     try {
       const loadedNetworks = await loadNetworks();
+
+      // Check if Hardhat should be included (only when both conditions are met)
+      const envNetworks = process.env.REACT_APP_OPENSCAN_NETWORKS;
+      const isDevelopment = process.env.REACT_APP_ENVIRONMENT === "development";
+      const hardhatInEnv = envNetworks?.split(",").some((id) => id.trim() === "31337");
+
+      // Add Hardhat network if in development AND explicitly enabled
+      if (isDevelopment && hardhatInEnv && !loadedNetworks.some((n) => n.networkId === 31337)) {
+        loadedNetworks.push(hardhatNetwork);
+      }
+
       setNetworks(loadedNetworks);
       // Update RPC URLs with the newly loaded network defaults
       setRpcUrlsState(getEffectiveRpcUrls());
