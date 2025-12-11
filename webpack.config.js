@@ -34,7 +34,10 @@ module.exports = {
 			path.resolve(__dirname, "public"),
 			path.resolve(__dirname, "dist"),
 		],
-		historyApiFallback: true,
+		historyApiFallback: {
+			// Allow dots in URLs (for ENS names like vitalik.eth)
+			disableDotRule: true,
+		},
 		port: 3030,
 		open: true,
 		hot: true,

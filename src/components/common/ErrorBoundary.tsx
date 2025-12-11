@@ -40,7 +40,8 @@ export class ErrorBoundary extends Component<Props, State> {
   };
 
   private handleGoHome = () => {
-    const isGhPages = typeof window !== "undefined" && window.location.hostname.includes("github.io");
+    const isGhPages =
+      typeof window !== "undefined" && window.location.hostname.includes("github.io");
     window.location.href = isGhPages ? "/explorer/" : "/";
   };
 

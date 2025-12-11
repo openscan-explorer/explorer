@@ -4,6 +4,7 @@ import type { NetworkConfig } from "../../../config/networks";
 import { useNetworks } from "../../../context/AppContext";
 import NetworkIcon from "../../common/NetworkIcon";
 import TierBadge from "../../common/TierBadge";
+import HomeSearchBar from "./HomeSearchBar";
 
 interface NetworkCardProps {
   network: NetworkConfig;
@@ -77,6 +78,8 @@ export default function Home() {
       <div className="home-content page-card">
         <h1 className="home-title">OPENSCAN</h1>
         <p className="subtitle">Select a blockchain network to explore</p>
+
+        <HomeSearchBar networks={displayNetworks} />
 
         <div className="network-grid">
           {isLoading && displayNetworks.length === 0 ? (

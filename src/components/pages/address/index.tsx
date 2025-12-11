@@ -1,8 +1,9 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import { AppContext } from "../../../context";
 import { useDataService } from "../../../hooks/useDataService";
 import { useENS } from "../../../hooks/useENS";
+import { ENSService } from "../../../services/ENS/ENSService";
 import type {
   Address as AddressData,
   AddressTransactionsResult,
@@ -21,13 +22,12 @@ import {
 } from "./displays";
 
 export default function Address() {
-  const { networkId, address } = useParams<{
+  const { networkId, address: addressParam } = useParams<{
     networkId?: string;
     address?: string;
   }>();
   const location = useLocation();
   const numericNetworkId = Number(networkId) || 1;
-  const dataService = useDataService(numericNetworkId);
   const { rpcUrls } = useContext(AppContext);
   const [addressData, setAddressData] = useState<AddressData | null>(null);
   const [addressType, setAddressType] = useState<AddressType>("account");
@@ -39,8 +39,62 @@ export default function Address() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Get ENS name from navigation state (if user searched by ENS name)
-  const initialEnsName = (location.state as { ensName?: string })?.ensName;
+  // ENS resolution state
+  const [resolvedAddress, setResolvedAddress] = useState<string | null>(null);
+  const [ensResolving, setEnsResolving] = useState(false);
+  const [ensError, setEnsError] = useState<string | null>(null);
+
+  // Detect if the URL parameter is an ENS name
+  const isEnsName = useMemo(() => {
+    return addressParam ? ENSService.isENSName(addressParam) : false;
+  }, [addressParam]);
+
+  // The actual address to use (resolved from ENS or direct from URL)
+  const address = isEnsName ? resolvedAddress : addressParam;
+
+  // Get ENS name from navigation state or from URL if it's an ENS name
+  const initialEnsName =
+    (location.state as { ensName?: string })?.ensName || (isEnsName ? addressParam : undefined);
+
+  // Create dataService after we know the address
+  const dataService = useDataService(numericNetworkId);
+
+  // Resolve ENS name to address
+  useEffect(() => {
+    if (!isEnsName || !addressParam) {
+      setResolvedAddress(null);
+      setEnsResolving(false);
+      setEnsError(null);
+      return;
+    }
+
+    const mainnetRpcUrls = rpcUrls[1];
+    if (!mainnetRpcUrls || mainnetRpcUrls.length === 0) {
+      setEnsError("No Ethereum mainnet RPC configured for ENS resolution");
+      setEnsResolving(false);
+      return;
+    }
+
+    setEnsResolving(true);
+    setEnsError(null);
+
+    const ensService = new ENSService(mainnetRpcUrls);
+    ensService
+      .resolve(addressParam)
+      .then((resolved) => {
+        if (resolved) {
+          setResolvedAddress(resolved);
+        } else {
+          setEnsError(`Could not resolve ENS name: ${addressParam}`);
+        }
+      })
+      .catch((err) => {
+        setEnsError(`Error resolving ENS: ${err instanceof Error ? err.message : "Unknown error"}`);
+      })
+      .finally(() => {
+        setEnsResolving(false);
+      });
+  }, [isEnsName, addressParam, rpcUrls]);
 
   // Use ENS hook to get reverse lookup and records
   const {
@@ -50,7 +104,7 @@ export default function Address() {
     decodedContenthash,
     loading: ensLoading,
     isMainnet,
-  } = useENS(address, numericNetworkId, initialEnsName);
+  } = useENS(address ?? undefined, numericNetworkId, initialEnsName);
 
   // Fetch address data and detect type in a single flow
   useEffect(() => {
@@ -133,6 +187,40 @@ export default function Address() {
         });
       });
   }, [dataService, address]);
+
+  // Show ENS resolving state (must come first before other checks)
+  if (isEnsName && (ensResolving || (!resolvedAddress && !ensError))) {
+    return (
+      <div className="container-wide">
+        <div className="block-display-card">
+          <div className="block-display-header">
+            <span className="block-label">ENS Name</span>
+            <span className="tx-mono header-subtitle">{addressParam}</span>
+          </div>
+          <div className="card-content-loading">
+            <Loader text={`Resolving ENS name: ${addressParam}...`} />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show ENS resolution error
+  if (ensError) {
+    return (
+      <div className="container-wide">
+        <div className="block-display-card">
+          <div className="block-display-header">
+            <span className="block-label">ENS Name</span>
+            <span className="tx-mono header-subtitle">{addressParam}</span>
+          </div>
+          <div className="card-content">
+            <p className="text-error margin-0">Error: {ensError}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
