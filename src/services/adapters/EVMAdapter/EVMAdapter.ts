@@ -24,7 +24,7 @@ import type { EthereumClient, SupportedChainId } from "explorer-network-connecto
 export class EVMAdapter extends NetworkAdapter {
   private client: EthereumClient;
 
-  constructor(networkId: SupportedChainId | 11155111, client: EthereumClient) {
+  constructor(networkId: SupportedChainId | 11155111 | 97 | 31337, client: EthereumClient) {
     super(networkId);
     this.client = client;
   }

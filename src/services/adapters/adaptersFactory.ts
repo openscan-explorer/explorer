@@ -32,6 +32,7 @@ export class AdapterFactory {
     switch (networkId) {
       case 1:
       case 11155111:
+      case 31337:
         return new EVMAdapter(networkId, client as EthereumClient);
       case 10:
         return new OptimismAdapter(networkId, client as OptimismClient);
