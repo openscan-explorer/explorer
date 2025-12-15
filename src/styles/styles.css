@@ -4696,10 +4696,23 @@ code {
    ======================================== */
 
 .settings-container {
-  max-width: 800px;
+  max-width: 100%;
   margin: 0 auto;
   font-family: 'Outfit', sans-serif;
   text-align: center;
+}
+
+.settings-top-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 768px) {
+  .settings-top-row {
+    grid-template-columns: 1fr;
+  }
 }
 
 .settings-success-message {
@@ -4803,6 +4816,29 @@ code {
   border-radius: 6px;
 }
 
+.settings-fetch-rpc-button {
+  font-size: 0.75rem;
+  font-weight: 500;
+  font-family: "Outfit", sans-serif;
+  color: var(--color-primary);
+  background: var(--color-primary-alpha-10);
+  border: 1px solid var(--color-primary-alpha-20);
+  padding: 2px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.settings-fetch-rpc-button:hover:not(:disabled) {
+  background: var(--color-primary-alpha-20);
+  border-color: var(--color-primary-alpha-40);
+}
+
+.settings-fetch-rpc-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .settings-rpc-input {
   width: 100%;
   padding: 10px 12px;
@@ -4871,6 +4907,38 @@ code {
   max-width: 100%;
   overflow: hidden;
   position: relative;
+  cursor: grab;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.settings-rpc-tag:active {
+  cursor: grabbing;
+}
+
+.settings-rpc-tag.dragging {
+  opacity: 0.5;
+  transform: scale(0.95);
+}
+
+.settings-rpc-tag-delete {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease;
+  flex-shrink: 0;
+}
+
+.settings-rpc-tag-delete:hover {
+  background: rgba(239, 68, 68, 0.8);
 }
 
 .settings-rpc-tag-index {
