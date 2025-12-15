@@ -1085,6 +1085,18 @@
 	flex-wrap: wrap;
 }
 
+.version-card-grid-4 {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: 24px;
+}
+
+@media (max-width: 768px) {
+	.version-card-grid-4 {
+		grid-template-columns: repeat(2, 1fr);
+	}
+}
+
 .version-info-item {
 	display: flex;
 	flex-direction: column;
@@ -1136,6 +1148,14 @@
 
 .network-info {
 	flex: 1;
+}
+
+/* Network info centered (for About page) */
+.network-item.text-center .network-info {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 8px;
 }
 
 .network-name {
@@ -1205,6 +1225,106 @@
 	background: transparent;
 	color: var(--color-primary);
 	border: 1px solid var(--color-primary);
+}
+
+/* About Page Sections */
+.about-section {
+	margin-bottom: 48px;
+}
+
+.about-overview-text {
+	max-width: 800px;
+	margin: 0 auto;
+	text-align: center;
+}
+
+.about-overview-text p {
+	font-size: 1.05rem;
+	line-height: 1.7;
+	color: rgba(255, 255, 255, 0.8);
+	margin-bottom: 16px;
+}
+
+.about-overview-text p:last-child {
+	margin-bottom: 0;
+}
+
+.about-overview-text strong {
+	color: var(--color-primary);
+}
+
+.about-section-intro {
+	font-size: 1.05rem;
+	line-height: 1.7;
+	color: rgba(255, 255, 255, 0.8);
+	text-align: center;
+	max-width: 800px;
+	margin: 0 auto 32px;
+}
+
+.about-section-intro strong {
+	color: var(--color-primary);
+}
+
+/* Principles List */
+.principles-list {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+	max-width: 700px;
+	margin: 0 auto;
+}
+
+.principle-item {
+	display: flex;
+	align-items: flex-start;
+	gap: 16px;
+	padding: 20px;
+	background: var(--color-primary-alpha-5);
+	border: 1px solid var(--color-primary-alpha-15);
+	border-radius: 12px;
+	transition: all 0.2s ease;
+}
+
+.principle-item:hover {
+	border-color: var(--color-primary-alpha-30);
+	background: var(--color-primary-alpha-10);
+}
+
+.principle-icon {
+	font-size: 1.5rem;
+	flex-shrink: 0;
+}
+
+.principle-content {
+	flex: 1;
+}
+
+.principle-title {
+	font-size: 1rem;
+	font-weight: 600;
+	color: var(--text-primary);
+	margin-bottom: 4px;
+}
+
+.principle-description {
+	font-size: 0.9rem;
+	color: rgba(255, 255, 255, 0.7);
+	line-height: 1.5;
+	margin: 0;
+}
+
+/* 2-column grid for vision cards */
+.data-grid-2 {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 20px;
+}
+
+@media (max-width: 768px) {
+	.data-grid-2 {
+		grid-template-columns: 1fr;
+	}
 }
 
 .button-secondary-inline:hover {
