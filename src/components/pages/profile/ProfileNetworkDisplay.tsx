@@ -23,7 +23,7 @@ const ProfileNetworkDisplay: React.FC<ProfileNetworkDisplayProps> = ({ profile }
           ) : (
             <div
               className="profile-logo-placeholder"
-              style={{ backgroundColor: profile.color || "#10b981" }}
+              style={{ "--profile-color": profile.color || "#10b981" } as React.CSSProperties}
             >
               {profile.name.charAt(0)}
             </div>

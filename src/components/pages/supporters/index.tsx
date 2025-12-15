@@ -137,7 +137,7 @@ const SupporterCard: React.FC<SupporterCardProps> = ({ supporter }) => {
       ) : (
         <div
           className="supporter-logo-placeholder"
-          style={{ backgroundColor: supporter.color || "#10b981" }}
+          style={{ "--supporter-color": supporter.color || "#10b981" } as React.CSSProperties}
         >
           {supporter.name.charAt(0)}
         </div>
@@ -160,9 +160,11 @@ const SupporterCard: React.FC<SupporterCardProps> = ({ supporter }) => {
       <Link
         to={link}
         className="supporter-card"
-        style={{
-          borderColor: supporter.color || "rgba(255, 255, 255, 0.1)",
-        }}
+        style={
+          {
+            "--supporter-color": supporter.color || "rgba(255, 255, 255, 0.1)",
+          } as React.CSSProperties
+        }
       >
         {cardContent}
       </Link>
@@ -172,9 +174,11 @@ const SupporterCard: React.FC<SupporterCardProps> = ({ supporter }) => {
   return (
     <div
       className="supporter-card supporter-card-no-link"
-      style={{
-        borderColor: supporter.color || "rgba(255, 255, 255, 0.1)",
-      }}
+      style={
+        {
+          "--supporter-color": supporter.color || "rgba(255, 255, 255, 0.1)",
+        } as React.CSSProperties
+      }
     >
       {cardContent}
     </div>

@@ -312,8 +312,7 @@ const MessageSigner: React.FC = () => {
                   placeholder="0x..."
                   value={txData}
                   onChange={(e) => setTxData(e.target.value)}
-                  className="devtools-input"
-                  style={{ minHeight: "60px" }}
+                  className="devtools-input min-h-60"
                   disabled={!isConnected}
                 />
               </div>

@@ -4211,6 +4211,9 @@ code {
   display: inline;
   font-weight: 800;
   transition: all 0.3s ease;
+  text-shadow:
+    0 0 10px color-mix(in srgb, var(--network-color, #fff) 50%, transparent),
+    0 0 20px color-mix(in srgb, var(--network-color, #fff) 25%, transparent);
 }
 
 .network-description {

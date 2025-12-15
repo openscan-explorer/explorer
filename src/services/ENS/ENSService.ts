@@ -101,8 +101,6 @@ export class ENSService {
 
     for (const rpcUrl of this.rpcUrls) {
       try {
-        console.log("ENS ethCall:", { rpcUrl, to, data });
-
         const response = await fetch(rpcUrl, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -115,10 +113,8 @@ export class ENSService {
         });
 
         const result = await response.json();
-        console.log("ENS ethCall result:", result);
 
         if (result.error) {
-          console.error("ENS RPC error:", result.error);
           errors.push(new Error(result.error.message || "RPC error"));
           continue; // Try next RPC
         }
@@ -130,7 +126,6 @@ export class ENSService {
 
         return result.result;
       } catch (err) {
-        console.error("ENS ethCall fetch error:", err);
         errors.push(err instanceof Error ? err : new Error(String(err)));
       }
     }
@@ -144,7 +139,6 @@ export class ENSService {
    */
   async getResolver(name: string): Promise<string | null> {
     const node = this.namehash(name);
-    console.log("ENS getResolver:", { name, node });
     const data = SELECTORS.resolver + node.slice(2);
 
     try {
@@ -155,15 +149,12 @@ export class ENSService {
         result === "0x" ||
         result === "0x0000000000000000000000000000000000000000000000000000000000000000"
       ) {
-        console.log("ENS getResolver: no resolver found");
         return null;
       }
 
       const resolverAddress = `0x${result.slice(-40)}`;
-      console.log("ENS getResolver: found resolver", resolverAddress);
       return resolverAddress;
-    } catch (err) {
-      console.error("ENS getResolver error:", err);
+    } catch {
       return null;
     }
   }

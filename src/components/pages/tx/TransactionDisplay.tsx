@@ -269,14 +269,7 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
 
     return (
       <div className="block-display-card">
-        <div
-          className="block-display-header"
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
+        <div className="block-display-header flex justify-between items-center">
           <span className="block-label">Transaction Details</span>
           {metadata && selectedProvider !== undefined && onProviderSelect && (
             <RPCIndicator
@@ -595,11 +588,13 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
                         <div className="tx-log-decoded">
                           <span
                             className="tx-event-badge"
-                            style={{
-                              backgroundColor: abiDecoded
-                                ? "#10b981"
-                                : getEventTypeColor(decoded?.type || ""),
-                            }}
+                            style={
+                              {
+                                "--event-color": abiDecoded
+                                  ? "#10b981"
+                                  : getEventTypeColor(decoded?.type || ""),
+                              } as React.CSSProperties
+                            }
                           >
                             {displayName}
                           </span>

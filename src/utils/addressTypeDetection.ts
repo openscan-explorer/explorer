@@ -53,7 +53,7 @@ async function fetchAddressData(addressHash: string, rpcUrl: string): Promise<Ad
     balance: BigInt(balance).toString(),
     code: code,
     txCount: Number.parseInt(txCount, 16).toString(),
-    storeageAt: {},
+    storageAt: {},
   };
 }
 

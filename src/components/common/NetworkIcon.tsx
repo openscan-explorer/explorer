@@ -36,7 +36,7 @@ export const NetworkIcon: React.FC<NetworkIconProps> = ({ network, size = 32 }) 
       width={size}
       height={size}
       onError={() => setImageError(true)}
-      style={{ objectFit: "contain" }}
+      className="object-contain"
     />
   );
 };

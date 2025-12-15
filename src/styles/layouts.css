@@ -1,6 +1,10 @@
 /* Layout Utilities
-   Note: Base flex and spacing utilities are in base.css.
-   This file contains semantic spacing (small/medium/large) and grid layouts.
+   Note: Base flex utilities (.flex-center, .flex-between, .flex-column, etc.)
+   are defined in base.css. This file contains:
+   - Grid layouts
+   - Semantic spacing (small/medium/large)
+   - Container widths
+   - Responsive utilities
 */
 
 /* Grid Layouts */
@@ -79,28 +83,16 @@
 	width: 100%;
 }
 
-/* Flex Utilities */
-.flex-center {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-}
-
-.flex-between {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-}
+/* Additional Flex Utilities
+   Note: Base flex utilities (.flex, .flex-center, .flex-between, .flex-column,
+   .items-center, .justify-between, etc.) are defined in base.css.
+   These are additional semantic variants.
+*/
 
 .flex-start {
 	display: flex;
 	justify-content: flex-start;
 	align-items: center;
-}
-
-.flex-column {
-	display: flex;
-	flex-direction: column;
 }
 
 .flex-column-gap {
@@ -224,5 +216,52 @@
 	.data-grid-3-centered > * {
 		flex: 0 1 100%;
 		max-width: 100%;
+  }
+  
+	.container-wide {
+		padding: 0 16px;
+	}
+
+	.container-medium {
+		padding: 0 16px;
+	}
+
+	/* Stack form rows on mobile */
+	.form-row {
+		flex-direction: column;
+		gap: 12px;
+	}
+
+	/* Reduce spacing on mobile */
+	.mt-large {
+		margin-top: 16px;
+	}
+
+	.mb-large {
+		margin-bottom: 16px;
+	}
+
+	.p-large {
+		padding: 16px;
+	}
+}
+
+@media (max-width: 480px) {
+	.container-wide,
+	.container-medium {
+		padding: 0 12px;
+	}
+
+	/* Further reduce spacing on small screens */
+	.mt-medium {
+		margin-top: 12px;
+	}
+
+	.mb-medium {
+		margin-bottom: 12px;
+	}
+
+	.p-medium {
+		padding: 12px;
 	}
 }

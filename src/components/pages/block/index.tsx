@@ -35,22 +35,19 @@ export default function BlockPage() {
       return;
     }
 
-    console.log("Fetching block:", blockNumber, "for chain:", numericNetworkId);
     setLoading(true);
     setError(null);
 
     dataService.networkAdapter
       .getBlock(blockNumber)
       .then((result) => {
-        console.log("Fetched block:", result);
         setBlockResult(result);
       })
       .catch((err) => {
-        console.error("Error fetching block:", err);
         setError(err.message || "Failed to fetch block");
       })
       .finally(() => setLoading(false));
-  }, [dataService, blockNumber, numericNetworkId]);
+  }, [dataService, blockNumber]);
 
   if (loading) {
     return (

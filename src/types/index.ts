@@ -1,3 +1,4 @@
+import type { EthLog } from "explorer-network-connectors";
 import type React from "react";
 
 // ==================== CORE DOMAIN TYPES ====================
@@ -32,8 +33,7 @@ export interface Block {
   totalDifficulty: string;
   transactions: string[];
   transactionsRoot: string;
-  // biome-ignore lint/suspicious/noExplicitAny: <TODO>
-  uncles: any[];
+  uncles: string[];
   blobGasUsed: string;
   excessBlobGas: string;
   withdrawalsRoot: string;
@@ -81,14 +81,12 @@ export interface TransactionArbitrum extends Transaction {
 export interface TransactionReceipt {
   blockHash: string;
   blockNumber: string;
-  // biome-ignore lint/suspicious/noExplicitAny: <TODO>
-  contractAddress: any;
+  contractAddress: string | null;
   cumulativeGasUsed: string;
   effectiveGasPrice: string;
   from: string;
   gasUsed: string;
-  // biome-ignore lint/suspicious/noExplicitAny: <TODO>
-  logs: any[];
+  logs: EthLog[];
   logsBloom: string;
   status: string;
   to: string;
@@ -115,7 +113,7 @@ export interface Address {
   balance: string;
   code: string;
   txCount: string;
-  storeageAt: StoreageAt;
+  storageAt: StorageAt;
   recentTransactions?: Transaction[];
 }
 
@@ -124,7 +122,7 @@ export interface Address {
  */
 export type AddressType = "account" | "contract" | "erc20" | "erc721" | "erc1155";
 
-export type StoreageAt = Record<string, string>;
+export type StorageAt = Record<string, string>;
 
 export interface MempoolTransaction {
   from: string;

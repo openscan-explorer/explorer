@@ -63,9 +63,7 @@ export default function Network() {
             <>
               <span
                 className="network-title-name"
-                style={{
-                  textShadow: `0 0 10px ${networkColor}80, 0 0 20px ${networkColor}40`,
-                }}
+                style={{ "--network-color": networkColor } as React.CSSProperties}
               >
                 {networkName}
               </span>{" "}

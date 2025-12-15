@@ -71,10 +71,10 @@ export function NetworkBlockIndicator({ className }: NetworkBlockIndicatorProps)
   return (
     <div
       className={`network-block-indicator ${className || ""}`}
-      style={{ borderColor: `${network.color}40` }}
+      style={{ "--network-color": network.color } as React.CSSProperties}
       title={network.name}
     >
-      <div className="network-block-pulse" style={{ background: network.color }} />
+      <div className="network-block-pulse" />
       <div className="network-block-logo">
         <NetworkIcon network={network} size={20} />
       </div>

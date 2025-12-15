@@ -21,7 +21,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = React.m
 
     const addNotification = useCallback(
       (message: string, type: Notification["type"], duration = 5000) => {
-        const id = Math.random().toString(36).substr(2, 9);
+        const id = crypto.randomUUID();
         const notification: Notification = { id, message, type, duration };
 
         setNotifications((prev) => [...prev, notification]);

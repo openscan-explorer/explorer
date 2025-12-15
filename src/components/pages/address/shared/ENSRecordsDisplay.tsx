@@ -42,17 +42,7 @@ const ENSRecordsDisplay: React.FC<ENSRecordsDisplayProps> = ({
         <div className="tx-section">
           <span className="tx-section-title">ENS Records</span>
         </div>
-        <div
-          style={{
-            padding: "12px 16px",
-            background: "rgba(245, 158, 11, 0.1)",
-            borderRadius: "6px",
-            fontSize: "0.85rem",
-            color: "#f59e0b",
-          }}
-        >
-          ENS records are only available on Ethereum Mainnet
-        </div>
+        <div className="ens-notice-warning">ENS records are only available on Ethereum Mainnet</div>
       </div>
     );
   }
@@ -64,15 +54,7 @@ const ENSRecordsDisplay: React.FC<ENSRecordsDisplayProps> = ({
         <div className="tx-section">
           <span className="tx-section-title">ENS Records</span>
         </div>
-        <div
-          style={{
-            padding: "12px 16px",
-            color: "rgba(255, 255, 255, 0.6)",
-            fontSize: "0.85rem",
-          }}
-        >
-          Loading ENS records...
-        </div>
+        <div className="ens-loading">Loading ENS records...</div>
       </div>
     );
   }
@@ -95,33 +77,11 @@ const ENSRecordsDisplay: React.FC<ENSRecordsDisplayProps> = ({
       <div className="tx-row">
         <span className="tx-label">ENS Name:</span>
         <span className="tx-value">
-          <span
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "8px",
-            }}
-          >
-            <span
-              style={{
-                fontWeight: "600",
-                color: "#10b981",
-                fontFamily: "monospace",
-              }}
-            >
-              {displayName}
-            </span>
+          <span className="ens-name-wrapper">
+            <span className="ens-name">{displayName}</span>
             {reverseResult && (
               <span
-                style={{
-                  fontSize: "0.75rem",
-                  padding: "2px 6px",
-                  borderRadius: "4px",
-                  background: reverseResult.verified
-                    ? "rgba(16, 185, 129, 0.15)"
-                    : "rgba(245, 158, 11, 0.15)",
-                  color: reverseResult.verified ? "#10b981" : "#f59e0b",
-                }}
+                className={`ens-badge ${reverseResult.verified ? "ens-badge--verified" : "ens-badge--unverified"}`}
               >
                 {reverseResult.verified ? "Primary Name" : "Unverified"}
               </span>
@@ -137,16 +97,11 @@ const ENSRecordsDisplay: React.FC<ENSRecordsDisplayProps> = ({
           <span className="tx-value">
             {records.textRecords.avatar.startsWith("http") ||
             records.textRecords.avatar.startsWith("ipfs") ? (
-              <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+              <div className="flex items-center gap-3">
                 <img
                   src={records.textRecords.avatar.replace("ipfs://", "https://ipfs.io/ipfs/")}
                   alt="ENS Avatar"
-                  style={{
-                    width: "48px",
-                    height: "48px",
-                    borderRadius: "8px",
-                    objectFit: "cover",
-                  }}
+                  className="ens-avatar"
                   onError={(e) => {
                     (e.target as HTMLImageElement).style.display = "none";
                   }}
@@ -155,7 +110,7 @@ const ENSRecordsDisplay: React.FC<ENSRecordsDisplayProps> = ({
                   href={records.textRecords.avatar}
                   target="_blank"
                   rel="noopener noreferrer"
-                  style={{ color: "#3b82f6", textDecoration: "none" }}
+                  className="link-primary"
                 >
                   {records.textRecords.avatar.length > 50
                     ? `${records.textRecords.avatar.slice(0, 50)}...`
@@ -175,24 +130,13 @@ const ENSRecordsDisplay: React.FC<ENSRecordsDisplayProps> = ({
           <span className="tx-label">Content Hash:</span>
           <span className="tx-value">
             {decodedContenthash ? (
-              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                <span
-                  style={{
-                    fontSize: "0.75rem",
-                    padding: "2px 6px",
-                    borderRadius: "4px",
-                    background: "rgba(139, 92, 246, 0.15)",
-                    color: "#8b5cf6",
-                    textTransform: "uppercase",
-                  }}
-                >
-                  {decodedContenthash.type}
-                </span>
+              <div className="flex items-center gap-2">
+                <span className="ens-badge ens-badge--contenthash">{decodedContenthash.type}</span>
                 <a
                   href={decodedContenthash.url.replace("ipfs://", "https://ipfs.io/ipfs/")}
                   target="_blank"
                   rel="noopener noreferrer"
-                  style={{ color: "#3b82f6", textDecoration: "none" }}
+                  className="link-primary"
                 >
                   {decodedContenthash.url.length > 60
                     ? `${decodedContenthash.url.slice(0, 60)}...`
@@ -200,9 +144,7 @@ const ENSRecordsDisplay: React.FC<ENSRecordsDisplayProps> = ({
                 </a>
               </div>
             ) : (
-              <span className="tx-mono" style={{ fontSize: "0.8rem" }}>
-                {records.contenthash.slice(0, 20)}...
-              </span>
+              <span className="tx-mono text-sm">{records.contenthash.slice(0, 20)}...</span>
             )}
           </span>
         </div>
@@ -225,27 +167,19 @@ const ENSRecordsDisplay: React.FC<ENSRecordsDisplayProps> = ({
           </button>
 
           {showAllRecords && (
-            <div
-              style={{
-                marginLeft: "16px",
-                borderLeft: "2px solid rgba(255, 255, 255, 0.1)",
-                paddingLeft: "16px",
-              }}
-            >
+            <div className="ens-text-records-wrapper">
               {Object.entries(records.textRecords)
                 .filter(([key]) => key !== "avatar") // Avatar is displayed separately
                 .map(([key, value]) => (
                   <div className="tx-row" key={key}>
-                    <span className="tx-label" style={{ minWidth: "120px" }}>
-                      {TEXT_RECORD_LABELS[key] || key}:
-                    </span>
+                    <span className="tx-label min-w-120">{TEXT_RECORD_LABELS[key] || key}:</span>
                     <span className="tx-value">
                       {value.startsWith("http") ? (
                         <a
                           href={value}
                           target="_blank"
                           rel="noopener noreferrer"
-                          style={{ color: "#3b82f6", textDecoration: "none" }}
+                          className="link-primary"
                         >
                           {value.length > 50 ? `${value.slice(0, 50)}...` : value}
                         </a>
@@ -254,7 +188,7 @@ const ENSRecordsDisplay: React.FC<ENSRecordsDisplayProps> = ({
                           href={`https://twitter.com/${value.replace("@", "")}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          style={{ color: "#3b82f6", textDecoration: "none" }}
+                          className="link-primary"
                         >
                           @{value.replace("@", "")}
                         </a>
@@ -263,15 +197,12 @@ const ENSRecordsDisplay: React.FC<ENSRecordsDisplayProps> = ({
                           href={`https://github.com/${value}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          style={{ color: "#3b82f6", textDecoration: "none" }}
+                          className="link-primary"
                         >
                           {value}
                         </a>
                       ) : key === "email" ? (
-                        <a
-                          href={`mailto:${value}`}
-                          style={{ color: "#3b82f6", textDecoration: "none" }}
-                        >
+                        <a href={`mailto:${value}`} className="link-primary">
                           {value}
                         </a>
                       ) : (
@@ -294,14 +225,7 @@ const ENSRecordsDisplay: React.FC<ENSRecordsDisplayProps> = ({
               href={`https://app.ens.domains/name/${displayName}`}
               target="_blank"
               rel="noopener noreferrer"
-              style={{
-                color: "#10b981",
-                textDecoration: "none",
-                fontWeight: "600",
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "6px",
-              }}
+              className="ens-app-link"
             >
               View on ENS App ↗
             </a>

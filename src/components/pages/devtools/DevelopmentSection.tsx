@@ -122,7 +122,7 @@ const DevelopmentSection: React.FC = () => {
             type="file"
             multiple
             onChange={handleFileInput}
-            style={{ display: "none" }}
+            className="hidden"
           />
         </div>
 

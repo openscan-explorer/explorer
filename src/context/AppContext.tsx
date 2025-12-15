@@ -1,4 +1,12 @@
-import { createContext, type ReactNode, useContext, useEffect, useMemo, useState } from "react";
+import {
+  createContext,
+  type ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { useAccount } from "wagmi";
 import { getAllNetworks, getNetworkById, loadNetworks } from "../config/networks";
 import { useWagmiConnection } from "../hooks/useWagmiConnection";
@@ -71,41 +79,44 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
     return filtered.length > 0 ? filtered : networks;
   }, [networks]);
 
-  const setRpcUrls = (next: RpcUrlsContextType) => {
+  const setRpcUrls = useCallback((next: RpcUrlsContextType) => {
     setRpcUrlsState(next);
     try {
       saveRpcUrlsToStorage(next);
     } catch (err) {
       console.warn("Failed to persist rpc urls", err);
     }
-  };
+  }, []);
 
   // biome-ignore lint/suspicious/noExplicitAny: <TODO>
-  const setJsonFiles = (next: Record<string, any>) => {
+  const setJsonFiles = useCallback((next: Record<string, any>) => {
     setJsonFilesState(next);
     try {
       saveJsonFilesToStorage(next);
     } catch (err) {
       console.warn("Failed to persist json files", err);
     }
-  };
+  }, []);
 
   // Hardhat network config for local development
-  const hardhatNetwork: NetworkConfig = {
-    networkId: 31337,
-    name: "Hardhat",
-    shortName: "hardhat",
-    description: "Local development network",
-    color: "#FFF100",
-    currency: "ETH",
-    isTestnet: true,
-    rpc: {
-      public: ["http://127.0.0.1:8545"],
-    },
-  };
+  const hardhatNetwork: NetworkConfig = useMemo(
+    () => ({
+      networkId: 31337,
+      name: "Hardhat",
+      shortName: "hardhat",
+      description: "Local development network",
+      color: "#FFF100",
+      currency: "ETH",
+      isTestnet: true,
+      rpc: {
+        public: ["http://127.0.0.1:8545"],
+      },
+    }),
+    [],
+  );
 
   // Load networks from metadata
-  const loadNetworkData = async () => {
+  const loadNetworkData = useCallback(async () => {
     setNetworksLoading(true);
     setNetworksError(null);
 
@@ -131,7 +142,7 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
     } finally {
       setNetworksLoading(false);
     }
-  };
+  }, [hardhatNetwork]);
 
   const _account = useAccount();
   const { isFullyConnected, address } = useWagmiConnection();
@@ -204,28 +215,40 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
     initializeApp();
   }, [isFullyConnected, address]);
 
-  return (
-    <AppContext.Provider
-      value={{
-        appReady,
-        resourcesLoaded,
-        isHydrated,
-        rpcUrls,
-        setRpcUrls,
-        jsonFiles,
-        setJsonFiles,
-        // Network values
-        networks,
-        enabledNetworks,
-        networksLoading,
-        networksError,
-        getNetwork: getNetworkById,
-        reloadNetworks: loadNetworkData,
-      }}
-    >
-      {children}
-    </AppContext.Provider>
+  const contextValue = useMemo<IAppContext>(
+    () => ({
+      appReady,
+      resourcesLoaded,
+      isHydrated,
+      rpcUrls,
+      setRpcUrls,
+      jsonFiles,
+      setJsonFiles,
+      // Network values
+      networks,
+      enabledNetworks,
+      networksLoading,
+      networksError,
+      getNetwork: getNetworkById,
+      reloadNetworks: loadNetworkData,
+    }),
+    [
+      appReady,
+      resourcesLoaded,
+      isHydrated,
+      rpcUrls,
+      setRpcUrls,
+      jsonFiles,
+      setJsonFiles,
+      networks,
+      enabledNetworks,
+      networksLoading,
+      networksError,
+      loadNetworkData,
+    ],
   );
+
+  return <AppContext.Provider value={contextValue}>{children}</AppContext.Provider>;
 };
 
 // Hook to use networks from AppContext

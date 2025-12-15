@@ -1,5 +1,5 @@
 // src/hooks/useENS.ts
-import { useCallback, useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { AppContext } from "../context";
 import { ENSService } from "../services/ENS/ENSService";
 import type { DecodedContenthash, ENSRecords, ENSReverseResult } from "../types";
@@ -38,10 +38,22 @@ export function useENS(
   // Check if we're on mainnet (ENS only works on Ethereum mainnet)
   const isMainnet = chainId === 1;
 
+  // Always use mainnet RPC for ENS resolution
+  const mainnetRpcUrls = rpcUrls[1];
+
+  // Memoize ENSService instance to avoid recreating on every render
+  const ensService = useMemo(() => {
+    if (!mainnetRpcUrls || mainnetRpcUrls.length === 0) {
+      return null;
+    }
+    return new ENSService(mainnetRpcUrls);
+  }, [mainnetRpcUrls]);
+
   const refetch = useCallback(() => {
     setFetchTrigger((prev) => prev + 1);
   }, []);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: _fetchTrigger is intentionally included to enable refetch()
   useEffect(() => {
     if (!address) {
       setEnsName(null);
@@ -51,16 +63,10 @@ export function useENS(
       return;
     }
 
-    // Always use mainnet RPC for ENS resolution
-    const mainnetRpcUrls = rpcUrls[1];
-
-    if (!mainnetRpcUrls || mainnetRpcUrls.length === 0) {
+    if (!ensService) {
       setError("No Ethereum mainnet RPC configured for ENS resolution");
       return;
     }
-
-    // Pass all RPC URLs for fallback support
-    const ensService = new ENSService(mainnetRpcUrls);
 
     const fetchENSData = async () => {
       setLoading(true);
@@ -105,7 +111,7 @@ export function useENS(
     };
 
     fetchENSData();
-  }, [address, rpcUrls, initialEnsName]);
+  }, [address, ensService, initialEnsName, _fetchTrigger]);
 
   return {
     ensName,
@@ -133,15 +139,23 @@ export function useENSResolve(ensName: string | undefined): {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const mainnetRpcUrls = rpcUrls[1];
+
+  // Memoize ENSService instance
+  const ensService = useMemo(() => {
+    if (!mainnetRpcUrls || mainnetRpcUrls.length === 0) {
+      return null;
+    }
+    return new ENSService(mainnetRpcUrls);
+  }, [mainnetRpcUrls]);
+
   useEffect(() => {
     if (!ensName || !ENSService.isENSName(ensName)) {
       setAddress(null);
       return;
     }
 
-    const mainnetRpcUrls = rpcUrls[1];
-
-    if (!mainnetRpcUrls || mainnetRpcUrls.length === 0) {
+    if (!ensService) {
       setError("No Ethereum mainnet RPC configured");
       return;
     }
@@ -151,7 +165,6 @@ export function useENSResolve(ensName: string | undefined): {
       setError(null);
 
       try {
-        const ensService = new ENSService(mainnetRpcUrls);
         const resolved = await ensService.resolve(ensName);
         setAddress(resolved);
 
@@ -166,7 +179,7 @@ export function useENSResolve(ensName: string | undefined): {
     };
 
     fetchAddress();
-  }, [ensName, rpcUrls]);
+  }, [ensName, ensService]);
 
   return { address, loading, error };
 }

@@ -21,20 +21,7 @@ const SearchBox = () => {
           {isResolving ? "..." : "Scan"}
         </button>
       </form>
-      {error && (
-        <div
-          style={{
-            color: "#ef4444",
-            fontSize: "0.85rem",
-            marginTop: "8px",
-            padding: "8px 12px",
-            background: "rgba(239, 68, 68, 0.1)",
-            borderRadius: "6px",
-          }}
-        >
-          {error}
-        </div>
-      )}
+      {error && <div className="search-error">{error}</div>}
     </div>
   );
 };

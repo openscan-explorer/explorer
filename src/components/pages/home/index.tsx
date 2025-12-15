@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import type { NetworkConfig } from "../../../config/networks";
 import { useNetworks } from "../../../context/AppContext";
@@ -11,30 +11,15 @@ interface NetworkCardProps {
 }
 
 const NetworkCard: React.FC<NetworkCardProps> = ({ network }) => {
-  const [isHovered, setIsHovered] = useState(false);
-
   return (
     <Link
       to={`/${network.networkId}`}
       className="network-card-link"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      style={{ "--network-color": network.color } as React.CSSProperties}
     >
-      <div
-        className="network-card"
-        style={{
-          border: `2px solid ${isHovered ? network.color : "rgba(255, 255, 255, 0.1)"}`,
-          transform: isHovered ? "translateY(-4px)" : "translateY(0)",
-          boxShadow: isHovered ? `0 8px 32px ${network.color}40` : "0 4px 16px rgba(0, 0, 0, 0.2)",
-        }}
-      >
+      <div className="network-card">
         <div className="network-card-header">
-          <div
-            className="network-card-icon"
-            style={{
-              background: `${network.color}20`,
-            }}
-          >
+          <div className="network-card-icon">
             <NetworkIcon network={network} size={32} />
           </div>
           <div className="network-card-info">

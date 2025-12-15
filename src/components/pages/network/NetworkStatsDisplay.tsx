@@ -110,17 +110,8 @@ const NetworkStatsDisplay: React.FC<NetworkStatsDisplayProps> = React.memo(
     return (
       <div className="container-wide network-stats-container">
         <div className="block-display-card">
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: "1rem",
-            }}
-          >
-            <h2 className="network-stats-title" style={{ margin: 0 }}>
-              Network Statistics
-            </h2>
+          <div className="flex justify-between items-center mb-medium">
+            <h2 className="network-stats-title margin-0">Network Statistics</h2>
             {metadata && selectedProvider !== undefined && onProviderSelect && (
               <RPCIndicator
                 metadata={metadata}

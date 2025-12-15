@@ -11,12 +11,12 @@ const ContractStorage: React.FC<ContractStorageProps> = ({ address }) => {
   const [storageValue, setStorageValue] = useState("");
 
   const handleGetStorage = useCallback(() => {
-    if (address.storeageAt?.[storageSlot]) {
-      setStorageValue(address.storeageAt[storageSlot]);
+    if (address.storageAt?.[storageSlot]) {
+      setStorageValue(address.storageAt[storageSlot]);
     } else {
       setStorageValue("0x0000000000000000000000000000000000000000000000000000000000000000");
     }
-  }, [address.storeageAt, storageSlot]);
+  }, [address.storageAt, storageSlot]);
 
   return (
     <div className="block-display-card">

@@ -132,7 +132,7 @@ export function createAddressFromBalance(
     balance: BigInt(balance).toString(),
     code,
     txCount: parseInt(txCount, 16).toString(),
-    storeageAt: {},
+    storageAt: {},
   };
 }
 

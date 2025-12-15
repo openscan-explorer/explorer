@@ -127,7 +127,6 @@ export default function Address() {
       return;
     }
 
-    console.log("Fetching address data and type for:", address, "on chain:", numericNetworkId);
     setLoading(true);
     setError(null);
 
@@ -137,12 +136,10 @@ export default function Address() {
       rpcUrl,
     })
       .then((result) => {
-        console.log("Fetched address with type:", result);
         setAddressData(result.address);
         setAddressType(result.addressType);
       })
       .catch((err) => {
-        console.error("Error fetching address:", err);
         setError(err.message || "Failed to fetch address data");
       })
       .finally(() => setLoading(false));
@@ -155,7 +152,6 @@ export default function Address() {
     dataService.networkAdapter
       .getAddressTransactions(address)
       .then(async (result) => {
-        console.log("Fetched transactions result:", result);
         setTransactionsResult(result);
 
         if (result.transactions.length > 0) {
@@ -163,10 +159,7 @@ export default function Address() {
           const txsToFetch = result.transactions.slice(0, 25);
           const txResults = await Promise.all(
             txsToFetch.map((hash) =>
-              dataService.networkAdapter.getTransaction(hash).catch((err) => {
-                console.error(`Failed to fetch tx ${hash}:`, err);
-                return null;
-              }),
+              dataService.networkAdapter.getTransaction(hash).catch(() => null),
             ),
           );
           setTransactionDetails(
@@ -178,7 +171,6 @@ export default function Address() {
         }
       })
       .catch((err) => {
-        console.error("Error fetching address transactions:", err);
         setTransactionsResult({
           transactions: [],
           source: "none",

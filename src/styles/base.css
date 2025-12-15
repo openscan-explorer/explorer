@@ -606,3 +606,42 @@
 .justify-center { justify-content: center; }
 .justify-between { justify-content: space-between; }
 .justify-end { justify-content: flex-end; }
+
+/* Display utilities */
+.hidden { display: none; }
+.block { display: block; }
+.inline-block { display: inline-block; }
+
+/* Object fit utilities */
+.object-contain { object-fit: contain; }
+.object-cover { object-fit: cover; }
+
+/* Link utilities */
+.link-primary {
+	color: var(--color-info, #3b82f6);
+	text-decoration: none;
+}
+
+.link-primary:hover {
+	text-decoration: underline;
+}
+
+/* Min-width utilities */
+.min-w-80 { min-width: 80px; }
+.min-w-100 { min-width: 100px; }
+.min-w-120 { min-width: 120px; }
+
+/* Min-height utilities */
+.min-h-60 { min-height: 60px; }
+.min-h-80 { min-height: 80px; }
+.min-h-100 { min-height: 100px; }
+
+/* Font size utilities */
+.text-xs { font-size: 0.75rem; }
+.text-sm { font-size: 0.8rem; }
+.text-base { font-size: 0.9rem; }
+.text-lg { font-size: 1rem; }
+
+/* Background utilities for dynamic colors (use CSS variables) */
+.bg-dynamic { background: var(--dynamic-bg); }
+.border-dynamic { border-color: var(--dynamic-border); }

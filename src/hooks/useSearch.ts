@@ -1,4 +1,4 @@
-import { useCallback, useContext, useState } from "react";
+import { useCallback, useContext, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { AppContext } from "../context";
 import { ENSService } from "../services/ENS/ENSService";
@@ -26,6 +26,16 @@ export function useSearch(): UseSearchResult {
   const networkId =
     pathSegments[0] && !Number.isNaN(Number(pathSegments[0])) ? pathSegments[0] : undefined;
 
+  const mainnetRpcUrls = rpcUrls[1];
+
+  // Memoize ENSService instance
+  const ensService = useMemo(() => {
+    if (!mainnetRpcUrls || mainnetRpcUrls.length === 0) {
+      return null;
+    }
+    return new ENSService(mainnetRpcUrls);
+  }, [mainnetRpcUrls]);
+
   const clearError = useCallback(() => setError(null), []);
 
   const handleSearch = useCallback(
@@ -40,13 +50,11 @@ export function useSearch(): UseSearchResult {
       if (ENSService.isENSName(term)) {
         setIsResolving(true);
         try {
-          const mainnetRpcUrls = rpcUrls[1];
-          if (!mainnetRpcUrls || mainnetRpcUrls.length === 0) {
+          if (!ensService) {
             setError("No Ethereum mainnet RPC configured");
             return;
           }
 
-          const ensService = new ENSService(mainnetRpcUrls);
           const resolvedAddress = await ensService.resolve(term);
 
           if (resolvedAddress) {
@@ -85,7 +93,7 @@ export function useSearch(): UseSearchResult {
         setSearchTerm("");
       }
     },
-    [searchTerm, networkId, navigate, rpcUrls],
+    [searchTerm, networkId, navigate, ensService],
   );
 
   return {

@@ -556,6 +556,7 @@
 	font-weight: 600;
 	font-size: 0.85rem;
 	color: white;
+	background-color: var(--event-color, #10b981);
 }
 
 .tx-event-signature {
@@ -784,8 +785,10 @@
 	cursor: pointer;
 }
 
-.network-card:hover {
+.network-card-link:hover .network-card {
 	transform: translateY(-4px);
+	border-color: var(--network-color, rgba(255, 255, 255, 0.1));
+	box-shadow: 0 8px 32px color-mix(in srgb, var(--network-color, #000) 25%, transparent);
 }
 
 .network-card-header {
@@ -811,6 +814,7 @@
 	align-items: center;
 	justify-content: center;
 	flex-shrink: 0;
+	background: color-mix(in srgb, var(--network-color, #888) 12%, transparent);
 }
 
 .network-card-info {
@@ -1907,7 +1911,7 @@
 	padding: 4px 10px;
 	height: 36px;
 	background: rgba(255, 255, 255, 0.05);
-	border: 1px solid rgba(255, 255, 255, 0.15);
+	border: 1px solid color-mix(in srgb, var(--network-color, #888) 25%, transparent);
 	border-radius: 8px;
 	transition: all 0.2s ease;
 }
@@ -1920,6 +1924,7 @@
 	width: 6px;
 	height: 6px;
 	border-radius: 50%;
+	background: var(--network-color, #888);
 	animation: network-pulse 2s ease-in-out infinite;
 }
 
@@ -2954,7 +2959,7 @@
 .supporter-card {
 	display: block;
 	background: rgba(255, 255, 255, 0.05);
-	border: 2px solid rgba(255, 255, 255, 0.1);
+	border: 2px solid var(--supporter-color, rgba(255, 255, 255, 0.1));
 	border-radius: 12px;
 	padding: 16px;
 	text-decoration: none;
@@ -2990,6 +2995,7 @@
 	font-size: 1.5rem;
 	font-weight: 700;
 	color: white;
+	background-color: var(--supporter-color, #10b981);
 }
 
 .supporter-info {
@@ -3087,7 +3093,7 @@
 	font-size: 2rem;
 	font-weight: 700;
 	color: white;
-	background: var(--color-primary);
+	background-color: var(--profile-color, var(--color-primary));
 	flex-shrink: 0;
 }
 
@@ -4550,5 +4556,80 @@
 
 .extra-data-toggle:hover {
 	background: var(--color-primary-alpha-20);
+}
+
+/* ENS Records Display */
+.ens-notice-warning {
+	padding: 12px 16px;
+	background: rgba(245, 158, 11, 0.1);
+	border-radius: 6px;
+	font-size: 0.85rem;
+	color: #f59e0b;
+}
+
+.ens-loading {
+	padding: 12px 16px;
+	color: rgba(255, 255, 255, 0.6);
+	font-size: 0.85rem;
+}
+
+.ens-name-wrapper {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.ens-name {
+	font-weight: 600;
+	color: #10b981;
+	font-family: monospace;
+}
+
+.ens-badge {
+	font-size: 0.75rem;
+	padding: 2px 6px;
+	border-radius: 4px;
+}
+
+.ens-badge--verified {
+	background: rgba(16, 185, 129, 0.15);
+	color: #10b981;
+}
+
+.ens-badge--unverified {
+	background: rgba(245, 158, 11, 0.15);
+	color: #f59e0b;
+}
+
+.ens-badge--contenthash {
+	background: rgba(139, 92, 246, 0.15);
+	color: #8b5cf6;
+	text-transform: uppercase;
+}
+
+.ens-avatar {
+	width: 48px;
+	height: 48px;
+	border-radius: 8px;
+	object-fit: cover;
+}
+
+.ens-text-records-wrapper {
+	margin-left: 16px;
+	border-left: 2px solid rgba(255, 255, 255, 0.1);
+	padding-left: 16px;
+}
+
+.ens-app-link {
+	color: #10b981;
+	text-decoration: none;
+	font-weight: 600;
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.ens-app-link:hover {
+	text-decoration: underline;
 }
 

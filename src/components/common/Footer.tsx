@@ -58,6 +58,15 @@ const Footer: React.FC<FooterProps> = ({ className = "" }) => {
         </div>
         <div className={`footer-right ${getVersionClass()}`}>
           <a
+            href={`${repoUrl}/issues/new?template=bug_report.md`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="footer-link"
+            title="Report a bug"
+          >
+            Report a Bug
+          </a>
+          <a
             href={`${repoUrl}/commit/${commitHash}`}
             target="_blank"
             rel="noopener noreferrer"
