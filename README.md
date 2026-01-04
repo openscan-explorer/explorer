@@ -111,8 +111,14 @@ This script will:
 ### Build for Production
 
 ```bash
-npm run build
+# Production build
+npm run build:production
+
+# Staging build
+npm run build:staging
 ```
+
+> **Note:** Build scripts require bash (Linux/macOS/WSL). Windows users should use WSL or run builds via CI.
 
 ### Type guards
 
@@ -183,6 +189,8 @@ Controls which networks are displayed in the application. This is useful for lim
 **Format:** Comma-separated list of chain IDs
 
 **Default:** If not set, all supported networks are enabled.
+
+**Note:** The Localhost network (31337) is only visible in development mode. To enable it in production/staging, explicitly include it in `REACT_APP_OPENSCAN_NETWORKS`.
 
 **Examples:**
 

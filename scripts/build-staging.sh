@@ -16,7 +16,6 @@ COMMIT_HASH=$(git rev-parse HEAD)
 
 # Build the app
 echo "Building React app on commit $COMMIT_HASH"
-NODE_ENV=staging REACT_APP_COMMIT_HASH=$COMMIT_HASH npm run build
-
+NODE_ENV=staging REACT_APP_COMMIT_HASH=$COMMIT_HASH webpack --config webpack.config.js --mode production
 echo "Staging build completed!"
 echo "Build output is in ./dist/"

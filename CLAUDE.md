@@ -18,7 +18,12 @@ npm start
 ### Build for Production
 
 ```bash
-npm run build
+# Production build
+npm run build:production
+
+# Staging build
+npm run build:staging
+
 # Output: dist/
 ```
 

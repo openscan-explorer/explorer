@@ -21,7 +21,8 @@
 	},
 	"scripts": {
 		"start": "NODE_ENV=development webpack serve --config webpack.config.js --mode development",
-		"build": "NODE_ENV=production webpack --config webpack.config.js --mode production",
+		"build:production": "bash ./scripts/build-production.sh",
+		"build:staging": "bash ./scripts/build-staging.sh",
 		"test": "npx vitest",
 		"test:run": "npx vitest run",
 		"test:e2e": "playwright test",
