@@ -63,7 +63,7 @@ A trustless, open-source blockchain explorer for Ethereum and Layer 2 networks. 
 
 ### Prerequisites
 
-- Node.js v22.21.1
+- Node.js v24.12.0
 - npm or yarn
 
 ### Installation
