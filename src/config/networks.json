@@ -1,6 +1,6 @@
 {
   "updatedAt": "2025-12-11T12:01:22.402Z",
-  "count": 8,
+  "count": 9,
   "networks": [
     {
       "chainId": 1,
@@ -271,6 +271,31 @@
           "name": "Docs",
           "url": "https://docs.bnbchain.org",
           "description": "Developer documentation"
+        }
+      ]
+    },
+    {
+      "chainId": 31337,
+      "name": "Localhost",
+      "shortName": "Localhost",
+      "description": "Local development network (Hardhat, Anvil)",
+      "currency": "ETH",
+      "color": "#4A5568",
+      "isTestnet": true,
+      "logo": "assets/networks/31337.svg",
+      "rpc": {
+        "public": ["http://127.0.0.1:8545"]
+      },
+      "links": [
+        {
+          "name": "Hardhat",
+          "url": "https://hardhat.org",
+          "description": "Hardhat documentation"
+        },
+        {
+          "name": "Foundry",
+          "url": "https://book.getfoundry.sh",
+          "description": "Foundry documentation"
         }
       ]
     }

@@ -93,9 +93,27 @@ export function getAllNetworks(): NetworkConfig[] {
 export function getEnabledNetworks(): NetworkConfig[] {
   const allNetworks = getAllNetworks();
   const envNetworks = process.env.REACT_APP_OPENSCAN_NETWORKS;
+  const localhostNetworkId = 31337;
+
+  // REACT_APP_ENVIRONMENT is set by webpack DefinePlugin based on NODE_ENV
+  const isDevelopment = process.env.REACT_APP_ENVIRONMENT === "development";
+
+  // Check if localhost is explicitly enabled in REACT_APP_OPENSCAN_NETWORKS
+  const isLocalhostExplicitlyEnabled = envNetworks
+    ?.split(",")
+    .map((id) => parseInt(id.trim(), 10))
+    .includes(localhostNetworkId);
+
+  // Filter out localhost in production/staging (only show in development or if explicitly enabled)
+  const filterLocalhost = (networks: NetworkConfig[]) => {
+    if (isDevelopment || isLocalhostExplicitlyEnabled) {
+      return networks;
+    }
+    return networks.filter((n) => n.networkId !== localhostNetworkId);
+  };
 
   if (!envNetworks || envNetworks.trim() === "") {
-    return allNetworks;
+    return filterLocalhost(allNetworks);
   }
 
   // Parse comma-separated network IDs
@@ -105,7 +123,7 @@ export function getEnabledNetworks(): NetworkConfig[] {
     .filter((id) => !Number.isNaN(id));
 
   if (enabledNetworkIds.length === 0) {
-    return allNetworks;
+    return filterLocalhost(allNetworks);
   }
 
   // Filter networks by enabled network IDs, maintaining order from env var
@@ -117,7 +135,7 @@ export function getEnabledNetworks(): NetworkConfig[] {
     }
   }
 
-  return enabledNetworks.length > 0 ? enabledNetworks : allNetworks;
+  return filterLocalhost(enabledNetworks.length > 0 ? enabledNetworks : allNetworks);
 }
 
 /**

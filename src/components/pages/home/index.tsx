@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import type { NetworkConfig } from "../../../config/networks";
 import { useNetworks } from "../../../context/AppContext";
@@ -36,27 +36,26 @@ const NetworkCard: React.FC<NetworkCardProps> = ({ network }) => {
 };
 
 export default function Home() {
-  const { enabledNetworks: allNetworks, isLoading } = useNetworks();
+  const { enabledNetworks, isLoading } = useNetworks();
+  const [showTestnets, setShowTestnets] = useState(false);
 
-  const displayNetworks = useMemo(() => {
-    const environment = process.env.REACT_APP_ENVIRONMENT;
-    const isDevelopment = environment === "development";
-    const envNetworks = process.env.REACT_APP_OPENSCAN_NETWORKS;
+  const { productionNetworks, testnetNetworks } = useMemo(() => {
+    const isDevelopment = process.env.REACT_APP_ENVIRONMENT === "development";
+    const localhostNetworkId = 31337;
 
-    // Check if Hardhat (31337) is explicitly enabled in REACT_APP_OPENSCAN_NETWORKS
-    const hardhatNetworkId = 31337;
-    const isHardhatExplicitlyEnabled = envNetworks
-      ?.split(",")
-      .map((id) => parseInt(id.trim(), 10))
-      .includes(hardhatNetworkId);
+    // In development, treat localhost as a production network (show with other networks)
+    const isProductionNetwork = (n: (typeof enabledNetworks)[0]) => {
+      if (isDevelopment && n.networkId === localhostNetworkId) {
+        return true;
+      }
+      return !n.isTestnet;
+    };
 
-    // Filter out Hardhat from home page if not in development and not explicitly enabled
-    if (!isDevelopment && !isHardhatExplicitlyEnabled) {
-      return allNetworks.filter((n) => n.networkId !== hardhatNetworkId);
-    }
+    const productionNetworks = enabledNetworks.filter(isProductionNetwork);
+    const testnetNetworks = enabledNetworks.filter((n) => !isProductionNetwork(n));
 
-    return allNetworks;
-  }, [allNetworks]);
+    return { productionNetworks, testnetNetworks };
+  }, [enabledNetworks]);
 
   return (
     <div className="home-container">
@@ -64,17 +63,38 @@ export default function Home() {
         <h1 className="home-title">OPENSCAN</h1>
         <p className="subtitle">Select a blockchain network to explore</p>
 
-        <HomeSearchBar networks={displayNetworks} />
+        <HomeSearchBar networks={enabledNetworks} />
 
         <div className="network-grid">
-          {isLoading && displayNetworks.length === 0 ? (
+          {isLoading && productionNetworks.length === 0 ? (
             <p className="loading-text">Loading networks...</p>
           ) : (
-            displayNetworks.map((network) => (
+            productionNetworks.map((network) => (
               <NetworkCard key={network.networkId} network={network} />
             ))
           )}
         </div>
+
+        {testnetNetworks.length > 0 && (
+          <>
+            {showTestnets && (
+              <div className="network-grid testnet-grid">
+                {testnetNetworks.map((network) => (
+                  <NetworkCard key={network.networkId} network={network} />
+                ))}
+              </div>
+            )}
+            <div className="testnet-toggle-container">
+              <button
+                type="button"
+                className="testnet-toggle-btn"
+                onClick={() => setShowTestnets(!showTestnets)}
+              >
+                {showTestnets ? "Hide testnets" : "Show testnets"}
+              </button>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

@@ -844,6 +844,38 @@
 	font-weight: 500;
 }
 
+/* Testnet toggle */
+.testnet-grid {
+	margin-top: 24px;
+}
+
+.testnet-toggle-container {
+	display: flex;
+	justify-content: center;
+	margin-top: 24px;
+	width: 100%;
+}
+
+.testnet-toggle-btn {
+	background: transparent;
+	border: 1px solid rgba(255, 255, 255, 0.2);
+	color: var(--color-text-muted);
+	padding: 8px 20px;
+	border-radius: 6px;
+	font-size: 0.875rem;
+	cursor: pointer;
+	transition:
+		color 0.2s ease,
+		border-color 0.2s ease,
+		background-color 0.2s ease;
+}
+
+.testnet-toggle-btn:hover {
+	color: var(--color-text);
+	border-color: rgba(255, 255, 255, 0.4);
+	background-color: rgba(255, 255, 255, 0.05);
+}
+
 /* ==========================================================================
    BUTTONS - Consolidated button classes
    All buttons share base styles with variants

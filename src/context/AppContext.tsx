@@ -8,7 +8,12 @@ import {
   useState,
 } from "react";
 import { useAccount } from "wagmi";
-import { getAllNetworks, getNetworkById, loadNetworks } from "../config/networks";
+import {
+  getAllNetworks,
+  getEnabledNetworks,
+  getNetworkById,
+  loadNetworks,
+} from "../config/networks";
 import { useWagmiConnection } from "../hooks/useWagmiConnection";
 import type { IAppContext, NetworkConfig, RpcUrlsContextType } from "../types";
 import { loadJsonFilesFromStorage, saveJsonFilesToStorage } from "../utils/artifactsStorage";
@@ -49,35 +54,8 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
   const [networksLoading, setNetworksLoading] = useState(true);
   const [networksError, setNetworksError] = useState<string | null>(null);
 
-  // Derive enabled networks from networks state
-  const enabledNetworks = useMemo(() => {
-    const envNetworks = process.env.REACT_APP_OPENSCAN_NETWORKS;
-
-    if (!envNetworks || envNetworks.trim() === "") {
-      return networks;
-    }
-
-    // Parse comma-separated network IDs
-    const enabledNetworkIds = envNetworks
-      .split(",")
-      .map((id) => parseInt(id.trim(), 10))
-      .filter((id) => !Number.isNaN(id));
-
-    if (enabledNetworkIds.length === 0) {
-      return networks;
-    }
-
-    // Filter networks by enabled network IDs, maintaining order from env var
-    const filtered: NetworkConfig[] = [];
-    for (const networkId of enabledNetworkIds) {
-      const network = networks.find((n) => n.networkId === networkId);
-      if (network) {
-        filtered.push(network);
-      }
-    }
-
-    return filtered.length > 0 ? filtered : networks;
-  }, [networks]);
+  // Get enabled networks (filters by env var and excludes localhost in prod/staging)
+  const enabledNetworks = useMemo(() => getEnabledNetworks(), []);
 
   const setRpcUrls = useCallback((next: RpcUrlsContextType) => {
     setRpcUrlsState(next);
