@@ -1,28 +1,13 @@
-import { test, expect } from "@playwright/test";
-import { MAINNET } from "../fixtures/mainnet";
-
-// Helper to wait for token content or error
-async function waitForTokenContent(page: import("@playwright/test").Page) {
-  await expect(
-    page
-      .locator(".erc721-header")
-      .or(page.locator(".erc1155-header"))
-      .or(page.locator("text=Error:"))
-      .or(page.locator("text=Something went wrong"))
-  ).toBeVisible({ timeout: 45000 });
-
-  return (
-    !(await page.locator("text=Error:").isVisible()) &&
-    !(await page.locator("text=Something went wrong").isVisible())
-  );
-}
+import { test, expect } from "../../fixtures/test";
+import { MAINNET } from "../../fixtures/mainnet";
+import { waitForTokenContent, DEFAULT_TIMEOUT } from "../../helpers/wait";
 
 test.describe("ERC721 Token Details", () => {
-  test("displays BAYC #1 NFT details section", async ({ page }) => {
+  test("displays BAYC #1 NFT details section", async ({ page }, testInfo) => {
     const token = MAINNET.tokens.baycToken1;
     await page.goto(`/${MAINNET.chainId}/address/${token.contractAddress}/${token.tokenId}`);
 
-    const loaded = await waitForTokenContent(page);
+    const loaded = await waitForTokenContent(page, testInfo);
     if (loaded) {
       // Verify ERC721 header is displayed
       await expect(page.locator(".erc721-header")).toBeVisible();
@@ -55,11 +40,11 @@ test.describe("ERC721 Token Details", () => {
     }
   });
 
-  test("displays BAYC #1 token image", async ({ page }) => {
+  test("displays BAYC #1 token image", async ({ page }, testInfo) => {
     const token = MAINNET.tokens.baycToken1;
     await page.goto(`/${MAINNET.chainId}/address/${token.contractAddress}/${token.tokenId}`);
 
-    const loaded = await waitForTokenContent(page);
+    const loaded = await waitForTokenContent(page, testInfo);
     if (loaded) {
       // Verify image container exists
       await expect(page.locator(".erc721-image-container")).toBeVisible();
@@ -69,11 +54,11 @@ test.describe("ERC721 Token Details", () => {
     }
   });
 
-  test("displays BAYC #1 properties/attributes", async ({ page }) => {
+  test("displays BAYC #1 properties/attributes", async ({ page }, testInfo) => {
     const token = MAINNET.tokens.baycToken1;
     await page.goto(`/${MAINNET.chainId}/address/${token.contractAddress}/${token.tokenId}`);
 
-    const loaded = await waitForTokenContent(page);
+    const loaded = await waitForTokenContent(page, testInfo);
     if (loaded) {
       // Verify Properties section exists
       await expect(page.locator("text=Properties")).toBeVisible();
@@ -89,11 +74,11 @@ test.describe("ERC721 Token Details", () => {
     }
   });
 
-  test("displays BAYC #1 Token URI section", async ({ page }) => {
+  test("displays BAYC #1 Token URI section", async ({ page }, testInfo) => {
     const token = MAINNET.tokens.baycToken1;
     await page.goto(`/${MAINNET.chainId}/address/${token.contractAddress}/${token.tokenId}`);
 
-    const loaded = await waitForTokenContent(page);
+    const loaded = await waitForTokenContent(page, testInfo);
     if (loaded) {
       // Verify Token URI section exists
       await expect(page.locator("text=Token URI")).toBeVisible();
@@ -106,22 +91,22 @@ test.describe("ERC721 Token Details", () => {
     }
   });
 
-  test("displays BAYC #1 Raw Metadata section", async ({ page }) => {
+  test("displays BAYC #1 Raw Metadata section", async ({ page }, testInfo) => {
     const token = MAINNET.tokens.baycToken1;
     await page.goto(`/${MAINNET.chainId}/address/${token.contractAddress}/${token.tokenId}`);
 
-    const loaded = await waitForTokenContent(page);
+    const loaded = await waitForTokenContent(page, testInfo);
     if (loaded) {
       // Verify Raw Metadata section exists (expandable)
       await expect(page.locator("text=Raw Metadata")).toBeVisible();
     }
   });
 
-  test("displays BAYC #100 with different properties", async ({ page }) => {
+  test("displays BAYC #100 with different properties", async ({ page }, testInfo) => {
     const token = MAINNET.tokens.baycToken100;
     await page.goto(`/${MAINNET.chainId}/address/${token.contractAddress}/${token.tokenId}`);
 
-    const loaded = await waitForTokenContent(page);
+    const loaded = await waitForTokenContent(page, testInfo);
     if (loaded) {
       // Verify token ID is displayed
       await expect(page.locator(".erc721-header-title")).toContainText(`#${token.tokenId}`);
@@ -140,7 +125,7 @@ test.describe("ERC721 Token Details", () => {
     }
   });
 
-  test("navigates to ERC721 token via collection lookup", async ({ page }) => {
+  test("navigates to ERC721 token via collection lookup", async ({ page }, testInfo) => {
     const addr = MAINNET.addresses.bayc;
     const tokenId = "1";
 
@@ -153,7 +138,7 @@ test.describe("ERC721 Token Details", () => {
         .locator(".erc721-token-input")
         .or(page.locator("text=Error:"))
         .or(page.locator("text=Failed to fetch"))
-    ).toBeVisible({ timeout: 45000 });
+    ).toBeVisible({ timeout: DEFAULT_TIMEOUT * 5 });
 
     // Only proceed if the token input is visible (page loaded successfully)
     if (await page.locator(".erc721-token-input").isVisible()) {
@@ -167,7 +152,7 @@ test.describe("ERC721 Token Details", () => {
       await expect(page).toHaveURL(new RegExp(`/${MAINNET.chainId}/address/${addr.address}/${tokenId}`));
 
       // Verify token details page loaded
-      const loaded = await waitForTokenContent(page);
+      const loaded = await waitForTokenContent(page, testInfo);
       if (loaded) {
         await expect(page.locator(".erc721-header")).toBeVisible();
       }
@@ -176,11 +161,11 @@ test.describe("ERC721 Token Details", () => {
 });
 
 test.describe("ERC1155 Token Details", () => {
-  test("displays ERC1155 token details page", async ({ page }) => {
+  test("displays ERC1155 token details page", async ({ page }, testInfo) => {
     const token = MAINNET.tokens.raribleToken;
     await page.goto(`/${MAINNET.chainId}/address/${token.contractAddress}/${token.tokenId}`);
 
-    const loaded = await waitForTokenContent(page);
+    const loaded = await waitForTokenContent(page, testInfo);
     if (loaded) {
       // Verify ERC1155 header is displayed
       await expect(page.locator(".erc1155-header")).toBeVisible();
@@ -192,22 +177,22 @@ test.describe("ERC1155 Token Details", () => {
     }
   });
 
-  test("displays ERC1155 token image container", async ({ page }) => {
+  test("displays ERC1155 token image container", async ({ page }, testInfo) => {
     const token = MAINNET.tokens.raribleToken;
     await page.goto(`/${MAINNET.chainId}/address/${token.contractAddress}/${token.tokenId}`);
 
-    const loaded = await waitForTokenContent(page);
+    const loaded = await waitForTokenContent(page, testInfo);
     if (loaded) {
       // Verify image container exists
       await expect(page.locator(".erc1155-image-container")).toBeVisible();
     }
   });
 
-  test("displays ERC1155 balance lookup section", async ({ page }) => {
+  test("displays ERC1155 balance lookup section", async ({ page }, testInfo) => {
     const token = MAINNET.tokens.raribleToken;
     await page.goto(`/${MAINNET.chainId}/address/${token.contractAddress}/${token.tokenId}`);
 
-    const loaded = await waitForTokenContent(page);
+    const loaded = await waitForTokenContent(page, testInfo);
     if (loaded) {
       // Verify balance lookup section exists (unique to ERC1155)
       await expect(page.locator(".erc1155-balance-lookup")).toBeVisible();
@@ -220,7 +205,7 @@ test.describe("ERC1155 Token Details", () => {
     }
   });
 
-  test("navigates to ERC1155 token via collection lookup", async ({ page }) => {
+  test("navigates to ERC1155 token via collection lookup", async ({ page }, testInfo) => {
     const addr = MAINNET.addresses.rarible;
     const tokenId = "1"; // Simple token ID for navigation test
 
@@ -235,7 +220,7 @@ test.describe("ERC1155 Token Details", () => {
         .or(page.locator("text=Error:"))
         .or(page.locator("text=Failed to fetch"))
         .first()
-    ).toBeVisible({ timeout: 45000 });
+    ).toBeVisible({ timeout: DEFAULT_TIMEOUT * 5 });
 
     // Only proceed if the ERC1155 token input is visible (contract detected as ERC1155)
     if (await page.locator(".erc1155-token-input").isVisible()) {
@@ -251,14 +236,14 @@ test.describe("ERC1155 Token Details", () => {
       // Verify token details page loaded (may be ERC1155 or show loading/error for invalid token)
       await expect(
         page.locator(".erc1155-header").or(page.locator("text=Error:")).or(page.locator(".erc1155-detail-content"))
-      ).toBeVisible({ timeout: 30000 });
+      ).toBeVisible({ timeout: DEFAULT_TIMEOUT * 3 });
     }
     // If not detected as ERC1155, test passes (RPC may not support interface detection)
   });
 });
 
 test.describe("Token Details - Error Handling", () => {
-  test("handles invalid token ID gracefully for ERC721", async ({ page }) => {
+  test("handles invalid token ID gracefully for ERC721", async ({ page }, testInfo) => {
     const addr = MAINNET.addresses.bayc;
     const invalidTokenId = "999999999"; // Non-existent token
 
@@ -271,10 +256,10 @@ test.describe("Token Details - Error Handling", () => {
         .or(page.locator("text=Something went wrong"))
         .or(page.locator(".erc721-header"))
         .or(page.locator(".erc721-detail-content"))
-    ).toBeVisible({ timeout: 30000 });
+    ).toBeVisible({ timeout: DEFAULT_TIMEOUT * 3 });
   });
 
-  test("handles invalid contract for token view", async ({ page }) => {
+  test("handles invalid contract for token view", async ({ page }, testInfo) => {
     const invalidContract = "0x0000000000000000000000000000000000000000";
     const tokenId = "1";
 
@@ -286,6 +271,7 @@ test.describe("Token Details - Error Handling", () => {
         .locator("text=Error:")
         .or(page.locator("text=Something went wrong"))
         .or(page.locator(".container-wide"))
-    ).toBeVisible({ timeout: 30000 });
+        .first()
+    ).toBeVisible({ timeout: DEFAULT_TIMEOUT * 3 });
   });
 });

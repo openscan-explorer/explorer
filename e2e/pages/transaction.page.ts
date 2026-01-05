@@ -1,4 +1,5 @@
 import type { Locator, Page } from "@playwright/test";
+import { DEFAULT_TIMEOUT } from "../helpers/wait";
 
 export class TransactionPage {
   readonly page: Page;
@@ -26,7 +27,7 @@ export class TransactionPage {
   }
 
   async waitForLoad() {
-    await this.loader.waitFor({ state: "hidden", timeout: 30000 });
+    await this.loader.waitFor({ state: "hidden", timeout: DEFAULT_TIMEOUT * 3 });
   }
 
   async getStatus(): Promise<"success" | "failed"> {

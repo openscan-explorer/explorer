@@ -1,29 +1,15 @@
-import { test, expect } from "@playwright/test";
-import { BlockPage } from "../pages/block.page";
-import { MAINNET } from "../fixtures/mainnet";
-
-// Helper to wait for content or error
-async function waitForBlockContent(page: import("@playwright/test").Page) {
-  await expect(
-    page
-      .locator("text=Transactions:")
-      .or(page.locator("text=Error:"))
-      .or(page.locator("text=Something went wrong"))
-  ).toBeVisible({ timeout: 45000 });
-
-  return (
-    !(await page.locator("text=Error:").isVisible()) &&
-    !(await page.locator("text=Something went wrong").isVisible())
-  );
-}
+import { test, expect } from "../../fixtures/test";
+import { BlockPage } from "../../pages/block.page";
+import { MAINNET } from "../../fixtures/mainnet";
+import { waitForBlockContent, DEFAULT_TIMEOUT } from "../../helpers/wait";
 
 test.describe("Block Page", () => {
-  test("block #10,000 - pre-London block with no transactions", async ({ page }) => {
+  test("block #10,000 - pre-London block with no transactions", async ({ page }, testInfo) => {
     const blockPage = new BlockPage(page);
     const block = MAINNET.blocks["10000"];
     await blockPage.goto(block.number);
 
-    const loaded = await waitForBlockContent(page);
+    const loaded = await waitForBlockContent(page, testInfo);
     if (loaded) {
       // Header section
       await expect(blockPage.blockNumber).toBeVisible();
@@ -67,12 +53,12 @@ test.describe("Block Page", () => {
     }
   });
 
-  test("block #1,000,000 - pre-London block with transactions", async ({ page }) => {
+  test("block #1,000,000 - pre-London block with transactions", async ({ page }, testInfo) => {
     const blockPage = new BlockPage(page);
     const block = MAINNET.blocks["1000000"];
     await blockPage.goto(block.number);
 
-    const loaded = await waitForBlockContent(page);
+    const loaded = await waitForBlockContent(page, testInfo);
     if (loaded) {
       // Header
       await expect(blockPage.blockNumber).toBeVisible();
@@ -114,12 +100,12 @@ test.describe("Block Page", () => {
     }
   });
 
-  test("block #20,000,000 - post-London block with base fee and withdrawals", async ({ page }) => {
+  test("block #20,000,000 - post-London block with base fee and withdrawals", async ({ page }, testInfo) => {
     const blockPage = new BlockPage(page);
     const block = MAINNET.blocks["20000000"];
     await blockPage.goto(block.number);
 
-    const loaded = await waitForBlockContent(page);
+    const loaded = await waitForBlockContent(page, testInfo);
     if (loaded) {
       // Header
       await expect(blockPage.blockNumber).toBeVisible();
@@ -164,12 +150,12 @@ test.describe("Block Page", () => {
     }
   });
 
-  test("block #10,000 more details section shows correct hash values", async ({ page }) => {
+  test("block #10,000 more details section shows correct hash values", async ({ page }, testInfo) => {
     const blockPage = new BlockPage(page);
     const block = MAINNET.blocks["10000"];
     await blockPage.goto(block.number);
 
-    const loaded = await waitForBlockContent(page);
+    const loaded = await waitForBlockContent(page, testInfo);
     if (loaded) {
       // Click "Show More Details" to expand
       const showMoreBtn = page.locator("text=Show More Details");
@@ -202,12 +188,12 @@ test.describe("Block Page", () => {
     }
   });
 
-  test("block #20,000,000 more details section includes withdrawals root", async ({ page }) => {
+  test("block #20,000,000 more details section includes withdrawals root", async ({ page }, testInfo) => {
     const blockPage = new BlockPage(page);
     const block = MAINNET.blocks["20000000"];
     await blockPage.goto(block.number);
 
-    const loaded = await waitForBlockContent(page);
+    const loaded = await waitForBlockContent(page, testInfo);
     if (loaded) {
       // Click "Show More Details" to expand
       const showMoreBtn = page.locator("text=Show More Details");
@@ -242,11 +228,11 @@ test.describe("Block Page", () => {
     }
   });
 
-  test("block navigation buttons work", async ({ page }) => {
+  test("block navigation buttons work", async ({ page }, testInfo) => {
     const blockPage = new BlockPage(page);
     await blockPage.goto(MAINNET.blocks["1000000"].number);
 
-    const loaded = await waitForBlockContent(page);
+    const loaded = await waitForBlockContent(page, testInfo);
     if (loaded) {
       // Verify navigation buttons exist
       await expect(blockPage.navPrevBtn).toBeVisible();
@@ -259,7 +245,10 @@ test.describe("Block Page", () => {
     await blockPage.goto(999999999999);
 
     await expect(
-      blockPage.errorText.or(blockPage.container).or(page.locator("text=Something went wrong"))
-    ).toBeVisible({ timeout: 30000 });
+      blockPage.errorText
+        .or(blockPage.container)
+        .or(page.locator("text=Something went wrong"))
+        .first()
+    ).toBeVisible({ timeout: DEFAULT_TIMEOUT * 3 });
   });
 });

@@ -1,34 +1,20 @@
-import { test, expect } from "@playwright/test";
-import { TransactionPage } from "../pages/transaction.page";
-import { MAINNET } from "../fixtures/mainnet";
-
-// Helper to wait for content or error
-async function waitForTxContent(page: import("@playwright/test").Page) {
-  await expect(
-    page
-      .locator("text=Transaction Hash:")
-      .or(page.locator("text=Error:"))
-      .or(page.locator("text=Something went wrong"))
-  ).toBeVisible({ timeout: 45000 });
-
-  return (
-    !(await page.locator("text=Error:").isVisible()) &&
-    !(await page.locator("text=Something went wrong").isVisible())
-  );
-}
+import { test, expect } from "../../fixtures/test";
+import { TransactionPage } from "../../pages/transaction.page";
+import { MAINNET } from "../../fixtures/mainnet";
+import { waitForTxContent, DEFAULT_TIMEOUT } from "../../helpers/wait";
 
 // Transaction hash constants for readability
 const FIRST_ETH_TRANSFER = "0x5c504ed432cb51138bcf09aa5e8a410dd4a1e204ef84bfed1be16dfba1b22060";
 const USDC_APPROVAL = "0xc55e2b90168af6972193c1f86fa4d7d7b31a29c156665d15b9cd48618b5177ef";
 
 test.describe("Transaction Page", () => {
-  test("displays first ETH transfer with all details", async ({ page }) => {
+  test("displays first ETH transfer with all details", async ({ page }, testInfo) => {
     const txPage = new TransactionPage(page);
     const tx = MAINNET.transactions[FIRST_ETH_TRANSFER];
 
     await txPage.goto(tx.hash);
 
-    const loaded = await waitForTxContent(page);
+    const loaded = await waitForTxContent(page, testInfo);
     if (loaded) {
       // Verify core transaction details
       await expect(page.locator("text=Transaction Hash:")).toBeVisible();
@@ -44,13 +30,13 @@ test.describe("Transaction Page", () => {
     }
   });
 
-  test("shows correct from and to addresses", async ({ page }) => {
+  test("shows correct from and to addresses", async ({ page }, testInfo) => {
     const txPage = new TransactionPage(page);
     const tx = MAINNET.transactions[FIRST_ETH_TRANSFER];
 
     await txPage.goto(tx.hash);
 
-    const loaded = await waitForTxContent(page);
+    const loaded = await waitForTxContent(page, testInfo);
     if (loaded) {
       const from = await txPage.getFromAddress();
       expect(from.toLowerCase()).toContain(tx.from.toLowerCase().slice(0, 10));
@@ -60,13 +46,13 @@ test.describe("Transaction Page", () => {
     }
   });
 
-  test("displays transaction value and fee", async ({ page }) => {
+  test("displays transaction value and fee", async ({ page }, testInfo) => {
     const txPage = new TransactionPage(page);
     const tx = MAINNET.transactions[FIRST_ETH_TRANSFER];
 
     await txPage.goto(tx.hash);
 
-    const loaded = await waitForTxContent(page);
+    const loaded = await waitForTxContent(page, testInfo);
     if (loaded) {
       // Verify value contains ETH
       const value = await txPage.getValue();
@@ -77,13 +63,13 @@ test.describe("Transaction Page", () => {
     }
   });
 
-  test("displays other attributes section", async ({ page }) => {
+  test("displays other attributes section", async ({ page }, testInfo) => {
     const txPage = new TransactionPage(page);
     const tx = MAINNET.transactions[FIRST_ETH_TRANSFER];
 
     await txPage.goto(tx.hash);
 
-    const loaded = await waitForTxContent(page);
+    const loaded = await waitForTxContent(page, testInfo);
     if (loaded) {
       // Verify other attributes section
       await expect(page.locator("text=Other Attributes:")).toBeVisible();
@@ -92,26 +78,26 @@ test.describe("Transaction Page", () => {
     }
   });
 
-  test("displays transaction with input data", async ({ page }) => {
+  test("displays transaction with input data", async ({ page }, testInfo) => {
     const txPage = new TransactionPage(page);
     const tx = MAINNET.transactions[USDC_APPROVAL];
 
     await txPage.goto(tx.hash);
 
-    const loaded = await waitForTxContent(page);
+    const loaded = await waitForTxContent(page, testInfo);
     if (loaded) {
       // Verify input data section exists for contract interactions
       await expect(page.locator("text=Input Data:")).toBeVisible();
     }
   });
 
-  test("displays block number link", async ({ page }) => {
+  test("displays block number link", async ({ page }, testInfo) => {
     const txPage = new TransactionPage(page);
     const tx = MAINNET.transactions[FIRST_ETH_TRANSFER];
 
     await txPage.goto(tx.hash);
 
-    const loaded = await waitForTxContent(page);
+    const loaded = await waitForTxContent(page, testInfo);
     if (loaded) {
       // Verify block section is displayed (block number may be formatted with commas)
       await expect(page.locator("text=Block:")).toBeVisible();
@@ -125,7 +111,10 @@ test.describe("Transaction Page", () => {
     await txPage.goto("0xinvalid");
 
     await expect(
-      txPage.errorText.or(txPage.container).or(page.locator("text=Something went wrong"))
-    ).toBeVisible({ timeout: 30000 });
+      txPage.errorText
+        .or(txPage.container)
+        .or(page.locator("text=Something went wrong"))
+        .first()
+    ).toBeVisible({ timeout: DEFAULT_TIMEOUT * 3 });
   });
 });
