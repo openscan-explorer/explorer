@@ -38,12 +38,17 @@ const subscriptionTypes: SubscriptionType[] = [
       },
       {
         tier: "Partner",
-        benefits: ["Token balance shown on the main explorer", "Simple profile page"],
+        benefits: [
+          "Token balance shown on the main explorer",
+          "Simple profile page",
+          "Multiple network listing",
+        ],
       },
       {
         tier: "Ally",
         benefits: [
           "Complete profile page with markdown description",
+          "OpenScan subdomain",
           "Direct communication line with the technical team",
         ],
       },
@@ -118,14 +123,11 @@ const subscriptionTypes: SubscriptionType[] = [
       },
       {
         tier: "Partner",
-        benefits: [
-          "Complete profile page with markdown description",
-          "Direct communication line with the technical team",
-        ],
+        benefits: ["Complete profile page with markdown description", "OpenScan subdomain"],
       },
       {
         tier: "Ally",
-        benefits: ["OpenScan subdomain", "Roadmap voting power"],
+        benefits: ["Direct communication line with the technical team", "Roadmap voting power"],
       },
     ],
   },

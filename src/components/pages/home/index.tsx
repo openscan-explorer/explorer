@@ -61,7 +61,6 @@ export default function Home() {
     <div className="home-container">
       <div className="home-content page-card">
         <h1 className="home-title">OPENSCAN</h1>
-        <p className="subtitle">Select a blockchain network to explore</p>
 
         <HomeSearchBar networks={enabledNetworks} />
 
