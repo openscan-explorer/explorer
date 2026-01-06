@@ -1,5 +1,6 @@
 import type React from "react";
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { AppContext } from "../../../context/AppContext";
 
 const NETWORKS: Record<number, { name: string }> = {
   1: { name: "Ethereum Mainnet" },
@@ -77,6 +78,16 @@ const ContractsSection: React.FC = () => {
   // biome-ignore lint/suspicious/noExplicitAny: <TODO>
   const [simResult, setSimResult] = useState<any>(null);
   const [simError, setSimError] = useState<string | null>(null);
+
+  // Contract Storage
+  const { rpcUrls } = useContext(AppContext);
+  const [showStorageReader, setShowStorageReader] = useState(false);
+  const [storageChainId, setStorageChainId] = useState<number>(1);
+  const [storageAddress, setStorageAddress] = useState("");
+  const [storageSlot, setStorageSlot] = useState("");
+  const [storageValue, setStorageValue] = useState<string | null>(null);
+  const [storageLoading, setStorageLoading] = useState(false);
+  const [storageError, setStorageError] = useState<string | null>(null);
 
   // Standard JSON Verification
   const verifyStandardJson = async () => {
@@ -282,6 +293,62 @@ const ContractsSection: React.FC = () => {
     };
 
     poll();
+  };
+
+  // Get Storage At
+  const getStorageAt = async () => {
+    setStorageLoading(true);
+    setStorageError(null);
+    setStorageValue(null);
+
+    try {
+      if (!storageAddress) {
+        throw new Error("Contract address is required");
+      }
+      if (!storageSlot && storageSlot !== "0") {
+        throw new Error("Storage slot is required");
+      }
+
+      const rpcUrlsForChain = rpcUrls[storageChainId as keyof typeof rpcUrls];
+      if (!rpcUrlsForChain || rpcUrlsForChain.length === 0) {
+        throw new Error(`No RPC URL configured for chain ${storageChainId}`);
+      }
+
+      const rpcUrl = Array.isArray(rpcUrlsForChain) ? rpcUrlsForChain[0] : rpcUrlsForChain;
+      if (!rpcUrl) {
+        throw new Error(`No RPC URL configured for chain ${storageChainId}`);
+      }
+
+      // Normalize the slot to hex format
+      let slot = storageSlot.trim();
+      if (!slot.startsWith("0x")) {
+        slot = `0x${BigInt(slot).toString(16)}`;
+      }
+
+      const response = await fetch(rpcUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          jsonrpc: "2.0",
+          method: "eth_getStorageAt",
+          params: [storageAddress, slot, "latest"],
+          id: 1,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.error) {
+        throw new Error(data.error.message || JSON.stringify(data.error));
+      }
+
+      setStorageValue(data.result);
+      // biome-ignore lint/suspicious/noExplicitAny: <TODO>
+    } catch (err: any) {
+      setStorageError(err.message || String(err));
+    } finally {
+      setStorageLoading(false);
+    }
   };
 
   // biome-ignore lint/suspicious/noExplicitAny: <TODO>
@@ -573,6 +640,83 @@ const ContractsSection: React.FC = () => {
 
             {simError && <div className="devtools-error">{simError}</div>}
             {simResult && renderResult(simResult)}
+          </div>
+        )}
+      </div>
+
+      {/* Contract Storage Reader */}
+      <div className="devtools-card">
+        {/** biome-ignore lint/a11y/noStaticElementInteractions: <TODO> */}
+        {/** biome-ignore lint/a11y/useKeyWithClickEvents: <TODO> */}
+        <div
+          className="devtools-tool-header cursor-pointer"
+          onClick={() => setShowStorageReader(!showStorageReader)}
+        >
+          <h3 className="devtools-tool-title">💾 Contract Storage Reader</h3>
+          <span className="devtools-section-toggle">{showStorageReader ? "▼" : "▶"}</span>
+        </div>
+        {showStorageReader && (
+          <div className="devtools-flex-column devtools-gap-12">
+            <p className="sourcify-similarity-hint">
+              Read raw storage values from any contract at a specific slot.
+            </p>
+
+            <div className="sourcify-grid-2col">
+              <div className="devtools-flex-column devtools-gap-4">
+                {/** biome-ignore lint/a11y/noLabelWithoutControl: <TODO> */}
+                <label className="input-label">Chain ID</label>
+                <select
+                  className="devtools-input"
+                  value={storageChainId}
+                  onChange={(e) => setStorageChainId(Number(e.target.value))}
+                >
+                  {Object.entries(NETWORKS).map(([id, net]) => (
+                    <option key={id} value={id}>
+                      {net.name} ({id})
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="devtools-flex-column devtools-gap-4">
+                {/** biome-ignore lint/a11y/noLabelWithoutControl: <TODO> */}
+                <label className="input-label">Contract Address</label>
+                <input
+                  type="text"
+                  className="devtools-input mono"
+                  placeholder="0x..."
+                  value={storageAddress}
+                  onChange={(e) => setStorageAddress(e.target.value)}
+                />
+              </div>
+            </div>
+
+            <div className="devtools-flex-column devtools-gap-4">
+              {/** biome-ignore lint/a11y/noLabelWithoutControl: <TODO> */}
+              <label className="input-label">Storage Slot</label>
+              <input
+                type="text"
+                className="devtools-input mono"
+                placeholder="0 or 0x0"
+                value={storageSlot}
+                onChange={(e) => setStorageSlot(e.target.value)}
+              />
+            </div>
+
+            {/** biome-ignore lint/a11y/useButtonType: <TODO> */}
+            <button className="devtools-button" onClick={getStorageAt} disabled={storageLoading}>
+              {storageLoading ? "Reading..." : "Read Storage"}
+            </button>
+
+            {storageError && <div className="devtools-error">{storageError}</div>}
+            {storageValue && (
+              <div className="devtools-results">
+                <div className="devtools-flex-column devtools-gap-4">
+                  {/** biome-ignore lint/a11y/noLabelWithoutControl: <TODO> */}
+                  <label className="input-label">Value (hex)</label>
+                  <pre className="mono sourcify-result-json">{storageValue}</pre>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>

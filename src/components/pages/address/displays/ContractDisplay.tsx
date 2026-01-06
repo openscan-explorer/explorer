@@ -11,7 +11,7 @@ import type {
   RPCMetadata,
   Transaction,
 } from "../../../../types";
-import { AddressHeader, ContractDetails, ContractStorage, TransactionHistory } from "../shared";
+import { AddressHeader, ContractDetails, TransactionHistory } from "../shared";
 import ENSRecordsDetails from "../shared/ENSRecordsDisplay";
 
 interface ContractDisplayProps {
@@ -242,9 +242,6 @@ const ContractDisplay: React.FC<ContractDisplayProps> = ({
           loadingTxDetails={loadingTxDetails}
           contractAbi={contractData?.abi}
         />
-
-        {/* Contract Storage */}
-        <ContractStorage address={address} />
       </div>
     </div>
   );
