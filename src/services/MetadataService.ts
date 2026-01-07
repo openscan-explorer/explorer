@@ -5,8 +5,7 @@
 
 import networksData from "../config/networks.json";
 
-const METADATA_BASE_URL =
-  "https://raw.githubusercontent.com/openscan-explorer/explorer-metadata/main/dist";
+const METADATA_BASE_URL = "https://cdn.jsdelivr.net/npm/@openscan/metadata/dist";
 
 export interface NetworkLink {
   name: string;
