@@ -51,6 +51,7 @@ import {
   LazyBlock,
   LazyBlocks,
   LazyChain,
+  LazyContact,
   LazyDevTools,
   LazyHome,
   LazyMempool,
@@ -138,6 +139,7 @@ function AppContent() {
               <Route path="/" element={<LazyHome />} />
               <Route path="settings" element={<LazySettings />} />
               <Route path="about" element={<LazyAbout />} />
+              <Route path="contact" element={<LazyContact />} />
               <Route path="devtools" element={<LazyDevTools />} />
               <Route path="subscriptions" element={<LazySubscriptions />} />
               <Route path="profile/:profileType/:profileId" element={<LazyProfile />} />

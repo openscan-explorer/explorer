@@ -45,15 +45,23 @@ const Footer: React.FC<FooterProps> = ({ className = "" }) => {
             onClick={() => navigate("/about")}
             className="footer-link btn-reset"
           >
-            About Openscan
+            About
           </button>
           |
           <button type="button" onClick={goToSubscriptions} className="footer-link btn-reset">
             Subscribe
           </button>
           |
+          <button
+            type="button"
+            onClick={() => navigate("/contact")}
+            className="footer-link btn-reset"
+          >
+            Contact
+          </button>
+          |
           <button type="button" onClick={goToSupporters} className="footer-link btn-reset">
-            Our Supporters ❤️
+            Supporters ❤️
           </button>
         </div>
         <div className={`footer-right ${getVersionClass()}`}>
