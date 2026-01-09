@@ -1,9 +1,6 @@
 import type React from "react";
 import { useState } from "react";
-import paymentHelp1 from "../../../assets/paymentHelp1.png";
-import paymentHelp2 from "../../../assets/paymentHelp2.png";
-import paymentHelp3 from "../../../assets/paymentHelp3.png";
-import { OPENSCAN_PAYMENT_ADDRESS } from "../../../config/index";
+import { OPENSCAN_DAO_ADDRESS } from "../../../config/index";
 import "../../../styles/subscriptions.css";
 
 type SubscriptionCategory = "tokens" | "networks" | "apps" | "companies";
@@ -177,7 +174,6 @@ const isEarlyAdopterPeriod = (): boolean => {
 
 const Subscriptions: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<SubscriptionCategory>("tokens");
-  const [showHelpImages, setShowHelpImages] = useState(false);
 
   const selectedSubscription = subscriptionTypes.find((s) => s.id === selectedCategory);
 
@@ -401,119 +397,80 @@ const Subscriptions: React.FC = () => {
             <div className="subscriptions-step">
               <div className="subscriptions-step-number">1</div>
               <div className="subscriptions-step-content">
-                <h4>Make Payment</h4>
+                <h4>Submit Pull Request</h4>
                 <p>
-                  Send your subscription payment to the <strong>openscan-payment</strong> contract
-                  on Ethereum Mainnet.
+                  Create a pull request to the{" "}
+                  <a
+                    href="https://github.com/openscan-explorer/explorer-metadata"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    explorer-metadata
+                  </a>{" "}
+                  repository with your project information and subscription details.
                 </p>
               </div>
             </div>
             <div className="subscriptions-step">
               <div className="subscriptions-step-number">2</div>
               <div className="subscriptions-step-content">
-                <h4>Sign Payment Transaction</h4>
+                <h4>PR Review & Approval</h4>
                 <p>
-                  Use OpenScan devtools to sign the tx hash of the payment transaction, save it to
-                  use on the next step to request the start of the subscription.
+                  The OpenScan team will review your pull request to verify eligibility and ensure
+                  all required information is provided.
                 </p>
               </div>
             </div>
             <div className="subscriptions-step">
               <div className="subscriptions-step-number">3</div>
               <div className="subscriptions-step-content">
-                <h4>Submit Github Pull Request or Issue</h4>
+                <h4>Make Payment & Prove Ownership</h4>
                 <p>
-                  Create a pull request or issue to the explorer-metadata repository with your
-                  project information and payment transaction hash.
+                  Once your PR is approved, send the subscription payment to{" "}
+                  <strong>{OPENSCAN_DAO_ADDRESS}</strong> on Ethereum Mainnet. Then use the{" "}
+                  <a href="/devtools" target="_blank" rel="noopener noreferrer">
+                    OpenScan Devtools
+                  </a>{" "}
+                  to sign the payment transaction hash and share it on your PR to prove ownership.
                 </p>
               </div>
             </div>
             <div className="subscriptions-step">
               <div className="subscriptions-step-number">4</div>
               <div className="subscriptions-step-content">
-                <h4>Get Verified</h4>
+                <h4>Subscription Activated</h4>
                 <p>
-                  Once your payment is confirmed and your pull request or issue is reviewed, your
-                  subscription benefits will be activated.
+                  After payment and signature verification, your PR will be merged and your
+                  subscription benefits will be activated immediately.
                 </p>
               </div>
             </div>
           </div>
 
-          {/* Collapsible Help Images */}
-          <div className="subscriptions-help-images">
-            {/* biome-ignore lint/a11y/useButtonType: toggle button */}
-            <button
-              className="subscriptions-help-toggle"
-              onClick={() => setShowHelpImages(!showHelpImages)}
-            >
-              {showHelpImages ? "Hide" : "Show"} Visual Guide
-              <span className="subscriptions-help-toggle-icon">{showHelpImages ? "▲" : "▼"}</span>
-            </button>
-            {showHelpImages && (
-              <div className="subscriptions-help-images-content">
-                <div className="subscriptions-help-image-wrapper">
-                  <h4>
-                    Step 1: Make Payment on{" "}
-                    <a
-                      href={`/1/address/${OPENSCAN_PAYMENT_ADDRESS}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      OpenScanPayment Contract
-                    </a>
-                  </h4>
-                  <img
-                    src={paymentHelp1}
-                    alt="Payment help step 1 - How to make payment to the contract"
-                    className="subscriptions-help-image"
-                  />
-                </div>
-                <div className="subscriptions-help-image-wrapper">
-                  <h4>
-                    Step 2: Sign Transaction Hash on{" "}
-                    <a href="/devtools" target="_blank" rel="noopener noreferrer">
-                      Devtools
-                    </a>
-                  </h4>
-                  <img
-                    src={paymentHelp2}
-                    alt="Payment help step 2 - How to sign the transaction hash"
-                    className="subscriptions-help-image"
-                  />
-                </div>
-                <div className="subscriptions-help-image-wrapper">
-                  <h4>
-                    Step 3: Submit Github Issue on{" "}
-                    <a
-                      href="https://github.com/openscan-explorer/explorer-metadata"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      explorer-metadata
-                    </a>
-                  </h4>
-                  <img
-                    src={paymentHelp3}
-                    alt="Payment help step 3 - How to submit an issue request"
-                    className="subscriptions-help-image"
-                  />
-                </div>
-              </div>
-            )}
+          <div className="subscriptions-payment-info">
+            <h4>Payment Address</h4>
+            <p>
+              All subscription payments are sent directly to the OpenScan DAO address:{" "}
+              <a
+                href={`/1/address/${OPENSCAN_DAO_ADDRESS}`}
+                className="subscriptions-payment-address"
+              >
+                {OPENSCAN_DAO_ADDRESS}
+              </a>
+            </p>
           </div>
 
           <div className="subscriptions-cta-buttons">
-            <a href={`/1/address/${OPENSCAN_PAYMENT_ADDRESS}`} className="button-primary-inline">
-              View Payment Contract
-            </a>
             <a
               href="https://github.com/openscan-explorer/explorer-metadata"
               target="_blank"
               rel="noopener noreferrer"
-              className="button-secondary-inline"
+              className="button-primary-inline"
             >
-              View Metadata Repository
+              Submit Subscription PR
+            </a>
+            <a href={`/1/address/${OPENSCAN_DAO_ADDRESS}`} className="button-secondary-inline">
+              View DAO Address
             </a>
           </div>
         </div>
