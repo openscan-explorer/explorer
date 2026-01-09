@@ -496,6 +496,19 @@
 	color: var(--color-primary);
 }
 
+.subscriptions-step-content a {
+	color: var(--color-primary);
+	text-decoration: none;
+}
+
+.subscriptions-step-content a:hover {
+	text-decoration: underline;
+}
+
+.subscriptions-step-content a:visited {
+	color: var(--color-primary);
+}
+
 /* Collapsible Help Images Section */
 .subscriptions-help-images {
 	margin-top: 32px;
@@ -625,6 +638,43 @@
 	font-family: "Outfit", sans-serif;
 	line-height: 1.5;
 	margin: 0;
+}
+
+/* Payment Info Section */
+.subscriptions-payment-info {
+	background: var(--color-primary-alpha-10);
+	border: 1px solid var(--color-primary-alpha-30);
+	border-radius: 12px;
+	padding: 20px 24px;
+	margin: 24px 0;
+	text-align: center;
+}
+
+.subscriptions-payment-info h4 {
+	font-size: 1rem;
+	font-family: "Outfit", sans-serif;
+	font-weight: 600;
+	color: var(--color-primary);
+	margin: 0 0 8px 0;
+}
+
+.subscriptions-payment-info p {
+	font-size: 0.95rem;
+	color: var(--text-secondary);
+	font-family: "Outfit", sans-serif;
+	line-height: 1.5;
+	margin: 0;
+}
+
+.subscriptions-payment-address {
+	font-family: "JetBrains Mono", monospace;
+	font-weight: 600;
+	color: var(--color-primary);
+	text-decoration: none;
+}
+
+.subscriptions-payment-address:hover {
+	text-decoration: underline;
 }
 
 /* Responsive */
