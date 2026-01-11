@@ -3,6 +3,7 @@ import { useLocation, useParams } from "react-router-dom";
 import { AppContext } from "../../../context";
 import { useDataService } from "../../../hooks/useDataService";
 import { useENS } from "../../../hooks/useENS";
+import { useProviderSelection } from "../../../hooks/useProviderSelection";
 import { ENSService } from "../../../services/ENS/ENSService";
 import type {
   Address as AddressData,
@@ -59,6 +60,14 @@ export default function Address() {
   // Create dataService after we know the address
   const dataService = useDataService(numericNetworkId);
 
+  // Provider selection state - store metadata from address data fetch
+  const [addressDataResult, setAddressDataResult] = useState<DataWithMetadata<AddressData> | null>(
+    null,
+  );
+  const [selectedProvider, setSelectedProvider] = useProviderSelection(
+    `address_${numericNetworkId}_${address}`,
+  );
+
   // Resolve ENS name to address
   useEffect(() => {
     if (!isEnsName || !addressParam) {
@@ -108,21 +117,7 @@ export default function Address() {
 
   // Fetch address data and detect type in a single flow
   useEffect(() => {
-    if (!address) {
-      setLoading(false);
-      return;
-    }
-
-    const rpcUrlsForChain = rpcUrls[numericNetworkId as keyof typeof rpcUrls];
-    if (!rpcUrlsForChain) {
-      setError("No RPC URL configured for this network");
-      setLoading(false);
-      return;
-    }
-
-    const rpcUrl = Array.isArray(rpcUrlsForChain) ? rpcUrlsForChain[0] : rpcUrlsForChain;
-    if (!rpcUrl) {
-      setError("No RPC URL configured for this network");
+    if (!address || !dataService) {
       setLoading(false);
       return;
     }
@@ -130,20 +125,41 @@ export default function Address() {
     setLoading(true);
     setError(null);
 
-    fetchAddressWithType({
-      addressHash: address,
-      chainId: numericNetworkId,
-      rpcUrl,
-    })
+    // Use DataService to fetch address data with metadata support
+    dataService.networkAdapter
+      .getAddress(address)
       .then((result) => {
-        setAddressData(result.address);
-        setAddressType(result.addressType);
+        // Store the full result with metadata
+        setAddressDataResult(result);
+
+        // Extract the address data
+        const addressData = result.data;
+        setAddressData(addressData);
+
+        // Detect address type using the utility
+        const rpcUrlsForChain = rpcUrls[numericNetworkId as keyof typeof rpcUrls];
+        const rpcUrl = Array.isArray(rpcUrlsForChain) ? rpcUrlsForChain[0] : rpcUrlsForChain;
+
+        if (rpcUrl) {
+          fetchAddressWithType({
+            addressHash: address,
+            chainId: numericNetworkId,
+            rpcUrl,
+          })
+            .then((typeResult) => {
+              setAddressType(typeResult.addressType);
+            })
+            .catch(() => {
+              // Fallback to account if type detection fails
+              setAddressType("account");
+            });
+        }
       })
       .catch((err) => {
         setError(err.message || "Failed to fetch address data");
       })
       .finally(() => setLoading(false));
-  }, [address, numericNetworkId, rpcUrls]);
+  }, [address, dataService, numericNetworkId, rpcUrls]);
 
   // Fetch transactions separately (still uses dataService for caching benefits)
   useEffect(() => {
@@ -283,6 +299,9 @@ export default function Address() {
     decodedContenthash,
     ensLoading,
     isMainnet,
+    metadata: addressDataResult?.metadata,
+    selectedProvider,
+    onProviderSelect: setSelectedProvider,
   };
 
   // Render appropriate display component based on detected type

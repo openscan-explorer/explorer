@@ -26,7 +26,16 @@ export function extractData<T>(strategyResultData: T | any): T {
         (r: any) => r.status === "success" && r.data !== undefined,
       );
 
-      return successfulResponse ? successfulResponse.data : (strategyResultData[0]?.data as T);
+      if (successfulResponse) {
+        return successfulResponse.data;
+      }
+
+      // All providers failed - throw an error with details
+      const errors = strategyResultData
+        // biome-ignore lint/suspicious/noExplicitAny: Provider response type is dynamic
+        .map((r: any) => `${r.url}: ${r.error || "Unknown error"}`)
+        .join("; ");
+      throw new Error(`All RPC providers failed: ${errors}`);
     }
   }
 
