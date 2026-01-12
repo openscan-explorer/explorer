@@ -75,7 +75,10 @@ export function useSearch(): UseSearchResult {
       }
 
       // Need networkId for non-ENS searches
-      if (!networkId) return;
+      if (!networkId) {
+        setError("Please select a network to search");
+        return;
+      }
 
       // Check if it's a transaction hash (0x followed by 64 hex chars)
       if (/^0x[a-fA-F0-9]{64}$/.test(term)) {
@@ -91,6 +94,12 @@ export function useSearch(): UseSearchResult {
       else if (/^\d+$/.test(term)) {
         navigate(`/${networkId}/block/${term}`);
         setSearchTerm("");
+      }
+      // No pattern matched - show error
+      else {
+        setError(
+          "Invalid search. Enter an address (0x...), transaction hash, block number, or ENS name.",
+        );
       }
     },
     [searchTerm, networkId, navigate, ensService],
