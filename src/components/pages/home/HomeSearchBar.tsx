@@ -43,6 +43,7 @@ function truncateSearchTerm(term: string): string {
 export default function HomeSearchBar({ networks }: HomeSearchBarProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
@@ -70,13 +71,34 @@ export default function HomeSearchBar({ networks }: HomeSearchBarProps) {
 
   const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
+    setError(null);
   }, []);
 
-  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Escape") {
+  const handleSearchClick = useCallback(() => {
+    const term = searchTerm.trim();
+    if (!term) return;
+
+    if (searchType === null) {
+      setError(
+        "Invalid search. Enter an address (0x...), transaction hash, block number, or ENS name.",
+      );
       setIsDropdownOpen(false);
+    } else {
+      setIsDropdownOpen(true);
     }
-  }, []);
+  }, [searchTerm, searchType]);
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === "Escape") {
+        setIsDropdownOpen(false);
+      }
+      if (e.key === "Enter") {
+        handleSearchClick();
+      }
+    },
+    [handleSearchClick],
+  );
 
   const handleNetworkSelect = useCallback(
     (network: NetworkConfig) => {
@@ -113,14 +135,42 @@ export default function HomeSearchBar({ networks }: HomeSearchBarProps) {
 
   return (
     <div className="home-search-container" ref={containerRef}>
-      <input
-        type="text"
-        className="home-search-input"
-        placeholder="Search by Address / Tx Hash / Block / ENS Name"
-        value={searchTerm}
-        onChange={handleInputChange}
-        onKeyDown={handleKeyDown}
-      />
+      <div className="home-search-input-wrapper">
+        <input
+          type="text"
+          className="home-search-input"
+          placeholder="Search by Address / Tx Hash / Block / ENS Name"
+          value={searchTerm}
+          onChange={handleInputChange}
+          onKeyDown={handleKeyDown}
+        />
+        <button
+          type="button"
+          className="home-search-button"
+          onClick={handleSearchClick}
+          aria-label="Search"
+          title="Search"
+        >
+          {/* biome-ignore lint/a11y/noSvgWithoutTitle: button has aria-label */}
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="2" />
+            <path
+              d="M21 21l-4.35-4.35"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
+          </svg>
+        </button>
+      </div>
+
+      {error && <div className="home-search-error">{error}</div>}
 
       {showDropdown && (
         <div className="home-search-dropdown">

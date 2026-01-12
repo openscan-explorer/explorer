@@ -154,6 +154,41 @@
 	cursor: not-allowed;
 }
 
+.home-search-input-wrapper {
+	position: relative;
+	display: flex;
+	align-items: center;
+}
+
+.home-search-input-wrapper .home-search-input {
+	padding-right: 50px;
+}
+
+.home-search-button {
+	position: absolute;
+	right: 8px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 36px;
+	height: 36px;
+	border: none;
+	border-radius: 8px;
+	background: var(--color-primary);
+	color: white;
+	cursor: pointer;
+	transition: all 0.2s ease;
+}
+
+.home-search-button:hover {
+	background: var(--color-primary-hover, var(--color-primary));
+	transform: scale(1.05);
+}
+
+.home-search-button:active {
+	transform: scale(0.95);
+}
+
 /* Search error message - shared between navbar and home search */
 .search-error,
 .home-search-error {
