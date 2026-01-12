@@ -32,8 +32,8 @@ test.describe("Address Page", () => {
 
     const loaded = await waitForAddressContent(page, testInfo);
     if (loaded && addr.hasENS) {
-      // Verify ENS name is displayed
-      await expect(page.locator(`text=${addr.ensName}`)).toBeVisible();
+      // Verify ENS name is displayed (use first() as ENS name appears multiple times)
+      await expect(page.locator(`text=${addr.ensName}`).first()).toBeVisible();
       // Check for ENS Records section (use first() to avoid strict mode with loading state)
       await expect(
         page.getByText("ENS Records", { exact: true }).or(page.getByText("ENS Name", { exact: true }))
@@ -116,8 +116,10 @@ test.describe("Address Page", () => {
       const type = await addressPage.getAddressType();
       expect(type.toLowerCase()).toMatch(/erc.?721/);
 
-      // Verify collection name and symbol are displayed
-      await expect(page.locator(`text=${addr.fullName}`).or(page.locator(`text=${addr.name}`))).toBeVisible();
+      // Verify collection name and symbol are displayed (use first() as name appears multiple times)
+      await expect(
+        page.locator(`text=${addr.fullName}`).or(page.locator(`text=${addr.name}`)).first()
+      ).toBeVisible();
       await expect(page.locator(`text=${addr.symbol}`)).toBeVisible();
 
       // Verify ERC721 badge is present (shows as "ERC-721")
