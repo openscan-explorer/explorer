@@ -3,7 +3,7 @@ import { BlocksPage } from "../../pages/blocks.page";
 import { DEFAULT_TIMEOUT } from "../../helpers/wait";
 
 test.describe("Blocks Page", () => {
-  test("displays blocks list with header and RPCIndicator badge always visible", async ({ page }) => {
+  test("displays blocks list with header", async ({ page }) => {
     const blocksPage = new BlocksPage(page);
     await blocksPage.goto("1");
 
@@ -21,14 +21,6 @@ test.describe("Blocks Page", () => {
     const infoText = await blocksPage.getInfoText();
     expect(infoText).toMatch(/Showing \d+ most recent blocks/);
 
-    // CRITICAL: Verify RPC Indicator badge is ALWAYS visible
-    await expect(blocksPage.rpcIndicator).toBeVisible();
-    await expect(blocksPage.rpcBadge).toBeVisible();
-
-    // Verify RPC badge shows strategy
-    const badgeText = await blocksPage.getRPCBadgeText();
-    expect(badgeText).toMatch(/Fallback|Parallel/);
-
     // Verify table is present with blocks
     await expect(blocksPage.tableWrapper).toBeVisible();
     await expect(blocksPage.blockTable).toBeVisible();
@@ -44,19 +36,15 @@ test.describe("Blocks Page", () => {
     await expect(blocksPage.olderBtn).toBeVisible();
   });
 
-  test("RPCIndicator badge is visible in parallel mode", async ({ page }) => {
+  test("RPCIndicator is not visible in fallback mode (default)", async ({ page }) => {
     const blocksPage = new BlocksPage(page);
     await blocksPage.goto("1");
 
     await expect(blocksPage.loader).toBeHidden({ timeout: DEFAULT_TIMEOUT * 3 });
 
-    // RPC Indicator should always be present
-    await expect(blocksPage.rpcIndicator).toBeVisible();
-    await expect(blocksPage.rpcBadge).toBeVisible();
-
-    // Badge should be clickable
-    const badgeText = await blocksPage.getRPCBadgeText();
-    expect(badgeText.length).toBeGreaterThan(0);
+    // RPC Indicator should NOT be present in fallback mode (default strategy)
+    // It only displays in parallel mode where multiple providers are compared
+    await expect(blocksPage.rpcIndicator).not.toBeVisible();
   });
 
   test("blocks header displays in single line layout", async ({ page }) => {
@@ -76,9 +64,6 @@ test.describe("Blocks Page", () => {
 
     // Verify info is inline with label
     await expect(blocksPage.blocksHeaderInfo).toBeVisible();
-
-    // RPC indicator should be on the same line (or wrapped on mobile)
-    await expect(blocksPage.rpcIndicator).toBeVisible();
   });
 
   test("displays correct block information in table", async ({ page }) => {
@@ -126,40 +111,27 @@ test.describe("Blocks Page", () => {
 
     // Now Newer should be enabled
     await expect(blocksPage.newerBtn).toBeEnabled();
-
-    // RPC indicator should still be visible after navigation
-    await expect(blocksPage.rpcIndicator).toBeVisible();
-    await expect(blocksPage.rpcBadge).toBeVisible();
   });
 
-  test("RPCIndicator persists when navigating between pages", async ({ page }) => {
+  test("navigates between block pages correctly", async ({ page }) => {
     const blocksPage = new BlocksPage(page);
     await blocksPage.goto("1");
 
     await expect(blocksPage.loader).toBeHidden({ timeout: DEFAULT_TIMEOUT * 3 });
 
-    // Verify RPC indicator is present on first page
-    await expect(blocksPage.rpcIndicator).toBeVisible();
-    const initialBadgeText = await blocksPage.getRPCBadgeText();
-
     // Navigate to older blocks
     await blocksPage.olderBtn.click();
     await expect(blocksPage.loader).toBeHidden({ timeout: DEFAULT_TIMEOUT * 3 });
 
-    // Verify RPC indicator is still present
-    await expect(blocksPage.rpcIndicator).toBeVisible();
-    const newBadgeText = await blocksPage.getRPCBadgeText();
-
-    // Badge text should be consistent
-    expect(newBadgeText).toBe(initialBadgeText);
+    // Verify blocks are still displayed
+    await expect(blocksPage.blockTable).toBeVisible();
 
     // Navigate back to latest
     await blocksPage.latestBtn.click();
     await expect(blocksPage.loader).toBeHidden({ timeout: DEFAULT_TIMEOUT * 3 });
 
-    // Verify RPC indicator is still present
-    await expect(blocksPage.rpcIndicator).toBeVisible();
-    await expect(blocksPage.rpcBadge).toBeVisible();
+    // Verify we're back on latest blocks
+    await expect(blocksPage.blockTable).toBeVisible();
   });
 
   test("handles loading state correctly", async ({ page }) => {
@@ -179,7 +151,6 @@ test.describe("Blocks Page", () => {
 
     // Content should be visible
     await expect(blocksPage.blocksHeader).toBeVisible();
-    await expect(blocksPage.rpcIndicator).toBeVisible();
     await expect(blocksPage.blockTable).toBeVisible();
   });
 
@@ -194,43 +165,25 @@ test.describe("Blocks Page", () => {
     const infoText = await blocksPage.getInfoText();
     expect(infoText).toMatch(/Showing blocks/);
     expect(infoText).not.toMatch(/most recent/);
-
-    // RPC indicator should still be visible
-    await expect(blocksPage.rpcIndicator).toBeVisible();
-    await expect(blocksPage.rpcBadge).toBeVisible();
   });
 
-  test("RPC indicator has proper styling and layout", async ({ page }) => {
+  test("header has proper styling and layout", async ({ page }) => {
     const blocksPage = new BlocksPage(page);
     await blocksPage.goto("1");
 
     await expect(blocksPage.loader).toBeHidden({ timeout: DEFAULT_TIMEOUT * 3 });
 
-    // Verify RPC indicator is part of header
-    const indicator = blocksPage.rpcIndicator;
-    await expect(indicator).toBeVisible();
-
-    // Verify badge is visible and has text
-    await expect(blocksPage.rpcBadge).toBeVisible();
-    const badgeText = await blocksPage.getRPCBadgeText();
-    expect(badgeText.length).toBeGreaterThan(0);
-
     // Verify header has proper structure
     const header = blocksPage.blocksHeader;
     await expect(header).toBeVisible();
 
-    // Check that header uses flexbox layout (elements are side by side)
+    // Verify header main section is visible
+    await expect(blocksPage.blocksHeaderMain).toBeVisible();
+    await expect(blocksPage.blockLabel).toBeVisible();
+    await expect(blocksPage.blocksHeaderInfo).toBeVisible();
+
+    // Check that header has proper dimensions
     const headerBox = await header.boundingBox();
-    const indicatorBox = await indicator.boundingBox();
-
     expect(headerBox).not.toBeNull();
-    expect(indicatorBox).not.toBeNull();
-
-    // Indicator should be within header bounds
-    if (headerBox && indicatorBox) {
-      expect(indicatorBox.x + indicatorBox.width).toBeLessThanOrEqual(
-        headerBox.x + headerBox.width + 1,
-      ); // +1 for rounding
-    }
   });
 });
