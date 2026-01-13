@@ -3,7 +3,7 @@ import { useContext, useMemo } from "react";
 import { AppContext } from "../context/AppContext";
 import { useSettings } from "../context/SettingsContext";
 import { DataService } from "../services/DataService";
-import type { SupportedChainId } from "explorer-network-connectors";
+import type { SupportedChainId } from "@openscan/network-connectors";
 import type { RpcUrlsContextType } from "../types";
 
 /**

@@ -1,4 +1,4 @@
-import type { EthLog } from "explorer-network-connectors";
+import type { EthLog } from "@openscan/network-connectors";
 import type React from "react";
 
 // ==================== CORE DOMAIN TYPES ====================

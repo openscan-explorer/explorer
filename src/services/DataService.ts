@@ -1,4 +1,4 @@
-import { type SupportedChainId, ClientFactory } from "explorer-network-connectors";
+import { type SupportedChainId, ClientFactory } from "@openscan/network-connectors";
 
 import { AdapterFactory } from "./adapters/adaptersFactory";
 import type { NetworkAdapter } from "./adapters/NetworkAdapter";

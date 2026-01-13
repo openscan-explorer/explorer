@@ -3,7 +3,7 @@ import type {
   PolygonBlock,
   PolygonTransaction,
   PolygonTransactionReceipt,
-} from "explorer-network-connectors";
+} from "@openscan/network-connectors";
 
 /**
  * Transforms an RPC block response into a Block domain object

@@ -17,7 +17,7 @@ import {
 import { extractData } from "../shared/extractData";
 import { normalizeBlockNumber } from "../shared/normalizeBlockNumber";
 import { mergeMetadata } from "../shared/mergeMetadata";
-import type { BNBClient } from "explorer-network-connectors";
+import type { BNBClient } from "@openscan/network-connectors";
 
 /**
  * BNB Smart Chain (BSC) blockchain adapter

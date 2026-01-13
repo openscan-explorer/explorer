@@ -1,5 +1,5 @@
 import type { Block, Transaction, Address } from "../../../types";
-import type { EthBlock, EthTransaction, EthTransactionReceipt } from "explorer-network-connectors";
+import type { EthBlock, EthTransaction, EthTransactionReceipt } from "@openscan/network-connectors";
 
 /**
  * Transforms an RPC block response into a Block domain object

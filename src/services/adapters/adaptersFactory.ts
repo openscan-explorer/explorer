@@ -14,7 +14,7 @@ import type {
   OptimismClient,
   PolygonClient,
   SupportedChainId,
-} from "explorer-network-connectors";
+} from "@openscan/network-connectors";
 
 // biome-ignore lint/complexity/noStaticOnlyClass: <TODO>
 export class AdapterFactory {

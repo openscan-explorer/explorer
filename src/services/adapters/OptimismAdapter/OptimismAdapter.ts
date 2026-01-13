@@ -16,7 +16,7 @@ import {
 import { extractData } from "../shared/extractData";
 import { normalizeBlockNumber } from "../shared/normalizeBlockNumber";
 import { mergeMetadata } from "../shared/mergeMetadata";
-import type { OptimismClient } from "explorer-network-connectors";
+import type { OptimismClient } from "@openscan/network-connectors";
 
 /**
  * Optimism (OP Stack) blockchain adapter

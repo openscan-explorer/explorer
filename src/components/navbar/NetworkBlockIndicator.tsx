@@ -2,7 +2,7 @@ import { useContext, useEffect, useMemo, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { getRPCUrls } from "../../config/rpcConfig";
 import { AppContext, useNetworks } from "../../context/AppContext";
-import { RpcClient } from "explorer-network-connectors";
+import { RpcClient } from "@openscan/network-connectors";
 import { NetworkIcon } from "../common/NetworkIcon";
 
 interface NetworkBlockIndicatorProps {
