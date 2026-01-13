@@ -3,7 +3,7 @@ import type {
   BaseBlock,
   BaseTransaction,
   BaseTransactionReceipt,
-} from "explorer-network-connectors";
+} from "@openscan/network-connectors";
 
 /**
  * Transforms a Base RPC block response into a Block domain object

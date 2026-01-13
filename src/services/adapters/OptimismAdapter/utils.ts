@@ -3,7 +3,7 @@ import type {
   OptimismBlock,
   OptimismTransaction,
   OptimismTransactionReceipt,
-} from "explorer-network-connectors";
+} from "@openscan/network-connectors";
 
 /**
  * Transforms an Optimism RPC block response into a Block domain object

@@ -1,5 +1,5 @@
 import type { Block, Transaction, Address } from "../../../types";
-import type { BNBBlock, BNBTransaction, BNBTransactionReceipt } from "explorer-network-connectors";
+import type { BNBBlock, BNBTransaction, BNBTransactionReceipt } from "@openscan/network-connectors";
 
 /**
  * Transforms a BNB RPC block response into a Block domain object

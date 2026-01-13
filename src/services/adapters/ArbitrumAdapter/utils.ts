@@ -3,7 +3,7 @@ import type {
   ArbitrumBlock,
   ArbitrumTransaction,
   ArbitrumTransactionReceipt,
-} from "explorer-network-connectors";
+} from "@openscan/network-connectors";
 
 /**
  * Transforms an Arbitrum RPC block response into a Block domain object

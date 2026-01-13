@@ -17,7 +17,7 @@ import {
 import { extractData } from "../shared/extractData";
 import { normalizeBlockNumber } from "../shared/normalizeBlockNumber";
 import { mergeMetadata } from "../shared/mergeMetadata";
-import type { PolygonClient, SupportedChainId } from "explorer-network-connectors";
+import type { PolygonClient, SupportedChainId } from "@openscan/network-connectors";
 
 /**
  * Polygon blockchain service

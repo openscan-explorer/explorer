@@ -16,7 +16,7 @@ import {
 import { extractData } from "../shared/extractData";
 import { normalizeBlockNumber } from "../shared/normalizeBlockNumber";
 import { mergeMetadata } from "../shared/mergeMetadata";
-import type { ArbitrumClient } from "explorer-network-connectors";
+import type { ArbitrumClient } from "@openscan/network-connectors";
 
 /**
  * Arbitrum blockchain adapter

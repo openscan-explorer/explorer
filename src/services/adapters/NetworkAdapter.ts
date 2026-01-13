@@ -1,4 +1,4 @@
-import type { SupportedChainId } from "explorer-network-connectors";
+import type { SupportedChainId } from "@openscan/network-connectors";
 import type {
   Block,
   Transaction,

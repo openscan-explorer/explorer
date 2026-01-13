@@ -17,7 +17,7 @@ import {
 import { extractData } from "../shared/extractData";
 import { normalizeBlockNumber } from "../shared/normalizeBlockNumber";
 import { mergeMetadata } from "../shared/mergeMetadata";
-import type { EthereumClient, SupportedChainId } from "explorer-network-connectors";
+import type { EthereumClient, SupportedChainId } from "@openscan/network-connectors";
 
 /**
  * EVM-compatible blockchain service

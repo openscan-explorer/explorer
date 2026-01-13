@@ -16,7 +16,7 @@ import {
 import { extractData } from "../shared/extractData";
 import { normalizeBlockNumber } from "../shared/normalizeBlockNumber";
 import { mergeMetadata } from "../shared/mergeMetadata";
-import type { BaseClient } from "explorer-network-connectors";
+import type { BaseClient } from "@openscan/network-connectors";
 
 /**
  * Base blockchain adapter
