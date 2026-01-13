@@ -7,6 +7,88 @@ import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import { AppContext } from "../../../../context";
 import type { ABI, ABIParameter, EventABI, FunctionABI } from "../../../../types";
 
+/**
+ * Generate a unique key for a function based on its name and input types
+ * This handles overloaded functions (same name, different parameters)
+ */
+function getFunctionKey(func: FunctionABI): string {
+  const inputTypes = func.inputs?.map((i) => i.type).join(",") || "";
+  return `${func.name}(${inputTypes})`;
+}
+
+/**
+ * Parse a string value into the appropriate type based on Solidity ABI type
+ */
+function parseAbiValue(value: string, type: string): unknown {
+  const trimmedValue = value.trim();
+
+  // Handle arrays (e.g., uint256[], address[], bytes32[])
+  if (type.endsWith("[]")) {
+    const baseType = type.slice(0, -2);
+    try {
+      // Try parsing as JSON array
+      const parsed = JSON.parse(trimmedValue);
+      if (Array.isArray(parsed)) {
+        return parsed.map((item) => parseAbiValue(String(item), baseType));
+      }
+    } catch {
+      // Try comma-separated values
+      if (trimmedValue.startsWith("[") && trimmedValue.endsWith("]")) {
+        const inner = trimmedValue.slice(1, -1);
+        if (inner.length === 0) return [];
+        return inner.split(",").map((item) => parseAbiValue(item.trim(), baseType));
+      }
+      // Single value or comma-separated without brackets
+      return trimmedValue.split(",").map((item) => parseAbiValue(item.trim(), baseType));
+    }
+  }
+
+  // Handle tuples (structs) - expect JSON format
+  if (type.startsWith("tuple")) {
+    try {
+      return JSON.parse(trimmedValue);
+    } catch {
+      return trimmedValue;
+    }
+  }
+
+  // Handle boolean
+  if (type === "bool") {
+    return trimmedValue.toLowerCase() === "true" || trimmedValue === "1";
+  }
+
+  // Handle integers (uint*, int*)
+  if (type.startsWith("uint") || type.startsWith("int")) {
+    try {
+      return BigInt(trimmedValue);
+    } catch {
+      return trimmedValue;
+    }
+  }
+
+  // Handle bytes (fixed or dynamic)
+  if (type === "bytes" || type.match(/^bytes\d+$/)) {
+    // Ensure it's a hex string
+    if (!trimmedValue.startsWith("0x")) {
+      return `0x${trimmedValue}`;
+    }
+    return trimmedValue;
+  }
+
+  // Handle address - return as-is but validate format
+  if (type === "address") {
+    return trimmedValue;
+  }
+
+  // Handle string - return as-is
+  if (type === "string") {
+    return trimmedValue;
+  }
+
+  // Default: return as-is
+  return trimmedValue;
+}
+
 interface ContractInteractionProps {
   addressHash: string;
   networkId: string;
@@ -46,7 +128,7 @@ const ContractInteraction: React.FC<ContractInteractionProps> = ({
             return;
           }
 
-          args.push(value);
+          args.push(parseAbiValue(value, input.type));
         }
       }
 
@@ -106,7 +188,7 @@ const ContractInteraction: React.FC<ContractInteractionProps> = ({
             return;
           }
 
-          args.push(value);
+          args.push(parseAbiValue(value, input.type));
         }
       }
 
@@ -246,14 +328,14 @@ const ContractInteraction: React.FC<ContractInteractionProps> = ({
               {readFunctions.map((func: FunctionABI) => (
                 <button
                   type="button"
-                  key={func.name}
+                  key={getFunctionKey(func)}
                   onClick={() => {
                     setSelectedReadFunction(func);
                     setSelectedWriteFunction(null);
                     setFunctionInputs({});
                     setReadFunctionResult(null);
                   }}
-                  className={`btn-function btn-function-read ${selectedReadFunction?.name === func.name ? "selected" : ""}`}
+                  className={`btn-function btn-function-read ${selectedReadFunction && getFunctionKey(selectedReadFunction) === getFunctionKey(func) ? "selected" : ""}`}
                 >
                   {func.name}
                 </button>
@@ -272,14 +354,14 @@ const ContractInteraction: React.FC<ContractInteractionProps> = ({
               {writeFunctions.map((func: FunctionABI) => (
                 <button
                   type="button"
-                  key={func.name}
+                  key={getFunctionKey(func)}
                   onClick={() => {
                     setSelectedWriteFunction(func);
                     setSelectedReadFunction(null);
                     setFunctionInputs({});
                     setReadFunctionResult(null);
                   }}
-                  className={`btn-function btn-function-write ${selectedWriteFunction?.name === func.name ? "selected" : ""}`}
+                  className={`btn-function btn-function-write ${selectedWriteFunction && getFunctionKey(selectedWriteFunction) === getFunctionKey(func) ? "selected" : ""}`}
                 >
                   {func.name}
                 </button>

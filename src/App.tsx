@@ -1,5 +1,4 @@
 import { RainbowKitProvider } from "@rainbow-me/rainbowkit";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useCallback, useEffect } from "react";
 import {
   HashRouter,
@@ -10,11 +9,8 @@ import {
   useLocation,
   useNavigate,
 } from "react-router-dom";
-import { WagmiProvider } from "wagmi";
 import { cssVariables, getRainbowKitTheme } from "./theme";
-import { networkConfig } from "./utils/networkConfig";
 import { getBaseDomainUrl, getSubdomain, getSubdomainRedirect } from "./utils/subdomainUtils";
-import "@rainbow-me/rainbowkit/styles.css";
 
 // Detect if we're running on GitHub Pages and get the correct basename
 function getBasename(): string {
@@ -44,6 +40,8 @@ import "./styles/layouts.css";
 import "./styles/components.css";
 import "./styles/tables.css";
 import "./styles/forms.css";
+import "./styles/rainbowkit.css";
+
 import Loading from "./components/common/Loading";
 import {
   LazyAbout,
@@ -63,15 +61,11 @@ import {
   LazyTx,
   LazyTxs,
 } from "./components/LazyComponents";
-import { NotificationProvider } from "./context/NotificationContext";
 import { SettingsProvider, useSettings, useTheme } from "./context/SettingsContext";
 import { useAppReady, useOnAppReady } from "./hooks/useAppReady";
 
 // Detect GH Pages once
 const isGhPages = typeof window !== "undefined" && window.location.hostname.includes("github.io");
-
-// Create a client for React Query
-const queryClient = new QueryClient();
 
 // Component that handles subdomain redirects
 function SubdomainRedirect() {
@@ -171,19 +165,13 @@ function App() {
 
   return (
     <ErrorBoundary>
-      <WagmiProvider config={networkConfig}>
-        <QueryClientProvider client={queryClient}>
-          <NotificationProvider>
-            <SettingsProvider>
-              <RainbowKitProviderWrapper>
-                <BaseRouter basename={basename}>
-                  <AppContent />
-                </BaseRouter>
-              </RainbowKitProviderWrapper>
-            </SettingsProvider>
-          </NotificationProvider>
-        </QueryClientProvider>
-      </WagmiProvider>
+      <SettingsProvider>
+        <RainbowKitProviderWrapper>
+          <BaseRouter basename={basename}>
+            <AppContent />
+          </BaseRouter>
+        </RainbowKitProviderWrapper>
+      </SettingsProvider>
     </ErrorBoundary>
   );
 }
