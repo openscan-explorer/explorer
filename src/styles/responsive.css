@@ -825,6 +825,11 @@
     min-width: 600px;
   }
 
+  /* Add vertical padding to tables on mobile */
+  .dash-table {
+    margin: 12px 0;
+  }
+
   /* Reduce table cell padding on mobile */
   .dash-table th,
   .dash-table td,
@@ -954,6 +959,259 @@
     flex: 1;
     max-width: 120px;
     text-align: center;
+  }
+}
+
+/* ==========================================================================
+   DETAIL PAGES - MOBILE RESPONSIVE
+   Block, Transaction, and Address detail page layouts
+   ========================================================================== */
+
+@media (max-width: 767px) {
+  /* Stack tx-row vertically on mobile */
+  .tx-row {
+    flex-direction: column;
+    gap: 4px;
+    padding: 10px 12px;
+  }
+
+  .tx-row .tx-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-tertiary);
+  }
+
+  .tx-row .tx-value {
+    font-size: 0.85rem;
+  }
+
+  /* Vertical rows stay vertical but with adjusted spacing */
+  .tx-row-vertical {
+    padding: 10px 12px;
+  }
+
+  .tx-row-vertical .tx-label {
+    margin-bottom: 6px;
+  }
+
+  /* Block display header adjustments */
+  .block-display-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .block-header-main {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .block-header-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .block-number {
+    font-size: 1.2rem;
+  }
+
+  .block-header-timestamp {
+    font-size: 0.8rem;
+  }
+
+  /* Block navigation buttons */
+  .block-nav-btn {
+    padding: 6px 10px;
+    font-size: 0.8rem;
+  }
+
+  /* Status badges */
+  .block-status-badge,
+  .tx-status-badge {
+    font-size: 0.7rem;
+    padding: 3px 8px;
+  }
+
+  /* Transaction attributes */
+  .tx-attrs {
+    gap: 8px;
+  }
+
+  .tx-attr {
+    font-size: 0.7rem;
+    padding: 3px 8px;
+  }
+
+  /* Confirmations badge */
+  .tx-confirmations {
+    font-size: 0.7rem;
+    padding: 2px 6px;
+    margin-left: 8px;
+  }
+
+  /* Decoded input section */
+  .tx-decoded-input {
+    padding: 10px;
+  }
+
+  .tx-decoded-function {
+    font-size: 0.8rem;
+  }
+
+  .tx-decoded-params {
+    font-size: 0.8rem;
+  }
+
+  .tx-decoded-param {
+    padding: 6px 0;
+  }
+
+  /* Input data */
+  .tx-input-data {
+    font-size: 0.75rem;
+    padding: 10px;
+  }
+
+  /* Transaction logs */
+  .tx-logs {
+    gap: 12px;
+  }
+
+  .tx-log {
+    flex-direction: column;
+  }
+
+  .tx-log-index {
+    width: 100%;
+    padding: 6px 10px;
+    border-radius: 6px 6px 0 0;
+    border-right: none;
+    border-bottom: 1px solid var(--overlay-light-10);
+  }
+
+  .tx-log-content {
+    padding: 10px;
+  }
+
+  .tx-log-row {
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .tx-log-row .tx-label {
+    font-size: 0.7rem;
+  }
+
+  .tx-event-badge {
+    font-size: 0.75rem;
+    padding: 3px 8px;
+  }
+
+  /* Topic display */
+  .tx-topic {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .tx-topic-index {
+    font-size: 0.7rem;
+  }
+
+  .tx-topic-value {
+    font-size: 0.75rem;
+    word-break: break-all;
+  }
+
+  /* Section headers */
+  .tx-section-header {
+    padding: 10px 12px;
+    font-size: 0.85rem;
+  }
+
+  .tx-section-toggle {
+    font-size: 0.85rem;
+  }
+
+  /* More details toggle */
+  .more-details-toggle {
+    font-size: 0.8rem;
+    padding: 8px 12px;
+  }
+
+  .more-details-content {
+    padding: 10px;
+  }
+
+  /* Gas percentage indicator */
+  .tx-gas-pct {
+    font-size: 0.7rem;
+  }
+
+  /* Address page specific */
+  .address-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .address-type-indicator {
+    font-size: 0.85rem;
+  }
+
+  .address-ens-name {
+    font-size: 1rem;
+  }
+
+  .address-section-content {
+    gap: 16px;
+  }
+
+  /* Balance section grid */
+  .data-grid-2,
+  .data-grid-3,
+  .data-grid-auto {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Even more compact on very small screens */
+  .tx-row {
+    padding: 8px 10px;
+  }
+
+  .tx-row .tx-label {
+    font-size: 0.7rem;
+  }
+
+  .tx-row .tx-value {
+    font-size: 0.8rem;
+  }
+
+  .block-number {
+    font-size: 1rem;
+  }
+
+  /* Smaller badges */
+  .block-status-badge,
+  .tx-status-badge,
+  .tx-attr,
+  .tx-event-badge {
+    font-size: 0.65rem;
+    padding: 2px 6px;
+  }
+
+  /* Transaction log compacting */
+  .tx-log-index {
+    font-size: 0.7rem;
+    padding: 4px 8px;
+  }
+
+  .tx-log-content {
+    padding: 8px;
   }
 }
 
