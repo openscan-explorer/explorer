@@ -1,0 +1,559 @@
+/* ==========================================================================
+   Responsive CSS - Mobile-First Foundation
+   Issue #114: Make explorer mobile-friendly and responsive
+
+   Breakpoints:
+   - Mobile:    375px  (iPhone SE baseline)
+   - Mobile L:  480px  (larger phones)
+   - Tablet:    768px  (tablets, small laptops)
+   - Desktop:   1024px (desktops)
+   - Wide:      1400px (large screens)
+   ========================================================================== */
+
+/* ==========================================================================
+   CSS CUSTOM PROPERTIES FOR BREAKPOINTS
+   Use these in JavaScript if needed via getComputedStyle
+   ========================================================================== */
+
+:root {
+  --breakpoint-mobile: 375px;
+  --breakpoint-mobile-lg: 480px;
+  --breakpoint-tablet: 768px;
+  --breakpoint-desktop: 1024px;
+  --breakpoint-wide: 1400px;
+
+  /* Touch target minimum size (WCAG 2.1 AAA) */
+  --touch-target-min: 44px;
+}
+
+/* ==========================================================================
+   VISIBILITY UTILITIES
+   Control element visibility at different breakpoints
+   ========================================================================== */
+
+/* Hide on mobile (show on tablet+) */
+.hide-mobile {
+  display: block;
+}
+
+/* Show only on mobile (hide on tablet+) */
+.show-mobile {
+  display: none;
+}
+
+/* Hide on tablet and below (show on desktop+) */
+.hide-tablet {
+  display: block;
+}
+
+/* Show only on tablet and below */
+.show-tablet {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .hide-mobile {
+    display: none !important;
+  }
+
+  .show-mobile {
+    display: block !important;
+  }
+
+  .show-mobile-flex {
+    display: flex !important;
+  }
+
+  .show-mobile-inline {
+    display: inline !important;
+  }
+
+  .show-mobile-inline-flex {
+    display: inline-flex !important;
+  }
+}
+
+@media (max-width: 1023px) {
+  .hide-tablet {
+    display: none !important;
+  }
+
+  .show-tablet {
+    display: block !important;
+  }
+
+  .show-tablet-flex {
+    display: flex !important;
+  }
+}
+
+/* ==========================================================================
+   LAYOUT UTILITIES
+   Stack and reflow layouts on mobile
+   ========================================================================== */
+
+/* Stack children vertically on mobile */
+.mobile-stack {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+}
+
+@media (max-width: 767px) {
+  .mobile-stack {
+    flex-direction: column;
+  }
+}
+
+/* Stack at tablet breakpoint */
+.tablet-stack {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+}
+
+@media (max-width: 1023px) {
+  .tablet-stack {
+    flex-direction: column;
+  }
+}
+
+/* Reverse stack order on mobile (useful for sidebar layouts) */
+@media (max-width: 767px) {
+  .mobile-stack-reverse {
+    flex-direction: column-reverse;
+  }
+}
+
+/* Full width on mobile */
+@media (max-width: 767px) {
+  .mobile-full-width {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}
+
+/* ==========================================================================
+   SPACING UTILITIES (Mobile Adjustments)
+   Reduce spacing on smaller screens
+   ========================================================================== */
+
+@media (max-width: 767px) {
+  .mobile-p-0 { padding: 0 !important; }
+  .mobile-p-1 { padding: 8px !important; }
+  .mobile-p-2 { padding: 12px !important; }
+  .mobile-p-3 { padding: 16px !important; }
+
+  .mobile-px-0 { padding-left: 0 !important; padding-right: 0 !important; }
+  .mobile-px-1 { padding-left: 8px !important; padding-right: 8px !important; }
+  .mobile-px-2 { padding-left: 12px !important; padding-right: 12px !important; }
+
+  .mobile-py-0 { padding-top: 0 !important; padding-bottom: 0 !important; }
+  .mobile-py-1 { padding-top: 8px !important; padding-bottom: 8px !important; }
+  .mobile-py-2 { padding-top: 12px !important; padding-bottom: 12px !important; }
+
+  .mobile-m-0 { margin: 0 !important; }
+  .mobile-m-1 { margin: 8px !important; }
+  .mobile-m-2 { margin: 12px !important; }
+
+  .mobile-mx-0 { margin-left: 0 !important; margin-right: 0 !important; }
+  .mobile-my-0 { margin-top: 0 !important; margin-bottom: 0 !important; }
+
+  .mobile-gap-1 { gap: 4px !important; }
+  .mobile-gap-2 { gap: 8px !important; }
+  .mobile-gap-3 { gap: 12px !important; }
+}
+
+/* ==========================================================================
+   TEXT UTILITIES
+   Responsive text sizing and truncation
+   ========================================================================== */
+
+/* Truncate text with ellipsis */
+.text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Truncate hash/address - show first and last characters */
+.hash-truncate {
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 767px) {
+  .hash-truncate {
+    max-width: 80px;
+  }
+
+  /* Smaller text on mobile */
+  .mobile-text-xs { font-size: 0.7rem !important; }
+  .mobile-text-sm { font-size: 0.75rem !important; }
+  .mobile-text-base { font-size: 0.85rem !important; }
+}
+
+@media (max-width: 480px) {
+  .hash-truncate {
+    max-width: 60px;
+  }
+}
+
+/* ==========================================================================
+   TOUCH TARGET UTILITIES
+   Ensure interactive elements meet minimum touch target size
+   ========================================================================== */
+
+.touch-target {
+  min-width: var(--touch-target-min);
+  min-height: var(--touch-target-min);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Expand clickable area without changing visual size */
+.touch-target-expand {
+  position: relative;
+}
+
+.touch-target-expand::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  min-width: var(--touch-target-min);
+  min-height: var(--touch-target-min);
+}
+
+/* ==========================================================================
+   GRID UTILITIES
+   Responsive grid configurations
+   ========================================================================== */
+
+/* Auto-fit grid that stacks on mobile */
+.grid-responsive {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+@media (max-width: 767px) {
+  .grid-responsive {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+/* 2-column grid that stacks on mobile */
+.grid-2-responsive {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 767px) {
+  .grid-2-responsive {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+/* 3-column grid with tablet and mobile breakpoints */
+.grid-3-responsive {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 1023px) {
+  .grid-3-responsive {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 767px) {
+  .grid-3-responsive {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+/* 4-column grid with all breakpoints */
+.grid-4-responsive {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 1023px) {
+  .grid-4-responsive {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 767px) {
+  .grid-4-responsive {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+/* ==========================================================================
+   SCROLLABLE CONTAINERS
+   Horizontal scroll for tables and overflow content
+   ========================================================================== */
+
+.scroll-x {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Hide scrollbar but keep functionality */
+.scroll-x-hidden {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.scroll-x-hidden::-webkit-scrollbar {
+  display: none;
+}
+
+/* Scroll shadow indicators */
+.scroll-shadow {
+  position: relative;
+}
+
+.scroll-shadow::before,
+.scroll-shadow::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 20px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.scroll-shadow::before {
+  left: 0;
+  background: linear-gradient(to right, var(--bg-primary), transparent);
+}
+
+.scroll-shadow::after {
+  right: 0;
+  background: linear-gradient(to left, var(--bg-primary), transparent);
+}
+
+/* ==========================================================================
+   CARD UTILITIES
+   Responsive card adjustments
+   ========================================================================== */
+
+@media (max-width: 767px) {
+  .card-mobile {
+    border-radius: 12px;
+    padding: 16px;
+  }
+
+  .card-mobile-compact {
+    border-radius: 8px;
+    padding: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .card-mobile {
+    border-radius: 8px;
+    padding: 12px;
+  }
+
+  .card-mobile-compact {
+    padding: 8px;
+  }
+}
+
+/* ==========================================================================
+   BUTTON UTILITIES
+   Ensure buttons are touch-friendly on mobile
+   ========================================================================== */
+
+@media (max-width: 767px) {
+  /* Full width buttons on mobile */
+  .btn-mobile-full {
+    width: 100%;
+  }
+
+  /* Ensure minimum touch target for buttons */
+  .btn-mobile-touch {
+    min-height: var(--touch-target-min);
+    padding: 12px 16px;
+  }
+}
+
+/* ==========================================================================
+   FORM UTILITIES
+   Responsive form adjustments
+   ========================================================================== */
+
+@media (max-width: 767px) {
+  /* Full width inputs on mobile */
+  .input-mobile-full {
+    width: 100%;
+  }
+
+  /* Larger touch targets for inputs */
+  .input-mobile-touch {
+    min-height: var(--touch-target-min);
+    padding: 12px 16px;
+    font-size: 16px; /* Prevents iOS zoom on focus */
+  }
+}
+
+/* ==========================================================================
+   NAVBAR MOBILE STYLES
+   Foundation for mobile navigation
+   ========================================================================== */
+
+/* Hamburger menu button - hidden by default, shown on mobile */
+.navbar-hamburger {
+  display: none;
+  width: var(--touch-target-min);
+  height: var(--touch-target-min);
+  padding: 8px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: white;
+}
+
+.navbar-hamburger-icon {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  width: 24px;
+  height: 18px;
+}
+
+.navbar-hamburger-icon span {
+  display: block;
+  width: 100%;
+  height: 2px;
+  background: currentColor;
+  border-radius: 1px;
+  transition: all 0.3s ease;
+}
+
+/* Mobile menu overlay */
+.navbar-mobile-menu {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--bg-primary);
+  z-index: 1000;
+  padding: 20px;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.navbar-mobile-menu.is-open {
+  display: flex;
+}
+
+.navbar-mobile-menu-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.navbar-mobile-menu-close {
+  width: var(--touch-target-min);
+  height: var(--touch-target-min);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text-primary);
+  font-size: 24px;
+}
+
+.navbar-mobile-menu-items {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.navbar-mobile-menu-item {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  border-radius: 12px;
+  background: var(--color-primary-alpha-10);
+  color: var(--text-primary);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1.1rem;
+  min-height: var(--touch-target-min);
+}
+
+.navbar-mobile-menu-item:hover,
+.navbar-mobile-menu-item:active {
+  background: var(--color-primary-alpha-20);
+}
+
+@media (max-width: 767px) {
+  .navbar-hamburger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+/* ==========================================================================
+   GLOBAL MOBILE ADJUSTMENTS
+   Base styles that apply across the app on mobile
+   ========================================================================== */
+
+@media (max-width: 767px) {
+  /* Prevent horizontal overflow */
+  body {
+    overflow-x: hidden;
+  }
+
+  /* Ensure images don't overflow */
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* Ensure pre/code blocks scroll */
+  pre, code {
+    max-width: 100%;
+    overflow-x: auto;
+  }
+}
+
+/* ==========================================================================
+   PRINT STYLES
+   Hide non-essential elements when printing
+   ========================================================================== */
+
+@media print {
+  .navbar,
+  .navbar-hamburger,
+  .navbar-mobile-menu,
+  .no-print {
+    display: none !important;
+  }
+}

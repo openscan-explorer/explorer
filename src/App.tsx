@@ -41,6 +41,7 @@ import "./styles/components.css";
 import "./styles/tables.css";
 import "./styles/forms.css";
 import "./styles/rainbowkit.css";
+import "./styles/responsive.css";
 
 import Loading from "./components/common/Loading";
 import {
