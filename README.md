@@ -63,8 +63,7 @@ A trustless, open-source blockchain explorer for Ethereum and Layer 2 networks. 
 
 ### Prerequisites
 
-- Node.js v24.12.0
-- npm or yarn
+- Bun >= 1.1.0 ([Installation guide](https://bun.sh/docs/installation))
 
 ### Installation
 
@@ -76,13 +75,13 @@ git clone https://github.com/yourusername/openscan.git
 cd openscan
 
 # Install dependencies
-npm install
+bun install
 
 # Start the development server
-npm start
+bun start
 ```
 
-The app will open at `http://localhost:3030`
+The app will open at `http://localhost:3000`
 
 ### Use with Anvil/Foundry
 
@@ -97,11 +96,11 @@ If you run any Hardhat node instance on the port 8545 it would be automatically 
 For development and testing, use the included script that starts a local node with sample transactions and OpenScan:
 
 ```bash
-# Run with npm script
-npm run dev
+# Run with bun script
+bun run dev
 
 # Run the script directly
-bash scripts/run-test-hardhat-env.sh
+bash scripts/run-test-env.sh
 ```
 
 This script will:
@@ -115,10 +114,10 @@ This script will:
 
 ```bash
 # Production build
-npm run build:production
+bun run build:production
 
 # Staging build
-npm run build:staging
+bun run build:staging
 ```
 
 > **Note:** Build scripts require bash (Linux/macOS/WSL). Windows users should use WSL or run builds via CI.
@@ -126,17 +125,17 @@ npm run build:staging
 ### Type guards
 
 ```bash
-npm run typecheck
+bun run typecheck
 ```
 
-### Lint and prettier
+### Lint and format
 
 ```bash
-npm run format:fix
+bun run format:fix
 ```
 
 ```bash
-npm run lint:fix
+bun run lint:fix
 ```
 
 ### End-to-End Tests
@@ -145,13 +144,13 @@ The project uses Playwright for E2E testing against Ethereum mainnet data.
 
 ```bash
 # Run all E2E tests
-npm run test:e2e
+bun run test:e2e
 
 # Run tests with UI mode (for debugging)
-npm run test:e2e:ui
+bun run test:e2e:ui
 
 # Run tests in debug mode
-npm run test:e2e:debug
+bun run test:e2e:debug
 ```
 
 **Test Coverage:**
@@ -174,13 +173,13 @@ Tests run automatically on every PR via GitHub Actions.
 #!/bin/sh
 set -eu
 
-npx @biomejs/biome check --staged --files-ignore-unknown=true --no-errors-on-unmatched
+bunx @biomejs/biome check --staged --files-ignore-unknown=true --no-errors-on-unmatched
 ```
 
 2. Make it executable
 
 ```bash
-chmod +x pre-commit
+chmod +x .git/hooks/pre-commit
 ```
 
 ### Environment Variables
@@ -199,13 +198,13 @@ Controls which networks are displayed in the application. This is useful for lim
 
 ```bash
 # Show only Ethereum Mainnet and Localhost
-REACT_APP_OPENSCAN_NETWORKS="1,31337" npm start
+REACT_APP_OPENSCAN_NETWORKS="1,31337" bun start
 
 # Show only Layer 2 networks
-REACT_APP_OPENSCAN_NETWORKS="42161,10,8453" npm start
+REACT_APP_OPENSCAN_NETWORKS="42161,10,8453" bun start
 
 # Show only testnets
-REACT_APP_OPENSCAN_NETWORKS="11155111,97" npm start
+REACT_APP_OPENSCAN_NETWORKS="11155111,97" bun start
 ```
 
 The networks will be displayed in the order specified in the environment variable.
@@ -244,6 +243,8 @@ Default RPC endpoints:
 
 ### Tech Stack
 
+- **Bun** - Package manager and runtime
+- **Vite** - Fast build tool and dev server
 - **React 19** - UI framework
 - **TypeScript** - Type safety
 - **React Router** - Client-side routing

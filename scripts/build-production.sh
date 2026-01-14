@@ -3,14 +3,13 @@
 # Set consistent encoding environment
 export LANG=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
-export NODE_OPTIONS="--max-old-space-size=4096"
 
 echo "Building production version..."
 
 # Install dependencies
 echo "Installing dependencies..."
-npm ci
-# 
+bun install --frozen-lockfile
+
 # Create .env file for production
 echo "Creating production environment file..."
 echo "REACT_APP_ENVIRONMENT=production" > .env
@@ -19,11 +18,11 @@ echo "REACT_APP_ENVIRONMENT=production" > .env
 COMMIT_HASH=$(git rev-parse HEAD)
 
 # Clean previous build
-rm -r dist || true
+rm -rf dist || true
 
-# Build the app
+# Build the app using Vite
 echo "Building React app on commit $COMMIT_HASH"
-NODE_ENV=production REACT_APP_COMMIT_HASH=$COMMIT_HASH webpack --config webpack.config.js --mode production
+NODE_ENV=production REACT_APP_COMMIT_HASH=$COMMIT_HASH bun run vite build
 
 echo "Production build completed!"
 echo "Build output is in ./dist/"

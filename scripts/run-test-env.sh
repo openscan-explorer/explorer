@@ -84,7 +84,7 @@ echo "🔍 Starting OpenScan (Ethereum Mainnet + hardhat only)..."
 cd "$OPENSCAN_DIR"
 
 # Start OpenScan - it will read .env.local on start
-REACT_APP_OPENSCAN_NETWORKS="1,31337" npm start &
+REACT_APP_OPENSCAN_NETWORKS="1,31337" bun start &
 OPENSCAN_PID=$!
 
 # Wait for OpenScan to start
@@ -96,7 +96,7 @@ echo "✨ Test Environment Ready!"
 echo "================================================"
 echo ""
 echo "📍 Local Test Node: http://127.0.0.1:8545 (Chain ID: 31337)"
-echo "📍 OpenScan:     http://localhost:3030"
+echo "📍 OpenScan:     http://localhost:3000"
 echo ""
 echo "🌐 Available Networks:"
 echo "   - Ethereum Mainnet (Chain ID: 1)"

@@ -1,0 +1,7 @@
+[install]
+# Use npm registry
+registry = "https://registry.npmjs.org/"
+
+[install.lockfile]
+# Save lockfile
+save = true

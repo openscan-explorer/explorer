@@ -8,21 +8,23 @@ OpenScan is a trustless, open-source, standalone web-app and multi-chain blockch
 
 ## Development Commands
 
+This project uses **Bun** as the package manager and runtime, and **Vite** as the bundler.
+
 ### Start Development Server
 
 ```bash
-npm start
-# Runs on http://localhost:3030
+bun start
+# Runs on http://localhost:3000
 ```
 
 ### Build for Production
 
 ```bash
 # Production build
-npm run build:production
+bun run build:production
 
 # Staging build
-npm run build:staging
+bun run build:staging
 
 # Output: dist/
 ```
@@ -30,29 +32,29 @@ npm run build:staging
 ### Type Checking
 
 ```bash
-npm run typecheck
+bun run typecheck
 ```
 
 ### Formatting and Linting
 
 ```bash
 # Check formatting (dry run)
-npm run format
+bun run format
 
 # Fix formatting issues automatically
-npm run format:fix
+bun run format:fix
 
 # Check linting issues (dry run)
-npm run lint
+bun run lint
 
 # Fix linting issues automatically
-npm run lint:fix
+bun run lint:fix
 ```
 
 ### Test Environment with Local Node
 
 ```bash
-npm run dev
+bun run dev
 # Starts Hardhat node + OpenScan with sample contracts
 # Creates hardhat-test-artifacts.zip for importing ABIs
 ```
@@ -143,10 +145,10 @@ Networks are defined in `src/config/networks.ts`. To control which networks are 
 
 ```bash
 # Show only specific networks (comma-separated chain IDs)
-REACT_APP_OPENSCAN_NETWORKS="1,31337" npm start
+REACT_APP_OPENSCAN_NETWORKS="1,31337" bun start
 
 # Show all networks (default)
-npm start
+bun start
 ```
 
 Supported chain IDs: 1 (Ethereum), 42161 (Arbitrum), 10 (Optimism), 8453 (Base), 56 (BSC), 137 (Polygon), 31337 (Localhost), 97 (BSC Testnet), 11155111 (Sepolia)
@@ -171,9 +173,9 @@ OpenScan includes special support for localhost development:
 
 ## Build Configuration
 
-- **Webpack** (`webpack.config.js`) - Custom config with TypeScript, CSS, asset loading
-- **GitHub Pages**: Set `GITHUB_PAGES=true` for `/openscan/` base path
-- **Environment Variables**: Injected via `webpack.DefinePlugin`:
+- **Vite** (`vite.config.ts`) - Fast bundler with TypeScript, CSS, and asset loading
+- **GitHub Pages**: Set `GITHUB_PAGES=true` for `/explorer/` base path
+- **Environment Variables**: Injected via Vite's `define` option:
   - `REACT_APP_COMMIT_HASH` - Git commit hash
   - `REACT_APP_OPENSCAN_NETWORKS` - Comma-separated chain IDs to display
   - `REACT_APP_ENVIRONMENT` - production/development
@@ -185,8 +187,8 @@ OpenScan includes special support for localhost development:
   - Indentation: 2 spaces
   - Scope: `src/**/*.ts`, `src/**/*.tsx`, `src/**/*.json` (excludes CSS files)
   - Enabled rules: All recommended Biome linting rules
-  - Use `npm run format:fix` to auto-format code before committing
-  - Use `npm run lint:fix` to auto-fix linting issues (max 1024 diagnostics shown)
+  - Use `bun run format:fix` to auto-format code before committing
+  - Use `bun run lint:fix` to auto-fix linting issues (max 1024 diagnostics shown)
 - **TypeScript** with strict mode (`noImplicitAny`, `noImplicitReturns`, `noUncheckedIndexedAccess`)
 - **React 19** with functional components and hooks
 - **CSS** All styles should be on `src/styles` folder, avoid using in line component styles.
@@ -199,16 +201,16 @@ ALWAYS run these commands before committing to ensure code quality:
 
 ```bash
 # 1. Fix formatting issues
-npm run format:fix
+bun run format:fix
 
 # 2. Fix linting issues
-npm run lint:fix
+bun run lint:fix
 
 # 3. Verify type safety
-npm run typecheck
+bun run typecheck
 
 # 4. Run tests (if applicable)
-npm run test:run
+bun run test:run
 ```
 
 ### Commits
@@ -227,9 +229,9 @@ npm run test:run
 
 ### When Claude Code Modifies Files
 
-- Run `npm run format:fix` and `npm run lint:fix` after making changes
+- Run `bun run format:fix` and `bun run lint:fix` after making changes
 - Address any remaining linting warnings that cannot be auto-fixed
-- Ensure TypeScript compilation succeeds with `npm run typecheck`
+- Ensure TypeScript compilation succeeds with `bun run typecheck`
 - Do not commit code with formatting, linting, or type errors
 
 ## Important Patterns
