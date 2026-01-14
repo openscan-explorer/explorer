@@ -71,6 +71,7 @@
 		"babel-loader": "^9.1.4",
 		"copy-webpack-plugin": "^13.0.1",
 		"css-loader": "^7.1.2",
+		"dotenv": "^17.2.3",
 		"dotenv-webpack": "^8.1.0",
 		"html-webpack-plugin": "^5.5.3",
 		"jsdom": "^27.2.0",
