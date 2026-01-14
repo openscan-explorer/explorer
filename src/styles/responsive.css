@@ -593,11 +593,108 @@
   justify-content: center;
 }
 
+/* Social links in mobile menu */
+.navbar-mobile-social-links {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  padding: 8px 0;
+}
+
+.navbar-mobile-social-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  background: var(--color-primary-alpha-5, rgba(var(--color-primary-rgb), 0.05));
+  color: var(--text-primary);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  font-family: "Outfit", sans-serif;
+  min-height: var(--touch-target-min);
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.navbar-mobile-social-btn:hover,
+.navbar-mobile-social-btn:active {
+  background: var(--color-primary-alpha-10);
+  border-color: var(--color-primary-alpha-20);
+}
+
+.navbar-mobile-social-btn svg {
+  flex-shrink: 0;
+  color: var(--text-secondary);
+}
+
 @media (max-width: 767px) {
   .navbar-hamburger {
     display: flex;
     align-items: center;
     justify-content: center;
+  }
+
+  /* Make network title fit on one line */
+  .home-title,
+  .network-title-name {
+    font-size: 2.5rem;
+    letter-spacing: -1px;
+  }
+
+  /* Remove top margin from network stats container */
+  .container-wide.network-stats-container {
+    margin-top: 0;
+  }
+
+  /* Hide network block logo in navbar on mobile */
+  .network-block-logo {
+    display: none;
+  }
+
+  /* Constrain navbar network logo size on mobile */
+  .navbar-logo-network img,
+  .navbar-logo-network svg {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+  }
+
+  /* Fix network card icon overflow */
+  .network-card {
+    overflow: hidden;
+  }
+
+  .network-card-icon {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+  }
+
+  .network-card-icon img,
+  .network-card-icon svg {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  /* Truncate hashes more aggressively on mobile */
+  .table-cell-hash {
+    max-width: 90px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: inline-block;
+  }
+
+  /* Truncate monospace values (hashes, addresses) on mobile */
+  .tx-value.tx-mono {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: block;
   }
 
   /* Adjust navbar padding on mobile */
@@ -647,7 +744,7 @@
   .footer-content {
     flex-direction: column;
     gap: 12px;
-    padding: 0 8px;
+    padding: 0;
   }
 
   .footer-left {
@@ -663,16 +760,12 @@
   }
 
   .footer-link {
-    padding: 8px 12px;
-    min-height: 36px;
-    display: flex;
-    align-items: center;
+    padding: 0 6px;
   }
 
-  /* Make social buttons larger for touch */
+  /* Hide social buttons in footer on mobile - they're in the hamburger menu */
   .github-btn-footer {
-    width: 36px;
-    height: 36px;
+    display: none;
   }
 
   .commit-link {
@@ -701,6 +794,12 @@
 
   .footer-right {
     gap: 6px;
+  }
+
+  /* Even smaller title on very small screens */
+  .home-title,
+  .network-title-name {
+    font-size: 2rem;
   }
 }
 
