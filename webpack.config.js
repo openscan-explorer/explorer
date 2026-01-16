@@ -22,7 +22,8 @@ module.exports = {
 	entry: path.resolve(__dirname, "src", "index.tsx"),
 	output: {
 		path: path.resolve(__dirname, "dist"),
-		filename: "bundle.js",
+		filename: isProd ? "[name].[contenthash].js" : "bundle.js",
+		chunkFilename: "[name].[contenthash].bundle.js",
 		publicPath: publicPath, // key for GH Pages
 		clean: true,
 		charset: false,
@@ -74,27 +75,29 @@ module.exports = {
 	optimization: {
 		moduleIds: "deterministic",
 		chunkIds: "deterministic",
-		minimize: true,
-		minimizer: [
-			new (require("terser-webpack-plugin"))({
-				terserOptions: {
-					mangle: {
-						safari10: true,
-						reserved: [],
-					},
-					compress: {
-						drop_console: false,
-						drop_debugger: false,
-						passes: 1,
-					},
-					format: {
-						comments: false,
-					},
-				},
-				parallel: false,
-				extractComments: false,
-			}),
-		],
+		minimize: isProd,
+		minimizer: isProd
+			? [
+					new (require("terser-webpack-plugin"))({
+						terserOptions: {
+							mangle: {
+								safari10: true,
+								reserved: [],
+							},
+							compress: {
+								drop_console: false,
+								drop_debugger: false,
+								passes: 1,
+							},
+							format: {
+								comments: false,
+							},
+						},
+						parallel: false,
+						extractComments: false,
+					}),
+				]
+			: [],
 	},
 	plugins: [
 		new HtmlWebpackPlugin({

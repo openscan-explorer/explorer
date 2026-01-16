@@ -51,6 +51,8 @@ npx hardhat compile
 echo "   Starting Hardhat node..."
 npx hardhat node --network hardhatMainnet > /tmp/hardhat-node.log 2>&1 &
 
+sleep 1
+
 # Here the network is set to localhost to target the running hardhat node via an HTTP node
 npx hardhat ignition deploy ignition/modules/TestSuite.ts --network localhost
 
