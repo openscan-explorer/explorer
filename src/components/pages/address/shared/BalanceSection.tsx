@@ -31,7 +31,7 @@ const BalanceSection: React.FC<BalanceSectionProps> = ({ address, currency = "ET
       </div>
 
       <div className="tx-row">
-        <span className="tx-label">Transactions:</span>
+        <span className="tx-label">Nonce (Transactions Sent):</span>
         <span className="tx-value">{Number(address.txCount).toLocaleString()} txns</span>
       </div>
     </div>

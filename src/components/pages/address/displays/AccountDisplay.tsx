@@ -18,6 +18,12 @@ interface AccountDisplayProps {
   transactionsResult?: AddressTransactionsResult | null;
   transactionDetails: Transaction[];
   loadingTxDetails: boolean;
+  searchTriggered: boolean;
+  searchingTxs: boolean;
+  searchLimit: number;
+  onStartSearch: (limit: number) => void;
+  onCancelSearch?: () => void;
+  onLoadMore?: (limit: number) => void;
   metadata?: RPCMetadata;
   selectedProvider?: string | null;
   onProviderSelect?: (provider: string) => void;
@@ -37,6 +43,12 @@ const AccountDisplay: React.FC<AccountDisplayProps> = ({
   transactionsResult,
   transactionDetails,
   loadingTxDetails,
+  searchTriggered,
+  searchingTxs,
+  searchLimit,
+  onStartSearch,
+  onCancelSearch,
+  onLoadMore,
   metadata,
   selectedProvider,
   onProviderSelect,
@@ -81,6 +93,13 @@ const AccountDisplay: React.FC<AccountDisplayProps> = ({
           transactionsResult={transactionsResult}
           transactionDetails={transactionDetails}
           loadingTxDetails={loadingTxDetails}
+          searchTriggered={searchTriggered}
+          searchingTxs={searchingTxs}
+          searchLimit={searchLimit}
+          onStartSearch={onStartSearch}
+          onCancelSearch={onCancelSearch}
+          onLoadMore={onLoadMore}
+          txCount={Number(address.txCount)}
         />
       </div>
     </div>

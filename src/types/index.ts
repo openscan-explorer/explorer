@@ -509,10 +509,16 @@ export interface LogEntry {
  */
 export interface AddressTransactionsResult {
   transactions: string[]; // Transaction hashes
-  source: "trace_filter" | "logs" | "none";
-  isComplete: boolean; // true if we have full history (trace_filter)
+  transactionDetails?: Transaction[]; // Full transaction data (when available)
+  source: "trace_filter" | "binary_search" | "logs" | "none";
+  isComplete: boolean; // true if we have full history (trace_filter or binary_search with no limit)
   message?: string; // Optional message about limitations
 }
+
+/**
+ * Callback for streaming transactions as they are found
+ */
+export type TransactionStreamCallback = (transactions: Transaction[]) => void;
 
 // ==================== ENS TYPES ====================
 

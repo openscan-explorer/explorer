@@ -1,4 +1,4 @@
-import { useContext, useEffect, useMemo, useState } from "react";
+import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import { AppContext } from "../../../context";
 import { useDataService } from "../../../hooks/useDataService";
@@ -36,7 +36,13 @@ export default function Address() {
     null,
   );
   const [transactionDetails, setTransactionDetails] = useState<Transaction[]>([]);
-  const [loadingTxDetails, setLoadingTxDetails] = useState(false);
+  const transactionHashSet = useRef(new Set<string>()); // Persistent set to track seen tx hashes
+  const [loadingTxDetails] = useState(false); // No longer needed with streaming
+  const [searchTriggered, setSearchTriggered] = useState(false);
+  const [searchLimit, setSearchLimit] = useState(100);
+  const [searchingTxs, setSearchingTxs] = useState(false);
+  const loadMoreFromBlockRef = useRef<number | undefined>(undefined); // Use ref to avoid triggering effect
+  const searchIdRef = useRef(0); // Counter to track active search and ignore stale callbacks
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -161,40 +167,162 @@ export default function Address() {
       .finally(() => setLoading(false));
   }, [address, dataService, numericNetworkId, rpcUrls]);
 
-  // Fetch transactions separately (still uses dataService for caching benefits)
+  // Optimized streaming callback - uses ref to avoid O(n) Set recreation on each update
+  // IMPORTANT: Hash set modification must happen OUTSIDE the functional updater
+  // because React Strict Mode calls functional updaters twice, which would cause
+  // the second call to see all transactions as duplicates
+  const handleTransactionsFound = useCallback((newTxs: Transaction[]) => {
+    console.log("[handleTransactionsFound] Called with", newTxs.length, "txs, hashSet size:", transactionHashSet.current.size);
+    // Filter duplicates BEFORE the state update (outside functional updater)
+    const uniqueNewTxs = newTxs.filter((tx) => {
+      if (transactionHashSet.current.has(tx.hash)) return false;
+      transactionHashSet.current.add(tx.hash);
+      return true;
+    });
+
+    console.log("[handleTransactionsFound] After filter, unique:", uniqueNewTxs.length);
+    if (uniqueNewTxs.length === 0) return;
+
+    setTransactionDetails((prev) => {
+      // Append new transactions
+      const combined = [...prev, ...uniqueNewTxs];
+
+      // Only sort if order might be wrong (check if newest new tx is newer than oldest prev)
+      // Since search goes newest-first, new batches are typically older, so we need to sort
+      if (prev.length > 0 && uniqueNewTxs.length > 0) {
+        combined.sort((a, b) => {
+          const blockA = Number.parseInt(a.blockNumber || "0", 16);
+          const blockB = Number.parseInt(b.blockNumber || "0", 16);
+          return blockB - blockA;
+        });
+      }
+
+      console.log("[handleTransactionsFound] prev:", prev.length, "-> combined:", combined.length);
+      return combined;
+    });
+  }, []);
+
+  // Fetch transactions only when user triggers search - with streaming support and cancellation
+  // Uses searchIdRef to track active search and prevent stale callbacks from a previous search
   useEffect(() => {
-    if (!dataService || !address) return;
+    console.log("[TxSearch Effect] Running, searchTriggered:", searchTriggered, "address:", address?.slice(0, 10));
+    if (!dataService || !address || !searchTriggered) {
+      console.log("[TxSearch Effect] Early return - missing deps or not triggered");
+      return;
+    }
 
+    // Increment search ID and capture it for this search instance
+    searchIdRef.current += 1;
+    const currentSearchId = searchIdRef.current;
+    console.log("[TxSearch Effect] Starting search, searchId:", currentSearchId);
+    const toBlock = loadMoreFromBlockRef.current;
+    const isLoadMore = toBlock !== undefined;
+
+    setSearchingTxs(true);
+    setTransactionsResult(null);
+
+    // Only clear transactions and hash set for fresh search, not for "load more"
+    if (!isLoadMore) {
+      console.log("[TxSearch Effect] Clearing transactions for fresh search");
+      setTransactionDetails([]);
+      transactionHashSet.current.clear();
+    }
+
+    // Check if this search is still active (not superseded by a newer search)
+    const isSearchActive = () => {
+      const active = searchIdRef.current === currentSearchId;
+      if (!active) {
+        console.log("[TxSearch] Search invalidated! current:", searchIdRef.current, "expected:", currentSearchId);
+      }
+      return active;
+    };
+
+    // Wrap the callback to check if search is still active
+    const wrappedCallback = (newTxs: Transaction[]) => {
+      console.log("[TxSearch Callback] Received", newTxs.length, "txs, isActive:", isSearchActive());
+      if (!isSearchActive()) return;
+      handleTransactionsFound(newTxs);
+    };
+
+    // Pass toBlock for "load more" functionality
     dataService.networkAdapter
-      .getAddressTransactions(address)
-      .then(async (result) => {
+      .getAddressTransactions(address, undefined, toBlock, searchLimit, wrappedCallback)
+      .then((result) => {
+        if (!isSearchActive()) return;
         setTransactionsResult(result);
-
-        if (result.transactions.length > 0) {
-          setLoadingTxDetails(true);
-          const txsToFetch = result.transactions.slice(0, 25);
-          const txResults = await Promise.all(
-            txsToFetch.map((hash) =>
-              dataService.networkAdapter.getTransaction(hash).catch(() => null),
-            ),
-          );
-          setTransactionDetails(
-            txResults
-              .filter((result): result is DataWithMetadata<Transaction> => result !== null)
-              .map((result) => result.data),
-          );
-          setLoadingTxDetails(false);
+        // Transactions are already added via streaming callback, no need to set them again
+        // Just ensure the hash set is populated for future "Load More" deduplication
+        if (result.transactionDetails) {
+          for (const tx of result.transactionDetails) {
+            transactionHashSet.current.add(tx.hash);
+          }
         }
       })
       .catch((err) => {
+        if (!isSearchActive()) return;
         setTransactionsResult({
           transactions: [],
           source: "none",
           isComplete: false,
           message: `Failed to fetch transaction history: ${err.message}`,
         });
+      })
+      .finally(() => {
+        if (!isSearchActive()) return;
+        setSearchingTxs(false);
+        // NOTE: Don't reset searchTriggered here - it controls whether results are shown
+        // Setting it to false would hide the transaction table and show the search prompt
+        // Reset loadMoreFromBlock after search completes
+        loadMoreFromBlockRef.current = undefined;
       });
-  }, [dataService, address]);
+  }, [dataService, address, searchTriggered, searchLimit, handleTransactionsFound]);
+
+  // Debug: Log when transactionDetails changes
+  useEffect(() => {
+    console.log("[DEBUG transactionDetails changed] length:", transactionDetails.length);
+  }, [transactionDetails]);
+
+  // Reset search state when address changes
+  // biome-ignore lint/correctness/useExhaustiveDependencies: intentionally reset state when address changes
+  useEffect(() => {
+    console.log("[Address Reset Effect] Resetting search state for address:", address?.slice(0, 10));
+    setSearchTriggered(false);
+    setSearchLimit(100);
+    loadMoreFromBlockRef.current = undefined;
+    setTransactionsResult(null);
+    setTransactionDetails([]);
+    transactionHashSet.current.clear(); // Clear the hash set
+  }, [address]);
+
+  // Handler to start transaction search with specified limit
+  const handleStartSearch = (limit: number) => {
+    loadMoreFromBlockRef.current = undefined; // Fresh search
+    setSearchLimit(limit);
+    setSearchTriggered(true);
+  };
+
+  // Handler to cancel an in-progress search
+  const handleCancelSearch = () => {
+    setSearchTriggered(false);
+    setSearchingTxs(false);
+  };
+
+  // Handler to load more transactions starting from the last displayed block
+  const handleLoadMore = (limit: number) => {
+    if (transactionDetails.length === 0) return;
+
+    // Find the oldest (lowest block number) transaction
+    const oldestTx = transactionDetails.reduce((oldest, tx) => {
+      const blockNum = Number.parseInt(tx.blockNumber || "0", 16);
+      const oldestBlockNum = Number.parseInt(oldest.blockNumber || "0", 16);
+      return blockNum < oldestBlockNum ? tx : oldest;
+    });
+
+    const oldestBlockNum = Number.parseInt(oldestTx.blockNumber || "0", 16);
+    loadMoreFromBlockRef.current = oldestBlockNum;
+    setSearchLimit(limit);
+    setSearchTriggered(true);
+  };
 
   // Show ENS resolving state (must come first before other checks)
   if (isEnsName && (ensResolving || (!resolvedAddress && !ensError))) {
@@ -293,6 +421,12 @@ export default function Address() {
     transactionsResult,
     transactionDetails,
     loadingTxDetails,
+    searchTriggered,
+    searchingTxs,
+    searchLimit,
+    onStartSearch: handleStartSearch,
+    onCancelSearch: handleCancelSearch,
+    onLoadMore: handleLoadMore,
     ensName,
     reverseResult,
     ensRecords,

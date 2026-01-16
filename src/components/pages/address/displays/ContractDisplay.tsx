@@ -21,6 +21,12 @@ interface ContractDisplayProps {
   transactionsResult?: AddressTransactionsResult | null;
   transactionDetails: Transaction[];
   loadingTxDetails: boolean;
+  searchTriggered: boolean;
+  searchingTxs: boolean;
+  searchLimit: number;
+  onStartSearch: (limit: number) => void;
+  onCancelSearch?: () => void;
+  onLoadMore?: (limit: number) => void;
   metadata?: RPCMetadata;
   selectedProvider?: string | null;
   onProviderSelect?: (provider: string) => void;
@@ -40,6 +46,12 @@ const ContractDisplay: React.FC<ContractDisplayProps> = ({
   transactionsResult,
   transactionDetails,
   loadingTxDetails,
+  searchTriggered,
+  searchingTxs,
+  searchLimit,
+  onStartSearch,
+  onCancelSearch,
+  onLoadMore,
   metadata,
   selectedProvider,
   onProviderSelect,
@@ -138,10 +150,10 @@ const ContractDisplay: React.FC<ContractDisplayProps> = ({
             </span>
           </div>
 
-          {/* Transaction Count */}
+          {/* Nonce (Transactions Sent) */}
           <div className="tx-row">
-            <span className="tx-label">Transactions:</span>
-            <span className="tx-value">{Number(address.txCount).toLocaleString()} txns</span>
+            <span className="tx-label">Nonce (Txns Sent):</span>
+            <span className="tx-value">{Number(address.txCount).toLocaleString()}</span>
           </div>
 
           {/* Verification Status */}
@@ -240,7 +252,14 @@ const ContractDisplay: React.FC<ContractDisplayProps> = ({
           transactionsResult={transactionsResult}
           transactionDetails={transactionDetails}
           loadingTxDetails={loadingTxDetails}
+          searchTriggered={searchTriggered}
+          searchingTxs={searchingTxs}
+          searchLimit={searchLimit}
+          onStartSearch={onStartSearch}
+          onCancelSearch={onCancelSearch}
+          onLoadMore={onLoadMore}
           contractAbi={contractData?.abi}
+          txCount={Number(address.txCount)}
         />
       </div>
     </div>
