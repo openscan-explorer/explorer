@@ -901,13 +901,14 @@
 
   /* Blocks header adjustments */
   .blocks-header {
-    flex-direction: column;
-    align-items: flex-start;
+    flex-direction: row;
+    align-items: center;
     gap: 8px;
     margin-bottom: 12px;
   }
 
   .blocks-header-main {
+    flex: 1;
     flex-wrap: wrap;
     gap: 6px;
   }
