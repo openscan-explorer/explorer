@@ -1,33 +1,8 @@
 import { RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { useCallback, useEffect } from "react";
-import {
-  HashRouter,
-  Navigate,
-  Route,
-  BrowserRouter as Router,
-  Routes,
-  useLocation,
-  useNavigate,
-} from "react-router-dom";
+import { HashRouter, Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { cssVariables, getRainbowKitTheme } from "./theme";
 import { getBaseDomainUrl, getSubdomain, getSubdomainRedirect } from "./utils/subdomainUtils";
-
-// Detect if we're running on GitHub Pages and get the correct basename
-function getBasename(): string {
-  const { hostname, pathname } = window.location;
-
-  // Check if we're on GitHub Pages
-  if (hostname.includes("github.io")) {
-    // Extract repo name from pathname (first segment after domain)
-    const pathSegments = pathname.split("/").filter(Boolean);
-    if (pathSegments.length > 0) {
-      return `/${pathSegments[0]}`;
-    }
-  }
-
-  // For local development or custom domains, no basename needed
-  return "";
-}
 
 import ErrorBoundary from "./components/common/ErrorBoundary";
 import Footer from "./components/common/Footer";
@@ -63,9 +38,6 @@ import {
 } from "./components/LazyComponents";
 import { SettingsProvider, useSettings, useTheme } from "./context/SettingsContext";
 import { useAppReady, useOnAppReady } from "./hooks/useAppReady";
-
-// Detect GH Pages once
-const isGhPages = typeof window !== "undefined" && window.location.hostname.includes("github.io");
 
 // Component that handles subdomain redirects
 function SubdomainRedirect() {
@@ -159,17 +131,13 @@ function AppContent() {
 
 // Main App component that provides the theme context
 function App() {
-  const BaseRouter = isGhPages ? HashRouter : Router;
-  // IMPORTANT: no basename for HashRouter
-  const basename = isGhPages ? "" : getBasename();
-
   return (
     <ErrorBoundary>
       <SettingsProvider>
         <RainbowKitProviderWrapper>
-          <BaseRouter basename={basename}>
+          <HashRouter>
             <AppContent />
-          </BaseRouter>
+          </HashRouter>
         </RainbowKitProviderWrapper>
       </SettingsProvider>
     </ErrorBoundary>
