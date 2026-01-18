@@ -345,6 +345,175 @@
 }
 
 /* ================================================
+   DevTools Mobile Responsive Styles
+   ================================================ */
+
+@media (max-width: 767px) {
+	.devtools-tabs {
+		overflow-x: auto;
+		-webkit-overflow-scrolling: touch;
+		scrollbar-width: none;
+		-ms-overflow-style: none;
+		gap: 6px;
+		padding: 4px;
+	}
+
+	.devtools-tabs::-webkit-scrollbar {
+		display: none;
+	}
+
+	.devtools-tab {
+		flex: 0 0 auto;
+		padding: 8px 14px;
+		font-size: 0.8rem;
+		white-space: nowrap;
+	}
+
+	.devtools-content {
+		padding: 12px 0;
+	}
+
+	.devtools-card,
+	.dev-section-container {
+		padding: 16px;
+		border-radius: 12px;
+	}
+
+	.devtools-tool-title,
+	.devtools-tool-title-inline {
+		font-size: 1rem;
+	}
+
+	.devtools-tool-header-row {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 12px;
+	}
+
+	/* Transaction builder rows - stack on mobile */
+	.tx-builder-network-row,
+	.tx-builder-address-row,
+	.tx-builder-value-row,
+	.tx-builder-gas-row,
+	.tx-builder-fee-row,
+	.tx-builder-signing-row {
+		flex-direction: column;
+		align-items: stretch;
+	}
+
+	.tx-builder-signing-row {
+		align-items: flex-start;
+	}
+
+	/* Keccak input row */
+	.keccak-input-row {
+		flex-direction: column;
+		align-items: stretch;
+	}
+
+	.keccak-type-select {
+		width: 100%;
+	}
+
+	/* Mode toggles */
+	.devtools-mode-toggle,
+	.keccak-mode-toggle {
+		flex-wrap: wrap;
+	}
+
+	.devtools-mode-btn,
+	.keccak-mode-btn {
+		flex: 1 1 auto;
+		min-width: 80px;
+	}
+
+	/* Buttons */
+	.devtools-btn,
+	.devtools-button {
+		padding: 10px 16px;
+		font-size: 0.85rem;
+	}
+
+	.tx-builder-buttons,
+	.raw-rlp-buttons,
+	.hex-encoder-buttons {
+		flex-direction: column;
+		gap: 8px;
+	}
+
+	.tx-builder-buttons .devtools-button,
+	.raw-rlp-buttons .devtools-button {
+		margin: 0;
+		width: 100%;
+	}
+
+	/* Results display */
+	.devtools-results-pre {
+		font-size: 0.7rem;
+		padding: 12px;
+		max-height: 300px;
+	}
+
+	/* Signature results */
+	.sig-result-row {
+		flex-direction: column;
+		gap: 4px;
+	}
+
+	.sig-result-label {
+		min-width: auto;
+	}
+
+	/* Input fields */
+	.devtools-input,
+	.devtools-select,
+	.devtools-textarea {
+		font-size: 16px; /* Prevent iOS zoom */
+	}
+
+	/* Development section dropzone */
+	.dev-dropzone {
+		padding: 24px 16px;
+	}
+
+	.dev-dropzone-icon {
+		font-size: 36px;
+	}
+
+	.dev-file-item {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 8px;
+	}
+
+	.dev-remove-btn {
+		margin-left: 0;
+		align-self: flex-end;
+	}
+}
+
+@media (max-width: 480px) {
+	.devtools-tab {
+		padding: 6px 10px;
+		font-size: 0.75rem;
+	}
+
+	.devtools-card,
+	.dev-section-container {
+		padding: 12px;
+	}
+
+	.devtools-tool-title,
+	.devtools-tool-title-inline {
+		font-size: 0.9rem;
+	}
+
+	.devtools-input-label {
+		font-size: 0.8rem;
+	}
+}
+
+/* ================================================
    Coming Soon Placeholder
    ================================================ */
 

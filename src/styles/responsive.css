@@ -1240,6 +1240,176 @@
 }
 
 /* ==========================================================================
+   RPC INDICATOR - MOBILE RESPONSIVE
+   ========================================================================== */
+
+@media (max-width: 767px) {
+  .rpc-indicator-dropdown {
+    min-width: auto;
+    width: calc(100vw - 32px);
+    max-width: 320px;
+    right: -8px;
+  }
+
+  .rpc-indicator-header {
+    padding: 10px 12px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .rpc-indicator-item {
+    padding: 10px 12px;
+  }
+
+  .rpc-indicator-item-url {
+    font-size: 11px;
+    max-width: 180px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .rpc-indicator-list {
+    max-height: 250px;
+  }
+
+  .rpc-indicator-badge {
+    padding: 4px 8px;
+    font-size: 0.7rem;
+  }
+
+  .rpc-indicator-status {
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .rpc-indicator-dropdown {
+    position: fixed;
+    top: auto;
+    bottom: 16px;
+    left: 16px;
+    right: 16px;
+    width: auto;
+    max-width: none;
+  }
+
+  .rpc-indicator-item-url {
+    max-width: 150px;
+  }
+}
+
+/* ==========================================================================
+   SETTINGS PAGE - MOBILE RESPONSIVE
+   ========================================================================== */
+
+@media (max-width: 767px) {
+  .settings-section {
+    padding: 16px;
+    border-radius: 12px;
+  }
+
+  .settings-section-title {
+    font-size: 1.1rem;
+  }
+
+  .settings-section-description {
+    font-size: 0.8rem;
+    margin-bottom: 16px;
+  }
+
+  .settings-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    max-width: 100%;
+  }
+
+  .settings-item > div:first-child {
+    text-align: left;
+  }
+
+  .settings-select {
+    width: 100%;
+  }
+
+  /* Chain name row - stack on mobile */
+  .settings-chain-name {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .settings-fetch-rpc-button {
+    margin-top: 4px;
+  }
+
+  /* RPC tags - more compact on mobile */
+  .settings-rpc-tags {
+    gap: 6px;
+  }
+
+  .settings-rpc-tag {
+    padding: 4px 8px;
+    font-size: 0.7rem;
+    max-width: calc(100vw - 80px);
+  }
+
+  .settings-rpc-tag-index {
+    font-size: 0.65rem;
+    padding: 1px 4px;
+    min-width: 16px;
+  }
+
+  .settings-rpc-tag-url {
+    max-width: 200px;
+  }
+
+  .settings-rpc-tag-delete {
+    width: 16px;
+    height: 16px;
+    font-size: 12px;
+  }
+
+  .settings-chain-item {
+    padding: 12px;
+  }
+
+  .settings-rpc-input {
+    font-size: 16px; /* Prevent iOS zoom */
+  }
+
+  .settings-save-button {
+    width: 100%;
+    padding: 14px 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .settings-section {
+    padding: 12px;
+  }
+
+  .settings-rpc-tag-url {
+    max-width: 150px;
+  }
+
+  .settings-chain-name {
+    font-size: 0.85rem;
+  }
+
+  .settings-chain-id-badge {
+    font-size: 0.7rem;
+    padding: 1px 6px;
+  }
+
+  .settings-fetch-rpc-button {
+    font-size: 0.7rem;
+    padding: 2px 8px;
+  }
+}
+
+/* ==========================================================================
    PRINT STYLES
    Hide non-essential elements when printing
    ========================================================================== */
