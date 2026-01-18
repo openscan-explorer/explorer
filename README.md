@@ -78,10 +78,10 @@ cd openscan
 bun install
 
 # Start the development server
-bun start
+npm start
 ```
 
-The app will open at `http://localhost:3000`
+The app will open at `http://localhost:3030`
 
 ### Use with Anvil/Foundry
 
@@ -97,7 +97,7 @@ For development and testing, use the included script that starts a local node wi
 
 ```bash
 # Run with bun script
-bun run dev
+npm run dev
 
 # Run the script directly
 bash scripts/run-test-env.sh
@@ -114,10 +114,10 @@ This script will:
 
 ```bash
 # Production build
-bun run build:production
+npm run build:production
 
 # Staging build
-bun run build:staging
+npm run build:staging
 ```
 
 > **Note:** Build scripts require bash (Linux/macOS/WSL). Windows users should use WSL or run builds via CI.
@@ -125,17 +125,17 @@ bun run build:staging
 ### Type guards
 
 ```bash
-bun run typecheck
+npm run typecheck
 ```
 
 ### Lint and format
 
 ```bash
-bun run format:fix
+npm run format:fix
 ```
 
 ```bash
-bun run lint:fix
+npm run lint:fix
 ```
 
 ### End-to-End Tests
@@ -144,13 +144,13 @@ The project uses Playwright for E2E testing against Ethereum mainnet data.
 
 ```bash
 # Run all E2E tests
-bun run test:e2e
+npm run test:e2e
 
 # Run tests with UI mode (for debugging)
-bun run test:e2e:ui
+npm run test:e2e:ui
 
 # Run tests in debug mode
-bun run test:e2e:debug
+npm run test:e2e:debug
 ```
 
 **Test Coverage:**
@@ -198,13 +198,13 @@ Controls which networks are displayed in the application. This is useful for lim
 
 ```bash
 # Show only Ethereum Mainnet and Localhost
-REACT_APP_OPENSCAN_NETWORKS="1,31337" bun start
+REACT_APP_OPENSCAN_NETWORKS="1,31337" npm start
 
 # Show only Layer 2 networks
-REACT_APP_OPENSCAN_NETWORKS="42161,10,8453" bun start
+REACT_APP_OPENSCAN_NETWORKS="42161,10,8453" npm start
 
 # Show only testnets
-REACT_APP_OPENSCAN_NETWORKS="11155111,97" bun start
+REACT_APP_OPENSCAN_NETWORKS="11155111,97" npm start
 ```
 
 The networks will be displayed in the order specified in the environment variable.

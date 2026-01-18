@@ -13,18 +13,18 @@ This project uses **Bun** as the package manager and runtime, and **Vite** as th
 ### Start Development Server
 
 ```bash
-bun start
-# Runs on http://localhost:3000
+npm start
+# Runs on http://localhost:3030
 ```
 
 ### Build for Production
 
 ```bash
 # Production build
-bun run build:production
+npm run build:production
 
 # Staging build
-bun run build:staging
+npm run build:staging
 
 # Output: dist/
 ```
@@ -32,29 +32,29 @@ bun run build:staging
 ### Type Checking
 
 ```bash
-bun run typecheck
+npm run typecheck
 ```
 
 ### Formatting and Linting
 
 ```bash
 # Check formatting (dry run)
-bun run format
+npm run format
 
 # Fix formatting issues automatically
-bun run format:fix
+npm run format:fix
 
 # Check linting issues (dry run)
-bun run lint
+npm run lint
 
 # Fix linting issues automatically
-bun run lint:fix
+npm run lint:fix
 ```
 
 ### Test Environment with Local Node
 
 ```bash
-bun run dev
+npm run dev
 # Starts Hardhat node + OpenScan with sample contracts
 # Creates hardhat-test-artifacts.zip for importing ABIs
 ```
@@ -145,10 +145,10 @@ Networks are defined in `src/config/networks.ts`. To control which networks are 
 
 ```bash
 # Show only specific networks (comma-separated chain IDs)
-REACT_APP_OPENSCAN_NETWORKS="1,31337" bun start
+REACT_APP_OPENSCAN_NETWORKS="1,31337" npm start
 
 # Show all networks (default)
-bun start
+npm start
 ```
 
 Supported chain IDs: 1 (Ethereum), 42161 (Arbitrum), 10 (Optimism), 8453 (Base), 56 (BSC), 137 (Polygon), 31337 (Localhost), 97 (BSC Testnet), 11155111 (Sepolia)
@@ -187,8 +187,8 @@ OpenScan includes special support for localhost development:
   - Indentation: 2 spaces
   - Scope: `src/**/*.ts`, `src/**/*.tsx`, `src/**/*.json` (excludes CSS files)
   - Enabled rules: All recommended Biome linting rules
-  - Use `bun run format:fix` to auto-format code before committing
-  - Use `bun run lint:fix` to auto-fix linting issues (max 1024 diagnostics shown)
+  - Use `npm run format:fix` to auto-format code before committing
+  - Use `npm run lint:fix` to auto-fix linting issues (max 1024 diagnostics shown)
 - **TypeScript** with strict mode (`noImplicitAny`, `noImplicitReturns`, `noUncheckedIndexedAccess`)
 - **React 19** with functional components and hooks
 - **CSS** All styles should be on `src/styles` folder, avoid using in line component styles.
@@ -201,16 +201,16 @@ ALWAYS run these commands before committing to ensure code quality:
 
 ```bash
 # 1. Fix formatting issues
-bun run format:fix
+npm run format:fix
 
 # 2. Fix linting issues
-bun run lint:fix
+npm run lint:fix
 
 # 3. Verify type safety
-bun run typecheck
+npm run typecheck
 
 # 4. Run tests (if applicable)
-bun run test:run
+npm run test:run
 ```
 
 ### Commits
@@ -229,9 +229,9 @@ bun run test:run
 
 ### When Claude Code Modifies Files
 
-- Run `bun run format:fix` and `bun run lint:fix` after making changes
+- Run `npm run format:fix` and `npm run lint:fix` after making changes
 - Address any remaining linting warnings that cannot be auto-fixed
-- Ensure TypeScript compilation succeeds with `bun run typecheck`
+- Ensure TypeScript compilation succeeds with `npm run typecheck`
 - Do not commit code with formatting, linting, or type errors
 
 ## Important Patterns

@@ -30,7 +30,7 @@ cleanup_ports() {
         kill $(lsof -t -i :8545) 2>/dev/null || true
     fi
     if lsof -i :3000 > /dev/null 2>&1; then
-        echo "⚠️  Killing existing process on port 3000..."
+        echo "⚠️  Killing existing process on port 3030..."
         kill $(lsof -t -i :3000) 2>/dev/null || true
     fi
     sleep 2
@@ -84,7 +84,7 @@ echo "🔍 Starting OpenScan (Ethereum Mainnet + hardhat only)..."
 cd "$OPENSCAN_DIR"
 
 # Start OpenScan - it will read .env.local on start
-REACT_APP_OPENSCAN_NETWORKS="1,31337" bun start &
+REACT_APP_OPENSCAN_NETWORKS="1,31337" npm start &
 OPENSCAN_PID=$!
 
 # Wait for OpenScan to start
@@ -96,7 +96,7 @@ echo "✨ Test Environment Ready!"
 echo "================================================"
 echo ""
 echo "📍 Local Test Node: http://127.0.0.1:8545 (Chain ID: 31337)"
-echo "📍 OpenScan:     http://localhost:3000"
+echo "📍 OpenScan:     http://localhost:3030"
 echo ""
 echo "🌐 Available Networks:"
 echo "   - Ethereum Mainnet (Chain ID: 1)"

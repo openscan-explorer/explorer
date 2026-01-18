@@ -7,6 +7,10 @@
 	"engines": {
 		"bun": ">=1.1.0"
 	},
+	"overrides": {
+		"@noble/hashes": "^1.8.0",
+		"@noble/curves": "^1.8.0"
+	},
 	"dependencies": {
 		"@openscan/network-connectors": "^1.0.0",
 		"@rainbow-me/rainbowkit": "^2.2.8",
@@ -31,18 +35,18 @@
 		"build:production": "bash ./scripts/build-production.sh",
 		"build:staging": "bash ./scripts/build-staging.sh",
 		"preview": "vite preview",
-		"test": "bun run vitest",
-		"test:run": "bun run vitest run",
-		"test:e2e": "bun run playwright test",
-		"test:e2e:ui": "bun run playwright test --ui",
-		"test:e2e:debug": "bun run playwright test --debug",
+		"test": "vitest",
+		"test:run": "vitest run",
+		"test:e2e": "playwright test",
+		"test:e2e:ui": "playwright test --ui",
+		"test:e2e:debug": "playwright test --debug",
 		"dev": "bash scripts/run-test-env.sh",
-		"typecheck": "bun run tsc --noEmit",
-		"format": "bun run biome format",
-		"format:fix": "bun run biome format --write",
-		"lint": "bun run biome lint",
-		"lint:fix": "bun run biome lint --write --max-diagnostics 1024",
-		"check": "bun run biome check --max-diagnostics 1024"
+		"typecheck": "tsc --noEmit",
+		"format": "biome format",
+		"format:fix": "biome format --write",
+		"lint": "biome lint",
+		"lint:fix": "biome lint --write --max-diagnostics 1024",
+		"check": "biome check --max-diagnostics 1024"
 	},
 	"browserslist": {
 		"production": [

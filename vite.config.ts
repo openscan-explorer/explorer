@@ -17,11 +17,11 @@ export default defineConfig({
   base,
   plugins: [react()],
   server: {
-    port: 3000,
+    port: 3030,
     open: true,
   },
   preview: {
-    port: 3000,
+    port: 3030,
   },
   build: {
     outDir: "dist",

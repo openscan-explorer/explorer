@@ -22,7 +22,7 @@ rm -rf dist || true
 
 # Build the app using Vite
 echo "Building React app on commit $COMMIT_HASH"
-NODE_ENV=production REACT_APP_COMMIT_HASH=$COMMIT_HASH bun run vite build
+NODE_ENV=production REACT_APP_COMMIT_HASH=$COMMIT_HASH npm run build
 
 echo "Production build completed!"
 echo "Build output is in ./dist/"
