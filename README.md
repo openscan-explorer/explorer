@@ -246,7 +246,7 @@ Default RPC endpoints:
 
 - **React 19** - UI framework
 - **TypeScript** - Type safety
-- **React Router** - Client-side routing
+- **React Router** - Client-side routing (HashRouter for IPFS/ENS compatibility)
 - **Custom RPC Service** - Direct JSON-RPC calls to blockchain nodes
 - **Biome** – Code formatting and linting
 

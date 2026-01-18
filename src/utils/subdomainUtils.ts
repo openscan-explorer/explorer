@@ -18,6 +18,11 @@ export function getSubdomain(): string | null {
     return null;
   }
 
+  // Skip subdomain processing for ENS gateways (e.g., openscan.eth.link, openscan.eth.limo)
+  if (hostname.endsWith(".eth.link") || hostname.endsWith(".eth.limo")) {
+    return null;
+  }
+
   // Handle localhost subdomains (e.g., ethereum.localhost)
   if (hostname.endsWith(".localhost")) {
     return hostname.replace(".localhost", "");
