@@ -8,6 +8,8 @@ OpenScan is a trustless, open-source, standalone web-app and multi-chain blockch
 
 ## Development Commands
 
+This project uses **Bun** as the package manager and runtime, and **Vite** as the bundler.
+
 ### Start Development Server
 
 ```bash
@@ -171,9 +173,9 @@ OpenScan includes special support for localhost development:
 
 ## Build Configuration
 
-- **Webpack** (`webpack.config.js`) - Custom config with TypeScript, CSS, asset loading
-- **GitHub Pages**: Set `GITHUB_PAGES=true` for `/openscan/` base path
-- **Environment Variables**: Injected via `webpack.DefinePlugin`:
+- **Vite** (`vite.config.ts`) - Fast bundler with TypeScript, CSS, and asset loading
+- **GitHub Pages**: Set `GITHUB_PAGES=true` for `/explorer/` base path
+- **Environment Variables**: Injected via Vite's `define` option:
   - `REACT_APP_COMMIT_HASH` - Git commit hash
   - `REACT_APP_OPENSCAN_NETWORKS` - Comma-separated chain IDs to display
   - `REACT_APP_ENVIRONMENT` - production/development

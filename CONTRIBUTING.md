@@ -6,8 +6,7 @@ Thank you for your interest in contributing to OpenScan! This guide will help yo
 
 ### Prerequisites
 
-- Node.js v22
-- npm
+- [Bun](https://bun.sh/) v1.1.0 or later
 
 ### Setup
 
@@ -19,7 +18,7 @@ Thank you for your interest in contributing to OpenScan! This guide will help yo
    ```
 3. Install dependencies:
    ```bash
-   npm install
+   bun install
    ```
 4. Start the development server:
    ```bash

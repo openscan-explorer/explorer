@@ -30,7 +30,7 @@ cleanup_ports() {
         kill $(lsof -t -i :8545) 2>/dev/null || true
     fi
     if lsof -i :3000 > /dev/null 2>&1; then
-        echo "⚠️  Killing existing process on port 3000..."
+        echo "⚠️  Killing existing process on port 3030..."
         kill $(lsof -t -i :3000) 2>/dev/null || true
     fi
     sleep 2
