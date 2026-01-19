@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/">
+  <ShortName>OpenScan</ShortName>
+  <Description>Search blockchain addresses, transactions, and blocks across multiple networks</Description>
+  <InputEncoding>UTF-8</InputEncoding>
+  <Image width="16" height="16" type="image/png">/openscan-logo.png</Image>
+  <Url type="text/html" template="/#/search?q={searchTerms}"/>
+</OpenSearchDescription>
