@@ -1,4 +1,8 @@
-import type { EthereumClient } from "@openscan/network-connectors";
+import type {
+  EthereumClient,
+  EthTransaction,
+  EthTransactionReceipt,
+} from "@openscan/network-connectors";
 import type { Transaction } from "../types";
 import { hexToNumber } from "./adapters/EVMAdapter/utils";
 
@@ -145,8 +149,8 @@ export class AddressTransactionSearch {
     if (!block || !block.transactions) return [];
 
     // First pass: identify direct transactions (from/to matches address)
-    const directTxs: Array<{ tx: any; isSent: boolean }> = [];
-    const otherTxs: Array<{ tx: any }> = [];
+    const directTxs: Array<{ tx: EthTransaction; isSent: boolean }> = [];
+    const otherTxs: Array<{ tx: EthTransaction }> = [];
 
     for (const tx of block.transactions) {
       if (typeof tx === "string") continue;
@@ -166,7 +170,7 @@ export class AddressTransactionSearch {
 
     // Second pass: fetch receipts for direct transactions
     const RECEIPT_BATCH_SIZE = 20;
-    const receipts = new Map<string, any>();
+    const receipts = new Map<string, EthTransactionReceipt | null>();
 
     for (let i = 0; i < directTxs.length; i += RECEIPT_BATCH_SIZE) {
       const batch = directTxs.slice(i, i + RECEIPT_BATCH_SIZE);
@@ -224,11 +228,11 @@ export class AddressTransactionSearch {
 
       // First: check tx.input for all transactions (no RPC calls needed)
       // This catches Disperse.app, multicall, and similar contracts
-      const txsWithAddressInInput: Array<{ tx: any }> = [];
-      const txsNeedingReceiptCheck: Array<{ tx: any }> = [];
+      const txsWithAddressInInput: Array<{ tx: EthTransaction }> = [];
+      const txsNeedingReceiptCheck: Array<{ tx: EthTransaction }> = [];
 
       for (const { tx } of otherTxs) {
-        if (tx.input && tx.input.toLowerCase().includes(normalizedAddr)) {
+        if (tx.input?.toLowerCase().includes(normalizedAddr)) {
           txsWithAddressInInput.push({ tx });
         } else {
           txsNeedingReceiptCheck.push({ tx });
