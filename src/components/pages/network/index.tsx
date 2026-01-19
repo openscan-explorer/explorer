@@ -61,6 +61,7 @@ export default function Network() {
             blocks={dashboard.latestBlocks}
             networkId={numericNetworkId}
             loading={dashboard.loading && dashboard.latestBlocks.length === 0}
+            currency={currency}
           />
           <LatestTransactionsTable
             transactions={dashboard.latestTransactions}

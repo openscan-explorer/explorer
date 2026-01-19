@@ -4932,6 +4932,29 @@
 	color: var(--color-primary);
 }
 
+.dashboard-block-details {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	flex: 1;
+	justify-content: center;
+}
+
+.dashboard-block-gas {
+	font-size: 0.75rem;
+	color: var(--color-text-muted);
+	background: rgba(255, 255, 255, 0.05);
+	padding: 2px 6px;
+	border-radius: 4px;
+}
+
+.dashboard-block-reward {
+	font-family: "JetBrains Mono", monospace;
+	font-size: 0.7rem;
+	color: var(--color-accent, #f59e0b);
+	white-space: nowrap;
+}
+
 /* Transaction Row Styles */
 .dashboard-tx-info {
 	flex: 0 0 auto;
