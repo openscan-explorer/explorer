@@ -14,9 +14,14 @@ interface TransactionHistoryProps {
   searchTriggered: boolean;
   searchingTxs: boolean;
   searchLimit?: number; // Selected search limit (5, 10, 50, or 0 for all)
+  searchVersion?: number; // Counter tracking search executions (> 0 means search was executed)
+  hasCachedData?: boolean; // Whether we loaded data from cache
+  oldestSearchedBlock?: number; // Oldest block that was searched (from cache or search)
   onStartSearch: (limit: number) => void;
   onCancelSearch?: () => void; // Cancel an in-progress search
   onLoadMore?: (limit: number) => void; // Load more transactions with specified limit
+  onSearchRecent?: () => void; // Search for recent transactions (new since cache)
+  onClearCache?: () => void; // Clear the transaction cache and reset
   txCount?: number; // Nonce (outgoing tx count) - used as minimum estimate for progress
 }
 
@@ -30,9 +35,14 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
   searchTriggered,
   searchingTxs,
   searchLimit = 100,
+  searchVersion = 0,
+  hasCachedData = false,
+  oldestSearchedBlock = 0,
   onStartSearch,
   onCancelSearch,
   onLoadMore,
+  onSearchRecent,
+  onClearCache,
   txCount = 0,
 }) => {
   const [selectedLimit, setSelectedLimit] = useState<number>(10);
@@ -109,6 +119,29 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
   );
 
   const hasContractAbi = useMemo(() => contractAbi && contractAbi.length > 0, [contractAbi]);
+
+  // Calculate block range from transactions (use oldestSearchedBlock if available for accurate range)
+  const blockRange = useMemo(() => {
+    if (transactionDetails.length === 0) return null;
+    let newest = 0;
+    for (const tx of transactionDetails) {
+      const blockNum = tx.blockNumber ? parseInt(tx.blockNumber, 16) : 0;
+      if (blockNum > newest) newest = blockNum;
+    }
+    if (newest === 0) return null;
+    // Use oldestSearchedBlock if a search has been done (hasCachedData or searchVersion > 0)
+    // This includes 0 when full history was searched
+    // Otherwise fall back to oldest tx block
+    const hasSearchedRange = hasCachedData || searchVersion > 0;
+    const oldest = hasSearchedRange
+      ? oldestSearchedBlock
+      : transactionDetails.reduce((min, tx) => {
+          const blockNum = tx.blockNumber ? parseInt(tx.blockNumber, 16) : 0;
+          return blockNum > 0 && blockNum < min ? blockNum : min;
+        }, Number.MAX_SAFE_INTEGER);
+    if (oldest === Number.MAX_SAFE_INTEGER) return null;
+    return { oldest, newest };
+  }, [transactionDetails, oldestSearchedBlock, hasCachedData, searchVersion]);
 
   // Render transaction table - extracted to avoid duplication
   const renderTransactionTable = (transactions: Transaction[]) => (
@@ -385,8 +418,8 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
         )}
       </div>
 
-      {/* Completed progress bar */}
-      {transactionsResult && transactionDetails.length > 0 && (
+      {/* Completed progress bar - only show after a search has been executed */}
+      {searchVersion > 0 && transactionsResult && transactionDetails.length > 0 && (
         <div className="tx-search-progress">
           <div className="tx-search-progress-bar">
             <div
@@ -404,6 +437,17 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
         </div>
       )}
 
+      {/* Block range info - always show when there are transactions */}
+      {transactionDetails.length > 0 && blockRange && (
+        <div className="tx-search-progress-info">
+          <span className="tx-search-progress-text">
+            Showing {transactionDetails.length} transaction
+            {transactionDetails.length === 1 ? "" : "s"} from blocks{" "}
+            {blockRange.oldest.toLocaleString()} to {blockRange.newest.toLocaleString()}
+          </span>
+        </div>
+      )}
+
       {/* Warning message for partial data */}
       {transactionsResult?.message && (
         <div
@@ -418,6 +462,15 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
 
       {/* Loading state */}
       {loadingTxDetails && <div className="tx-history-empty">Loading transaction details...</div>}
+
+      {/* Search Recent button - always shown when we have cached data (new blocks could have new txs) */}
+      {!loadingTxDetails && hasCachedData && onSearchRecent && (
+        <div className="tx-history-search-recent">
+          <button type="button" className="tx-history-search-recent-btn" onClick={onSearchRecent}>
+            Search Recent Transactions
+          </button>
+        </div>
+      )}
 
       {/* Transaction table */}
       {!loadingTxDetails &&
@@ -495,6 +548,15 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
             </div>
           </div>
         )}
+
+      {/* Clear cache link */}
+      {!loadingTxDetails && transactionDetails.length > 0 && onClearCache && (
+        <div className="tx-history-clear-cache">
+          <button type="button" className="tx-history-clear-cache-btn" onClick={onClearCache}>
+            Clear tx cache
+          </button>
+        </div>
+      )}
 
       {/* Empty state */}
       {!loadingTxDetails && transactionDetails.length === 0 && !transactionsResult?.message && (

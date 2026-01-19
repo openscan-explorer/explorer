@@ -134,7 +134,7 @@ export class EVMAdapter extends NetworkAdapter {
 
   async getAddressTransactions(
     address: string,
-    _fromBlock?: number | "earliest",
+    fromBlock?: number | "earliest",
     toBlock?: number | "latest",
     limit = 100,
     onTransactionsFound?: (txs: Transaction[]) => void,
@@ -145,6 +145,7 @@ export class EVMAdapter extends NetworkAdapter {
       const result = await this.txSearch.searchAddressActivity(address, {
         limit,
         toBlock: typeof toBlock === "number" ? toBlock : undefined,
+        fromBlock: typeof fromBlock === "number" ? fromBlock : undefined,
         onTransactionsFound: onTransactionsFound
           ? (txs) => {
               // Strip the 'type' property from transactions before passing to callback

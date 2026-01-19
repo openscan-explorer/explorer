@@ -27,9 +27,14 @@ interface ERC721DisplayProps {
   searchTriggered: boolean;
   searchingTxs: boolean;
   searchLimit: number;
+  searchVersion?: number;
+  hasCachedData?: boolean;
+  oldestSearchedBlock?: number;
   onStartSearch: (limit: number) => void;
   onCancelSearch?: () => void;
   onLoadMore?: (limit: number) => void;
+  onSearchRecent?: () => void;
+  onClearCache?: () => void;
   metadata?: RPCMetadata;
   selectedProvider?: string | null;
   onProviderSelect?: (provider: string) => void;
@@ -52,9 +57,14 @@ const ERC721Display: React.FC<ERC721DisplayProps> = ({
   searchTriggered,
   searchingTxs,
   searchLimit,
+  searchVersion = 0,
+  hasCachedData = false,
+  oldestSearchedBlock = 0,
   onStartSearch,
   onCancelSearch,
   onLoadMore,
+  onSearchRecent,
+  onClearCache,
   metadata,
   selectedProvider,
   onProviderSelect,
@@ -366,9 +376,14 @@ const ERC721Display: React.FC<ERC721DisplayProps> = ({
           searchTriggered={searchTriggered}
           searchingTxs={searchingTxs}
           searchLimit={searchLimit}
+          searchVersion={searchVersion}
+          hasCachedData={hasCachedData}
+          oldestSearchedBlock={oldestSearchedBlock}
           onStartSearch={onStartSearch}
           onCancelSearch={onCancelSearch}
           onLoadMore={onLoadMore}
+          onSearchRecent={onSearchRecent}
+          onClearCache={onClearCache}
           contractAbi={contractData?.abi}
           txCount={Number(address.txCount)}
         />

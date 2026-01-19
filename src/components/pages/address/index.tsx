@@ -22,6 +22,72 @@ import {
   ERC1155Display,
 } from "./displays";
 
+// Transaction cache utilities
+const TX_CACHE_PREFIX = "tx_cache_";
+const CACHE_EXPIRY_MS = 7 * 24 * 60 * 60 * 1000; // 1 week
+
+interface TxCache {
+  transactions: Transaction[];
+  timestamp: number;
+  isComplete: boolean;
+  oldestSearchedBlock: number; // Lowest block we've searched to (for Load More)
+}
+
+function getTxCacheKey(networkId: number, address: string): string {
+  return `${TX_CACHE_PREFIX}${networkId}_${address.toLowerCase()}`;
+}
+
+function loadTxCache(networkId: number, address: string): TxCache | null {
+  try {
+    const key = getTxCacheKey(networkId, address);
+    const cached = localStorage.getItem(key);
+    if (!cached) return null;
+
+    const data = JSON.parse(cached) as TxCache;
+    if (Date.now() - data.timestamp > CACHE_EXPIRY_MS) {
+      localStorage.removeItem(key);
+      return null;
+    }
+    return data;
+  } catch {
+    return null;
+  }
+}
+
+function saveTxCache(networkId: number, address: string, cache: TxCache): void {
+  try {
+    const key = getTxCacheKey(networkId, address);
+    localStorage.setItem(key, JSON.stringify(cache));
+  } catch {
+    // localStorage might be full or disabled
+  }
+}
+
+function clearTxCache(networkId: number, address: string): void {
+  try {
+    const key = getTxCacheKey(networkId, address);
+    localStorage.removeItem(key);
+  } catch {
+    // Ignore errors
+  }
+}
+
+function getNewestBlockFromTxs(transactions: Transaction[]): number {
+  if (transactions.length === 0) return 0;
+  return Math.max(
+    ...transactions.map((tx) => (tx.blockNumber ? Number.parseInt(tx.blockNumber, 16) : 0)),
+  );
+}
+
+function getOldestBlockFromTxs(transactions: Transaction[]): number {
+  if (transactions.length === 0) return Number.MAX_SAFE_INTEGER;
+  return Math.min(
+    ...transactions.map((tx) =>
+      tx.blockNumber ? Number.parseInt(tx.blockNumber, 16) : Number.MAX_SAFE_INTEGER,
+    ),
+  );
+}
+
 export default function Address() {
   const { networkId, address: addressParam } = useParams<{
     networkId?: string;
@@ -42,10 +108,15 @@ export default function Address() {
   const [searchLimit, setSearchLimit] = useState(100);
   const [searchingTxs, setSearchingTxs] = useState(false);
   const loadMoreFromBlockRef = useRef<number | undefined>(undefined); // Use ref to avoid triggering effect
+  const searchToBlockRef = useRef<number | undefined>(undefined); // For "Search Recent" - stop at this block
   const [searchVersion, setSearchVersion] = useState(0); // Counter to force effect re-run
   const searchIdRef = useRef(0); // Counter to track active search and ignore stale callbacks
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Cache-related state
+  const [hasCachedData, setHasCachedData] = useState(false);
+  const [oldestSearchedBlock, setOldestSearchedBlock] = useState(0); // Oldest block from cache (for Load More)
 
   // ENS resolution state
   const [resolvedAddress, setResolvedAddress] = useState<string | null>(null);
@@ -210,15 +281,18 @@ export default function Address() {
 
   // Fetch transactions only when user triggers search - with streaming support and cancellation
   // Uses searchIdRef to track active search and prevent stale callbacks from a previous search
+  // searchVersion > 0 ensures we only search when user explicitly triggers (not when loading from cache)
   // biome-ignore lint/correctness/useExhaustiveDependencies: searchVersion is intentionally used to force re-run on Load More
   useEffect(() => {
     console.log(
       "[TxSearch Effect] Running, searchTriggered:",
       searchTriggered,
+      "searchVersion:",
+      searchVersion,
       "address:",
       address?.slice(0, 10),
     );
-    if (!dataService || !address || !searchTriggered) {
+    if (!dataService || !address || !searchTriggered || searchVersion === 0) {
       console.log("[TxSearch Effect] Early return - missing deps or not triggered");
       return;
     }
@@ -226,18 +300,28 @@ export default function Address() {
     // Increment search ID and capture it for this search instance
     searchIdRef.current += 1;
     const currentSearchId = searchIdRef.current;
-    console.log("[TxSearch Effect] Starting search, searchId:", currentSearchId);
     const toBlock = loadMoreFromBlockRef.current;
+    const fromBlock = searchToBlockRef.current;
     const isLoadMore = toBlock !== undefined;
+    const isSearchRecent = fromBlock !== undefined;
+    console.log(
+      "[TxSearch Effect] Starting search, searchId:",
+      currentSearchId,
+      "toBlock:",
+      toBlock,
+      "fromBlock:",
+      fromBlock,
+    );
 
     setSearchingTxs(true);
     setTransactionsResult(null);
 
-    // Only clear transactions and hash set for fresh search, not for "load more"
-    if (!isLoadMore) {
+    // Only clear transactions for fresh search, not for "load more" or "search recent"
+    if (!isLoadMore && !isSearchRecent) {
       console.log("[TxSearch Effect] Clearing transactions for fresh search");
       setTransactionDetails([]);
       transactionHashSet.current.clear();
+      setHasCachedData(false);
     }
 
     // Check if this search is still active (not superseded by a newer search)
@@ -266,11 +350,24 @@ export default function Address() {
       handleTransactionsFound(newTxs);
     };
 
-    // Pass toBlock for "load more" functionality
+    // Pass toBlock for "load more" and fromBlock for "search recent"
     dataService.networkAdapter
-      .getAddressTransactions(address, undefined, toBlock, searchLimit, wrappedCallback)
+      .getAddressTransactions(address, fromBlock, toBlock, searchLimit, wrappedCallback)
       .then((result) => {
         if (!isSearchActive()) return;
+
+        // Special handling for "Search Recent" when no new transactions found
+        if (isSearchRecent && result.transactions.length === 0) {
+          // Preserve existing cached data but show a warning
+          setTransactionsResult((prev) => ({
+            transactions: prev?.transactions || [],
+            source: prev?.source || "binary_search",
+            isComplete: prev?.isComplete || false, // Preserve original isComplete for Load More
+            message: "No recent transactions found",
+          }));
+          return;
+        }
+
         setTransactionsResult(result);
         // Transactions are already added via streaming callback, no need to set them again
         // Just ensure the hash set is populated for future "Load More" deduplication
@@ -279,6 +376,37 @@ export default function Address() {
             transactionHashSet.current.add(tx.hash);
           }
         }
+
+        // Save to localStorage cache after successful search
+        setTransactionDetails((currentTxs) => {
+          if (currentTxs.length > 0 && address) {
+            const oldestTxBlock = getOldestBlockFromTxs(currentTxs);
+            // For "Search Recent", don't update isComplete - it only searched recent blocks
+            // The full history isComplete status depends on searching older blocks
+            const cacheIsComplete = isSearchRecent ? false : result.isComplete;
+            // If search is complete, we searched to block 0
+            // For load more, use minimum of current and cached
+            // Otherwise use oldest tx block
+            let oldestSearched: number;
+            if (result.isComplete && !isSearchRecent) {
+              oldestSearched = 0;
+            } else if (isLoadMore) {
+              oldestSearched = Math.min(oldestTxBlock, oldestSearchedBlock || oldestTxBlock);
+            } else {
+              oldestSearched = oldestTxBlock;
+            }
+            saveTxCache(numericNetworkId, address, {
+              transactions: currentTxs,
+              timestamp: Date.now(),
+              isComplete: cacheIsComplete,
+              oldestSearchedBlock: oldestSearched,
+            });
+            // Update cache state
+            setOldestSearchedBlock(oldestSearched);
+            setHasCachedData(true);
+          }
+          return currentTxs; // Don't modify, just read
+        });
       })
       .catch((err) => {
         if (!isSearchActive()) return;
@@ -292,10 +420,9 @@ export default function Address() {
       .finally(() => {
         if (!isSearchActive()) return;
         setSearchingTxs(false);
-        // NOTE: Don't reset searchTriggered here - it controls whether results are shown
-        // Setting it to false would hide the transaction table and show the search prompt
-        // Reset loadMoreFromBlock after search completes
+        // Reset refs after search completes
         loadMoreFromBlockRef.current = undefined;
+        searchToBlockRef.current = undefined;
       });
   }, [dataService, address, searchTriggered, searchLimit, searchVersion, handleTransactionsFound]);
 
@@ -304,19 +431,47 @@ export default function Address() {
     console.log("[DEBUG transactionDetails changed] length:", transactionDetails.length);
   }, [transactionDetails]);
 
-  // Reset search state when address changes
+  // Reset search state when address changes and load from cache if available
   useEffect(() => {
     console.log(
       "[Address Reset Effect] Resetting search state for address:",
       address?.slice(0, 10),
     );
+
+    // Reset all state
     setSearchTriggered(false);
     setSearchLimit(100);
     loadMoreFromBlockRef.current = undefined;
+    searchToBlockRef.current = undefined;
     setTransactionsResult(null);
     setTransactionDetails([]);
-    transactionHashSet.current.clear(); // Clear the hash set
-  }, [address]);
+    transactionHashSet.current.clear();
+    setHasCachedData(false);
+    setOldestSearchedBlock(0);
+
+    // Try to load from cache
+    if (address) {
+      const cache = loadTxCache(numericNetworkId, address);
+      if (cache && cache.transactions.length > 0) {
+        console.log("[Cache] Loaded", cache.transactions.length, "transactions from cache");
+        setTransactionDetails(cache.transactions);
+        setHasCachedData(true);
+        setOldestSearchedBlock(cache.oldestSearchedBlock);
+        // Populate hash set with cached transactions
+        for (const tx of cache.transactions) {
+          transactionHashSet.current.add(tx.hash);
+        }
+        // Set searchTriggered to show the table (but not searching)
+        setSearchTriggered(true);
+        // Create a result object to show status
+        setTransactionsResult({
+          transactions: cache.transactions.map((tx) => tx.hash),
+          source: "binary_search",
+          isComplete: cache.isComplete,
+        });
+      }
+    }
+  }, [address, numericNetworkId]);
 
   // Handler to start transaction search with specified limit
   const handleStartSearch = (limit: number) => {
@@ -336,18 +491,52 @@ export default function Address() {
   const handleLoadMore = (limit: number) => {
     if (transactionDetails.length === 0) return;
 
-    // Find the oldest (lowest block number) transaction
-    const oldestTx = transactionDetails.reduce((oldest, tx) => {
-      const blockNum = Number.parseInt(tx.blockNumber || "0", 16);
-      const oldestBlockNum = Number.parseInt(oldest.blockNumber || "0", 16);
-      return blockNum < oldestBlockNum ? tx : oldest;
-    });
+    // Use cached oldest block if available, otherwise find from transactions
+    let oldestBlockNum: number;
+    if (oldestSearchedBlock > 0) {
+      oldestBlockNum = oldestSearchedBlock;
+    } else {
+      const oldestTx = transactionDetails.reduce((oldest, tx) => {
+        const blockNum = Number.parseInt(tx.blockNumber || "0", 16);
+        const oldestBlockNum = Number.parseInt(oldest.blockNumber || "0", 16);
+        return blockNum < oldestBlockNum ? tx : oldest;
+      });
+      oldestBlockNum = Number.parseInt(oldestTx.blockNumber || "0", 16);
+    }
 
-    const oldestBlockNum = Number.parseInt(oldestTx.blockNumber || "0", 16);
     loadMoreFromBlockRef.current = oldestBlockNum;
+    searchToBlockRef.current = undefined; // Search down to block 0
     setSearchLimit(limit);
     setSearchTriggered(true);
     setSearchVersion((v) => v + 1); // Force effect re-run
+  };
+
+  // Handler to search for recent transactions (new txs since cache was saved)
+  const handleSearchRecent = () => {
+    if (transactionDetails.length === 0) return;
+
+    // Find the newest (highest block number) transaction in cache
+    const newestBlock = getNewestBlockFromTxs(transactionDetails);
+
+    // Search from latest block down to the newest cached block + 1
+    loadMoreFromBlockRef.current = undefined; // Start from latest
+    searchToBlockRef.current = newestBlock + 1; // Stop before cached transactions
+    setSearchLimit(0); // No limit for recent search
+    setSearchTriggered(true);
+    setSearchVersion((v) => v + 1); // Force effect re-run
+  };
+
+  // Handler to clear the transaction cache and reset the table
+  const handleClearCache = () => {
+    if (!address) return;
+    clearTxCache(numericNetworkId, address);
+    setTransactionDetails([]);
+    setTransactionsResult(null);
+    transactionHashSet.current.clear();
+    setHasCachedData(false);
+    setOldestSearchedBlock(0);
+    setSearchTriggered(false);
+    setSearchVersion(0);
   };
 
   // Show ENS resolving state (must come first before other checks)
@@ -450,9 +639,14 @@ export default function Address() {
     searchTriggered,
     searchingTxs,
     searchLimit,
+    searchVersion,
+    hasCachedData,
+    oldestSearchedBlock: oldestSearchedBlock,
     onStartSearch: handleStartSearch,
     onCancelSearch: handleCancelSearch,
     onLoadMore: handleLoadMore,
+    onSearchRecent: handleSearchRecent,
+    onClearCache: handleClearCache,
     ensName,
     reverseResult,
     ensRecords,

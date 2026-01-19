@@ -350,13 +350,21 @@ export class AddressTransactionSearch {
     options: {
       limit?: number;
       toBlock?: number; // Search up to this block (exclusive) - for "load more" functionality
+      fromBlock?: number; // Stop searching at this block (inclusive) - for "search recent" functionality
       onProgress?: ProgressCallback;
       onTransactionsFound?: TransactionFoundCallback;
     } = {},
   ): Promise<SearchResult> {
-    const { limit = 100, toBlock, onProgress, onTransactionsFound } = options;
+    const { limit = 100, toBlock, fromBlock, onProgress, onTransactionsFound } = options;
     const normalizedAddress = address.toLowerCase();
-    console.log("[AddressTransactionSearch] Starting search, limit:", limit, "toBlock:", toBlock);
+    console.log(
+      "[AddressTransactionSearch] Starting search, limit:",
+      limit,
+      "toBlock:",
+      toBlock,
+      "fromBlock:",
+      fromBlock,
+    );
 
     // Clear cache for fresh search (unless continuing from previous search)
     if (!toBlock) {
@@ -373,7 +381,9 @@ export class AddressTransactionSearch {
     }
 
     // Get initial and final states (getState already handles delay)
-    const initialState = await this.getState(address, 0);
+    // If fromBlock is provided, use it as the lower bound instead of block 0
+    const startBlock = fromBlock !== undefined ? fromBlock : 0;
+    const initialState = await this.getState(address, startBlock);
     const finalState = await this.getState(address, endBlock);
 
     // No activity if states are identical and nonce is 0
@@ -497,8 +507,8 @@ export class AddressTransactionSearch {
     // Report progress
     onProgress?.({ phase: "searching", current: 0, total: 1 });
 
-    // Run unified search
-    await search(0, endBlock, initialState, finalState);
+    // Run unified search (use startBlock which is fromBlock if provided, otherwise 0)
+    await search(startBlock, endBlock, initialState, finalState);
 
     // Sort blocks (newest first) for the result
     const sortedBlocks = Array.from(foundBlocks).sort((a, b) => b - a);
