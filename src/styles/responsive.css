@@ -1287,13 +1287,13 @@
 
 @media (max-width: 480px) {
   .rpc-indicator-dropdown {
-    position: fixed;
-    top: auto;
-    bottom: 16px;
-    left: 16px;
-    right: 16px;
-    width: auto;
-    max-width: none;
+    position: absolute;
+    top: calc(100% + 4px);
+    right: 0;
+    left: auto;
+    bottom: auto;
+    width: calc(100vw - 32px);
+    max-width: 300px;
   }
 
   .rpc-indicator-item-url {
