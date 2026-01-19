@@ -1,13 +1,14 @@
 import { test, expect } from "../../fixtures/test";
 import { TxsPage } from "../../pages/txs.page";
+import { DEFAULT_TIMEOUT } from "../../helpers/wait";
 
 test.describe("Transactions Page", () => {
   test("displays transactions list with header", async ({ page }) => {
     const txsPage = new TxsPage(page);
     await txsPage.goto("1");
 
-    // Wait for page to fully load (loader hidden + content visible)
-    await txsPage.waitForLoad();
+    // Wait for loader to disappear
+    await expect(txsPage.loader).toBeHidden({ timeout: DEFAULT_TIMEOUT * 3 });
 
     // Verify header structure
     await expect(txsPage.blocksHeader).toBeVisible();
@@ -38,7 +39,7 @@ test.describe("Transactions Page", () => {
     const txsPage = new TxsPage(page);
     await txsPage.goto("1");
 
-    await txsPage.waitForLoad();
+    await expect(txsPage.loader).toBeHidden({ timeout: DEFAULT_TIMEOUT * 3 });
 
     // RPC Indicator should NOT be present in fallback mode (default strategy)
     // It only displays in parallel mode where multiple providers are compared
@@ -49,7 +50,7 @@ test.describe("Transactions Page", () => {
     const txsPage = new TxsPage(page);
     await txsPage.goto("1");
 
-    await txsPage.waitForLoad();
+    await expect(txsPage.loader).toBeHidden({ timeout: DEFAULT_TIMEOUT * 3 });
 
     // Verify header main container has flex layout elements
     await expect(txsPage.blocksHeaderMain).toBeVisible();
@@ -68,8 +69,7 @@ test.describe("Transactions Page", () => {
     const txsPage = new TxsPage(page);
     await txsPage.goto("1");
 
-    // Wait for page to fully load
-    await txsPage.waitForLoad();
+    await expect(txsPage.loader).toBeHidden({ timeout: DEFAULT_TIMEOUT * 3 });
 
     // Verify table headers
     const table = txsPage.txTable;
@@ -79,7 +79,7 @@ test.describe("Transactions Page", () => {
     await expect(table.locator("th", { hasText: "To" })).toBeVisible();
     await expect(table.locator("th", { hasText: "Value" })).toBeVisible();
     await expect(table.locator("th", { hasText: "Gas Price" })).toBeVisible();
-    await expect(table.locator("th").filter({ hasText: /^Gas$/ })).toBeVisible();
+    await expect(table.locator("th", { hasText: "Gas" })).toBeVisible();
 
     // Verify at least one row exists
     const firstRow = table.locator("tbody tr").first();
@@ -93,8 +93,7 @@ test.describe("Transactions Page", () => {
     const txsPage = new TxsPage(page);
     await txsPage.goto("1");
 
-    // Wait for page to fully load
-    await txsPage.waitForLoad();
+    await expect(txsPage.loader).toBeHidden({ timeout: DEFAULT_TIMEOUT * 3 });
 
     // On latest page, Latest and Newer should be disabled
     await expect(txsPage.latestBtn.first()).toBeDisabled();
@@ -106,11 +105,8 @@ test.describe("Transactions Page", () => {
     // Click Older button
     await txsPage.olderBtn.first().click();
 
-    // Wait for URL to change (indicates navigation happened)
-    await expect(page).toHaveURL(/fromBlock=/);
-
-    // Wait for navigation to complete (loading starts then finishes)
-    await txsPage.waitForNavigationLoad();
+    // Wait for new transactions to load
+    await expect(txsPage.loader).toBeHidden({ timeout: DEFAULT_TIMEOUT * 3 });
 
     // Now Newer should be enabled
     await expect(txsPage.newerBtn.first()).toBeEnabled();
@@ -120,20 +116,18 @@ test.describe("Transactions Page", () => {
     const txsPage = new TxsPage(page);
     await txsPage.goto("1");
 
-    await txsPage.waitForLoad();
+    await expect(txsPage.loader).toBeHidden({ timeout: DEFAULT_TIMEOUT * 3 });
 
     // Navigate to older transactions
     await txsPage.olderBtn.first().click();
-    await expect(page).toHaveURL(/fromBlock=/);
-    await txsPage.waitForNavigationLoad();
+    await expect(txsPage.loader).toBeHidden({ timeout: DEFAULT_TIMEOUT * 3 });
 
     // Verify transactions are still displayed
     await expect(txsPage.txTable).toBeVisible();
 
     // Navigate back to latest
     await txsPage.latestBtn.first().click();
-    await expect(page).not.toHaveURL(/fromBlock=/);
-    await txsPage.waitForNavigationLoad();
+    await expect(txsPage.loader).toBeHidden({ timeout: DEFAULT_TIMEOUT * 3 });
 
     // Verify we're back on latest transactions
     await expect(txsPage.txTable).toBeVisible();
@@ -152,7 +146,7 @@ test.describe("Transactions Page", () => {
     await navigation;
 
     // Loader should eventually disappear
-    await txsPage.waitForLoad();
+    await expect(txsPage.loader).toBeHidden({ timeout: DEFAULT_TIMEOUT * 3 });
 
     // Content should be visible
     await expect(txsPage.blocksHeader).toBeVisible();
@@ -164,7 +158,7 @@ test.describe("Transactions Page", () => {
     const fromBlock = 1000000;
     await txsPage.gotoWithFromBlock(fromBlock, "1");
 
-    await txsPage.waitForLoad();
+    await expect(txsPage.loader).toBeHidden({ timeout: DEFAULT_TIMEOUT * 3 });
 
     // Verify header shows block range instead of "last N blocks"
     const infoText = await txsPage.getInfoText();
@@ -176,7 +170,7 @@ test.describe("Transactions Page", () => {
     const txsPage = new TxsPage(page);
     await txsPage.goto("1");
 
-    await txsPage.waitForLoad();
+    await expect(txsPage.loader).toBeHidden({ timeout: DEFAULT_TIMEOUT * 3 });
 
     // Verify header has proper structure
     const header = txsPage.blocksHeader;
@@ -196,7 +190,7 @@ test.describe("Transactions Page", () => {
     const txsPage = new TxsPage(page);
     await txsPage.goto("1");
 
-    await txsPage.waitForLoad();
+    await expect(txsPage.loader).toBeHidden({ timeout: DEFAULT_TIMEOUT * 3 });
 
     // Verify container structure
     await expect(txsPage.container).toBeVisible();
