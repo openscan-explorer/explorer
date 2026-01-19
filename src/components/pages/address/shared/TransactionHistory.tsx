@@ -2,49 +2,112 @@ import type React from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { toFunctionSelector } from "viem";
+import { useDataService } from "../../../../hooks/useDataService";
 import type { ABI, AddressTransactionsResult, FunctionABI, Transaction } from "../../../../types";
+
+// Transaction cache utilities
+const TX_CACHE_PREFIX = "tx_cache_";
+const CACHE_EXPIRY_MS = 7 * 24 * 60 * 60 * 1000; // 1 week
+
+interface TxCache {
+  transactions: Transaction[];
+  timestamp: number;
+  isComplete: boolean;
+  oldestSearchedBlock: number;
+}
+
+function getTxCacheKey(networkId: number, address: string): string {
+  return `${TX_CACHE_PREFIX}${networkId}_${address.toLowerCase()}`;
+}
+
+function loadTxCache(networkId: number, address: string): TxCache | null {
+  try {
+    const key = getTxCacheKey(networkId, address);
+    const cached = localStorage.getItem(key);
+    if (!cached) return null;
+
+    const data = JSON.parse(cached) as TxCache;
+    if (Date.now() - data.timestamp > CACHE_EXPIRY_MS) {
+      localStorage.removeItem(key);
+      return null;
+    }
+    return data;
+  } catch {
+    return null;
+  }
+}
+
+function saveTxCache(networkId: number, address: string, cache: TxCache): void {
+  try {
+    const key = getTxCacheKey(networkId, address);
+    localStorage.setItem(key, JSON.stringify(cache));
+  } catch {
+    // localStorage might be full or disabled
+  }
+}
+
+function clearTxCache(networkId: number, address: string): void {
+  try {
+    const key = getTxCacheKey(networkId, address);
+    localStorage.removeItem(key);
+  } catch {
+    // Ignore errors
+  }
+}
+
+function getNewestBlockFromTxs(transactions: Transaction[]): number {
+  if (transactions.length === 0) return 0;
+  return Math.max(
+    ...transactions.map((tx) => (tx.blockNumber ? Number.parseInt(tx.blockNumber, 16) : 0)),
+  );
+}
+
+function getOldestBlockFromTxs(transactions: Transaction[]): number {
+  if (transactions.length === 0) return Number.MAX_SAFE_INTEGER;
+  return Math.min(
+    ...transactions.map((tx) =>
+      tx.blockNumber ? Number.parseInt(tx.blockNumber, 16) : Number.MAX_SAFE_INTEGER,
+    ),
+  );
+}
 
 interface TransactionHistoryProps {
   networkId: string;
   addressHash: string;
-  transactionsResult?: AddressTransactionsResult | null;
-  transactionDetails: Transaction[];
-  loadingTxDetails: boolean;
   contractAbi?: ABI[];
-  searchTriggered: boolean;
-  searchingTxs: boolean;
-  searchLimit?: number; // Selected search limit (5, 10, 50, or 0 for all)
-  searchVersion?: number; // Counter tracking search executions (> 0 means search was executed)
-  hasCachedData?: boolean; // Whether we loaded data from cache
-  oldestSearchedBlock?: number; // Oldest block that was searched (from cache or search)
-  onStartSearch: (limit: number) => void;
-  onCancelSearch?: () => void; // Cancel an in-progress search
-  onLoadMore?: (limit: number) => void; // Load more transactions with specified limit
-  onSearchRecent?: () => void; // Search for recent transactions (new since cache)
-  onClearCache?: () => void; // Clear the transaction cache and reset
   txCount?: number; // Nonce (outgoing tx count) - used as minimum estimate for progress
 }
 
 const TransactionHistory: React.FC<TransactionHistoryProps> = ({
   networkId,
   addressHash,
-  transactionsResult,
-  transactionDetails,
-  loadingTxDetails,
   contractAbi,
-  searchTriggered,
-  searchingTxs,
-  searchLimit = 100,
-  searchVersion = 0,
-  hasCachedData = false,
-  oldestSearchedBlock = 0,
-  onStartSearch,
-  onCancelSearch,
-  onLoadMore,
-  onSearchRecent,
-  onClearCache,
   txCount = 0,
 }) => {
+  const numericNetworkId = Number(networkId) || 1;
+  const dataService = useDataService(numericNetworkId);
+
+  // Transaction state
+  const [transactionsResult, setTransactionsResult] = useState<AddressTransactionsResult | null>(
+    null,
+  );
+  const [transactionDetails, setTransactionDetails] = useState<Transaction[]>([]);
+  const transactionHashSet = useRef(new Set<string>());
+
+  // Search state
+  const [searchTriggered, setSearchTriggered] = useState(false);
+  const [searchLimit, setSearchLimit] = useState(100);
+  const [searchingTxs, setSearchingTxs] = useState(false);
+  const [searchVersion, setSearchVersion] = useState(0);
+  const loadMoreFromBlockRef = useRef<number | undefined>(undefined);
+  const searchToBlockRef = useRef<number | undefined>(undefined);
+  const searchIdRef = useRef(0);
+
+  // Cache state
+  const [hasCachedData, setHasCachedData] = useState(false);
+  const [oldestSearchedBlock, setOldestSearchedBlock] = useState(0);
+
+  // UI state
   const [selectedLimit, setSelectedLimit] = useState<number>(10);
   const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
   const [loadMoreDropdownOpen, setLoadMoreDropdownOpen] = useState<boolean>(false);
@@ -73,6 +136,221 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
     };
   }, [dropdownOpen, loadMoreDropdownOpen]);
 
+  // Optimized streaming callback
+  const handleTransactionsFound = useCallback((newTxs: Transaction[]) => {
+    const uniqueNewTxs = newTxs.filter((tx) => {
+      if (transactionHashSet.current.has(tx.hash)) return false;
+      transactionHashSet.current.add(tx.hash);
+      return true;
+    });
+
+    if (uniqueNewTxs.length === 0) return;
+
+    setTransactionDetails((prev) => {
+      const combined = [...prev, ...uniqueNewTxs];
+      if (prev.length > 0 && uniqueNewTxs.length > 0) {
+        combined.sort((a, b) => {
+          const blockA = Number.parseInt(a.blockNumber || "0", 16);
+          const blockB = Number.parseInt(b.blockNumber || "0", 16);
+          return blockB - blockA;
+        });
+      }
+      return combined;
+    });
+  }, []);
+
+  // Reset state and load cache when address changes
+  useEffect(() => {
+    setSearchTriggered(false);
+    setSearchLimit(100);
+    loadMoreFromBlockRef.current = undefined;
+    searchToBlockRef.current = undefined;
+    setTransactionsResult(null);
+    setTransactionDetails([]);
+    transactionHashSet.current.clear();
+    setHasCachedData(false);
+    setOldestSearchedBlock(0);
+    setSearchVersion(0);
+
+    // Try to load from cache
+    const cache = loadTxCache(numericNetworkId, addressHash);
+    if (cache && cache.transactions.length > 0) {
+      setTransactionDetails(cache.transactions);
+      setHasCachedData(true);
+      setOldestSearchedBlock(cache.oldestSearchedBlock);
+      for (const tx of cache.transactions) {
+        transactionHashSet.current.add(tx.hash);
+      }
+      setSearchTriggered(true);
+      setTransactionsResult({
+        transactions: cache.transactions.map((tx) => tx.hash),
+        source: "binary_search",
+        isComplete: cache.isComplete,
+      });
+    }
+  }, [addressHash, numericNetworkId]);
+
+  // Transaction search effect
+  useEffect(() => {
+    if (!dataService || !addressHash || !searchTriggered || searchVersion === 0) {
+      return;
+    }
+
+    searchIdRef.current += 1;
+    const currentSearchId = searchIdRef.current;
+    const toBlock = loadMoreFromBlockRef.current;
+    const fromBlock = searchToBlockRef.current;
+    const isLoadMore = toBlock !== undefined;
+    const isSearchRecent = fromBlock !== undefined;
+
+    setSearchingTxs(true);
+    setTransactionsResult(null);
+
+    if (!isLoadMore && !isSearchRecent) {
+      setTransactionDetails([]);
+      transactionHashSet.current.clear();
+      setHasCachedData(false);
+    }
+
+    const isSearchActive = () => searchIdRef.current === currentSearchId;
+
+    const wrappedCallback = (newTxs: Transaction[]) => {
+      if (!isSearchActive()) return;
+      handleTransactionsFound(newTxs);
+    };
+
+    dataService.networkAdapter
+      .getAddressTransactions(addressHash, fromBlock, toBlock, searchLimit, wrappedCallback)
+      .then((result) => {
+        if (!isSearchActive()) return;
+
+        if (isSearchRecent && result.transactions.length === 0) {
+          setTransactionsResult((prev) => ({
+            transactions: prev?.transactions || [],
+            source: prev?.source || "binary_search",
+            isComplete: prev?.isComplete || false,
+            message: "No recent transactions found",
+          }));
+          return;
+        }
+
+        setTransactionsResult(result);
+
+        if (result.transactionDetails) {
+          for (const tx of result.transactionDetails) {
+            transactionHashSet.current.add(tx.hash);
+          }
+        }
+
+        // Save to cache
+        setTransactionDetails((currentTxs) => {
+          if (currentTxs.length > 0) {
+            const oldestTxBlock = getOldestBlockFromTxs(currentTxs);
+            const cacheIsComplete = isSearchRecent ? false : result.isComplete;
+            let oldestSearched: number;
+            if (result.isComplete && !isSearchRecent) {
+              oldestSearched = 0;
+            } else if (isLoadMore) {
+              oldestSearched = Math.min(oldestTxBlock, oldestSearchedBlock || oldestTxBlock);
+            } else {
+              oldestSearched = oldestTxBlock;
+            }
+            saveTxCache(numericNetworkId, addressHash, {
+              transactions: currentTxs,
+              timestamp: Date.now(),
+              isComplete: cacheIsComplete,
+              oldestSearchedBlock: oldestSearched,
+            });
+            setOldestSearchedBlock(oldestSearched);
+            setHasCachedData(true);
+          }
+          return currentTxs;
+        });
+      })
+      .catch((err) => {
+        if (!isSearchActive()) return;
+        setTransactionsResult({
+          transactions: [],
+          source: "none",
+          isComplete: false,
+          message: `Failed to fetch transaction history: ${err.message}`,
+        });
+      })
+      .finally(() => {
+        if (!isSearchActive()) return;
+        setSearchingTxs(false);
+        loadMoreFromBlockRef.current = undefined;
+        searchToBlockRef.current = undefined;
+      });
+  }, [
+    dataService,
+    addressHash,
+    searchTriggered,
+    searchLimit,
+    searchVersion,
+    handleTransactionsFound,
+    numericNetworkId,
+    oldestSearchedBlock,
+  ]);
+
+  // Handlers
+  const handleStartSearch = (limit: number) => {
+    loadMoreFromBlockRef.current = undefined;
+    setSearchLimit(limit);
+    setSearchTriggered(true);
+    setSearchVersion((v) => v + 1);
+  };
+
+  const handleCancelSearch = () => {
+    setSearchTriggered(false);
+    setSearchingTxs(false);
+  };
+
+  const handleLoadMore = (limit: number) => {
+    if (transactionDetails.length === 0) return;
+
+    let oldestBlockNum: number;
+    if (oldestSearchedBlock > 0) {
+      oldestBlockNum = oldestSearchedBlock;
+    } else {
+      const oldestTx = transactionDetails.reduce((oldest, tx) => {
+        const blockNum = Number.parseInt(tx.blockNumber || "0", 16);
+        const oldestBlockNum = Number.parseInt(oldest.blockNumber || "0", 16);
+        return blockNum < oldestBlockNum ? tx : oldest;
+      });
+      oldestBlockNum = Number.parseInt(oldestTx.blockNumber || "0", 16);
+    }
+
+    loadMoreFromBlockRef.current = oldestBlockNum;
+    searchToBlockRef.current = undefined;
+    setSearchLimit(limit);
+    setSearchTriggered(true);
+    setSearchVersion((v) => v + 1);
+  };
+
+  const handleSearchRecent = () => {
+    if (transactionDetails.length === 0) return;
+
+    const newestBlock = getNewestBlockFromTxs(transactionDetails);
+    loadMoreFromBlockRef.current = undefined;
+    searchToBlockRef.current = newestBlock + 1;
+    setSearchLimit(0);
+    setSearchTriggered(true);
+    setSearchVersion((v) => v + 1);
+  };
+
+  const handleClearCache = () => {
+    clearTxCache(numericNetworkId, addressHash);
+    setTransactionDetails([]);
+    setTransactionsResult(null);
+    transactionHashSet.current.clear();
+    setHasCachedData(false);
+    setOldestSearchedBlock(0);
+    setSearchTriggered(false);
+    setSearchVersion(0);
+  };
+
+  // Utility functions
   const truncate = useCallback((str: string, start = 6, end = 4) => {
     if (!str) return "";
     if (str.length <= start + end) return str;
@@ -88,7 +366,6 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
     }
   }, []);
 
-  // Decode function name from calldata using ABI
   const decodeFunctionName = useCallback(
     (data: string | undefined): string | null => {
       if (!data || data === "0x" || data.length < 10) return null;
@@ -120,7 +397,6 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
 
   const hasContractAbi = useMemo(() => contractAbi && contractAbi.length > 0, [contractAbi]);
 
-  // Calculate block range from transactions (use oldestSearchedBlock if available for accurate range)
   const blockRange = useMemo(() => {
     if (transactionDetails.length === 0) return null;
     let newest = 0;
@@ -129,9 +405,6 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
       if (blockNum > newest) newest = blockNum;
     }
     if (newest === 0) return null;
-    // Use oldestSearchedBlock if a search has been done (hasCachedData or searchVersion > 0)
-    // This includes 0 when full history was searched
-    // Otherwise fall back to oldest tx block
     const hasSearchedRange = hasCachedData || searchVersion > 0;
     const oldest = hasSearchedRange
       ? oldestSearchedBlock
@@ -143,7 +416,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
     return { oldest, newest };
   }, [transactionDetails, oldestSearchedBlock, hasCachedData, searchVersion]);
 
-  // Render transaction table - extracted to avoid duplication
+  // Render transaction table
   const renderTransactionTable = (transactions: Transaction[]) => (
     <div className="address-table-container">
       <table className="recent-transactions-table">
@@ -258,9 +531,9 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
               <button
                 type="button"
                 className="tx-history-search-btn"
-                onClick={() => onStartSearch(selectedLimit)}
+                onClick={() => handleStartSearch(selectedLimit)}
               >
-                🔍 Search Transactions
+                Search Transactions
               </button>
               <button
                 type="button"
@@ -327,13 +600,9 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
   }
 
   // Show searching state with live transaction table
-  // (transactions populate as they are found)
   if (searchingTxs) {
     const foundCount = transactionDetails.length;
-    // Use txCount (nonce) as minimum estimate - actual total may be higher due to incoming txs
-    // If searching for a limit, use that as target; otherwise use txCount as estimate
     const targetEstimate = searchLimit > 0 ? searchLimit : Math.max(txCount, 1);
-    // Calculate progress but cap at 95% while searching (never show complete until done)
     const rawProgress = targetEstimate > 0 ? (foundCount / targetEstimate) * 100 : 0;
     const progressPercent = Math.min(rawProgress, 95);
     const isIndeterminate = foundCount === 0;
@@ -348,7 +617,6 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
           </span>
         </div>
 
-        {/* Progress bar */}
         <div className="tx-search-progress">
           <div className="tx-search-progress-bar">
             <div
@@ -362,18 +630,14 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
                 ? "Searching for transactions..."
                 : `Found ${foundCount} transaction${foundCount === 1 ? "" : "s"}...`}
             </span>
-            {onCancelSearch && (
-              <button type="button" className="tx-history-cancel-btn" onClick={onCancelSearch}>
-                Cancel
-              </button>
-            )}
+            <button type="button" className="tx-history-cancel-btn" onClick={handleCancelSearch}>
+              Cancel
+            </button>
           </div>
         </div>
 
-        {/* Show transactions as they are found */}
         {transactionDetails.length > 0 && renderTransactionTable(transactionDetails)}
 
-        {/* Show searching indicator if no transactions yet */}
         {transactionDetails.length === 0 && (
           <div className="tx-history-searching">
             <div className="tx-history-searching-spinner" />
@@ -454,112 +718,108 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
           className={`tx-history-message ${transactionsResult.source === "none" ? "tx-history-message-error" : "tx-history-message-warning"}`}
         >
           <span className="tx-history-message-icon">
-            {transactionsResult.source === "none" ? "⚠️" : "ℹ️"}
+            {transactionsResult.source === "none" ? "Warning" : "Info"}
           </span>
           {transactionsResult.message}
         </div>
       )}
 
-      {/* Loading state */}
-      {loadingTxDetails && <div className="tx-history-empty">Loading transaction details...</div>}
-
-      {/* Search Recent button - always shown when we have cached data (new blocks could have new txs) */}
-      {!loadingTxDetails && hasCachedData && onSearchRecent && (
+      {/* Search Recent button - always shown when we have cached data */}
+      {hasCachedData && (
         <div className="tx-history-search-recent">
-          <button type="button" className="tx-history-search-recent-btn" onClick={onSearchRecent}>
+          <button
+            type="button"
+            className="tx-history-search-recent-btn"
+            onClick={handleSearchRecent}
+          >
             Search Recent Transactions
           </button>
         </div>
       )}
 
       {/* Transaction table */}
-      {!loadingTxDetails &&
-        transactionDetails.length > 0 &&
-        renderTransactionTable(transactionDetails)}
+      {transactionDetails.length > 0 && renderTransactionTable(transactionDetails)}
 
-      {/* Load More button with dropdown - hide when search is complete (no more txs to find) */}
-      {!loadingTxDetails &&
-        transactionDetails.length > 0 &&
-        onLoadMore &&
-        !transactionsResult?.isComplete && (
-          <div className="tx-history-load-more">
-            <div className="tx-history-button-group" ref={loadMoreDropdownRef}>
-              <button
-                type="button"
-                className="tx-history-load-more-btn"
-                onClick={() => onLoadMore(selectedLimit)}
-              >
-                Load More
-              </button>
-              <button
-                type="button"
-                className="tx-history-dropdown-toggle tx-history-load-more-toggle"
-                onClick={() => setLoadMoreDropdownOpen(!loadMoreDropdownOpen)}
-              >
-                <span className="tx-history-dropdown-count">
-                  {selectedLimit === 0 ? "All txs" : `${selectedLimit} txs`}
-                </span>
-                <span className="tx-history-dropdown-arrow">▼</span>
-              </button>
-              {loadMoreDropdownOpen && (
-                <div className="tx-history-dropdown-menu">
-                  <button
-                    type="button"
-                    className="tx-history-dropdown-item"
-                    onClick={() => {
-                      setSelectedLimit(5);
-                      setLoadMoreDropdownOpen(false);
-                    }}
-                  >
-                    5 more transactions
-                  </button>
-                  <button
-                    type="button"
-                    className="tx-history-dropdown-item"
-                    onClick={() => {
-                      setSelectedLimit(10);
-                      setLoadMoreDropdownOpen(false);
-                    }}
-                  >
-                    10 more transactions
-                  </button>
-                  <button
-                    type="button"
-                    className="tx-history-dropdown-item"
-                    onClick={() => {
-                      setSelectedLimit(50);
-                      setLoadMoreDropdownOpen(false);
-                    }}
-                  >
-                    50 more transactions
-                  </button>
-                  <button
-                    type="button"
-                    className="tx-history-dropdown-item"
-                    onClick={() => {
-                      setSelectedLimit(0);
-                      setLoadMoreDropdownOpen(false);
-                    }}
-                  >
-                    All remaining transactions
-                  </button>
-                </div>
-              )}
-            </div>
+      {/* Load More button with dropdown - hide when search is complete */}
+      {transactionDetails.length > 0 && !transactionsResult?.isComplete && (
+        <div className="tx-history-load-more">
+          <div className="tx-history-button-group" ref={loadMoreDropdownRef}>
+            <button
+              type="button"
+              className="tx-history-load-more-btn"
+              onClick={() => handleLoadMore(selectedLimit)}
+            >
+              Load More
+            </button>
+            <button
+              type="button"
+              className="tx-history-dropdown-toggle tx-history-load-more-toggle"
+              onClick={() => setLoadMoreDropdownOpen(!loadMoreDropdownOpen)}
+            >
+              <span className="tx-history-dropdown-count">
+                {selectedLimit === 0 ? "All txs" : `${selectedLimit} txs`}
+              </span>
+              <span className="tx-history-dropdown-arrow">▼</span>
+            </button>
+            {loadMoreDropdownOpen && (
+              <div className="tx-history-dropdown-menu">
+                <button
+                  type="button"
+                  className="tx-history-dropdown-item"
+                  onClick={() => {
+                    setSelectedLimit(5);
+                    setLoadMoreDropdownOpen(false);
+                  }}
+                >
+                  5 more transactions
+                </button>
+                <button
+                  type="button"
+                  className="tx-history-dropdown-item"
+                  onClick={() => {
+                    setSelectedLimit(10);
+                    setLoadMoreDropdownOpen(false);
+                  }}
+                >
+                  10 more transactions
+                </button>
+                <button
+                  type="button"
+                  className="tx-history-dropdown-item"
+                  onClick={() => {
+                    setSelectedLimit(50);
+                    setLoadMoreDropdownOpen(false);
+                  }}
+                >
+                  50 more transactions
+                </button>
+                <button
+                  type="button"
+                  className="tx-history-dropdown-item"
+                  onClick={() => {
+                    setSelectedLimit(0);
+                    setLoadMoreDropdownOpen(false);
+                  }}
+                >
+                  All remaining transactions
+                </button>
+              </div>
+            )}
           </div>
-        )}
+        </div>
+      )}
 
       {/* Clear cache link */}
-      {!loadingTxDetails && transactionDetails.length > 0 && onClearCache && (
+      {transactionDetails.length > 0 && (
         <div className="tx-history-clear-cache">
-          <button type="button" className="tx-history-clear-cache-btn" onClick={onClearCache}>
+          <button type="button" className="tx-history-clear-cache-btn" onClick={handleClearCache}>
             Clear tx cache
           </button>
         </div>
       )}
 
       {/* Empty state */}
-      {!loadingTxDetails && transactionDetails.length === 0 && !transactionsResult?.message && (
+      {transactionDetails.length === 0 && !transactionsResult?.message && (
         <div className="tx-history-empty">No transactions found for this address</div>
       )}
     </div>

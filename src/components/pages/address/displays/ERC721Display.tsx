@@ -6,12 +6,10 @@ import { useSourcify } from "../../../../hooks/useSourcify";
 import { fetchToken, getAssetUrl, type TokenMetadata } from "../../../../services/MetadataService";
 import type {
   Address,
-  AddressTransactionsResult,
   DecodedContenthash,
   ENSRecords,
   ENSReverseResult,
   RPCMetadata,
-  Transaction,
 } from "../../../../types";
 import { decodeAbiString } from "../../../../utils/hexUtils";
 import { AddressHeader, ContractDetails, TransactionHistory } from "../shared";
@@ -21,20 +19,6 @@ interface ERC721DisplayProps {
   address: Address;
   addressHash: string;
   networkId: string;
-  transactionsResult?: AddressTransactionsResult | null;
-  transactionDetails: Transaction[];
-  loadingTxDetails: boolean;
-  searchTriggered: boolean;
-  searchingTxs: boolean;
-  searchLimit: number;
-  searchVersion?: number;
-  hasCachedData?: boolean;
-  oldestSearchedBlock?: number;
-  onStartSearch: (limit: number) => void;
-  onCancelSearch?: () => void;
-  onLoadMore?: (limit: number) => void;
-  onSearchRecent?: () => void;
-  onClearCache?: () => void;
   metadata?: RPCMetadata;
   selectedProvider?: string | null;
   onProviderSelect?: (provider: string) => void;
@@ -51,20 +35,6 @@ const ERC721Display: React.FC<ERC721DisplayProps> = ({
   address,
   addressHash,
   networkId,
-  transactionsResult,
-  transactionDetails,
-  loadingTxDetails,
-  searchTriggered,
-  searchingTxs,
-  searchLimit,
-  searchVersion = 0,
-  hasCachedData = false,
-  oldestSearchedBlock = 0,
-  onStartSearch,
-  onCancelSearch,
-  onLoadMore,
-  onSearchRecent,
-  onClearCache,
   metadata,
   selectedProvider,
   onProviderSelect,
@@ -370,20 +340,6 @@ const ERC721Display: React.FC<ERC721DisplayProps> = ({
         <TransactionHistory
           networkId={networkId}
           addressHash={addressHash}
-          transactionsResult={transactionsResult}
-          transactionDetails={transactionDetails}
-          loadingTxDetails={loadingTxDetails}
-          searchTriggered={searchTriggered}
-          searchingTxs={searchingTxs}
-          searchLimit={searchLimit}
-          searchVersion={searchVersion}
-          hasCachedData={hasCachedData}
-          oldestSearchedBlock={oldestSearchedBlock}
-          onStartSearch={onStartSearch}
-          onCancelSearch={onCancelSearch}
-          onLoadMore={onLoadMore}
-          onSearchRecent={onSearchRecent}
-          onClearCache={onClearCache}
           contractAbi={contractData?.abi}
           txCount={Number(address.txCount)}
         />

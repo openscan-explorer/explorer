@@ -1,12 +1,10 @@
 import type React from "react";
 import type {
   Address,
-  AddressTransactionsResult,
   DecodedContenthash,
   ENSRecords,
   ENSReverseResult,
   RPCMetadata,
-  Transaction,
 } from "../../../../types";
 import { AddressHeader, BalanceSection, TransactionHistory } from "../shared";
 import ENSRecordsDetails from "../shared/ENSRecordsDisplay";
@@ -15,20 +13,6 @@ interface AccountDisplayProps {
   address: Address;
   addressHash: string;
   networkId: string;
-  transactionsResult?: AddressTransactionsResult | null;
-  transactionDetails: Transaction[];
-  loadingTxDetails: boolean;
-  searchTriggered: boolean;
-  searchingTxs: boolean;
-  searchLimit: number;
-  searchVersion?: number;
-  hasCachedData?: boolean;
-  oldestSearchedBlock?: number;
-  onStartSearch: (limit: number) => void;
-  onCancelSearch?: () => void;
-  onLoadMore?: (limit: number) => void;
-  onSearchRecent?: () => void;
-  onClearCache?: () => void;
   metadata?: RPCMetadata;
   selectedProvider?: string | null;
   onProviderSelect?: (provider: string) => void;
@@ -45,20 +29,6 @@ const AccountDisplay: React.FC<AccountDisplayProps> = ({
   address,
   addressHash,
   networkId,
-  transactionsResult,
-  transactionDetails,
-  loadingTxDetails,
-  searchTriggered,
-  searchingTxs,
-  searchLimit,
-  searchVersion = 0,
-  hasCachedData = false,
-  oldestSearchedBlock = 0,
-  onStartSearch,
-  onCancelSearch,
-  onLoadMore,
-  onSearchRecent,
-  onClearCache,
   metadata,
   selectedProvider,
   onProviderSelect,
@@ -100,20 +70,6 @@ const AccountDisplay: React.FC<AccountDisplayProps> = ({
         <TransactionHistory
           networkId={networkId}
           addressHash={addressHash}
-          transactionsResult={transactionsResult}
-          transactionDetails={transactionDetails}
-          loadingTxDetails={loadingTxDetails}
-          searchTriggered={searchTriggered}
-          searchingTxs={searchingTxs}
-          searchLimit={searchLimit}
-          searchVersion={searchVersion}
-          hasCachedData={hasCachedData}
-          oldestSearchedBlock={oldestSearchedBlock}
-          onStartSearch={onStartSearch}
-          onCancelSearch={onCancelSearch}
-          onLoadMore={onLoadMore}
-          onSearchRecent={onSearchRecent}
-          onClearCache={onClearCache}
           txCount={Number(address.txCount)}
         />
       </div>
