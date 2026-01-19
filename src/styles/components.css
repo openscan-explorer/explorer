@@ -2854,6 +2854,42 @@
 	font-weight: 600;
 }
 
+/* Fallback mode styles */
+.rpc-indicator-item.fallback-mode {
+	cursor: default;
+}
+
+.rpc-indicator-item.fallback-mode:hover {
+	background: transparent;
+}
+
+.rpc-indicator-fallback-info {
+	padding: 8px 16px;
+	background: var(--overlay-light-5);
+	border-bottom: 1px solid var(--overlay-light-10);
+	font-size: 12px;
+	color: var(--text-secondary);
+}
+
+.rpc-indicator-item-time {
+	margin-top: 4px;
+	font-size: 10px;
+	color: var(--text-tertiary);
+	padding-left: 24px;
+}
+
+.rpc-indicator-footer {
+	padding: 8px 16px;
+	border-top: 1px solid var(--overlay-light-10);
+	background: var(--overlay-light-3);
+}
+
+.rpc-indicator-footer-note {
+	font-size: 10px;
+	color: var(--text-secondary);
+	font-style: italic;
+}
+
 /* Version Warning Icon */
 .build-warning-icon {
 	position: relative;

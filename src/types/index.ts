@@ -289,10 +289,10 @@ export const DEFAULT_SETTINGS: UserSettings = {
 export type RPCStrategy = "fallback" | "parallel";
 
 /**
- * Metadata about RPC request when using parallel strategy
+ * Metadata about RPC request when using parallel or fallback strategy
  */
 export interface RPCMetadata {
-  strategy: "parallel";
+  strategy: "parallel" | "fallback";
   timestamp: number;
   responses: RPCProviderResponse[];
   hasInconsistencies: boolean;
