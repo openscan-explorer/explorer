@@ -135,12 +135,12 @@ export default function Search() {
 
   if (!query) {
     return (
-      <div className="container-wide">
-        <div className="block-display-card">
-          <div className="block-display-header">
-            <span className="block-label">Search</span>
-          </div>
-          <div className="card-content">
+      <div className="container-wide search-page-wrapper">
+        <div className="block-display-card search-results-card">
+          <div className="search-results-container">
+            <div className="search-results-header">
+              <h1 className="search-results-title">Search</h1>
+            </div>
             <p className="text-muted margin-0">No search query provided</p>
           </div>
         </div>
@@ -150,15 +150,16 @@ export default function Search() {
 
   if (searchType === "unknown") {
     return (
-      <div className="container-wide">
-        <div className="block-display-card">
-          <div className="block-display-header">
-            <span className="block-label">Search Results</span>
-            <span className="tx-mono header-subtitle" title={query}>
-              {truncateQuery(query, 32)}
-            </span>
-          </div>
-          <div className="card-content">
+      <div className="container-wide search-page-wrapper">
+        <div className="block-display-card search-results-card">
+          <div className="search-results-container">
+            <div className="search-results-header">
+              <h1 className="search-results-title">Search Results</h1>
+              <div className="search-results-query-display">
+                <span className="search-results-query-text">{query}</span>
+                <span className="search-type-badge search-type-badge-error">Invalid</span>
+              </div>
+            </div>
             <p className="text-error margin-0">
               Invalid search query. Enter an address (0x...), transaction hash, block number, or ENS
               name.

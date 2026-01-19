@@ -4797,6 +4797,12 @@
 	border: 1px solid rgba(139, 92, 246, 0.3);
 }
 
+.search-type-badge-error {
+	background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(220, 38, 38, 0.2));
+	color: #f87171;
+	border-color: rgba(239, 68, 68, 0.3);
+}
+
 .search-info-message {
 	background: rgba(59, 130, 246, 0.1);
 	border: 1px solid rgba(59, 130, 246, 0.2);
