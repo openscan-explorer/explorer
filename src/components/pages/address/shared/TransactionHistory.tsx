@@ -17,7 +17,7 @@ interface TransactionHistoryProps {
   onStartSearch: (limit: number) => void;
   onCancelSearch?: () => void; // Cancel an in-progress search
   onLoadMore?: (limit: number) => void; // Load more transactions with specified limit
-  txCount?: number; // Total transaction count for progress bar
+  txCount?: number; // Nonce (outgoing tx count) - used as minimum estimate for progress
 }
 
 const TransactionHistory: React.FC<TransactionHistoryProps> = ({
@@ -134,7 +134,10 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
                 </Link>
               </td>
               <td>
-                <Link to={`/${networkId}/block/${tx.blockNumber ? parseInt(tx.blockNumber, 16) : 0}`} className="address-table-link">
+                <Link
+                  to={`/${networkId}/block/${tx.blockNumber ? parseInt(tx.blockNumber, 16) : 0}`}
+                  className="address-table-link"
+                >
                   {tx.blockNumber ? parseInt(tx.blockNumber, 16).toLocaleString() : "Pending"}
                 </Link>
               </td>
@@ -294,10 +297,13 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
   // (transactions populate as they are found)
   if (searchingTxs) {
     const foundCount = transactionDetails.length;
-    // Use searchLimit if set (0 means all, so use txCount), otherwise use txCount
-    const targetCount = searchLimit > 0 ? Math.min(searchLimit, txCount) : txCount;
-    const progressPercent = targetCount > 0 ? Math.min((foundCount / targetCount) * 100, 100) : 0;
-    const isIndeterminate = foundCount === 0; // Show indeterminate animation when no txs found yet
+    // Use txCount (nonce) as minimum estimate - actual total may be higher due to incoming txs
+    // If searching for a limit, use that as target; otherwise use txCount as estimate
+    const targetEstimate = searchLimit > 0 ? searchLimit : Math.max(txCount, 1);
+    // Calculate progress but cap at 95% while searching (never show complete until done)
+    const rawProgress = targetEstimate > 0 ? (foundCount / targetEstimate) * 100 : 0;
+    const progressPercent = Math.min(rawProgress, 95);
+    const isIndeterminate = foundCount === 0;
 
     return (
       <div className="tx-details">
@@ -319,9 +325,9 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
           </div>
           <div className="tx-search-progress-info">
             <span className="tx-search-progress-text">
-              {isIndeterminate
+              {foundCount === 0
                 ? "Searching for transactions..."
-                : `Found ${foundCount} of ${targetCount} transactions`}
+                : `Found ${foundCount} transaction${foundCount === 1 ? "" : "s"}...`}
             </span>
             {onCancelSearch && (
               <button type="button" className="tx-history-cancel-btn" onClick={onCancelSearch}>
@@ -379,6 +385,25 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
         )}
       </div>
 
+      {/* Completed progress bar */}
+      {transactionsResult && transactionDetails.length > 0 && (
+        <div className="tx-search-progress">
+          <div className="tx-search-progress-bar">
+            <div
+              className="tx-search-progress-fill tx-search-progress-complete"
+              style={{ width: "100%" }}
+            />
+          </div>
+          <div className="tx-search-progress-info">
+            <span className="tx-search-progress-text">
+              {transactionsResult.isComplete
+                ? `Found all ${transactionDetails.length} transaction${transactionDetails.length === 1 ? "" : "s"}`
+                : `Found ${transactionDetails.length} transaction${transactionDetails.length === 1 ? "" : "s"}`}
+            </span>
+          </div>
+        </div>
+      )}
+
       {/* Warning message for partial data */}
       {transactionsResult?.message && (
         <div
@@ -399,74 +424,77 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
         transactionDetails.length > 0 &&
         renderTransactionTable(transactionDetails)}
 
-      {/* Load More button with dropdown */}
-      {!loadingTxDetails && transactionDetails.length > 0 && onLoadMore && (
-        <div className="tx-history-load-more">
-          <div className="tx-history-button-group" ref={loadMoreDropdownRef}>
-            <button
-              type="button"
-              className="tx-history-load-more-btn"
-              onClick={() => onLoadMore(selectedLimit)}
-            >
-              Load More
-            </button>
-            <button
-              type="button"
-              className="tx-history-dropdown-toggle tx-history-load-more-toggle"
-              onClick={() => setLoadMoreDropdownOpen(!loadMoreDropdownOpen)}
-            >
-              <span className="tx-history-dropdown-count">
-                {selectedLimit === 0 ? "All txs" : `${selectedLimit} txs`}
-              </span>
-              <span className="tx-history-dropdown-arrow">▼</span>
-            </button>
-            {loadMoreDropdownOpen && (
-              <div className="tx-history-dropdown-menu">
-                <button
-                  type="button"
-                  className="tx-history-dropdown-item"
-                  onClick={() => {
-                    setSelectedLimit(5);
-                    setLoadMoreDropdownOpen(false);
-                  }}
-                >
-                  5 more transactions
-                </button>
-                <button
-                  type="button"
-                  className="tx-history-dropdown-item"
-                  onClick={() => {
-                    setSelectedLimit(10);
-                    setLoadMoreDropdownOpen(false);
-                  }}
-                >
-                  10 more transactions
-                </button>
-                <button
-                  type="button"
-                  className="tx-history-dropdown-item"
-                  onClick={() => {
-                    setSelectedLimit(50);
-                    setLoadMoreDropdownOpen(false);
-                  }}
-                >
-                  50 more transactions
-                </button>
-                <button
-                  type="button"
-                  className="tx-history-dropdown-item"
-                  onClick={() => {
-                    setSelectedLimit(0);
-                    setLoadMoreDropdownOpen(false);
-                  }}
-                >
-                  All remaining transactions
-                </button>
-              </div>
-            )}
+      {/* Load More button with dropdown - hide when search is complete (no more txs to find) */}
+      {!loadingTxDetails &&
+        transactionDetails.length > 0 &&
+        onLoadMore &&
+        !transactionsResult?.isComplete && (
+          <div className="tx-history-load-more">
+            <div className="tx-history-button-group" ref={loadMoreDropdownRef}>
+              <button
+                type="button"
+                className="tx-history-load-more-btn"
+                onClick={() => onLoadMore(selectedLimit)}
+              >
+                Load More
+              </button>
+              <button
+                type="button"
+                className="tx-history-dropdown-toggle tx-history-load-more-toggle"
+                onClick={() => setLoadMoreDropdownOpen(!loadMoreDropdownOpen)}
+              >
+                <span className="tx-history-dropdown-count">
+                  {selectedLimit === 0 ? "All txs" : `${selectedLimit} txs`}
+                </span>
+                <span className="tx-history-dropdown-arrow">▼</span>
+              </button>
+              {loadMoreDropdownOpen && (
+                <div className="tx-history-dropdown-menu">
+                  <button
+                    type="button"
+                    className="tx-history-dropdown-item"
+                    onClick={() => {
+                      setSelectedLimit(5);
+                      setLoadMoreDropdownOpen(false);
+                    }}
+                  >
+                    5 more transactions
+                  </button>
+                  <button
+                    type="button"
+                    className="tx-history-dropdown-item"
+                    onClick={() => {
+                      setSelectedLimit(10);
+                      setLoadMoreDropdownOpen(false);
+                    }}
+                  >
+                    10 more transactions
+                  </button>
+                  <button
+                    type="button"
+                    className="tx-history-dropdown-item"
+                    onClick={() => {
+                      setSelectedLimit(50);
+                      setLoadMoreDropdownOpen(false);
+                    }}
+                  >
+                    50 more transactions
+                  </button>
+                  <button
+                    type="button"
+                    className="tx-history-dropdown-item"
+                    onClick={() => {
+                      setSelectedLimit(0);
+                      setLoadMoreDropdownOpen(false);
+                    }}
+                  >
+                    All remaining transactions
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
       {/* Empty state */}
       {!loadingTxDetails && transactionDetails.length === 0 && !transactionsResult?.message && (

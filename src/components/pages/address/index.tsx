@@ -42,6 +42,7 @@ export default function Address() {
   const [searchLimit, setSearchLimit] = useState(100);
   const [searchingTxs, setSearchingTxs] = useState(false);
   const loadMoreFromBlockRef = useRef<number | undefined>(undefined); // Use ref to avoid triggering effect
+  const [searchVersion, setSearchVersion] = useState(0); // Counter to force effect re-run
   const searchIdRef = useRef(0); // Counter to track active search and ignore stale callbacks
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -172,7 +173,12 @@ export default function Address() {
   // because React Strict Mode calls functional updaters twice, which would cause
   // the second call to see all transactions as duplicates
   const handleTransactionsFound = useCallback((newTxs: Transaction[]) => {
-    console.log("[handleTransactionsFound] Called with", newTxs.length, "txs, hashSet size:", transactionHashSet.current.size);
+    console.log(
+      "[handleTransactionsFound] Called with",
+      newTxs.length,
+      "txs, hashSet size:",
+      transactionHashSet.current.size,
+    );
     // Filter duplicates BEFORE the state update (outside functional updater)
     const uniqueNewTxs = newTxs.filter((tx) => {
       if (transactionHashSet.current.has(tx.hash)) return false;
@@ -204,8 +210,14 @@ export default function Address() {
 
   // Fetch transactions only when user triggers search - with streaming support and cancellation
   // Uses searchIdRef to track active search and prevent stale callbacks from a previous search
+  // biome-ignore lint/correctness/useExhaustiveDependencies: searchVersion is intentionally used to force re-run on Load More
   useEffect(() => {
-    console.log("[TxSearch Effect] Running, searchTriggered:", searchTriggered, "address:", address?.slice(0, 10));
+    console.log(
+      "[TxSearch Effect] Running, searchTriggered:",
+      searchTriggered,
+      "address:",
+      address?.slice(0, 10),
+    );
     if (!dataService || !address || !searchTriggered) {
       console.log("[TxSearch Effect] Early return - missing deps or not triggered");
       return;
@@ -232,14 +244,24 @@ export default function Address() {
     const isSearchActive = () => {
       const active = searchIdRef.current === currentSearchId;
       if (!active) {
-        console.log("[TxSearch] Search invalidated! current:", searchIdRef.current, "expected:", currentSearchId);
+        console.log(
+          "[TxSearch] Search invalidated! current:",
+          searchIdRef.current,
+          "expected:",
+          currentSearchId,
+        );
       }
       return active;
     };
 
     // Wrap the callback to check if search is still active
     const wrappedCallback = (newTxs: Transaction[]) => {
-      console.log("[TxSearch Callback] Received", newTxs.length, "txs, isActive:", isSearchActive());
+      console.log(
+        "[TxSearch Callback] Received",
+        newTxs.length,
+        "txs, isActive:",
+        isSearchActive(),
+      );
       if (!isSearchActive()) return;
       handleTransactionsFound(newTxs);
     };
@@ -275,7 +297,7 @@ export default function Address() {
         // Reset loadMoreFromBlock after search completes
         loadMoreFromBlockRef.current = undefined;
       });
-  }, [dataService, address, searchTriggered, searchLimit, handleTransactionsFound]);
+  }, [dataService, address, searchTriggered, searchLimit, searchVersion, handleTransactionsFound]);
 
   // Debug: Log when transactionDetails changes
   useEffect(() => {
@@ -283,9 +305,11 @@ export default function Address() {
   }, [transactionDetails]);
 
   // Reset search state when address changes
-  // biome-ignore lint/correctness/useExhaustiveDependencies: intentionally reset state when address changes
   useEffect(() => {
-    console.log("[Address Reset Effect] Resetting search state for address:", address?.slice(0, 10));
+    console.log(
+      "[Address Reset Effect] Resetting search state for address:",
+      address?.slice(0, 10),
+    );
     setSearchTriggered(false);
     setSearchLimit(100);
     loadMoreFromBlockRef.current = undefined;
@@ -299,6 +323,7 @@ export default function Address() {
     loadMoreFromBlockRef.current = undefined; // Fresh search
     setSearchLimit(limit);
     setSearchTriggered(true);
+    setSearchVersion((v) => v + 1); // Force effect re-run
   };
 
   // Handler to cancel an in-progress search
@@ -322,6 +347,7 @@ export default function Address() {
     loadMoreFromBlockRef.current = oldestBlockNum;
     setSearchLimit(limit);
     setSearchTriggered(true);
+    setSearchVersion((v) => v + 1); // Force effect re-run
   };
 
   // Show ENS resolving state (must come first before other checks)

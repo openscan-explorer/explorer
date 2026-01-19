@@ -40,7 +40,9 @@ interface SearchProgress {
 }
 
 type ProgressCallback = (progress: SearchProgress) => void;
-type TransactionFoundCallback = (txs: Array<Transaction & { type: "sent" | "received" | "internal" }>) => void;
+type TransactionFoundCallback = (
+  txs: Array<Transaction & { type: "sent" | "received" | "internal" }>,
+) => void;
 
 /**
  * Extract data from strategy result, handling both fallback and parallel modes
@@ -413,7 +415,12 @@ export class AddressTransactionSearch {
     ): Promise<void> => {
       // Check limit - stop if we have enough transactions (0 means no limit)
       if (limit > 0 && allTransactions.length >= limit) {
-        console.log("[Search] Limit reached, stopping. Found:", allTransactions.length, "Limit:", limit);
+        console.log(
+          "[Search] Limit reached, stopping. Found:",
+          allTransactions.length,
+          "Limit:",
+          limit,
+        );
         return;
       }
 
@@ -430,11 +437,22 @@ export class AddressTransactionSearch {
           // If only balance changed (not nonce), search for internal transactions
           const searchForInternal = balanceChanged && !nonceChanged;
           await this.delay(this.requestDelay);
-          const blockTxs = await this.fetchBlockTransactions(endBlock, normalizedAddress, searchForInternal);
+          const blockTxs = await this.fetchBlockTransactions(
+            endBlock,
+            normalizedAddress,
+            searchForInternal,
+          );
 
           if (blockTxs.length > 0) {
             allTransactions.push(...blockTxs);
-            console.log("[Search] Found", blockTxs.length, "txs in block", endBlock, "- Total:", allTransactions.length);
+            console.log(
+              "[Search] Found",
+              blockTxs.length,
+              "txs in block",
+              endBlock,
+              "- Total:",
+              allTransactions.length,
+            );
             // Notify callback immediately so UI can update
             onTransactionsFound?.(blockTxs);
           }
@@ -499,7 +517,15 @@ export class AddressTransactionSearch {
     const receivedCount = limitedTxs.filter((t) => t.type === "received").length;
     const internalCount = limitedTxs.filter((t) => t.type === "internal").length;
 
-    console.log("[AddressTransactionSearch] Search complete. Total found:", allTransactions.length, "Returning:", limitedTxs.length, "(internal:", internalCount, ")");
+    console.log(
+      "[AddressTransactionSearch] Search complete. Total found:",
+      allTransactions.length,
+      "Returning:",
+      limitedTxs.length,
+      "(internal:",
+      internalCount,
+      ")",
+    );
 
     return {
       blocks: sortedBlocks,

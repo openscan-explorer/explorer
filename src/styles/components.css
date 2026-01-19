@@ -4136,6 +4136,15 @@
 	animation: indeterminate 1.5s ease-in-out infinite;
 }
 
+.tx-search-progress-complete {
+	background: var(--color-success);
+	transition: width 0.3s ease-out;
+}
+
+.tx-search-progress-complete::after {
+	display: none;
+}
+
 @keyframes shimmer {
 	0% {
 		transform: translateX(-100%);
