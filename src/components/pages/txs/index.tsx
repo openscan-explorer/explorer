@@ -265,8 +265,8 @@ export default function Txs() {
                   <th>From</th>
                   <th>To</th>
                   <th>Value</th>
-                  <th>Gas Price</th>
-                  <th>Gas</th>
+                  <th className="hide-mobile">Gas Price</th>
+                  <th className="hide-mobile">Gas</th>
                 </tr>
               </thead>
               <tbody>
@@ -310,8 +310,12 @@ export default function Txs() {
                       )}
                     </td>
                     <td className="table-cell-value">{formatValue(transaction.value)}</td>
-                    <td className="table-cell-muted">{formatGasPrice(transaction.gasPrice)}</td>
-                    <td className="table-cell-muted">{Number(transaction.gas).toLocaleString()}</td>
+                    <td className="table-cell-muted hide-mobile">
+                      {formatGasPrice(transaction.gasPrice)}
+                    </td>
+                    <td className="table-cell-muted hide-mobile">
+                      {Number(transaction.gas).toLocaleString()}
+                    </td>
                   </tr>
                 ))}
               </tbody>

@@ -217,10 +217,10 @@ export default function Blocks() {
                 <th>Block</th>
                 <th>Timestamp</th>
                 <th>Txns</th>
-                <th>Miner</th>
+                <th className="hide-mobile">Miner</th>
                 <th>Gas Used</th>
-                <th>Gas Limit</th>
-                <th>Size</th>
+                <th className="hide-mobile">Gas Limit</th>
+                <th className="hide-mobile">Size</th>
               </tr>
             </thead>
             <tbody>
@@ -238,7 +238,7 @@ export default function Blocks() {
                   <td className="table-cell-value">
                     {block.transactions ? block.transactions.length : 0}
                   </td>
-                  <td className="table-cell-mono" title={block.miner}>
+                  <td className="table-cell-mono hide-mobile" title={block.miner}>
                     <Link
                       to={`/${networkId}/address/${block.miner}`}
                       className="table-cell-address"
@@ -247,8 +247,12 @@ export default function Blocks() {
                     </Link>
                   </td>
                   <td className="table-cell-text">{Number(block.gasUsed).toLocaleString()}</td>
-                  <td className="table-cell-muted">{Number(block.gasLimit).toLocaleString()}</td>
-                  <td className="table-cell-muted">{Number(block.size).toLocaleString()} bytes</td>
+                  <td className="table-cell-muted hide-mobile">
+                    {Number(block.gasLimit).toLocaleString()}
+                  </td>
+                  <td className="table-cell-muted hide-mobile">
+                    {Number(block.size).toLocaleString()} bytes
+                  </td>
                 </tr>
               ))}
             </tbody>
