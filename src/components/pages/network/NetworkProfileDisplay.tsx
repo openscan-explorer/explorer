@@ -64,7 +64,7 @@ const ProfileDisplay: React.FC<ProfileDisplayProps> = React.memo(({ network }) =
   }
 
   return (
-    <div className="container-wide profile-container">
+    <div className="profile-container">
       {/* Collapsed state - show button */}
       {profileState === "collapsed" && (
         <button type="button" className="profile-expand-button" onClick={handleExpandClick}>

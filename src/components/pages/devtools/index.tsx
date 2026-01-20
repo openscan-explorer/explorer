@@ -8,6 +8,8 @@ import TransactionsSection from "./TransactionsSection";
 import UtilsSection from "./UtilsSection";
 import "../../../styles/devtools.css";
 
+const validSections = ["transactions", "signatures", "utils", "contracts", "development"];
+
 const DevTools: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -16,10 +18,10 @@ const DevTools: React.FC = () => {
   const [activeSection, setActiveSection] = useState(sectionParam);
 
   useEffect(() => {
-    const newSection = searchParams.get("section") || "transactions";
-    const validSections = ["transactions", "signatures", "utils", "contracts", "development"];
+    const params = new URLSearchParams(location.search);
+    const newSection = params.get("section") || "transactions";
     setActiveSection(validSections.includes(newSection) ? newSection : "transactions");
-  }, [searchParams.get]);
+  }, [location.search]);
 
   const tabs = [
     { name: "transactions", label: "Transactions" },
@@ -38,6 +40,24 @@ const DevTools: React.FC = () => {
     <div className="container-wide">
       <div className="page-card devtools-content-wrapper">
         <h1 className="page-title-small text-center">Dev Tools</h1>
+
+        {/* Mobile dropdown */}
+        <div className="devtools-mobile-select">
+          <select
+            value={activeSection}
+            onChange={(e) => handleTabClick(e.target.value)}
+            className="devtools-section-select"
+          >
+            {tabs.map((tab) => (
+              <option key={tab.name} value={tab.name}>
+                {tab.label}
+              </option>
+            ))}
+          </select>
+          <span className="devtools-select-arrow">▼</span>
+        </div>
+
+        {/* Desktop tabs */}
         <div className="devtools-tabs">
           {tabs.map((tab) => (
             // biome-ignore lint/a11y/useButtonType: <TODO>

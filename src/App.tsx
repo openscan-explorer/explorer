@@ -16,6 +16,7 @@ import "./styles/components.css";
 import "./styles/tables.css";
 import "./styles/forms.css";
 import "./styles/rainbowkit.css";
+import "./styles/responsive.css";
 
 import Loading from "./components/common/Loading";
 import {
@@ -29,6 +30,7 @@ import {
   LazyHome,
   LazyMempool,
   LazyProfile,
+  LazySearch,
   LazySettings,
   LazySubscriptions,
   LazySupporters,
@@ -103,6 +105,7 @@ function AppContent() {
             <SubdomainRedirect />
             <Routes>
               <Route path="/" element={<LazyHome />} />
+              <Route path="search" element={<LazySearch />} />
               <Route path="settings" element={<LazySettings />} />
               <Route path="about" element={<LazyAbout />} />
               <Route path="contact" element={<LazyContact />} />

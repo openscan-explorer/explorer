@@ -47,11 +47,11 @@ const Footer: React.FC<FooterProps> = ({ className = "" }) => {
           >
             About
           </button>
-          |
+          <span className="footer-separator hide-mobile">|</span>
           <button type="button" onClick={goToSubscriptions} className="footer-link btn-reset">
             Subscribe
           </button>
-          |
+          <span className="footer-separator hide-mobile">|</span>
           <button
             type="button"
             onClick={() => navigate("/contact")}
@@ -59,7 +59,7 @@ const Footer: React.FC<FooterProps> = ({ className = "" }) => {
           >
             Contact
           </button>
-          |
+          <span className="footer-separator hide-mobile">|</span>
           <button type="button" onClick={goToSupporters} className="footer-link btn-reset">
             Supporters ❤️
           </button>
