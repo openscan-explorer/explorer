@@ -111,6 +111,7 @@
 	color: var(--text-secondary);
 	font-family: "Outfit", sans-serif;
 	font-weight: 500;
+	white-space: nowrap;
 }
 
 .table-cell-mono {

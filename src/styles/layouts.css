@@ -77,9 +77,9 @@
 .network-grid {
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-	gap: 24px;
+	gap: 12px;
 	max-width: 1400px;
-	margin: 0 auto;
+	margin: 12px auto 0px;
 	width: 100%;
 }
 

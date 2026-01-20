@@ -32,9 +32,7 @@
    ========================================================================== */
 
 /* Hide on mobile (show on tablet+) */
-.hide-mobile {
-  display: block;
-}
+/* Note: No display property set here to preserve natural element display (e.g., table-cell for td/th) */
 
 /* Show only on mobile (hide on tablet+) */
 .show-mobile {
@@ -42,9 +40,7 @@
 }
 
 /* Hide on tablet and below (show on desktop+) */
-.hide-tablet {
-  display: block;
-}
+/* Note: No display property set here to preserve natural element display */
 
 /* Show only on tablet and below */
 .show-tablet {

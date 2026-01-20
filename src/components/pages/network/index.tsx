@@ -1,52 +1,18 @@
-import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useNetwork } from "../../../context/AppContext";
-import { useDataService } from "../../../hooks/useDataService";
-import { useProviderSelection } from "../../../hooks/useProviderSelection";
-import { useSelectedData } from "../../../hooks/useSelectedData";
-import type { DataWithMetadata, NetworkStats } from "../../../types";
+import { useNetworkDashboard } from "../../../hooks/useNetworkDashboard";
 import Loader from "../../common/Loader";
 import SearchBox from "../../common/SearchBox";
+import DashboardStats from "./DashboardStats";
+import LatestBlocksTable from "./LatestBlocksTable";
+import LatestTransactionsTable from "./LatestTransactionsTable";
 import ProfileDisplay from "./NetworkProfileDisplay";
-import NetworkStatsDisplay from "./NetworkStatsDisplay";
 
 export default function Network() {
   const { networkId } = useParams<{ networkId?: string }>();
   const numericNetworkId = Number(networkId) || 1;
   const networkConfig = useNetwork(numericNetworkId);
-  const dataService = useDataService(numericNetworkId);
-  const [networkStatsResult, setNetworkStatsResult] =
-    useState<DataWithMetadata<NetworkStats> | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  // Provider selection state
-  const [selectedProvider, setSelectedProvider] = useProviderSelection(
-    `networkStats_${numericNetworkId}`,
-  );
-
-  // Extract actual network stats based on selected provider
-  const networkStats = useSelectedData(networkStatsResult, selectedProvider);
-
-  useEffect(() => {
-    if (!dataService) {
-      setLoading(false);
-      return;
-    }
-
-    setLoading(true);
-    setError(null);
-
-    dataService.networkAdapter
-      .getNetworkStats()
-      .then((result) => {
-        setNetworkStatsResult(result);
-      })
-      .catch((err) => {
-        setError(err.message || "Failed to fetch network stats");
-      })
-      .finally(() => setLoading(false));
-  }, [dataService]);
+  const dashboard = useNetworkDashboard(numericNetworkId);
 
   // Generate title based on network
   // Strip "Ethereum" from network names (e.g., "Ethereum Mainnet" -> "MAINNET")
@@ -54,10 +20,11 @@ export default function Network() {
   const networkName = rawName.replace(/^ETHEREUM\s*/i, "").trim();
   const networkColor = networkConfig?.color || "#627eea";
   const hasNetworkName = networkName.length > 0;
+  const currency = networkConfig?.currency || "ETH";
 
   return (
-    <div className="home-container">
-      <div className="home-content page-card">
+    <div className="container-wide">
+      <div className="block-display-card">
         <h1 className="home-title network-title">
           {hasNetworkName && (
             <>
@@ -74,17 +41,36 @@ export default function Network() {
           <p className="network-description">{networkConfig.description}</p>
         )}
         <SearchBox />
-        {loading && <Loader text="Loading network stats..." />}
-        {error && <p className="error-text-center">Error: {error}</p>}
-        {networkStats && (
-          <NetworkStatsDisplay
-            networkStats={networkStats}
-            networkId={numericNetworkId}
-            metadata={networkStatsResult?.metadata}
-            selectedProvider={selectedProvider}
-            onProviderSelect={setSelectedProvider}
-          />
+
+        {dashboard.loading && dashboard.latestBlocks.length === 0 && (
+          <Loader text="Loading network data..." />
         )}
+
+        {dashboard.error && <p className="error-text-center">Error: {dashboard.error}</p>}
+
+        <DashboardStats
+          price={dashboard.price}
+          gasPrice={dashboard.gasPrice}
+          blockNumber={dashboard.blockNumber}
+          currency={currency}
+          loading={dashboard.loading && dashboard.latestBlocks.length === 0}
+        />
+
+        <div className="dashboard-tables-row">
+          <LatestBlocksTable
+            blocks={dashboard.latestBlocks}
+            networkId={numericNetworkId}
+            loading={dashboard.loading && dashboard.latestBlocks.length === 0}
+            currency={currency}
+          />
+          <LatestTransactionsTable
+            transactions={dashboard.latestTransactions}
+            networkId={numericNetworkId}
+            currency={currency}
+            loading={dashboard.loading && dashboard.latestTransactions.length === 0}
+          />
+        </div>
+
         <ProfileDisplay network={networkConfig} />
       </div>
     </div>

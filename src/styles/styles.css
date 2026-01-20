@@ -1583,6 +1583,7 @@ body {
   font-size: 0.95rem;
   border-top: 1px solid var(--border-color);
   border-bottom: 1px solid var(--border-color);
+  white-space: nowrap;
 }
 
 /* Centered table data cells */
@@ -4238,6 +4239,7 @@ code {
   -webkit-text-fill-color: var(--color-primary);
   background-clip: unset;
   text-shadow: none;
+  text-align: center;
 }
 
 .network-title-name {
@@ -5503,7 +5505,7 @@ code {
 /* ==================== Profile Display ==================== */
 
 .profile-container {
-  margin-top: 1.5rem !important; 
+  margin-top: 6px !important; 
 }
 .profile-container .block-display-card {
   background: var(--bg-card);

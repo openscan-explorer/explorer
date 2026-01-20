@@ -4738,6 +4738,326 @@
 }
 
 /* ============================================
+   Network Dashboard Styles
+   ============================================ */
+
+/* Dashboard Stats Row */
+.dashboard-stats-row {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 16px;
+	margin: 6px 0;
+}
+
+.dashboard-stat-card {
+	background: rgba(255, 255, 255, 0.03);
+	border: 1px solid rgba(255, 255, 255, 0.08);
+	border-radius: 12px;
+	padding: 20px;
+	text-align: center;
+}
+
+.dashboard-stat-label {
+	font-size: 0.8rem;
+	color: var(--color-text-muted);
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	margin-bottom: 8px;
+}
+
+.dashboard-stat-value {
+	font-family: "Outfit", sans-serif;
+	font-size: 1.5rem;
+	font-weight: 700;
+	color: var(--color-primary-muted);
+}
+
+.dashboard-stat-loading {
+	opacity: 0.5;
+}
+
+/* Dashboard Tables Row */
+.dashboard-tables-row {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 24px;
+	margin: 6px 0;
+}
+
+.dashboard-table-section {
+	background: rgba(255, 255, 255, 0.02);
+	border: 1px solid rgba(255, 255, 255, 0.06);
+	border-radius: 12px;
+	padding: 16px;
+}
+
+.dashboard-table-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 12px;
+	padding-bottom: 12px;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.dashboard-table-title-link {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	text-decoration: none;
+	transition: opacity 0.2s;
+}
+
+.dashboard-table-title-link:hover {
+	opacity: 0.8;
+}
+
+.dashboard-table-title {
+	font-family: "Outfit", sans-serif;
+	font-size: 1rem;
+	font-weight: 600;
+	color: var(--color-primary-muted);
+	margin: 0;
+}
+
+.dashboard-title-arrow {
+	font-size: 0.9rem;
+	color: var(--color-primary);
+	opacity: 0.6;
+	transition: opacity 0.2s;
+}
+
+.dashboard-table-title-link:hover .dashboard-title-arrow {
+	opacity: 1;
+}
+
+.dashboard-view-all {
+	font-size: 0.8rem;
+	color: var(--color-primary);
+	text-decoration: none;
+	padding: 6px 12px;
+	background: rgba(99, 102, 241, 0.1);
+	border-radius: 6px;
+	transition: all 0.2s;
+}
+
+.dashboard-view-all:hover {
+	background: rgba(99, 102, 241, 0.2);
+	color: var(--color-primary);
+}
+
+.dashboard-table-loading,
+.dashboard-table-empty {
+	color: var(--color-text-muted);
+	font-size: 0.875rem;
+	text-align: center;
+	padding: 24px 0;
+}
+
+.dashboard-table-compact {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+/* Transactions table scrollable to match blocks height */
+.dashboard-table-section:last-child .dashboard-table-compact {
+	max-height: 290px;
+	overflow-y: auto;
+	scrollbar-width: none; /* Firefox */
+	-ms-overflow-style: none; /* IE/Edge */
+}
+
+.dashboard-table-section:last-child .dashboard-table-compact::-webkit-scrollbar {
+	display: none; /* Chrome/Safari/Opera */
+}
+
+.dashboard-table-row {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 10px 12px;
+	background: rgba(255, 255, 255, 0.02);
+	border-radius: 8px;
+	transition: background 0.2s;
+}
+
+.dashboard-table-row:hover {
+	background: rgba(255, 255, 255, 0.04);
+}
+
+/* Block Row Styles */
+.dashboard-block-info {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+
+.dashboard-block-number {
+	font-family: "JetBrains Mono", monospace;
+	font-size: 0.875rem;
+	color: var(--color-primary);
+	text-decoration: none;
+}
+
+.dashboard-block-number:hover {
+	text-decoration: underline;
+}
+
+.dashboard-block-time {
+	font-size: 0.75rem;
+	color: var(--color-text-muted);
+}
+
+.dashboard-block-meta {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+	gap: 2px;
+}
+
+.dashboard-block-txns {
+	font-size: 0.8rem;
+	color: var(--color-text-muted);
+}
+
+.dashboard-block-miner {
+	font-family: "JetBrains Mono", monospace;
+	font-size: 0.75rem;
+	color: var(--color-text-muted);
+	text-decoration: none;
+}
+
+.dashboard-block-miner:hover {
+	color: var(--color-primary);
+}
+
+.dashboard-block-details {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	flex: 1;
+	justify-content: center;
+}
+
+.dashboard-block-gas {
+	font-size: 0.75rem;
+	color: var(--color-text-muted);
+	background: rgba(255, 255, 255, 0.05);
+	padding: 2px 6px;
+	border-radius: 4px;
+}
+
+.dashboard-block-reward {
+	font-family: "JetBrains Mono", monospace;
+	font-size: 0.7rem;
+	color: var(--color-accent, #f59e0b);
+	white-space: nowrap;
+}
+
+/* Transaction Row Styles */
+.dashboard-tx-info {
+	flex: 0 0 auto;
+	min-width: 90px;
+}
+
+.dashboard-tx-hash {
+	font-family: "JetBrains Mono", monospace;
+	font-size: 0.85rem;
+	color: var(--color-primary);
+	text-decoration: none;
+}
+
+.dashboard-tx-hash:hover {
+	text-decoration: underline;
+}
+
+.dashboard-tx-addresses {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	flex: 1 1 auto;
+	justify-content: center;
+	min-width: 0;
+	overflow: hidden;
+}
+
+.dashboard-tx-from,
+.dashboard-tx-to {
+	font-family: "JetBrains Mono", monospace;
+	font-size: 0.75rem;
+	color: var(--color-text-muted);
+	text-decoration: none;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.dashboard-tx-from:hover,
+.dashboard-tx-to:hover {
+	color: var(--color-primary);
+}
+
+.dashboard-tx-arrow {
+	color: rgba(255, 255, 255, 0.3);
+	font-size: 0.75rem;
+	flex-shrink: 0;
+}
+
+.dashboard-tx-contract {
+	font-size: 0.75rem;
+	color: #10b981;
+	font-weight: 500;
+	flex-shrink: 0;
+}
+
+.dashboard-tx-value {
+	font-family: "JetBrains Mono", monospace;
+	font-size: 0.8rem;
+	color: var(--color-primary-muted);
+	text-align: right;
+	flex: 0 0 auto;
+	min-width: 80px;
+}
+
+/* Dashboard Responsive */
+@media (max-width: 900px) {
+	.dashboard-tables-row {
+		grid-template-columns: 1fr;
+	}
+}
+
+@media (max-width: 640px) {
+	.dashboard-stats-row {
+		grid-template-columns: 1fr;
+		gap: 12px;
+	}
+
+	.dashboard-stat-card {
+		padding: 16px;
+	}
+
+	.dashboard-stat-value {
+		font-size: 1.25rem;
+	}
+
+	.dashboard-table-row {
+		flex-wrap: wrap;
+		gap: 8px;
+	}
+
+	.dashboard-tx-addresses {
+		width: 100%;
+		justify-content: flex-start;
+	}
+
+	.dashboard-tx-value {
+		width: 100%;
+		text-align: left;
+	}
+}
+
+/* ============================================
    Search Results Page
    ============================================ */
 
