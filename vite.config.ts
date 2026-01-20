@@ -1,6 +1,11 @@
 import { execSync } from "child_process";
+import { readFileSync } from "fs";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
+
+// Get version from package.json
+const packageJson = JSON.parse(readFileSync("./package.json", "utf-8"));
+const appVersion = packageJson.version || "0.0.0";
 
 // Get git commit hash
 let commitHash = "development";
@@ -46,7 +51,7 @@ export default defineConfig({
         "https://github.com/openscan-explorer/explorer"
     ),
     "process.env.REACT_APP_VERSION": JSON.stringify(
-      process.env.REACT_APP_VERSION || "1.0.0-alpha"
+      process.env.REACT_APP_VERSION || appVersion
     ),
     "process.env.REACT_APP_OPENSCAN_NETWORKS": JSON.stringify(
       process.env.REACT_APP_OPENSCAN_NETWORKS || ""
