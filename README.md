@@ -63,8 +63,7 @@ A trustless, open-source blockchain explorer for Ethereum and Layer 2 networks. 
 
 ### Prerequisites
 
-- Node.js v24.12.0
-- npm or yarn
+- Bun >= 1.1.0 ([Installation guide](https://bun.sh/docs/installation))
 
 ### Installation
 
@@ -76,7 +75,7 @@ git clone https://github.com/yourusername/openscan.git
 cd openscan
 
 # Install dependencies
-npm install
+bun install
 
 # Start the development server
 npm start
@@ -97,11 +96,11 @@ If you run any Hardhat node instance on the port 8545 it would be automatically 
 For development and testing, use the included script that starts a local node with sample transactions and OpenScan:
 
 ```bash
-# Run with npm script
+# Run with bun script
 npm run dev
 
 # Run the script directly
-bash scripts/run-test-hardhat-env.sh
+bash scripts/run-test-env.sh
 ```
 
 This script will:
@@ -129,7 +128,7 @@ npm run build:staging
 npm run typecheck
 ```
 
-### Lint and prettier
+### Lint and format
 
 ```bash
 npm run format:fix
@@ -174,13 +173,13 @@ Tests run automatically on every PR via GitHub Actions.
 #!/bin/sh
 set -eu
 
-npx @biomejs/biome check --staged --files-ignore-unknown=true --no-errors-on-unmatched
+bunx @biomejs/biome check --staged --files-ignore-unknown=true --no-errors-on-unmatched
 ```
 
 2. Make it executable
 
 ```bash
-chmod +x pre-commit
+chmod +x .git/hooks/pre-commit
 ```
 
 ### Environment Variables
@@ -244,6 +243,8 @@ Default RPC endpoints:
 
 ### Tech Stack
 
+- **Bun** - Package manager and runtime
+- **Vite** - Fast build tool and dev server
 - **React 19** - UI framework
 - **TypeScript** - Type safety
 - **React Router** - Client-side routing (HashRouter for IPFS/ENS compatibility)

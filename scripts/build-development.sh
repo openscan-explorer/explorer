@@ -15,7 +15,7 @@ rm -r dist || true
 
 # Build the app with only Hardhat network (31337) enabled
 echo "Building React app on commit $COMMIT_HASH"
-NODE_ENV=development REACT_APP_ENVIRONMENT=development REACT_APP_COMMIT_HASH=$COMMIT_HASH REACT_APP_OPENSCAN_NETWORKS=31337 npm run build:development
+NODE_ENV=development REACT_APP_ENVIRONMENT=development REACT_APP_COMMIT_HASH=$COMMIT_HASH REACT_APP_OPENSCAN_NETWORKS=31337 npm run build
 
 echo "Hardhat-only build completed!"
 echo "Build output is in ./dist/"

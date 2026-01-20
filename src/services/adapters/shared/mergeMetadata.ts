@@ -2,8 +2,8 @@ import type { RPCMetadata, RPCProviderResponse } from "../../../types";
 
 /**
  * Merges multiple RPCMetadata objects from sequential calls
- * Takes the intersection of providers (only providers that succeeded in ALL calls)
- * and combines the data arrays
+ * For parallel strategy: Takes the intersection of providers (only providers that succeeded in ALL calls)
+ * For fallback strategy: Returns the last metadata (merging doesn't apply)
  */
 export function mergeMetadata<T>(
   metadataList: Array<RPCMetadata | undefined>,
@@ -13,6 +13,15 @@ export function mergeMetadata<T>(
 
   if (validMetadata.length === 0) {
     return undefined;
+  }
+
+  // Check if all metadata is fallback strategy
+  const allFallback = validMetadata.every((m) => m.strategy === "fallback");
+
+  if (allFallback) {
+    // For fallback, return the last metadata since merging doesn't apply
+    // The last call's attempt history is most relevant
+    return validMetadata[validMetadata.length - 1];
   }
 
   // If only one metadata object, return it with transformed data

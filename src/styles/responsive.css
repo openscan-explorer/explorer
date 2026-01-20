@@ -1,0 +1,1421 @@
+/* ==========================================================================
+   Responsive CSS - Mobile-First Foundation
+   Issue #114: Make explorer mobile-friendly and responsive
+
+   Breakpoints:
+   - Mobile:    375px  (iPhone SE baseline)
+   - Mobile L:  480px  (larger phones)
+   - Tablet:    768px  (tablets, small laptops)
+   - Desktop:   1024px (desktops)
+   - Wide:      1400px (large screens)
+   ========================================================================== */
+
+/* ==========================================================================
+   CSS CUSTOM PROPERTIES FOR BREAKPOINTS
+   Use these in JavaScript if needed via getComputedStyle
+   ========================================================================== */
+
+:root {
+  --breakpoint-mobile: 375px;
+  --breakpoint-mobile-lg: 480px;
+  --breakpoint-tablet: 768px;
+  --breakpoint-desktop: 1024px;
+  --breakpoint-wide: 1400px;
+
+  /* Touch target minimum size (WCAG 2.1 AAA) */
+  --touch-target-min: 44px;
+}
+
+/* ==========================================================================
+   VISIBILITY UTILITIES
+   Control element visibility at different breakpoints
+   ========================================================================== */
+
+/* Hide on mobile (show on tablet+) */
+/* Note: No display property set here to preserve natural element display (e.g., table-cell for td/th) */
+
+/* Show only on mobile (hide on tablet+) */
+.show-mobile {
+  display: none;
+}
+
+/* Hide on tablet and below (show on desktop+) */
+/* Note: No display property set here to preserve natural element display */
+
+/* Show only on tablet and below */
+.show-tablet {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .hide-mobile {
+    display: none !important;
+  }
+
+  .show-mobile {
+    display: block !important;
+  }
+
+  .show-mobile-flex {
+    display: flex !important;
+  }
+
+  .show-mobile-inline {
+    display: inline !important;
+  }
+
+  .show-mobile-inline-flex {
+    display: inline-flex !important;
+  }
+}
+
+@media (max-width: 1023px) {
+  .hide-tablet {
+    display: none !important;
+  }
+
+  .show-tablet {
+    display: block !important;
+  }
+
+  .show-tablet-flex {
+    display: flex !important;
+  }
+}
+
+/* ==========================================================================
+   LAYOUT UTILITIES
+   Stack and reflow layouts on mobile
+   ========================================================================== */
+
+/* Stack children vertically on mobile */
+.mobile-stack {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+}
+
+@media (max-width: 767px) {
+  .mobile-stack {
+    flex-direction: column;
+  }
+}
+
+/* Stack at tablet breakpoint */
+.tablet-stack {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+}
+
+@media (max-width: 1023px) {
+  .tablet-stack {
+    flex-direction: column;
+  }
+}
+
+/* Reverse stack order on mobile (useful for sidebar layouts) */
+@media (max-width: 767px) {
+  .mobile-stack-reverse {
+    flex-direction: column-reverse;
+  }
+}
+
+/* Full width on mobile */
+@media (max-width: 767px) {
+  .mobile-full-width {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}
+
+/* ==========================================================================
+   SPACING UTILITIES (Mobile Adjustments)
+   Reduce spacing on smaller screens
+   ========================================================================== */
+
+@media (max-width: 767px) {
+  .mobile-p-0 { padding: 0 !important; }
+  .mobile-p-1 { padding: 8px !important; }
+  .mobile-p-2 { padding: 12px !important; }
+  .mobile-p-3 { padding: 16px !important; }
+
+  .mobile-px-0 { padding-left: 0 !important; padding-right: 0 !important; }
+  .mobile-px-1 { padding-left: 8px !important; padding-right: 8px !important; }
+  .mobile-px-2 { padding-left: 12px !important; padding-right: 12px !important; }
+
+  .mobile-py-0 { padding-top: 0 !important; padding-bottom: 0 !important; }
+  .mobile-py-1 { padding-top: 8px !important; padding-bottom: 8px !important; }
+  .mobile-py-2 { padding-top: 12px !important; padding-bottom: 12px !important; }
+
+  .mobile-m-0 { margin: 0 !important; }
+  .mobile-m-1 { margin: 8px !important; }
+  .mobile-m-2 { margin: 12px !important; }
+
+  .mobile-mx-0 { margin-left: 0 !important; margin-right: 0 !important; }
+  .mobile-my-0 { margin-top: 0 !important; margin-bottom: 0 !important; }
+
+  .mobile-gap-1 { gap: 4px !important; }
+  .mobile-gap-2 { gap: 8px !important; }
+  .mobile-gap-3 { gap: 12px !important; }
+}
+
+/* ==========================================================================
+   TEXT UTILITIES
+   Responsive text sizing and truncation
+   ========================================================================== */
+
+/* Truncate text with ellipsis */
+.text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Truncate hash/address - show first and last characters */
+.hash-truncate {
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 767px) {
+  .hash-truncate {
+    max-width: 80px;
+  }
+
+  /* Smaller text on mobile */
+  .mobile-text-xs { font-size: 0.7rem !important; }
+  .mobile-text-sm { font-size: 0.75rem !important; }
+  .mobile-text-base { font-size: 0.85rem !important; }
+}
+
+@media (max-width: 480px) {
+  .hash-truncate {
+    max-width: 60px;
+  }
+}
+
+/* ==========================================================================
+   TOUCH TARGET UTILITIES
+   Ensure interactive elements meet minimum touch target size
+   ========================================================================== */
+
+.touch-target {
+  min-width: var(--touch-target-min);
+  min-height: var(--touch-target-min);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Expand clickable area without changing visual size */
+.touch-target-expand {
+  position: relative;
+}
+
+.touch-target-expand::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  min-width: var(--touch-target-min);
+  min-height: var(--touch-target-min);
+}
+
+/* ==========================================================================
+   GRID UTILITIES
+   Responsive grid configurations
+   ========================================================================== */
+
+/* Auto-fit grid that stacks on mobile */
+.grid-responsive {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+@media (max-width: 767px) {
+  .grid-responsive {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+/* 2-column grid that stacks on mobile */
+.grid-2-responsive {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 767px) {
+  .grid-2-responsive {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+/* 3-column grid with tablet and mobile breakpoints */
+.grid-3-responsive {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 1023px) {
+  .grid-3-responsive {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 767px) {
+  .grid-3-responsive {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+/* 4-column grid with all breakpoints */
+.grid-4-responsive {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 1023px) {
+  .grid-4-responsive {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 767px) {
+  .grid-4-responsive {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+/* ==========================================================================
+   SCROLLABLE CONTAINERS
+   Horizontal scroll for tables and overflow content
+   ========================================================================== */
+
+.scroll-x {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Hide scrollbar but keep functionality */
+.scroll-x-hidden {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.scroll-x-hidden::-webkit-scrollbar {
+  display: none;
+}
+
+/* Scroll shadow indicators */
+.scroll-shadow {
+  position: relative;
+}
+
+.scroll-shadow::before,
+.scroll-shadow::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 20px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.scroll-shadow::before {
+  left: 0;
+  background: linear-gradient(to right, var(--bg-primary), transparent);
+}
+
+.scroll-shadow::after {
+  right: 0;
+  background: linear-gradient(to left, var(--bg-primary), transparent);
+}
+
+/* ==========================================================================
+   CARD UTILITIES
+   Responsive card adjustments
+   ========================================================================== */
+
+@media (max-width: 767px) {
+  .card-mobile {
+    border-radius: 12px;
+    padding: 16px;
+  }
+
+  .card-mobile-compact {
+    border-radius: 8px;
+    padding: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .card-mobile {
+    border-radius: 8px;
+    padding: 12px;
+  }
+
+  .card-mobile-compact {
+    padding: 8px;
+  }
+}
+
+/* ==========================================================================
+   BUTTON UTILITIES
+   Ensure buttons are touch-friendly on mobile
+   ========================================================================== */
+
+@media (max-width: 767px) {
+  /* Full width buttons on mobile */
+  .btn-mobile-full {
+    width: 100%;
+  }
+
+  /* Ensure minimum touch target for buttons */
+  .btn-mobile-touch {
+    min-height: var(--touch-target-min);
+    padding: 12px 16px;
+  }
+}
+
+/* ==========================================================================
+   FORM UTILITIES
+   Responsive form adjustments
+   ========================================================================== */
+
+@media (max-width: 767px) {
+  /* Full width inputs on mobile */
+  .input-mobile-full {
+    width: 100%;
+  }
+
+  /* Larger touch targets for inputs */
+  .input-mobile-touch {
+    min-height: var(--touch-target-min);
+    padding: 12px 16px;
+    font-size: 16px; /* Prevents iOS zoom on focus */
+  }
+}
+
+/* ==========================================================================
+   NAVBAR MOBILE STYLES
+   Foundation for mobile navigation
+   ========================================================================== */
+
+/* Hamburger menu button - hidden by default, shown on mobile */
+.navbar-hamburger {
+  display: none;
+  width: var(--touch-target-min);
+  height: var(--touch-target-min);
+  padding: 8px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: white;
+  border-radius: 8px;
+  transition: background 0.2s ease;
+}
+
+.navbar-hamburger:hover {
+  background: var(--overlay-light-20, rgba(255, 255, 255, 0.2));
+}
+
+.navbar-hamburger-icon {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  width: 24px;
+  height: 18px;
+}
+
+.navbar-hamburger-icon span {
+  display: block;
+  width: 100%;
+  height: 2px;
+  background: currentColor;
+  border-radius: 1px;
+  transition: all 0.3s ease;
+}
+
+/* Mobile menu overlay */
+.navbar-mobile-menu {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--bg-primary);
+  z-index: 1000;
+  padding: 20px;
+  flex-direction: column;
+  overflow-y: auto;
+  animation: slideInRight 0.3s ease;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.navbar-mobile-menu.is-open {
+  display: flex;
+}
+
+.navbar-mobile-menu-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-primary);
+}
+
+.navbar-mobile-menu-close {
+  width: var(--touch-target-min);
+  height: var(--touch-target-min);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--text-primary);
+  font-size: 24px;
+  transition: background 0.2s ease;
+}
+
+.navbar-mobile-menu-close:hover {
+  background: var(--color-primary-alpha-10);
+}
+
+.navbar-mobile-menu-items {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.navbar-mobile-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 12px;
+  background: var(--color-primary-alpha-5, rgba(var(--color-primary-rgb), 0.05));
+  color: var(--text-primary);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1rem;
+  font-family: "Outfit", sans-serif;
+  min-height: var(--touch-target-min);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.navbar-mobile-menu-item:hover,
+.navbar-mobile-menu-item:active {
+  background: var(--color-primary-alpha-10);
+  border-color: var(--color-primary-alpha-20);
+}
+
+.navbar-mobile-menu-item svg {
+  flex-shrink: 0;
+  color: var(--color-primary);
+}
+
+.navbar-mobile-menu-divider {
+  height: 1px;
+  background: var(--border-primary);
+  margin: 8px 0;
+}
+
+/* Mobile search in menu */
+.navbar-mobile-search {
+  margin-bottom: 16px;
+}
+
+.navbar-mobile-search .search-form {
+  display: flex;
+  gap: 8px;
+}
+
+.navbar-mobile-search .search-input {
+  flex: 1;
+  padding: 12px 16px;
+  font-size: 16px; /* Prevent iOS zoom */
+  border-radius: 10px;
+  border: 2px solid var(--border-primary);
+  background: var(--input-bg);
+  color: var(--input-text);
+}
+
+.navbar-mobile-search .search-input:focus {
+  border-color: var(--color-primary);
+  outline: none;
+}
+
+.navbar-mobile-search .search-button {
+  width: var(--touch-target-min);
+  height: var(--touch-target-min);
+  border-radius: 10px;
+  background: var(--color-primary);
+  border: none;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Social links in mobile menu */
+.navbar-mobile-social-links {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  padding: 8px 0;
+}
+
+.navbar-mobile-social-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  background: var(--color-primary-alpha-5, rgba(var(--color-primary-rgb), 0.05));
+  color: var(--text-primary);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  font-family: "Outfit", sans-serif;
+  min-height: var(--touch-target-min);
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.navbar-mobile-social-btn:hover,
+.navbar-mobile-social-btn:active {
+  background: var(--color-primary-alpha-10);
+  border-color: var(--color-primary-alpha-20);
+}
+
+.navbar-mobile-social-btn svg {
+  flex-shrink: 0;
+  color: var(--text-secondary);
+}
+
+@media (max-width: 767px) {
+  .navbar-hamburger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Make network title fit on one line */
+  .home-title,
+  .network-title-name {
+    font-size: 2.5rem;
+    letter-spacing: -1px;
+  }
+
+  /* Remove top margin from network stats container */
+  .container-wide.network-stats-container {
+    margin-top: 0;
+  }
+
+  /* Hide network block logo in navbar on mobile */
+  .network-block-logo {
+    display: none;
+  }
+
+  /* Constrain navbar network logo size on mobile */
+  .navbar-logo-network img,
+  .navbar-logo-network svg {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+  }
+
+  /* Fix network card icon overflow */
+  .network-card {
+    overflow: hidden;
+  }
+
+  .network-card-icon {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+  }
+
+  .network-card-icon img,
+  .network-card-icon svg {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  /* Truncate hashes more aggressively on mobile */
+  .table-cell-hash {
+    max-width: 90px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: inline-block;
+  }
+
+  /* Truncate monospace values (hashes, addresses) on mobile */
+  .tx-value.tx-mono {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: block;
+  }
+
+  /* Adjust navbar padding on mobile */
+  .navbar {
+    padding: 0 12px;
+    margin: 8px auto 10px;
+  }
+
+  .navbar-inner {
+    padding: 10px 12px;
+    border-radius: 12px;
+  }
+
+  /* Hide the left ul class name if exists */
+  .navbar-left {
+    gap: 4px;
+  }
+
+  /* Reduce gap between right elements */
+  .navbar-right {
+    gap: 8px;
+  }
+
+  /* Make toggle buttons touch-friendly */
+  .navbar-toggle-btn {
+    min-width: 40px;
+    min-height: 40px;
+  }
+}
+
+/* ==========================================================================
+   FOOTER MOBILE STYLES
+   Responsive footer layout
+   ========================================================================== */
+
+/* Footer separator styling */
+.footer-separator {
+  color: var(--text-secondary);
+  opacity: 0.5;
+}
+
+@media (max-width: 767px) {
+  .app-footer {
+    padding: 12px 16px;
+  }
+
+  .footer-content {
+    flex-direction: column;
+    gap: 12px;
+    padding: 0;
+  }
+
+  .footer-left {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .footer-right {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .footer-link {
+    padding: 0 6px;
+  }
+
+  /* Hide social buttons in footer on mobile - they're in the hamburger menu */
+  .github-btn-footer {
+    display: none;
+  }
+
+  .commit-link {
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-footer {
+    padding: 10px 12px;
+  }
+
+  .footer-left {
+    gap: 4px;
+  }
+
+  .footer-link {
+    padding: 6px 10px;
+    font-size: 0.7rem;
+  }
+
+  /* Hide "Report a Bug" on very small screens */
+  .footer-right .footer-link {
+    display: none;
+  }
+
+  .footer-right {
+    gap: 6px;
+  }
+
+  /* Even smaller title on very small screens */
+  .home-title,
+  .network-title-name {
+    font-size: 2rem;
+  }
+}
+
+/* ==========================================================================
+   DATA TABLES - MOBILE RESPONSIVE
+   Horizontal scroll and improved display for tables on mobile
+   ========================================================================== */
+
+@media (max-width: 767px) {
+  /* Table wrapper with horizontal scroll */
+  .table-wrapper,
+  .address-table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 0 -12px;
+    padding: 0 12px;
+  }
+
+  /* Ensure table doesn't shrink below content */
+  .dash-table,
+  .recent-transactions-table,
+  .address-table {
+    min-width: 600px;
+  }
+
+  /* Add vertical padding to tables on mobile */
+  .dash-table {
+    margin: 12px 0;
+  }
+
+  /* Reduce table cell padding on mobile */
+  .dash-table th,
+  .dash-table td,
+  .recent-transactions-table th,
+  .recent-transactions-table td {
+    padding: 10px 8px;
+    font-size: 0.8rem;
+  }
+
+  /* Reduce header font size */
+  .dash-table thead th,
+  .recent-transactions-table thead th {
+    font-size: 0.7rem;
+  }
+
+  /* Truncate hash cells */
+  .table-cell-hash {
+    max-width: 80px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* Truncate address cells */
+  .table-cell-address {
+    max-width: 90px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* Method badges - smaller on mobile */
+  .method-badge {
+    max-width: 70px;
+    font-size: 0.65rem;
+    padding: 2px 6px;
+  }
+
+  /* Status badges - smaller on mobile */
+  .table-status-badge {
+    font-size: 0.7rem;
+    padding: 3px 8px;
+  }
+
+  /* Pagination adjustments */
+  .pagination-container {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 12px 0;
+  }
+
+  .pagination-btn {
+    padding: 8px 12px;
+    font-size: 0.8rem;
+    min-height: var(--touch-target-min, 44px);
+  }
+
+  /* Block display card - reduce padding */
+  .block-display-card {
+    padding: 12px;
+    border-radius: 12px;
+  }
+
+  /* Page card - reduce padding */
+  .page-card {
+    padding: 16px;
+    border-radius: 14px;
+  }
+
+  /* Blocks header adjustments */
+  .blocks-header {
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .blocks-header-main {
+    flex: 1;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .block-label {
+    font-size: 1.1rem;
+  }
+
+  .blocks-header-info {
+    font-size: 0.8rem;
+  }
+
+  /* Hide divider on mobile */
+  .block-header-divider {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Even more compact tables on small screens */
+  .dash-table th,
+  .dash-table td,
+  .recent-transactions-table th,
+  .recent-transactions-table td {
+    padding: 8px 6px;
+    font-size: 0.75rem;
+  }
+
+  .dash-table thead th,
+  .recent-transactions-table thead th {
+    font-size: 0.65rem;
+  }
+
+  /* Smaller truncation for very small screens */
+  .table-cell-hash {
+    max-width: 60px;
+  }
+
+  .table-cell-address {
+    max-width: 70px;
+  }
+
+  /* Stack pagination buttons */
+  .pagination-container {
+    justify-content: center;
+  }
+
+  .pagination-btn {
+    flex: 1;
+    max-width: 120px;
+    text-align: center;
+  }
+}
+
+/* ==========================================================================
+   DETAIL PAGES - MOBILE RESPONSIVE
+   Block, Transaction, and Address detail page layouts
+   ========================================================================== */
+
+@media (max-width: 767px) {
+  /* Stack tx-row vertically on mobile */
+  .tx-row {
+    flex-direction: column;
+    gap: 4px;
+    padding: 10px 12px;
+  }
+
+  .tx-row .tx-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-tertiary);
+  }
+
+  .tx-row .tx-value {
+    font-size: 0.85rem;
+  }
+
+  /* Vertical rows stay vertical but with adjusted spacing */
+  .tx-row-vertical {
+    padding: 10px 12px;
+  }
+
+  .tx-row-vertical .tx-label {
+    margin-bottom: 6px;
+  }
+
+  /* Block display header adjustments */
+  .block-display-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .block-header-main {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .block-header-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .block-number {
+    font-size: 1.2rem;
+  }
+
+  .block-header-timestamp {
+    font-size: 0.8rem;
+  }
+
+  /* Block navigation buttons */
+  .block-nav-btn {
+    padding: 6px 10px;
+    font-size: 0.8rem;
+  }
+
+  /* Status badges */
+  .block-status-badge,
+  .tx-status-badge {
+    font-size: 0.7rem;
+    padding: 3px 8px;
+  }
+
+  /* Transaction attributes */
+  .tx-attrs {
+    gap: 8px;
+  }
+
+  .tx-attr {
+    font-size: 0.7rem;
+    padding: 3px 8px;
+  }
+
+  /* Confirmations badge */
+  .tx-confirmations {
+    font-size: 0.7rem;
+    padding: 2px 6px;
+    margin-left: 8px;
+  }
+
+  /* Decoded input section */
+  .tx-decoded-input {
+    padding: 10px;
+  }
+
+  .tx-decoded-function {
+    font-size: 0.8rem;
+  }
+
+  .tx-decoded-params {
+    font-size: 0.8rem;
+  }
+
+  .tx-decoded-param {
+    padding: 6px 0;
+  }
+
+  /* Input data */
+  .tx-input-data {
+    font-size: 0.75rem;
+    padding: 10px;
+  }
+
+  /* Transaction logs */
+  .tx-logs {
+    gap: 12px;
+  }
+
+  .tx-log {
+    flex-direction: column;
+  }
+
+  .tx-log-index {
+    width: 100%;
+    padding: 6px 10px;
+    border-radius: 6px 6px 0 0;
+    border-right: none;
+    border-bottom: 1px solid var(--overlay-light-10);
+  }
+
+  .tx-log-content {
+    padding: 10px;
+  }
+
+  .tx-log-row {
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .tx-log-row .tx-label {
+    font-size: 0.7rem;
+  }
+
+  .tx-event-badge {
+    font-size: 0.75rem;
+    padding: 3px 8px;
+  }
+
+  /* Topic display */
+  .tx-topic {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .tx-topic-index {
+    font-size: 0.7rem;
+  }
+
+  .tx-topic-value {
+    font-size: 0.75rem;
+    word-break: break-all;
+  }
+
+  /* Section headers */
+  .tx-section-header {
+    padding: 10px 12px;
+    font-size: 0.85rem;
+  }
+
+  .tx-section-toggle {
+    font-size: 0.85rem;
+  }
+
+  /* More details toggle */
+  .more-details-toggle {
+    font-size: 0.8rem;
+    padding: 8px 12px;
+  }
+
+  .more-details-content {
+    padding: 10px;
+  }
+
+  /* Gas percentage indicator */
+  .tx-gas-pct {
+    font-size: 0.7rem;
+  }
+
+  /* Address page specific */
+  .address-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .address-type-indicator {
+    font-size: 0.85rem;
+  }
+
+  .address-ens-name {
+    font-size: 1rem;
+  }
+
+  .address-section-content {
+    gap: 16px;
+  }
+
+  /* Balance section grid */
+  .data-grid-2,
+  .data-grid-3,
+  .data-grid-auto {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Even more compact on very small screens */
+  .tx-row {
+    padding: 8px 10px;
+  }
+
+  .tx-row .tx-label {
+    font-size: 0.7rem;
+  }
+
+  .tx-row .tx-value {
+    font-size: 0.8rem;
+  }
+
+  .block-number {
+    font-size: 1rem;
+  }
+
+  /* Smaller badges */
+  .block-status-badge,
+  .tx-status-badge,
+  .tx-attr,
+  .tx-event-badge {
+    font-size: 0.65rem;
+    padding: 2px 6px;
+  }
+
+  /* Transaction log compacting */
+  .tx-log-index {
+    font-size: 0.7rem;
+    padding: 4px 8px;
+  }
+
+  .tx-log-content {
+    padding: 8px;
+  }
+}
+
+/* ==========================================================================
+   GLOBAL MOBILE ADJUSTMENTS
+   Base styles that apply across the app on mobile
+   ========================================================================== */
+
+@media (max-width: 767px) {
+  /* Prevent horizontal overflow */
+  body {
+    overflow-x: hidden;
+  }
+
+  /* Ensure images don't overflow */
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* Ensure pre/code blocks scroll */
+  pre, code {
+    max-width: 100%;
+    overflow-x: auto;
+  }
+}
+
+/* ==========================================================================
+   RPC INDICATOR - MOBILE RESPONSIVE
+   ========================================================================== */
+
+@media (max-width: 767px) {
+  .rpc-indicator-dropdown {
+    min-width: auto;
+    width: calc(100vw - 32px);
+    max-width: 320px;
+    right: -8px;
+  }
+
+  .rpc-indicator-header {
+    padding: 10px 12px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .rpc-indicator-item {
+    padding: 10px 12px;
+  }
+
+  .rpc-indicator-item-url {
+    font-size: 11px;
+    max-width: 180px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .rpc-indicator-list {
+    max-height: 250px;
+  }
+
+  .rpc-indicator-badge {
+    padding: 4px 8px;
+    font-size: 0.7rem;
+  }
+
+  .rpc-indicator-status {
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .rpc-indicator-dropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    right: 0;
+    left: auto;
+    bottom: auto;
+    width: calc(100vw - 32px);
+    max-width: 300px;
+  }
+
+  .rpc-indicator-item-url {
+    max-width: 150px;
+  }
+}
+
+/* ==========================================================================
+   SETTINGS PAGE - MOBILE RESPONSIVE
+   ========================================================================== */
+
+@media (max-width: 767px) {
+  .settings-section {
+    padding: 16px;
+    border-radius: 12px;
+  }
+
+  .settings-section-title {
+    font-size: 1.1rem;
+  }
+
+  .settings-section-description {
+    font-size: 0.8rem;
+    margin-bottom: 16px;
+  }
+
+  .settings-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    max-width: 100%;
+  }
+
+  .settings-item > div:first-child {
+    text-align: left;
+  }
+
+  .settings-select {
+    width: 100%;
+  }
+
+  /* Chain name row - stack on mobile */
+  .settings-chain-name {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .settings-fetch-rpc-button {
+    margin-top: 4px;
+  }
+
+  /* RPC tags - more compact on mobile */
+  .settings-rpc-tags {
+    gap: 6px;
+  }
+
+  .settings-rpc-tag {
+    padding: 4px 8px;
+    font-size: 0.7rem;
+    max-width: calc(100vw - 80px);
+  }
+
+  .settings-rpc-tag-index {
+    font-size: 0.65rem;
+    padding: 1px 4px;
+    min-width: 16px;
+  }
+
+  .settings-rpc-tag-url {
+    max-width: 200px;
+  }
+
+  .settings-rpc-tag-delete {
+    width: 16px;
+    height: 16px;
+    font-size: 12px;
+  }
+
+  .settings-chain-item {
+    padding: 12px;
+  }
+
+  .settings-rpc-input {
+    font-size: 16px; /* Prevent iOS zoom */
+  }
+
+  .settings-save-button {
+    width: 100%;
+    padding: 14px 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .settings-section {
+    padding: 12px;
+  }
+
+  .settings-rpc-tag-url {
+    max-width: 150px;
+  }
+
+  .settings-chain-name {
+    font-size: 0.85rem;
+  }
+
+  .settings-chain-id-badge {
+    font-size: 0.7rem;
+    padding: 1px 6px;
+  }
+
+  .settings-fetch-rpc-button {
+    font-size: 0.7rem;
+    padding: 2px 8px;
+  }
+}
+
+/* ==========================================================================
+   PRINT STYLES
+   Hide non-essential elements when printing
+   ========================================================================== */
+
+@media print {
+  .navbar,
+  .navbar-hamburger,
+  .navbar-mobile-menu,
+  .no-print {
+    display: none !important;
+  }
+}

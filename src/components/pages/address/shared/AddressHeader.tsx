@@ -14,6 +14,14 @@ interface AddressHeaderProps {
   tokenName?: string;
 }
 
+// Truncate hash to show first and last N characters
+const truncateHash = (hash: string, chars = 4): string => {
+  if (hash.length <= chars * 2 + 3) return hash;
+  const prefix = hash.startsWith("0x") ? `0x${hash.slice(2, 2 + chars)}` : hash.slice(0, chars);
+  const suffix = hash.slice(-chars);
+  return `${prefix}...${suffix}`;
+};
+
 const AddressHeader: React.FC<AddressHeaderProps> = ({
   addressHash,
   addressType,
@@ -24,6 +32,8 @@ const AddressHeader: React.FC<AddressHeaderProps> = ({
   tokenSymbol,
   tokenName,
 }) => {
+  const truncatedHash = truncateHash(addressHash, 4);
+
   return (
     <div className="block-display-header address-header">
       <div>
@@ -33,7 +43,8 @@ const AddressHeader: React.FC<AddressHeaderProps> = ({
           {tokenSymbol && <span className="address-token-symbol">{tokenSymbol}</span>}
         </div>
         {(ensName || tokenName) && <span className="address-ens-name">{ensName || tokenName}</span>}
-        <span className="tx-mono header-subtitle">{addressHash}</span>
+        <span className="tx-mono header-subtitle hide-mobile">{addressHash}</span>
+        <span className="tx-mono header-subtitle show-mobile">{truncatedHash}</span>
       </div>
       {metadata && selectedProvider !== undefined && onProviderSelect && (
         <RPCIndicator
