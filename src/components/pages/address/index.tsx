@@ -5,13 +5,7 @@ import { useDataService } from "../../../hooks/useDataService";
 import { useENS } from "../../../hooks/useENS";
 import { useProviderSelection } from "../../../hooks/useProviderSelection";
 import { ENSService } from "../../../services/ENS/ENSService";
-import type {
-  Address as AddressData,
-  AddressTransactionsResult,
-  AddressType,
-  DataWithMetadata,
-  Transaction,
-} from "../../../types";
+import type { Address as AddressData, AddressType, DataWithMetadata } from "../../../types";
 import { fetchAddressWithType } from "../../../utils/addressTypeDetection";
 import Loader from "../../common/Loader";
 import {
@@ -32,11 +26,6 @@ export default function Address() {
   const { rpcUrls } = useContext(AppContext);
   const [addressData, setAddressData] = useState<AddressData | null>(null);
   const [addressType, setAddressType] = useState<AddressType>("account");
-  const [transactionsResult, setTransactionsResult] = useState<AddressTransactionsResult | null>(
-    null,
-  );
-  const [transactionDetails, setTransactionDetails] = useState<Transaction[]>([]);
-  const [loadingTxDetails, setLoadingTxDetails] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -161,41 +150,6 @@ export default function Address() {
       .finally(() => setLoading(false));
   }, [address, dataService, numericNetworkId, rpcUrls]);
 
-  // Fetch transactions separately (still uses dataService for caching benefits)
-  useEffect(() => {
-    if (!dataService || !address) return;
-
-    dataService.networkAdapter
-      .getAddressTransactions(address)
-      .then(async (result) => {
-        setTransactionsResult(result);
-
-        if (result.transactions.length > 0) {
-          setLoadingTxDetails(true);
-          const txsToFetch = result.transactions.slice(0, 25);
-          const txResults = await Promise.all(
-            txsToFetch.map((hash) =>
-              dataService.networkAdapter.getTransaction(hash).catch(() => null),
-            ),
-          );
-          setTransactionDetails(
-            txResults
-              .filter((result): result is DataWithMetadata<Transaction> => result !== null)
-              .map((result) => result.data),
-          );
-          setLoadingTxDetails(false);
-        }
-      })
-      .catch((err) => {
-        setTransactionsResult({
-          transactions: [],
-          source: "none",
-          isComplete: false,
-          message: `Failed to fetch transaction history: ${err.message}`,
-        });
-      });
-  }, [dataService, address]);
-
   // Show ENS resolving state (must come first before other checks)
   if (isEnsName && (ensResolving || (!resolvedAddress && !ensError))) {
     return (
@@ -290,9 +244,6 @@ export default function Address() {
     address: addressData,
     addressHash: address,
     networkId: networkId || "1",
-    transactionsResult,
-    transactionDetails,
-    loadingTxDetails,
     ensName,
     reverseResult,
     ensRecords,
