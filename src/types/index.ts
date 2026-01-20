@@ -264,6 +264,14 @@ export type RpcUrlsContextType = Record<number, RPCUrls>;
 // ==================== SETTINGS TYPES ====================
 
 /**
+ * API keys for RPC providers
+ */
+export interface ApiKeys {
+  infura?: string;
+  alchemy?: string;
+}
+
+/**
  * User settings for the application
  */
 export interface UserSettings {
@@ -271,6 +279,7 @@ export interface UserSettings {
   showBackgroundBlocks?: boolean;
   rpcStrategy?: "fallback" | "parallel";
   maxParallelRequests?: number;
+  apiKeys?: ApiKeys;
 }
 
 /**
@@ -281,6 +290,7 @@ export const DEFAULT_SETTINGS: UserSettings = {
   showBackgroundBlocks: true,
   rpcStrategy: "fallback",
   maxParallelRequests: 3,
+  apiKeys: {},
 };
 
 /**
