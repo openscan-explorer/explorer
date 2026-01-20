@@ -32,6 +32,7 @@
 	"scripts": {
 		"start": "vite",
 		"build": "vite build",
+		"build:development": "vite build --mode development",
 		"build:production": "bash ./scripts/build-production.sh",
 		"build:staging": "bash ./scripts/build-staging.sh",
 		"preview": "vite preview",
