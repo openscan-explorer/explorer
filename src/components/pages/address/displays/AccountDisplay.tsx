@@ -1,12 +1,10 @@
 import type React from "react";
 import type {
   Address,
-  AddressTransactionsResult,
   DecodedContenthash,
   ENSRecords,
   ENSReverseResult,
   RPCMetadata,
-  Transaction,
 } from "../../../../types";
 import { AddressHeader, BalanceSection, TransactionHistory } from "../shared";
 import ENSRecordsDetails from "../shared/ENSRecordsDisplay";
@@ -15,9 +13,6 @@ interface AccountDisplayProps {
   address: Address;
   addressHash: string;
   networkId: string;
-  transactionsResult?: AddressTransactionsResult | null;
-  transactionDetails: Transaction[];
-  loadingTxDetails: boolean;
   metadata?: RPCMetadata;
   selectedProvider?: string | null;
   onProviderSelect?: (provider: string) => void;
@@ -34,9 +29,6 @@ const AccountDisplay: React.FC<AccountDisplayProps> = ({
   address,
   addressHash,
   networkId,
-  transactionsResult,
-  transactionDetails,
-  loadingTxDetails,
   metadata,
   selectedProvider,
   onProviderSelect,
@@ -78,9 +70,7 @@ const AccountDisplay: React.FC<AccountDisplayProps> = ({
         <TransactionHistory
           networkId={networkId}
           addressHash={addressHash}
-          transactionsResult={transactionsResult}
-          transactionDetails={transactionDetails}
-          loadingTxDetails={loadingTxDetails}
+          txCount={Number(address.txCount)}
         />
       </div>
     </div>

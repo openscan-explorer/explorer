@@ -18,6 +18,7 @@ import { extractData } from "../shared/extractData";
 import { normalizeBlockNumber } from "../shared/normalizeBlockNumber";
 import { mergeMetadata } from "../shared/mergeMetadata";
 import type { EthereumClient, SupportedChainId } from "@openscan/network-connectors";
+import { AddressTransactionSearch } from "../../AddressTransactionSearch";
 
 /**
  * EVM-compatible blockchain service
@@ -25,10 +26,12 @@ import type { EthereumClient, SupportedChainId } from "@openscan/network-connect
  */
 export class EVMAdapter extends NetworkAdapter {
   private client: EthereumClient;
+  private txSearch: AddressTransactionSearch;
 
   constructor(networkId: SupportedChainId | 11155111 | 97 | 31337, client: EthereumClient) {
     super(networkId);
     this.client = client;
+    this.txSearch = new AddressTransactionSearch(client);
   }
   async getBlock(blockNumber: BlockNumberOrTag): Promise<DataWithMetadata<Block>> {
     const normalizedBlockNumber = normalizeBlockNumber(blockNumber);
@@ -130,22 +133,66 @@ export class EVMAdapter extends NetworkAdapter {
   }
 
   async getAddressTransactions(
-    _address: string,
-    _fromBlock?: number | "earliest",
-    _toBlock?: number | "latest",
-    _limit = 100,
+    address: string,
+    fromBlock?: number | "earliest",
+    toBlock?: number | "latest",
+    limit = 100,
+    onTransactionsFound?: (txs: Transaction[]) => void,
   ): Promise<AddressTransactionsResult> {
-    // EVM doesn't have a native method to get transactions by address
-    // This would require scanning blocks or using an indexer
-    // For now, return empty result
-    console.warn("getAddressTransactions not fully implemented for EVM chains");
+    try {
+      // Use binary search on nonce/balance to find important blocks
+      // Pass the streaming callback to get transactions as they are found
+      const result = await this.txSearch.searchAddressActivity(address, {
+        limit,
+        toBlock: typeof toBlock === "number" ? toBlock : undefined,
+        fromBlock: typeof fromBlock === "number" ? fromBlock : undefined,
+        onTransactionsFound: onTransactionsFound
+          ? (txs) => {
+              // Strip the 'type' property from transactions before passing to callback
+              const cleanTxs = txs.map(({ type: _type, ...tx }) => tx as Transaction);
+              onTransactionsFound(cleanTxs);
+            }
+          : undefined,
+      });
 
-    return {
-      transactions: [],
-      source: "none",
-      isComplete: false,
-      message: "Address transaction lookup not supported without indexer",
-    };
+      if (result.transactions.length === 0) {
+        return {
+          transactions: [],
+          transactionDetails: [],
+          source: "none",
+          isComplete: true,
+          message: "No transactions found for this address",
+        };
+      }
+
+      // Extract transaction hashes and clean transaction details
+      const txHashes = result.transactions.map((tx) => tx.hash);
+      const txDetails = result.transactions.map(({ type: _type, ...tx }) => tx as Transaction);
+
+      return {
+        transactions: txHashes,
+        transactionDetails: txDetails,
+        source: "binary_search",
+        isComplete: result.stats.totalTxs < limit || limit === 0,
+        message:
+          limit > 0 && result.stats.totalTxs >= limit
+            ? `Showing ${limit} transactions (more may exist)`
+            : undefined,
+      };
+    } catch (error) {
+      console.error("Error searching address transactions:", error);
+
+      return {
+        transactions: [],
+        transactionDetails: [],
+        source: "none",
+        isComplete: false,
+        message:
+          error instanceof Error
+            ? `Search failed: ${error.message}`
+            : "Address transaction lookup failed",
+      };
+    }
   }
 
   async getLatestBlockNumber(): Promise<number> {
