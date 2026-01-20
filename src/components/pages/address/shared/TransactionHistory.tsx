@@ -191,6 +191,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
   }, [addressHash, numericNetworkId]);
 
   // Transaction search effect
+  // biome-ignore lint/correctness/useExhaustiveDependencies: oldestSearchedBlock intentionally excluded - effect should not re-run when it changes (causes table clear bug)
   useEffect(() => {
     if (!dataService || !addressHash || !searchTriggered || searchVersion === 0) {
       return;
@@ -290,7 +291,6 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
     searchVersion,
     handleTransactionsFound,
     numericNetworkId,
-    oldestSearchedBlock,
   ]);
 
   // Handlers
