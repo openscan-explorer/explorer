@@ -2,8 +2,14 @@
 	"name": "openscan",
 	"version": "1.1.0-alpha",
 	"private": true,
+	"type": "module",
+	"packageManager": "bun@1.1.0",
 	"engines": {
-		"node": ">=24.0.0"
+		"bun": ">=1.1.0"
+	},
+	"overrides": {
+		"@noble/hashes": "^1.8.0",
+		"@noble/curves": "^1.8.0"
 	},
 	"dependencies": {
 		"@openscan/network-connectors": "^1.0.0",
@@ -24,28 +30,25 @@
 		"web-vitals": "^2.1.4"
 	},
 	"scripts": {
-		"start": "NODE_ENV=development webpack serve --config webpack.config.js --mode development",
+		"start": "vite",
+		"build": "vite build",
+		"build:development": "vite build --mode development",
 		"build:production": "bash ./scripts/build-production.sh",
 		"build:staging": "bash ./scripts/build-staging.sh",
-		"build:development": "webpack --config webpack.config.js --mode development",
-		"test": "npx vitest",
-		"test:run": "npx vitest run",
+		"preview": "vite preview",
+		"test": "vitest",
+		"test:run": "vitest run",
 		"test:e2e": "playwright test",
 		"test:e2e:ui": "playwright test --ui",
 		"test:e2e:debug": "playwright test --debug",
 		"dev": "bash scripts/run-test-env.sh",
 		"typecheck": "tsc --noEmit",
-		"format": "npx @biomejs/biome format",
-		"format:fix": "npx @biomejs/biome format --write",
-		"lint": "npx @biomejs/biome lint",
-		"lint:fix": "npx @biomejs/biome lint --write --max-diagnostics 1024",
-		"check": "npx @biomejs/biome check --max-diagnostics 1024"
-	},
-	"eslintConfig": {
-		"extends": [
-			"react-app",
-			"react-app/jest"
-		]
+		"format": "biome format",
+		"format:fix": "biome format --write",
+		"lint": "biome lint",
+		"lint:fix": "biome lint --write --max-diagnostics 1024",
+		"check": "biome check --max-diagnostics 1024",
+		"audit": "bash ./scripts/audit.sh"
 	},
 	"browserslist": {
 		"production": [
@@ -60,25 +63,13 @@
 		]
 	},
 	"devDependencies": {
-		"@babel/core": "^7.23.1",
-		"@babel/preset-env": "^7.23.1",
-		"@babel/preset-react": "^7.22.15",
 		"@biomejs/biome": "^2.3.11",
 		"@playwright/test": "^1.57.0",
-		"@svgr/webpack": "^8.1.0",
 		"@types/react": "^19.1.8",
 		"@types/react-dom": "^19.1.6",
-		"babel-loader": "^9.1.4",
-		"copy-webpack-plugin": "^13.0.1",
-		"css-loader": "^7.1.2",
+		"@vitejs/plugin-react": "^5.1.2",
 		"dotenv": "^17.2.3",
-		"dotenv-webpack": "^8.1.0",
-		"html-webpack-plugin": "^5.5.3",
-		"jsdom": "^27.2.0",
-		"style-loader": "^4.0.0",
-		"ts-loader": "^9.5.2",
-		"webpack": "^5.88.2",
-		"webpack-cli": "^5.1.4",
-		"webpack-dev-server": "^5.2.2"
+		"happy-dom": "^20.1.0",
+		"vite": "^7.3.1"
 	}
 }

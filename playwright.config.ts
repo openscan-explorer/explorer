@@ -27,7 +27,7 @@ export default defineConfig({
   // - ALCHEMY_E2E_API_KEY: Your Alchemy API key
   // These are injected into localStorage by the test fixture (e2e/fixtures/test.ts)
   webServer: {
-    command: "npm start",
+    command: "npm run start",
     url: "http://localhost:3030",
     reuseExistingServer: !process.env.CI,
     timeout: 120000,
