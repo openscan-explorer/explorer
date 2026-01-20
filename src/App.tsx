@@ -30,6 +30,7 @@ import {
   LazyHome,
   LazyMempool,
   LazyProfile,
+  LazySearch,
   LazySettings,
   LazySubscriptions,
   LazySupporters,
@@ -104,6 +105,7 @@ function AppContent() {
             <SubdomainRedirect />
             <Routes>
               <Route path="/" element={<LazyHome />} />
+              <Route path="search" element={<LazySearch />} />
               <Route path="settings" element={<LazySettings />} />
               <Route path="about" element={<LazyAbout />} />
               <Route path="contact" element={<LazyContact />} />
