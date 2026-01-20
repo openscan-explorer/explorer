@@ -18,9 +18,9 @@
       "profile": "profiles/networks/1.md",
       "rpc": {
         "public": [
+          "https://ethereum.publicnode.com",
           "https://eth.llamarpc.com",
           "https://0xrpc.io/eth",
-          "https://ethereum.publicnode.com",
           "https://eth.blockrazor.xyz",
           "https://rpc.mevblocker.io",
           "https://rpc.flashbots.net"

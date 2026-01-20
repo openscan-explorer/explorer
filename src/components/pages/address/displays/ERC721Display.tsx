@@ -6,12 +6,10 @@ import { useSourcify } from "../../../../hooks/useSourcify";
 import { fetchToken, getAssetUrl, type TokenMetadata } from "../../../../services/MetadataService";
 import type {
   Address,
-  AddressTransactionsResult,
   DecodedContenthash,
   ENSRecords,
   ENSReverseResult,
   RPCMetadata,
-  Transaction,
 } from "../../../../types";
 import { decodeAbiString } from "../../../../utils/hexUtils";
 import { AddressHeader, ContractDetails, TransactionHistory } from "../shared";
@@ -21,9 +19,6 @@ interface ERC721DisplayProps {
   address: Address;
   addressHash: string;
   networkId: string;
-  transactionsResult?: AddressTransactionsResult | null;
-  transactionDetails: Transaction[];
-  loadingTxDetails: boolean;
   metadata?: RPCMetadata;
   selectedProvider?: string | null;
   onProviderSelect?: (provider: string) => void;
@@ -40,9 +35,6 @@ const ERC721Display: React.FC<ERC721DisplayProps> = ({
   address,
   addressHash,
   networkId,
-  transactionsResult,
-  transactionDetails,
-  loadingTxDetails,
   metadata,
   selectedProvider,
   onProviderSelect,
@@ -255,10 +247,10 @@ const ERC721Display: React.FC<ERC721DisplayProps> = ({
             </span>
           </div>
 
-          {/* Transaction Count */}
+          {/* Nonce (Transactions Sent) */}
           <div className="tx-row">
-            <span className="tx-label">Transactions:</span>
-            <span className="tx-value">{Number(address.txCount).toLocaleString()} txns</span>
+            <span className="tx-label">Nonce (Txns Sent):</span>
+            <span className="tx-value">{Number(address.txCount).toLocaleString()}</span>
           </div>
 
           {/* Verification Status */}
@@ -348,10 +340,8 @@ const ERC721Display: React.FC<ERC721DisplayProps> = ({
         <TransactionHistory
           networkId={networkId}
           addressHash={addressHash}
-          transactionsResult={transactionsResult}
-          transactionDetails={transactionDetails}
-          loadingTxDetails={loadingTxDetails}
           contractAbi={contractData?.abi}
+          txCount={Number(address.txCount)}
         />
       </div>
     </div>

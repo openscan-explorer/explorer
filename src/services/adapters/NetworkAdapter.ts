@@ -92,6 +92,7 @@ export abstract class NetworkAdapter {
     fromBlock?: number | "earliest",
     toBlock?: number | "latest",
     limit?: number,
+    onTransactionsFound?: (txs: Transaction[]) => void,
   ): Promise<AddressTransactionsResult>;
 
   /**
