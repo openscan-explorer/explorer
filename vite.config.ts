@@ -1,6 +1,7 @@
 import { execSync } from "child_process";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
+import { devArtifactsPlugin } from "./vite-plugin-artifacts";
 
 // Get git commit hash
 let commitHash = "development";
@@ -15,7 +16,7 @@ const base = isGhPages ? "/explorer/" : "/";
 
 export default defineConfig({
   base,
-  plugins: [react()],
+  plugins: [react(), devArtifactsPlugin()],
   server: {
     port: 3030,
     open: true,

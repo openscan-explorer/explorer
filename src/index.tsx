@@ -5,7 +5,11 @@ import { WagmiProvider } from "wagmi";
 import App from "./App";
 import { AppContextProvider } from "./context/AppContext";
 import { NotificationProvider } from "./context/NotificationContext";
+import { injectDevArtifacts } from "./utils/devArtifacts";
 import { networkConfig } from "./utils/networkConfig";
+
+// Inject development artifacts into localStorage (dev mode only)
+injectDevArtifacts();
 
 const queryClient = new QueryClient();
 
