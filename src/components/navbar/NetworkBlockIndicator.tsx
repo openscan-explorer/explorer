@@ -95,11 +95,24 @@ export function NetworkBlockIndicator({ className }: NetworkBlockIndicatorProps)
       <span className="network-block-number">
         {isLoading ? "..." : blockNumber !== null ? `#${blockNumber.toLocaleString()}` : "---"}
       </span>
+      {/* biome-ignore lint/a11y/useSemanticElements: using div for styling consistency */}
       <div
         className="network-block-number network-gas-tracker"
         id="gas-tracker"
-        title={gasPrice ? `${formatGasPrice(gasPrice).value} ${formatGasPrice(gasPrice).unit}` : "Gas Tracker"}
+        title={
+          gasPrice
+            ? `${formatGasPrice(gasPrice).value} ${formatGasPrice(gasPrice).unit}`
+            : "Gas Tracker"
+        }
+        role="button"
+        tabIndex={0}
         onClick={() => navigate(`/${networkId}/gastracker`)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            navigate(`/${networkId}/gastracker`);
+          }
+        }}
       >
         <svg
           width="12"
