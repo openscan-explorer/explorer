@@ -1,12 +1,5 @@
 import { type BlockNumberOrTag, NetworkAdapter, type TraceResult } from "../NetworkAdapter";
-import type {
-  Block,
-  Transaction,
-  Address,
-  NetworkStats,
-  DataWithMetadata,
-  AddressTransactionsResult,
-} from "../../../types";
+import type { Block, Transaction, Address, NetworkStats, DataWithMetadata } from "../../../types";
 import {
   transformOptimismBlockToBlock,
   transformOptimismTransactionToTransaction,
@@ -16,7 +9,7 @@ import {
 import { extractData } from "../shared/extractData";
 import { normalizeBlockNumber } from "../shared/normalizeBlockNumber";
 import { mergeMetadata } from "../shared/mergeMetadata";
-import type { OptimismClient } from "@openscan/network-connectors";
+import type { OptimismClient, EthereumClient } from "@openscan/network-connectors";
 
 /**
  * Optimism (OP Stack) blockchain adapter
@@ -29,6 +22,7 @@ export class OptimismAdapter extends NetworkAdapter {
   constructor(networkId: 10, client: OptimismClient) {
     super(networkId);
     this.client = client;
+    this.initTxSearch(client as unknown as EthereumClient);
   }
 
   async getBlock(blockNumber: BlockNumberOrTag): Promise<DataWithMetadata<Block>> {
@@ -127,25 +121,6 @@ export class OptimismAdapter extends NetworkAdapter {
     return {
       data: addressData,
       metadata: balanceResult.metadata as DataWithMetadata<Address>["metadata"],
-    };
-  }
-
-  async getAddressTransactions(
-    _address: string,
-    _fromBlock?: number | "earliest",
-    _toBlock?: number | "latest",
-    _limit = 100,
-  ): Promise<AddressTransactionsResult> {
-    // Optimism doesn't have a native method to get transactions by address
-    // This would require scanning blocks or using an indexer
-    // For now, return empty result
-    console.warn("getAddressTransactions not fully implemented for Optimism");
-
-    return {
-      transactions: [],
-      source: "none",
-      isComplete: false,
-      message: "Address transaction lookup not supported without indexer",
     };
   }
 
