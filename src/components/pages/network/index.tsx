@@ -51,9 +51,11 @@ export default function Network() {
         <DashboardStats
           price={dashboard.price}
           gasPrice={dashboard.gasPrice}
+          gasPrices={dashboard.gasPrices}
           blockNumber={dashboard.blockNumber}
           currency={currency}
           loading={dashboard.loading && dashboard.latestBlocks.length === 0}
+          networkId={numericNetworkId}
         />
 
         <div className="dashboard-tables-row">

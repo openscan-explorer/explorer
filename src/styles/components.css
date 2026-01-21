@@ -1968,11 +1968,6 @@
 	background: rgba(255, 255, 255, 0.05);
 	border: 1px solid color-mix(in srgb, var(--network-color, #888) 25%, transparent);
 	border-radius: 8px;
-	transition: all 0.2s ease;
-}
-
-.network-block-indicator:hover {
-	background: rgba(255, 255, 255, 0.08);
 }
 
 .network-block-pulse {
@@ -2031,6 +2026,15 @@
 	color: var(--text-primary);
 	font-weight: 500;
 	line-height: 1.2;
+}
+
+.network-gas-tracker {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	padding-left: 8px;
+	border-left: 1px solid rgba(255, 255, 255, 0.1);
+	cursor: pointer;
 }
 
 /* Pagination */
@@ -5118,6 +5122,7 @@
 	text-transform: uppercase;
 	letter-spacing: 0.05em;
 	margin-bottom: 8px;
+	text-align: center;
 }
 
 .dashboard-stat-value {
@@ -5129,6 +5134,82 @@
 
 .dashboard-stat-loading {
 	opacity: 0.5;
+}
+
+/* Clickable stat label */
+.dashboard-stat-label-link {
+	display: block;
+	font-size: 0.8rem;
+	color: var(--color-text-muted);
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	margin-bottom: 8px;
+	text-align: center;
+	text-decoration: none;
+	transition: color 0.2s ease;
+}
+
+.dashboard-stat-label-link:hover {
+	color: var(--color-primary);
+}
+
+/* Gas Price Tiers */
+.dashboard-stat-card-gas {
+	padding: 16px 12px;
+}
+
+.dashboard-gas-tiers {
+	display: flex;
+	justify-content: space-between;
+	gap: 8px;
+}
+
+.gas-tier {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	flex: 1;
+	padding: 6px 8px;
+	border-radius: 8px;
+	background: rgba(255, 255, 255, 0.03);
+}
+
+.gas-tier-label {
+	font-size: 0.7rem;
+	color: var(--color-text-muted);
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	margin-bottom: 4px;
+}
+
+.gas-tier-value {
+	font-family: "Outfit", sans-serif;
+	font-size: 0.95rem;
+	font-weight: 600;
+}
+
+.gas-tier-low .gas-tier-label {
+	color: #4ade80;
+}
+
+.gas-tier-low .gas-tier-value {
+	color: #4ade80;
+}
+
+.gas-tier-avg .gas-tier-label {
+	color: #fbbf24;
+}
+
+.gas-tier-avg .gas-tier-value {
+	color: #fbbf24;
+}
+
+.gas-tier-high .gas-tier-label {
+	color: #f87171;
+}
+
+.gas-tier-high .gas-tier-value {
+	color: #f87171;
 }
 
 /* Dashboard Tables Row */
@@ -5396,6 +5477,10 @@
 		font-size: 1.25rem;
 	}
 
+	.gas-tier-value {
+		font-size: 0.85rem;
+	}
+
 	.dashboard-table-row {
 		flex-wrap: wrap;
 		gap: 8px;
@@ -5596,5 +5681,253 @@
 
 	.search-result-item {
 		padding: 8px 12px;
+	}
+}
+
+/* ============================================
+   Gas Tracker Page Styles
+   ============================================ */
+
+.gas-tracker-header {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	text-align: center;
+}
+
+.gas-tracker-back-link {
+	font-size: 0.9rem;
+	color: var(--color-primary-muted);
+	text-decoration: none;
+	transition: color 0.2s ease;
+}
+
+.gas-tracker-back-link:hover {
+	color: var(--color-primary);
+}
+
+.gas-tracker-section-title {
+	font-size: 1.25rem;
+	font-weight: 600;
+	color: var(--color-text);
+	text-align: center;
+	margin: 0 0px 20px 0px;
+}
+
+.gas-tracker-section-subtitle {
+	font-size: 0.85rem;
+	color: var(--color-text-muted);
+	margin-bottom: 20px;
+	text-align: center;
+	margin: 0 0px 20px 0px;
+}
+
+/* Gas Price Cards */
+.gas-price-cards {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 16px;
+	margin-bottom: 20px;
+}
+
+.gas-price-card {
+	background: rgba(255, 255, 255, 0.03);
+	border: 1px solid rgba(255, 255, 255, 0.08);
+	border-radius: 12px;
+	padding: 24px;
+	text-align: center;
+}
+
+.gas-price-tier-label {
+	font-size: 0.85rem;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	margin-bottom: 8px;
+}
+
+.gas-price-tier-value {
+	font-family: "Outfit", sans-serif;
+	font-size: 1.75rem;
+	font-weight: 700;
+	margin-bottom: 8px;
+}
+
+.gas-price-tier-time {
+	font-size: 0.8rem;
+	color: var(--color-text-muted);
+}
+
+.gas-price-low .gas-price-tier-label,
+.gas-price-low .gas-price-tier-value {
+	color: #4ade80;
+}
+
+.gas-price-avg .gas-price-tier-label,
+.gas-price-avg .gas-price-tier-value {
+	color: #fbbf24;
+}
+
+.gas-price-high .gas-price-tier-label,
+.gas-price-high .gas-price-tier-value {
+	color: #f87171;
+}
+
+.gas-base-fee {
+	display: flex;
+	justify-content: center;
+	gap: 8px;
+	padding: 12px;
+	background: rgba(255, 255, 255, 0.02);
+	border-radius: 8px;
+	margin-bottom: 10px;
+}
+
+.gas-base-fee-label {
+	color: var(--color-text-muted);
+}
+
+.gas-base-fee-value {
+	font-weight: 600;
+	color: var(--color-text);
+}
+
+/* Transaction Cost Table */
+.tx-cost-table {
+	background: rgba(255, 255, 255, 0.02);
+	border: 1px solid rgba(255, 255, 255, 0.06);
+	border-radius: 12px;
+	overflow: hidden;
+}
+
+.tx-cost-header {
+	display: grid;
+	grid-template-columns: 2fr 1fr 1.5fr 1.5fr 1.5fr;
+	padding: 12px 16px;
+	background: rgba(255, 255, 255, 0.03);
+	border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+	font-size: 0.75rem;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	color: var(--color-text-muted);
+}
+
+.tx-cost-row {
+	display: grid;
+	grid-template-columns: 2fr 1fr 1.5fr 1.5fr 1.5fr;
+	padding: 16px;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+	transition: background 0.2s ease;
+}
+
+.tx-cost-row:last-child {
+	border-bottom: none;
+}
+
+.tx-cost-row:hover {
+	background: rgba(255, 255, 255, 0.02);
+}
+
+.tx-cost-col-name {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.tx-cost-name {
+	font-weight: 600;
+	color: var(--color-text);
+}
+
+.tx-cost-desc {
+	font-size: 0.75rem;
+	color: var(--color-text-muted);
+}
+
+.tx-cost-col-gas {
+	font-family: "JetBrains Mono", monospace;
+	font-size: 0.85rem;
+	color: var(--color-text-muted);
+	display: flex;
+	align-items: center;
+}
+
+.tx-cost-col-low,
+.tx-cost-col-avg,
+.tx-cost-col-high {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+
+.tx-cost-eth {
+	font-family: "JetBrains Mono", monospace;
+	font-size: 0.85rem;
+	color: var(--color-text);
+}
+
+.tx-cost-usd {
+	font-size: 0.75rem;
+	color: var(--color-text-muted);
+}
+
+.tx-cost-col-low .tx-cost-eth {
+	color: #4ade80;
+}
+
+.tx-cost-col-avg .tx-cost-eth {
+	color: #fbbf24;
+}
+
+.tx-cost-col-high .tx-cost-eth {
+	color: #f87171;
+}
+
+.gas-tracker-updated {
+	text-align: center;
+	font-size: 0.8rem;
+	color: var(--color-text-muted);
+	padding-top: 16px;
+	border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Gas Tracker Responsive */
+@media (max-width: 900px) {
+	.gas-price-cards {
+		grid-template-columns: repeat(3, 1fr);
+	}
+
+	.tx-cost-header,
+	.tx-cost-row {
+		grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+	}
+}
+
+@media (max-width: 640px) {
+	.gas-tracker-header {
+		flex-direction: column;
+		align-items: center;
+		gap: 12px;
+	}
+
+	.gas-price-cards {
+		grid-template-columns: 1fr;
+	}
+
+	.gas-price-card {
+		padding: 16px;
+	}
+
+	.gas-price-tier-value {
+		font-size: 1.5rem;
+	}
+
+	.tx-cost-table {
+		overflow-x: auto;
+	}
+
+	.tx-cost-header,
+	.tx-cost-row {
+		min-width: 600px;
 	}
 }

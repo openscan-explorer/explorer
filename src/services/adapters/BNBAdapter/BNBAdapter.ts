@@ -26,6 +26,10 @@ export class BNBAdapter extends NetworkAdapter {
     this.initTxSearch(client as unknown as EthereumClient);
   }
 
+  protected getClient(): EthereumClient {
+    return this.client as unknown as EthereumClient;
+  }
+
   async getBlock(blockNumber: BlockNumberOrTag): Promise<DataWithMetadata<Block>> {
     const normalizedBlockNumber = normalizeBlockNumber(blockNumber);
     const result = await this.client.getBlockByNumber(normalizedBlockNumber);
