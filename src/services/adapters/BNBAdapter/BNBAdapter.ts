@@ -1,12 +1,5 @@
 import { type BlockNumberOrTag, NetworkAdapter } from "../NetworkAdapter";
-import type {
-  Block,
-  Transaction,
-  Address,
-  NetworkStats,
-  DataWithMetadata,
-  AddressTransactionsResult,
-} from "../../../types";
+import type { Block, Transaction, Address, NetworkStats, DataWithMetadata } from "../../../types";
 import type { TraceResult } from "../NetworkAdapter";
 import {
   transformBNBBlockToBlock,
@@ -17,7 +10,7 @@ import {
 import { extractData } from "../shared/extractData";
 import { normalizeBlockNumber } from "../shared/normalizeBlockNumber";
 import { mergeMetadata } from "../shared/mergeMetadata";
-import type { BNBClient } from "@openscan/network-connectors";
+import type { BNBClient, EthereumClient } from "@openscan/network-connectors";
 
 /**
  * BNB Smart Chain (BSC) blockchain adapter
@@ -30,6 +23,7 @@ export class BNBAdapter extends NetworkAdapter {
   constructor(networkId: 56 | 97, client: BNBClient) {
     super(networkId);
     this.client = client;
+    this.initTxSearch(client as unknown as EthereumClient);
   }
 
   async getBlock(blockNumber: BlockNumberOrTag): Promise<DataWithMetadata<Block>> {
@@ -128,25 +122,6 @@ export class BNBAdapter extends NetworkAdapter {
     return {
       data: addressData,
       metadata: balanceResult.metadata as DataWithMetadata<Address>["metadata"],
-    };
-  }
-
-  async getAddressTransactions(
-    _address: string,
-    _fromBlock?: number | "earliest",
-    _toBlock?: number | "latest",
-    _limit = 100,
-  ): Promise<AddressTransactionsResult> {
-    // BNB doesn't have a native method to get transactions by address
-    // This would require scanning blocks or using an indexer
-    // For now, return empty result
-    console.warn("getAddressTransactions not fully implemented for BNB chain");
-
-    return {
-      transactions: [],
-      source: "none",
-      isComplete: false,
-      message: "Address transaction lookup not supported without indexer",
     };
   }
 
