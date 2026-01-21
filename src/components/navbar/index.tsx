@@ -430,6 +430,38 @@ const Navbar = () => {
                 </svg>
                 <span>Transactions</span>
               </button>
+              <button
+                type="button"
+                className="navbar-mobile-menu-item"
+                onClick={() => handleMobileNavigation(`/${networkId}/gastracker`)}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <title>Gas Tracker</title>
+                  <path
+                    d="M3 22V6a2 2 0 012-2h8a2 2 0 012 2v16"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path d="M3 22h12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                  <path
+                    d="M13 10h2a2 2 0 012 2v3a2 2 0 002 2h0a2 2 0 002-2V9l-3-3"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M7 10h4v4H7z"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+                <span>Gas Tracker</span>
+              </button>
             </>
           )}
 

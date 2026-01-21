@@ -16,7 +16,7 @@ import {
 import { extractData } from "../shared/extractData";
 import { normalizeBlockNumber } from "../shared/normalizeBlockNumber";
 import { mergeMetadata } from "../shared/mergeMetadata";
-import type { BaseClient } from "@openscan/network-connectors";
+import type { BaseClient, EthereumClient } from "@openscan/network-connectors";
 
 /**
  * Base blockchain adapter
@@ -29,6 +29,10 @@ export class BaseAdapter extends NetworkAdapter {
   constructor(networkId: 8453, client: BaseClient) {
     super(networkId);
     this.client = client;
+  }
+
+  protected getClient(): EthereumClient {
+    return this.client as unknown as EthereumClient;
   }
 
   async getBlock(blockNumber: BlockNumberOrTag): Promise<DataWithMetadata<Block>> {

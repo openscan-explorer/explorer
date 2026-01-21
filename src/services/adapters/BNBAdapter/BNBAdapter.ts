@@ -17,7 +17,7 @@ import {
 import { extractData } from "../shared/extractData";
 import { normalizeBlockNumber } from "../shared/normalizeBlockNumber";
 import { mergeMetadata } from "../shared/mergeMetadata";
-import type { BNBClient } from "@openscan/network-connectors";
+import type { BNBClient, EthereumClient } from "@openscan/network-connectors";
 
 /**
  * BNB Smart Chain (BSC) blockchain adapter
@@ -30,6 +30,10 @@ export class BNBAdapter extends NetworkAdapter {
   constructor(networkId: 56 | 97, client: BNBClient) {
     super(networkId);
     this.client = client;
+  }
+
+  protected getClient(): EthereumClient {
+    return this.client as unknown as EthereumClient;
   }
 
   async getBlock(blockNumber: BlockNumberOrTag): Promise<DataWithMetadata<Block>> {

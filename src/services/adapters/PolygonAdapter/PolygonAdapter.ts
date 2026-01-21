@@ -17,7 +17,7 @@ import {
 import { extractData } from "../shared/extractData";
 import { normalizeBlockNumber } from "../shared/normalizeBlockNumber";
 import { mergeMetadata } from "../shared/mergeMetadata";
-import type { PolygonClient, SupportedChainId } from "@openscan/network-connectors";
+import type { PolygonClient, SupportedChainId, EthereumClient } from "@openscan/network-connectors";
 
 /**
  * Polygon blockchain service
@@ -30,6 +30,11 @@ export class PolygonAdapter extends NetworkAdapter {
     super(networkId);
     this.client = client;
   }
+
+  protected getClient(): EthereumClient {
+    return this.client as unknown as EthereumClient;
+  }
+
   async getBlock(blockNumber: BlockNumberOrTag): Promise<DataWithMetadata<Block>> {
     const normalizedBlockNumber = normalizeBlockNumber(blockNumber);
     const result = await this.client.getBlockByNumber(normalizedBlockNumber);

@@ -33,6 +33,10 @@ export class EVMAdapter extends NetworkAdapter {
     this.client = client;
     this.txSearch = new AddressTransactionSearch(client);
   }
+
+  protected getClient(): EthereumClient {
+    return this.client;
+  }
   async getBlock(blockNumber: BlockNumberOrTag): Promise<DataWithMetadata<Block>> {
     const normalizedBlockNumber = normalizeBlockNumber(blockNumber);
     const result = await this.client.getBlockByNumber(normalizedBlockNumber);

@@ -6,7 +6,7 @@
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { AppContext } from "../context/AppContext";
 import { getNativeTokenPrice } from "../services/PriceService";
-import type { Block, NetworkStats, Transaction } from "../types";
+import type { Block, GasPrices, NetworkStats, Transaction } from "../types";
 import { useDataService } from "./useDataService";
 
 const REFRESH_INTERVAL = 10000; // 10 seconds
@@ -16,6 +16,7 @@ const TXS_TO_FETCH = 10;
 export interface DashboardData {
   price: number | null;
   gasPrice: string | null;
+  gasPrices: GasPrices | null;
   blockNumber: string | null;
   latestBlocks: Block[];
   latestTransactions: Transaction[];
@@ -27,6 +28,7 @@ export interface DashboardData {
 const initialState: DashboardData = {
   price: null,
   gasPrice: null,
+  gasPrices: null,
   blockNumber: null,
   latestBlocks: [],
   latestTransactions: [],
@@ -53,10 +55,11 @@ export function useNetworkDashboard(networkId: number): DashboardData {
     isFetchingRef.current = true;
 
     try {
-      // Fetch network stats and price in parallel
+      // Fetch network stats, gas prices, and price in parallel
       // For L2s, price is fetched from mainnet pools
-      const [statsResult, priceResult] = await Promise.all([
+      const [statsResult, gasPricesResult, priceResult] = await Promise.all([
         dataService.networkAdapter.getNetworkStats(),
+        dataService.networkAdapter.getGasPrices().catch(() => null),
         rpcUrl
           ? getNativeTokenPrice(networkId, rpcUrl, mainnetRpcUrl || undefined)
           : Promise.resolve(null),
@@ -106,6 +109,7 @@ export function useNetworkDashboard(networkId: number): DashboardData {
       setData({
         price: priceResult,
         gasPrice: stats.currentGasPrice,
+        gasPrices: gasPricesResult?.data || null,
         blockNumber: stats.currentBlockNumber,
         latestBlocks: blocks,
         latestTransactions: transactions,

@@ -16,7 +16,7 @@ import {
 import { extractData } from "../shared/extractData";
 import { normalizeBlockNumber } from "../shared/normalizeBlockNumber";
 import { mergeMetadata } from "../shared/mergeMetadata";
-import type { ArbitrumClient } from "@openscan/network-connectors";
+import type { ArbitrumClient, EthereumClient } from "@openscan/network-connectors";
 
 /**
  * Arbitrum blockchain adapter
@@ -30,6 +30,10 @@ export class ArbitrumAdapter extends NetworkAdapter {
   constructor(networkId: 42161, client: ArbitrumClient) {
     super(networkId);
     this.client = client;
+  }
+
+  protected getClient(): EthereumClient {
+    return this.client as unknown as EthereumClient;
   }
 
   async getBlock(blockNumber: BlockNumberOrTag): Promise<DataWithMetadata<Block>> {

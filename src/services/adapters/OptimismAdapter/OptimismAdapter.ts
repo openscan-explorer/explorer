@@ -16,7 +16,7 @@ import {
 import { extractData } from "../shared/extractData";
 import { normalizeBlockNumber } from "../shared/normalizeBlockNumber";
 import { mergeMetadata } from "../shared/mergeMetadata";
-import type { OptimismClient } from "@openscan/network-connectors";
+import type { OptimismClient, EthereumClient } from "@openscan/network-connectors";
 
 /**
  * Optimism (OP Stack) blockchain adapter
@@ -29,6 +29,10 @@ export class OptimismAdapter extends NetworkAdapter {
   constructor(networkId: 10, client: OptimismClient) {
     super(networkId);
     this.client = client;
+  }
+
+  protected getClient(): EthereumClient {
+    return this.client as unknown as EthereumClient;
   }
 
   async getBlock(blockNumber: BlockNumberOrTag): Promise<DataWithMetadata<Block>> {
