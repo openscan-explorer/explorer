@@ -18,8 +18,15 @@ export function getSubdomain(): string | null {
     return null;
   }
 
-  // Skip subdomain processing for ENS gateways (e.g., openscan.eth.link, openscan.eth.limo)
+  // Handle ENS gateway subdomains (e.g., ethereum.openscan.eth.link -> ethereum)
+  // These resolve ENS subdomains like ethereum.openscan.eth
   if (hostname.endsWith(".eth.link") || hostname.endsWith(".eth.limo")) {
+    const parts = hostname.split(".");
+    // ethereum.openscan.eth.link = 4 parts, openscan.eth.link = 3 parts
+    // ethereum.openscan.eth.limo = 4 parts, openscan.eth.limo = 3 parts
+    if (parts.length > 3 && parts[0]) {
+      return parts[0];
+    }
     return null;
   }
 
