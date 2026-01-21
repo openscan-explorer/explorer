@@ -2,6 +2,7 @@ import { execSync } from "child_process";
 import { readFileSync } from "fs";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
+import { devArtifactsPlugin } from "./vite-plugin-artifacts";
 
 // Get version from package.json
 const packageJson = JSON.parse(readFileSync("./package.json", "utf-8"));
@@ -20,7 +21,7 @@ const base = isGhPages ? "/explorer/" : "/";
 
 export default defineConfig({
   base,
-  plugins: [react()],
+  plugins: [react(), devArtifactsPlugin()],
   server: {
     port: 3030,
     open: true,
