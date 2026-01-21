@@ -9,6 +9,7 @@ import type {
   GasPrices,
 } from "../../types";
 import { extractData } from "./shared/extractData";
+import { AddressTransactionSearch } from "../AddressTransactionSearch";
 
 export type BlockTag = "latest" | "earliest" | "pending" | "finalized" | "safe";
 export type BlockNumberOrTag = number | string | BlockTag;
@@ -46,6 +47,7 @@ export interface TraceCallConfig {
 export abstract class NetworkAdapter {
   networkId: number;
   isLocalHost: boolean;
+  protected txSearch: AddressTransactionSearch | null = null;
 
   constructor(networkId: SupportedChainId | 31337 | 11155111 | 97) {
     this.networkId = networkId;
@@ -57,6 +59,14 @@ export abstract class NetworkAdapter {
    * Each adapter must implement this to provide its client
    */
   protected abstract getClient(): EthereumClient;
+
+  /**
+   * Initialize the transaction search service
+   * Call this in subclass constructors to enable binary search tx discovery
+   */
+  protected initTxSearch(client: EthereumClient): void {
+    this.txSearch = new AddressTransactionSearch(client);
+  }
 
   /**
    * Get block by number or tag
@@ -89,20 +99,81 @@ export abstract class NetworkAdapter {
   abstract getAddress(address: string): Promise<DataWithMetadata<Address>>;
 
   /**
-   * Get transactions for an address
+   * Get transactions for an address using binary search on nonce/balance changes
    * @param address - Address to query
    * @param fromBlock - Starting block (optional)
    * @param toBlock - Ending block (optional)
    * @param limit - Maximum number of transactions to return
+   * @param onTransactionsFound - Callback for streaming results
    * @returns List of transactions
    */
-  abstract getAddressTransactions(
+  async getAddressTransactions(
     address: string,
     fromBlock?: number | "earliest",
     toBlock?: number | "latest",
-    limit?: number,
+    limit = 100,
     onTransactionsFound?: (txs: Transaction[]) => void,
-  ): Promise<AddressTransactionsResult>;
+  ): Promise<AddressTransactionsResult> {
+    if (!this.txSearch) {
+      return {
+        transactions: [],
+        source: "none",
+        isComplete: false,
+        message: "Transaction search not initialized for this network",
+      };
+    }
+
+    try {
+      const result = await this.txSearch.searchAddressActivity(address, {
+        limit,
+        toBlock: typeof toBlock === "number" ? toBlock : undefined,
+        fromBlock: typeof fromBlock === "number" ? fromBlock : undefined,
+        onTransactionsFound: onTransactionsFound
+          ? (txs) => {
+              const cleanTxs = txs.map(({ type: _type, ...tx }) => tx as Transaction);
+              onTransactionsFound(cleanTxs);
+            }
+          : undefined,
+      });
+
+      if (result.transactions.length === 0) {
+        return {
+          transactions: [],
+          transactionDetails: [],
+          source: "none",
+          isComplete: true,
+          message: "No transactions found for this address",
+        };
+      }
+
+      const txHashes = result.transactions.map((tx) => tx.hash);
+      const txDetails = result.transactions.map(({ type: _type, ...tx }) => tx as Transaction);
+
+      return {
+        transactions: txHashes,
+        transactionDetails: txDetails,
+        source: "binary_search",
+        isComplete: result.stats.totalTxs < limit || limit === 0,
+        message:
+          limit > 0 && result.stats.totalTxs >= limit
+            ? `Showing ${limit} transactions (more may exist)`
+            : undefined,
+      };
+    } catch (error) {
+      console.error("Error searching address transactions:", error);
+
+      return {
+        transactions: [],
+        transactionDetails: [],
+        source: "none",
+        isComplete: false,
+        message:
+          error instanceof Error
+            ? `Search failed: ${error.message}`
+            : "Address transaction lookup failed",
+      };
+    }
+  }
 
   /**
    * Get the latest block number

@@ -1,12 +1,5 @@
 import { type BlockNumberOrTag, NetworkAdapter, type TraceResult } from "../NetworkAdapter";
-import type {
-  Block,
-  Transaction,
-  Address,
-  NetworkStats,
-  DataWithMetadata,
-  AddressTransactionsResult,
-} from "../../../types";
+import type { Block, Transaction, Address, NetworkStats, DataWithMetadata } from "../../../types";
 import {
   transformArbitrumBlockToBlock,
   transformArbitrumTransactionToTransaction,
@@ -30,6 +23,7 @@ export class ArbitrumAdapter extends NetworkAdapter {
   constructor(networkId: 42161, client: ArbitrumClient) {
     super(networkId);
     this.client = client;
+    this.initTxSearch(client as unknown as EthereumClient);
   }
 
   protected getClient(): EthereumClient {
@@ -132,25 +126,6 @@ export class ArbitrumAdapter extends NetworkAdapter {
     return {
       data: addressData,
       metadata: balanceResult.metadata as DataWithMetadata<Address>["metadata"],
-    };
-  }
-
-  async getAddressTransactions(
-    _address: string,
-    _fromBlock?: number | "earliest",
-    _toBlock?: number | "latest",
-    _limit = 100,
-  ): Promise<AddressTransactionsResult> {
-    // Arbitrum doesn't have a native method to get transactions by address
-    // This would require scanning blocks or using an indexer
-    // For now, return empty result
-    console.warn("getAddressTransactions not fully implemented for Arbitrum");
-
-    return {
-      transactions: [],
-      source: "none",
-      isComplete: false,
-      message: "Address transaction lookup not supported without indexer",
     };
   }
 
