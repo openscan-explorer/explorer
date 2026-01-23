@@ -1,5 +1,5 @@
 import type React from "react";
-import { useCallback, useContext, useMemo, useState } from "react";
+import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { getEnabledNetworks } from "../../../config/networks";
 import { AppContext } from "../../../context/AppContext";
 import { useSettings } from "../../../context/SettingsContext";
@@ -64,6 +64,11 @@ const Settings: React.FC = () => {
     infura: false,
     alchemy: false,
   });
+
+  // Sync localRpc when context rpcUrls changes (e.g., after save)
+  useEffect(() => {
+    setLocalRpc({ ...rpcUrls });
+  }, [rpcUrls]);
 
   const updateField = (key: keyof RpcUrlsContextType, value: string) => {
     setLocalRpc((prev) => ({ ...prev, [key]: value }));
