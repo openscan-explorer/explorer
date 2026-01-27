@@ -143,9 +143,9 @@ When creating PRs, follow the template at `.github/PULL_REQUEST_TEMPLATE.md`:
 <!-- Any additional information that reviewers should know -->
 ```
 
-## Issue Template (Bug Report)
+## Issue Templates
 
-When creating bug reports, follow the template at `.github/ISSUE_TEMPLATE/bug_report.md`:
+### Bug Report (`.github/ISSUE_TEMPLATE/bug_report.md`)
 
 ```markdown
 ---
@@ -182,6 +182,59 @@ If applicable, add screenshots to help explain your problem.
 Add any other context about the problem here.
 ```
 
+### Feature Request (`.github/ISSUE_TEMPLATE/feature_request.md`)
+
+```markdown
+---
+name: Feature Request
+about: Suggest a new feature or enhancement
+title: "feat: "
+labels: enhancement
+---
+
+## Summary
+A clear and concise description of the feature you'd like to see.
+
+## Motivation
+Why is this feature needed? What problem does it solve?
+
+## Proposed Solution
+Describe how you envision this feature working.
+
+## Alternatives Considered
+Any alternative solutions or features you've considered.
+
+## Additional Context
+Add any other context, mockups, or screenshots about the feature request.
+
+## Acceptance Criteria
+- [ ] Criteria 1
+- [ ] Criteria 2
+- [ ] Criteria 3
+```
+
+### General Issue (`.github/ISSUE_TEMPLATE/general_issue.md`)
+
+```markdown
+---
+name: General Issue
+about: For questions, discussions, or issues that don't fit other templates
+title: ""
+---
+
+## Description
+Describe your issue, question, or topic for discussion.
+
+## Context
+Provide any relevant context or background information.
+
+## Expected Outcome
+What outcome or resolution are you looking for?
+
+## Additional Information
+Any other details that might be helpful.
+```
+
 ## Creating PRs with Claude
 
 When asked to create a PR:
@@ -194,7 +247,11 @@ When asked to create a PR:
 ## Creating Issues with Claude
 
 When asked to create an issue:
-1. Use the appropriate template (bug report, feature request)
+1. Choose the appropriate template:
+   - **Bug Report** (`[BUG]` prefix) - For bugs and unexpected behavior
+   - **Feature Request** (`feat:` prefix) - For new features and enhancements
+   - **General Issue** - For questions, discussions, or other topics
 2. Fill in all sections with relevant details
-3. Add appropriate labels
+3. Add appropriate labels (`bug`, `enhancement`, etc.)
 4. Include reproduction steps for bugs
+5. Include acceptance criteria for feature requests
