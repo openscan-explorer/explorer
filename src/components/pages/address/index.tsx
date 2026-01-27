@@ -164,10 +164,6 @@ export default function Address() {
     return (
       <div className="container-wide">
         <div className="block-display-card">
-          <div className="block-display-header">
-            <span className="block-label">ENS Name</span>
-            <span className="tx-mono header-subtitle">{addressParam}</span>
-          </div>
           <div className="card-content-loading">
             <Loader text={`Resolving ENS name: ${addressParam}...`} />
           </div>
@@ -181,12 +177,10 @@ export default function Address() {
     return (
       <div className="container-wide">
         <div className="block-display-card">
-          <div className="block-display-header">
-            <span className="block-label">ENS Name</span>
-            <span className="tx-mono header-subtitle">{addressParam}</span>
-          </div>
           <div className="card-content">
-            <p className="text-error margin-0">Error: {ensError}</p>
+            <p className="text-error margin-0">
+              Could not resolve ENS name "{addressParam}": {ensError}
+            </p>
           </div>
         </div>
       </div>
