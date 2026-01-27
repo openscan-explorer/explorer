@@ -309,6 +309,32 @@ export function clearSupportersCache(): void {
   supportersCacheTime = 0;
 }
 
+/**
+ * Get token supporters for a specific chain
+ * @param chainId - The chain ID to filter by
+ * @returns Token supporters sorted by tier (highest first)
+ */
+export async function getTokenSupportersByChain(chainId: number): Promise<Supporter[]> {
+  const supporters = await fetchSupporters();
+  return supporters
+    .filter((s) => s.type === "token" && s.chainId === chainId)
+    .sort((a, b) => b.currentTier - a.currentTier);
+}
+
+/**
+ * Get token supporters by tier and chain
+ * @param chainId - The chain ID to filter by
+ * @param minTier - Minimum tier (1, 2, or 3)
+ * @returns Token supporters with tier >= minTier
+ */
+export async function getTokenSupportersByTier(
+  chainId: number,
+  minTier: 1 | 2 | 3,
+): Promise<Supporter[]> {
+  const supporters = await getTokenSupportersByChain(chainId);
+  return supporters.filter((s) => s.currentTier >= minTier);
+}
+
 // ============================================
 // Profile Types and Functions
 // ============================================
@@ -552,6 +578,69 @@ export async function fetchToken(chainId: number, address: string): Promise<Toke
     return await response.json();
   } catch (error) {
     console.error("Error fetching token:", error);
+    return null;
+  }
+}
+
+/**
+ * Token list item from all.json
+ */
+export interface TokenListItem {
+  address: string;
+  name: string;
+  symbol: string;
+  decimals: number;
+  type?: "ERC20" | "ERC721" | "ERC1155";
+}
+
+/**
+ * Token list response from tokens/{chainId}/all.json
+ */
+export interface TokenListResponse {
+  chainId: number;
+  updatedAt: string;
+  count: number;
+  tokens: TokenListItem[];
+}
+
+// Cache for token lists
+const tokenListCache: Map<number, { data: TokenListResponse; timestamp: number }> = new Map();
+
+/**
+ * Fetch all tokens for a chain from tokens/{chainId}/all.json
+ * @param chainId - The chain ID to fetch tokens for
+ * @returns Token list response or null if failed
+ */
+export async function fetchTokenList(chainId: number): Promise<TokenListResponse | null> {
+  const now = Date.now();
+  const cached = tokenListCache.get(chainId);
+
+  // Return cached data if still valid
+  if (cached && now - cached.timestamp < CACHE_DURATION) {
+    return cached.data;
+  }
+
+  try {
+    const response = await fetch(`${METADATA_BASE_URL}/tokens/${chainId}/all.json`);
+
+    if (!response.ok) {
+      return null;
+    }
+
+    const data: TokenListResponse = await response.json();
+
+    // Update cache
+    tokenListCache.set(chainId, { data, timestamp: now });
+
+    return data;
+  } catch (error) {
+    console.error("Error fetching token list:", error);
+
+    // Return cached data if available, even if stale
+    if (cached) {
+      return cached.data;
+    }
+
     return null;
   }
 }
