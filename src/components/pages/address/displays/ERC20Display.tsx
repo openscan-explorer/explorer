@@ -5,7 +5,7 @@ import { useSourcify } from "../../../../hooks/useSourcify";
 import { fetchToken, getAssetUrl, type TokenMetadata } from "../../../../services/MetadataService";
 import type { Address, ENSReverseResult, RPCMetadata } from "../../../../types";
 import { hexToUtf8 } from "../../../../utils/erc20Utils";
-import { AddressHeader, TransactionHistory } from "../shared";
+import { AddressHeader } from "../shared";
 import ContractInfoCard from "../shared/ContractInfoCard";
 import ContractInfoCards from "../shared/ContractInfoCards";
 import ERC20TokenInfoCard from "../shared/ERC20TokenInfoCard";
@@ -232,14 +232,6 @@ const ERC20Display: React.FC<ERC20DisplayProps> = ({
               ? `https://repo.sourcify.dev/contracts/full_match/${networkId}/${addressHash}/`
               : undefined
           }
-        />
-
-        {/* Transaction History */}
-        <TransactionHistory
-          networkId={networkId}
-          addressHash={addressHash}
-          contractAbi={contractData?.abi}
-          txCount={Number(address.txCount)}
         />
       </div>
     </div>

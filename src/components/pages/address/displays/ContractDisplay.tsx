@@ -3,7 +3,7 @@ import { useContext, useMemo } from "react";
 import { AppContext } from "../../../../context";
 import { useSourcify } from "../../../../hooks/useSourcify";
 import type { Address, ENSReverseResult, RPCMetadata } from "../../../../types";
-import { AddressHeader, TransactionHistory } from "../shared";
+import { AddressHeader } from "../shared";
 import ContractInfoCard from "../shared/ContractInfoCard";
 import ContractInfoCards from "../shared/ContractInfoCards";
 
@@ -118,14 +118,6 @@ const ContractDisplay: React.FC<ContractDisplayProps> = ({
               ? `https://repo.sourcify.dev/contracts/full_match/${networkId}/${addressHash}/`
               : undefined
           }
-        />
-
-        {/* Transaction History */}
-        <TransactionHistory
-          networkId={networkId}
-          addressHash={addressHash}
-          contractAbi={contractData?.abi}
-          txCount={Number(address.txCount)}
         />
       </div>
     </div>

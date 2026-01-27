@@ -5,7 +5,7 @@ import { useSourcify } from "../../../../hooks/useSourcify";
 import { fetchToken, getAssetUrl, type TokenMetadata } from "../../../../services/MetadataService";
 import type { Address, ENSReverseResult, RPCMetadata } from "../../../../types";
 import { decodeAbiString } from "../../../../utils/hexUtils";
-import { AddressHeader, TransactionHistory } from "../shared";
+import { AddressHeader } from "../shared";
 import ContractInfoCard from "../shared/ContractInfoCard";
 import ContractInfoCards from "../shared/ContractInfoCards";
 import NFTCollectionInfoCard from "../shared/NFTCollectionInfoCard";
@@ -210,14 +210,6 @@ const ERC721Display: React.FC<ERC721DisplayProps> = ({
               ? `https://repo.sourcify.dev/contracts/full_match/${networkId}/${addressHash}/`
               : undefined
           }
-        />
-
-        {/* Transaction History */}
-        <TransactionHistory
-          networkId={networkId}
-          addressHash={addressHash}
-          contractAbi={contractData?.abi}
-          txCount={Number(address.txCount)}
         />
       </div>
     </div>
