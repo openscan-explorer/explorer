@@ -4395,6 +4395,17 @@
 	background: rgba(0, 0, 0, 0.1);
 }
 
+.token-logo-placeholder {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: var(--color-primary-alpha-15);
+	color: var(--color-primary);
+	font-weight: 600;
+	font-size: 0.9rem;
+	flex-shrink: 0;
+}
+
 .token-name-symbol {
 	display: flex;
 	align-items: center;
@@ -5930,4 +5941,769 @@
 	.tx-cost-row {
 		min-width: 600px;
 	}
+}
+
+/* ==========================================================================
+   TOKEN HOLDINGS SECTION
+   Displays ERC20 token balances for an address
+   ========================================================================== */
+
+.token-holdings-section {
+	margin-top: 16px;
+}
+
+.token-holdings-list {
+	display: flex;
+	flex-direction: column;
+	gap: 0;
+}
+
+.token-holding-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 12px 16px;
+	border-bottom: 1px solid var(--color-primary-alpha-10);
+	transition: background 0.2s ease;
+	text-decoration: none;
+	color: inherit;
+	cursor: pointer;
+}
+
+.token-holding-row:last-child {
+	border-bottom: none;
+}
+
+.token-holding-row:hover {
+	background: var(--color-primary-alpha-15);
+}
+
+.token-holding-row:hover .token-name {
+	color: var(--color-primary);
+}
+
+.token-holding-info {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.token-holding-details {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	flex-wrap: wrap;
+}
+
+.token-holding-balance {
+	font-weight: 600;
+	color: var(--text-primary);
+	font-size: 0.95rem;
+}
+
+/* Token Tier Badges */
+.token-tier-badge {
+	font-size: 0.7rem;
+	padding: 2px 6px;
+	border-radius: 4px;
+	font-weight: 600;
+	text-transform: uppercase;
+}
+
+.token-tier-badge.tier-3 {
+	background: var(--color-success-alpha-10);
+	color: var(--color-success);
+}
+
+.token-tier-badge.tier-2 {
+	background: var(--color-info-alpha-10);
+	color: var(--color-info);
+}
+
+.token-tier-badge.tier-1 {
+	background: var(--color-warning-alpha-10);
+	color: var(--color-warning);
+}
+
+.token-custom-badge {
+	font-size: 0.7rem;
+	padding: 2px 6px;
+	border-radius: 4px;
+	font-weight: 600;
+	background: var(--color-accent-alpha-10);
+	color: var(--color-accent);
+	text-transform: uppercase;
+}
+
+/* Token Holdings Actions */
+.token-holdings-actions {
+	display: flex;
+	gap: 12px;
+	padding: 12px 16px;
+	border-top: 1px solid var(--color-primary-alpha-10);
+}
+
+/* Token Holdings States */
+.token-holdings-loading,
+.token-holdings-empty {
+	color: var(--text-secondary);
+	font-style: italic;
+}
+
+.token-holdings-error {
+	padding: 12px 16px;
+	background: var(--color-error-alpha-10);
+	color: var(--color-error);
+	font-size: 0.9rem;
+	border-radius: 4px;
+	margin: 8px 16px;
+}
+
+/* ==========================================================================
+   CUSTOM TOKEN MODAL
+   Modal for adding custom ERC20 tokens
+   ========================================================================== */
+
+.custom-token-modal {
+	max-width: 480px;
+}
+
+.custom-token-modal .modal-body {
+	padding: 16px 0;
+}
+
+.custom-token-modal .form-group {
+	margin-bottom: 16px;
+}
+
+.custom-token-modal .form-label {
+	display: block;
+	margin-bottom: 8px;
+	font-weight: 500;
+	color: var(--text-secondary);
+	font-size: 0.9rem;
+}
+
+.custom-token-input {
+	width: 100%;
+	font-family: "JetBrains Mono", "Fira Code", monospace;
+	font-size: 0.85rem;
+}
+
+.custom-token-validation-error {
+	margin-top: 6px;
+	font-size: 0.8rem;
+	color: var(--color-error);
+}
+
+.custom-token-loading {
+	padding: 16px;
+	text-align: center;
+	color: var(--text-secondary);
+	font-style: italic;
+}
+
+.custom-token-error {
+	padding: 12px;
+	background: var(--color-error-alpha-10);
+	color: var(--color-error);
+	border-radius: 6px;
+	font-size: 0.9rem;
+}
+
+/* Custom Token Preview */
+.custom-token-preview {
+	background: var(--color-primary-alpha-5);
+	border-radius: 8px;
+	padding: 16px;
+	margin-top: 16px;
+}
+
+.custom-token-preview-header {
+	font-weight: 600;
+	color: var(--text-primary);
+	margin-bottom: 12px;
+	font-size: 0.95rem;
+}
+
+.custom-token-preview-row {
+	display: flex;
+	justify-content: space-between;
+	padding: 6px 0;
+	font-size: 0.9rem;
+}
+
+.custom-token-preview-row:not(:last-child) {
+	border-bottom: 1px solid var(--color-primary-alpha-10);
+}
+
+.custom-token-preview-label {
+	color: var(--text-secondary);
+}
+
+.custom-token-preview-value {
+	color: var(--text-primary);
+	font-weight: 500;
+}
+
+.custom-token-balance {
+	color: var(--color-primary);
+	font-weight: 600;
+}
+
+/* Token Holdings Responsive */
+@media (max-width: 640px) {
+	.token-holding-row {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 8px;
+	}
+
+	.token-holding-balance {
+		margin-left: 44px;
+	}
+
+	.token-holdings-actions {
+		flex-direction: column;
+	}
+
+	.token-holdings-actions .btn {
+		width: 100%;
+	}
+}
+
+/* ==========================================================================
+   Account Info Cards - Horizontal Layout
+   ========================================================================== */
+
+.account-info-cards {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 16px;
+	margin-bottom: 16px;
+}
+
+.account-card {
+	background: var(--color-surface);
+	border: 1px solid var(--color-primary-alpha-10);
+	border-radius: 8px;
+	padding: 16px;
+}
+
+.account-card-title {
+	font-size: 0.75rem;
+	text-transform: uppercase;
+	color: var(--text-secondary);
+	margin-bottom: 12px;
+	letter-spacing: 0.05em;
+	font-weight: 600;
+}
+
+.account-card-row {
+	display: flex;
+	gap: 4px;
+	align-items: center;
+	padding: 8px 0;
+	border-bottom: 1px solid var(--color-primary-alpha-8);
+}
+
+.account-card-row:last-child {
+	border-bottom: none;
+}
+
+.account-card-label {
+	font-size: 0.85rem;
+	color: var(--text-secondary);
+	font-weight: 500;
+}
+
+.account-card-value {
+	font-size: 0.9rem;
+	font-weight: 600;
+	color: var(--text-primary);
+}
+
+.account-card-empty {
+	color: var(--text-secondary);
+	font-style: italic;
+	font-weight: 400;
+}
+
+.account-card-usd {
+	color: var(--color-success);
+	font-weight: 600;
+}
+
+.account-card-price {
+	color: var(--text-secondary);
+	font-weight: 400;
+	font-size: 0.8rem;
+	margin-left: 6px;
+}
+
+.account-card-loading {
+	color: var(--text-secondary);
+	font-style: italic;
+	font-weight: 400;
+}
+
+.account-card-link {
+	color: var(--color-primary);
+	text-decoration: none;
+	font-family: "JetBrains Mono", "Fira Code", monospace;
+	font-size: 0.85rem;
+}
+
+.account-card-link:hover {
+	text-decoration: underline;
+}
+
+.account-card-token-holdings {
+	margin-top: 8px;
+	border-top: 1px solid var(--color-primary-alpha-8);
+	padding-top: 8px;
+}
+
+/* ENS Badge Small - for card layout */
+.ens-badge-small {
+	display: inline-block;
+	padding: 2px 6px;
+	border-radius: 4px;
+	font-size: 0.7rem;
+	font-weight: 500;
+	margin-left: 8px;
+}
+
+.ens-badge-small.ens-badge--verified {
+	background: var(--color-success-alpha-15);
+	color: var(--color-success);
+}
+
+.ens-badge-small.ens-badge--unverified {
+	background: var(--color-warning-alpha-15);
+	color: var(--color-warning);
+}
+
+/* Token Holdings Compact/Collapsible Styles */
+.token-holdings-compact {
+	width: 100%;
+}
+
+.token-holdings-toggle {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	width: 100%;
+	padding: 8px 0;
+	background: none;
+	border: none;
+	cursor: pointer;
+	font-family: inherit;
+	text-align: left;
+}
+
+.token-holdings-toggle:hover {
+	opacity: 0.8;
+}
+
+.token-holdings-toggle-label {
+	font-size: 0.85rem;
+	color: var(--text-secondary);
+	font-weight: 500;
+}
+
+.token-holdings-toggle-count {
+	font-size: 0.85rem;
+	color: var(--color-primary);
+	font-weight: 600;
+	margin-left: auto;
+	margin-right: 8px;
+}
+
+.token-holdings-toggle-arrow {
+	font-size: 0.9rem;
+	color: var(--text-secondary);
+	font-weight: 600;
+	width: 16px;
+	text-align: center;
+}
+
+.token-holdings-compact-expanded {
+	margin-top: 0;
+}
+
+.token-holdings-compact-expanded .tx-section {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.token-holdings-collapse-btn {
+	background: none;
+	border: none;
+	cursor: pointer;
+	font-size: 1rem;
+	color: var(--text-secondary);
+	padding: 4px 8px;
+	line-height: 1;
+	font-weight: 600;
+}
+
+.token-holdings-collapse-btn:hover {
+	color: var(--color-primary);
+}
+
+/* Responsive: Stack cards on mobile */
+@media (max-width: 768px) {
+	.account-info-cards {
+		grid-template-columns: 1fr;
+	}
+}
+
+/* ==========================================================================
+   Contract Info Card
+   ========================================================================== */
+
+.contract-info-card {
+	background: var(--color-surface);
+	border: 1px solid var(--color-primary-alpha-10);
+	border-radius: 8px;
+	padding: 16px;
+	margin-bottom: 16px;
+}
+
+.contract-checking {
+	color: var(--text-secondary);
+	font-style: italic;
+}
+
+.contract-verification-badge {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.contract-verified-icon {
+	color: var(--color-success);
+	font-weight: 600;
+}
+
+.contract-verified-text {
+	color: var(--color-success);
+	font-weight: 600;
+}
+
+.contract-match-badge {
+	display: inline-block;
+	padding: 2px 8px;
+	border-radius: 4px;
+	font-size: 0.75rem;
+	font-weight: 500;
+	background: var(--color-success-alpha-15);
+	color: var(--color-success);
+	margin-left: 4px;
+}
+
+.contract-not-verified {
+	color: var(--text-secondary);
+}
+
+.contract-name {
+	font-weight: 600;
+	color: var(--color-primary);
+}
+
+.account-card-mono {
+	font-family: "JetBrains Mono", "Fira Code", monospace;
+	font-size: 0.85rem;
+}
+
+.contract-bytecode-section {
+	margin-top: 8px;
+	padding-top: 8px;
+	border-top: 1px solid var(--color-primary-alpha-8);
+}
+
+.contract-bytecode-toggle {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	width: 100%;
+	padding: 8px 0;
+	background: none;
+	border: none;
+	cursor: pointer;
+	font-family: inherit;
+}
+
+.contract-bytecode-toggle:hover {
+	opacity: 0.8;
+}
+
+.contract-toggle-icon {
+	font-size: 1rem;
+	color: var(--text-secondary);
+	font-weight: 600;
+}
+
+.contract-bytecode-content {
+	margin-top: 8px;
+	padding: 12px;
+	background: var(--color-surface-secondary);
+	border-radius: 4px;
+	overflow-x: auto;
+	max-height: 200px;
+	overflow-y: auto;
+}
+
+.contract-bytecode-content code {
+	font-family: "JetBrains Mono", "Fira Code", monospace;
+	font-size: 0.8rem;
+	word-break: break-all;
+	white-space: pre-wrap;
+	color: var(--text-primary);
+}
+
+/* ==========================================================================
+   ERC20 Token Info Card
+   ========================================================================== */
+
+.erc20-token-info-card {
+	background: var(--color-surface);
+	border: 1px solid var(--color-primary-alpha-10);
+	border-radius: 8px;
+	padding: 16px;
+	margin-bottom: 16px;
+}
+
+.erc20-token-display {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.erc20-token-logo {
+	width: 20px;
+	height: 20px;
+	border-radius: 50%;
+	object-fit: cover;
+}
+
+.erc20-token-name-symbol {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.erc20-token-name {
+	font-weight: 600;
+	color: var(--text-primary);
+}
+
+.erc20-token-symbol {
+	color: var(--text-secondary);
+	font-size: 0.9rem;
+}
+
+/* ==========================================================================
+   Contract Details Section (inside Contract Info Card)
+   ========================================================================== */
+
+.contract-details-section {
+	margin-top: 12px;
+	padding-top: 12px;
+	border-top: 1px solid var(--color-primary-alpha-8);
+}
+
+.contract-details-toggle {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	width: 100%;
+	padding: 8px 0;
+	background: none;
+	border: none;
+	cursor: pointer;
+	font-family: inherit;
+}
+
+.contract-details-toggle:hover {
+	opacity: 0.8;
+}
+
+.contract-details-content {
+	margin-top: 8px;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.contract-collapsible-item {
+	border: 1px solid var(--color-primary-alpha-8);
+	border-radius: 6px;
+	overflow: hidden;
+}
+
+.contract-collapsible-toggle {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	width: 100%;
+	padding: 10px 12px;
+	background: var(--color-surface-secondary);
+	border: none;
+	cursor: pointer;
+	font-family: inherit;
+	font-size: 0.85rem;
+	font-weight: 500;
+	color: var(--text-primary);
+}
+
+.contract-collapsible-toggle:hover {
+	background: var(--color-primary-alpha-8);
+}
+
+.contract-toggle-icon-small {
+	font-size: 0.75rem;
+	color: var(--text-secondary);
+}
+
+.contract-code-content {
+	padding: 12px;
+	background: var(--color-surface-secondary);
+	overflow-x: auto;
+	max-height: 300px;
+	overflow-y: auto;
+}
+
+.contract-code-content code {
+	font-family: "JetBrains Mono", "Fira Code", monospace;
+	font-size: 0.8rem;
+	word-break: break-all;
+	white-space: pre-wrap;
+	color: var(--text-primary);
+}
+
+.contract-source-files {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	padding: 8px;
+}
+
+/* ==========================================================================
+   NFT Collection Info Card
+   ========================================================================== */
+
+.nft-collection-info-card {
+	background: var(--color-surface);
+	border: 1px solid var(--color-primary-alpha-10);
+	border-radius: 8px;
+	padding: 16px;
+	margin-bottom: 16px;
+}
+
+.nft-collection-display {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.nft-collection-logo {
+	width: 24px;
+	height: 24px;
+	border-radius: 4px;
+	object-fit: cover;
+}
+
+.nft-collection-name-symbol {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.nft-collection-name {
+	font-weight: 600;
+	color: var(--text-primary);
+}
+
+.nft-collection-symbol {
+	color: var(--text-secondary);
+	font-size: 0.9rem;
+}
+
+.nft-token-lookup-section {
+	margin-top: 8px;
+	padding-top: 8px;
+	border-top: 1px solid var(--color-primary-alpha-8);
+}
+
+.nft-token-lookup-row {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.nft-token-input {
+	flex: 1;
+	padding: 6px 10px;
+	border: 1px solid var(--color-primary-alpha-15);
+	border-radius: 4px;
+	background: var(--color-surface-secondary);
+	color: var(--text-primary);
+	font-size: 0.85rem;
+	font-family: "JetBrains Mono", "Fira Code", monospace;
+	max-width: 150px;
+}
+
+.nft-token-input:focus {
+	outline: none;
+	border-color: var(--color-primary);
+}
+
+.nft-token-input::placeholder {
+	color: var(--text-secondary);
+	opacity: 0.7;
+}
+
+.nft-view-button {
+	padding: 6px 12px;
+	background: var(--color-primary);
+	color: white;
+	border: none;
+	border-radius: 4px;
+	font-size: 0.85rem;
+	font-weight: 500;
+	cursor: pointer;
+	text-decoration: none;
+	transition: opacity 0.15s ease;
+}
+
+.nft-view-button:hover {
+	opacity: 0.9;
+}
+
+.nft-view-button.disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+	pointer-events: none;
+}
+
+/* Token Standard Badges */
+.token-standard-badge {
+	display: inline-block;
+	padding: 2px 8px;
+	border-radius: 4px;
+	font-size: 0.75rem;
+	font-weight: 600;
+}
+
+.token-standard-erc721 {
+	background: var(--color-info-alpha-15);
+	color: var(--color-info);
+}
+
+.token-standard-erc1155 {
+	background: var(--color-warning-alpha-15);
+	color: var(--color-warning);
 }
