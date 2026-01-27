@@ -27,6 +27,7 @@ export default function Address() {
   const [addressData, setAddressData] = useState<AddressData | null>(null);
   const [addressType, setAddressType] = useState<AddressType>("account");
   const [loading, setLoading] = useState(true);
+  const [typeLoading, setTypeLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   // ENS resolution state
@@ -108,10 +109,12 @@ export default function Address() {
   useEffect(() => {
     if (!address || !dataService) {
       setLoading(false);
+      setTypeLoading(false);
       return;
     }
 
     setLoading(true);
+    setTypeLoading(true);
     setError(null);
 
     // Use DataService to fetch address data with metadata support
@@ -141,11 +144,17 @@ export default function Address() {
             .catch(() => {
               // Fallback to account if type detection fails
               setAddressType("account");
+            })
+            .finally(() => {
+              setTypeLoading(false);
             });
+        } else {
+          setTypeLoading(false);
         }
       })
       .catch((err) => {
         setError(err.message || "Failed to fetch address data");
+        setTypeLoading(false);
       })
       .finally(() => setLoading(false));
   }, [address, dataService, numericNetworkId, rpcUrls]);
@@ -155,10 +164,6 @@ export default function Address() {
     return (
       <div className="container-wide">
         <div className="block-display-card">
-          <div className="block-display-header">
-            <span className="block-label">ENS Name</span>
-            <span className="tx-mono header-subtitle">{addressParam}</span>
-          </div>
           <div className="card-content-loading">
             <Loader text={`Resolving ENS name: ${addressParam}...`} />
           </div>
@@ -172,28 +177,22 @@ export default function Address() {
     return (
       <div className="container-wide">
         <div className="block-display-card">
-          <div className="block-display-header">
-            <span className="block-label">ENS Name</span>
-            <span className="tx-mono header-subtitle">{addressParam}</span>
-          </div>
           <div className="card-content">
-            <p className="text-error margin-0">Error: {ensError}</p>
+            <p className="text-error margin-0">
+              Could not resolve ENS name "{addressParam}": {ensError}
+            </p>
           </div>
         </div>
       </div>
     );
   }
 
-  if (loading) {
+  if (loading || typeLoading) {
     return (
       <div className="container-wide">
         <div className="block-display-card">
-          <div className="block-display-header">
-            <span className="block-label">Address</span>
-            <span className="tx-mono header-subtitle">{address}</span>
-          </div>
           <div className="card-content-loading">
-            <Loader text="Loading address data..." />
+            <Loader text={loading ? "Loading address data..." : "Detecting address type..."} />
           </div>
         </div>
       </div>
@@ -204,10 +203,6 @@ export default function Address() {
     return (
       <div className="container-wide">
         <div className="block-display-card">
-          <div className="block-display-header">
-            <span className="block-label">Address</span>
-            <span className="tx-mono header-subtitle">{address}</span>
-          </div>
           <div className="card-content">
             <p className="text-error margin-0">Error: {error}</p>
           </div>
@@ -220,9 +215,6 @@ export default function Address() {
     return (
       <div className="container-wide">
         <div className="block-display-card">
-          <div className="block-display-header">
-            <span className="block-label">Address</span>
-          </div>
           <div className="card-content">
             <p className="text-muted margin-0">No address provided</p>
           </div>

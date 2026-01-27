@@ -1,13 +1,7 @@
 import type React from "react";
-import type {
-  Address,
-  DecodedContenthash,
-  ENSRecords,
-  ENSReverseResult,
-  RPCMetadata,
-} from "../../../../types";
-import { AddressHeader, BalanceSection, TransactionHistory } from "../shared";
-import ENSRecordsDetails from "../shared/ENSRecordsDisplay";
+import type { Address, ENSReverseResult, RPCMetadata } from "../../../../types";
+import { AddressHeader, TransactionHistory } from "../shared";
+import AccountInfoCards from "../shared/AccountInfoCards";
 
 interface AccountDisplayProps {
   address: Address;
@@ -19,9 +13,6 @@ interface AccountDisplayProps {
   // ENS props
   ensName?: string | null;
   reverseResult?: ENSReverseResult | null;
-  ensRecords?: ENSRecords | null;
-  decodedContenthash?: DecodedContenthash | null;
-  ensLoading?: boolean;
   isMainnet?: boolean;
 }
 
@@ -34,9 +25,6 @@ const AccountDisplay: React.FC<AccountDisplayProps> = ({
   onProviderSelect,
   ensName,
   reverseResult,
-  ensRecords,
-  decodedContenthash,
-  ensLoading = false,
   isMainnet = true,
 }) => {
   return (
@@ -44,27 +32,21 @@ const AccountDisplay: React.FC<AccountDisplayProps> = ({
       <AddressHeader
         addressHash={addressHash}
         addressType="account"
-        ensName={ensName || reverseResult?.ensName}
         metadata={metadata}
         selectedProvider={selectedProvider}
         onProviderSelect={onProviderSelect}
       />
 
       <div className="address-section-content">
-        {/* Balance Section */}
-        <BalanceSection address={address} />
-
-        {/* ENS Records Section */}
-        {(ensName || reverseResult?.ensName || ensLoading) && (
-          <ENSRecordsDetails
-            ensName={ensName || null}
-            reverseResult={reverseResult}
-            records={ensRecords}
-            decodedContenthash={decodedContenthash}
-            loading={ensLoading}
-            isMainnet={isMainnet}
-          />
-        )}
+        {/* Account Info Cards - Overview + More Info side by side */}
+        <AccountInfoCards
+          address={address}
+          addressHash={addressHash}
+          networkId={Number(networkId)}
+          ensName={ensName}
+          reverseResult={reverseResult}
+          isMainnet={isMainnet}
+        />
 
         {/* Transaction History */}
         <TransactionHistory
