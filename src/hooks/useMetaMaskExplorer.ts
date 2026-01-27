@@ -4,7 +4,7 @@ import type { NetworkMetadata } from "../services/MetadataService";
 // Networks that cannot use wallet_addEthereumChain
 // Chain ID 1 (Mainnet): MetaMask blocks this for security reasons
 // Chain ID 31337 (Localhost): Local development networks don't need this
-export const UNSUPPORTED_NETWORKS = [123];
+export const UNSUPPORTED_NETWORKS: number[] = [];
 
 export interface SetExplorerResult {
   success: boolean;
