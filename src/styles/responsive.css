@@ -431,7 +431,7 @@
 }
 
 .navbar-hamburger:hover {
-  background: var(--overlay-light-20, rgba(255, 255, 255, 0.2));
+  background: var(--overlay-light-20);
 }
 
 .navbar-hamburger-icon {

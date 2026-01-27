@@ -776,8 +776,8 @@
 }
 
 .network-card {
-	background: rgba(255, 255, 255, 0.05);
-	border: 2px solid rgba(255, 255, 255, 0.1);
+	background: var(--overlay-light-5);
+	border: 2px solid var(--overlay-light-10);
 	border-radius: 12px;
 	padding: 16px;
 	transition: all 0.3s ease;
@@ -787,7 +787,7 @@
 
 .network-card-link:hover .network-card {
 	transform: translateY(-4px);
-	border-color: var(--network-color, rgba(255, 255, 255, 0.1));
+	border-color: var(--network-color, var(--overlay-light-10));
 	box-shadow: 0 8px 32px color-mix(in srgb, var(--network-color, #000) 25%, transparent);
 }
 
@@ -858,7 +858,7 @@
 
 .testnet-toggle-btn {
 	background: transparent;
-	border: 1px solid rgba(255, 255, 255, 0.2);
+	border: 1px solid var(--overlay-light-20);
 	color: var(--color-text-muted);
 	padding: 8px 20px;
 	border-radius: 6px;
@@ -872,8 +872,8 @@
 
 .testnet-toggle-btn:hover {
 	color: var(--color-text);
-	border-color: rgba(255, 255, 255, 0.4);
-	background-color: rgba(255, 255, 255, 0.05);
+	border-color: var(--overlay-light-40);
+	background-color: var(--overlay-light-5);
 }
 
 /* ==========================================================================
@@ -1047,7 +1047,7 @@
 
 .page-subtitle {
 	font-size: 1.2rem;
-	color: rgba(255, 255, 255, 0.7);
+	color: var(--text-secondary);
 	font-family: "Outfit", sans-serif;
 	max-width: 600px;
 	margin: 0 auto;
@@ -1099,8 +1099,8 @@
 
 /* Feature Cards */
 .feature-card {
-	background: rgba(255, 255, 255, 0.03);
-	border: 1px solid rgba(255, 255, 255, 0.1);
+	background: var(--overlay-light-3);
+	border: 1px solid var(--overlay-light-10);
 	border-radius: 12px;
 	padding: 24px;
 	transition: all 0.2s ease;
@@ -1121,7 +1121,7 @@
 
 .feature-card-description {
 	font-size: 0.95rem;
-	color: rgba(255, 255, 255, 0.7);
+	color: var(--text-secondary);
 	font-family: "Outfit", sans-serif;
 	line-height: 1.6;
 	margin: 0;
@@ -1163,7 +1163,7 @@
 
 .version-info-label {
 	font-size: 0.85rem;
-	color: rgba(255, 255, 255, 0.6);
+	color: var(--text-secondary);
 	margin-bottom: 8px;
 	font-family: "Outfit", sans-serif;
 }
@@ -1228,7 +1228,7 @@
 .network-chain-id {
 	font-size: 0.85rem;
 	font-family: "monospace";
-	color: rgba(255, 255, 255, 0.6);
+	color: var(--text-secondary);
 }
 
 /* Open Source Card */
@@ -1253,7 +1253,7 @@
 
 .opensource-description {
 	font-size: 1.1rem;
-	color: rgba(255, 255, 255, 0.7);
+	color: var(--text-secondary);
 	font-family: "Outfit", sans-serif;
 	line-height: 1.6;
 	max-width: 800px;
@@ -1300,7 +1300,7 @@
 .about-overview-text p {
 	font-size: 1.05rem;
 	line-height: 1.7;
-	color: rgba(255, 255, 255, 0.8);
+	color: var(--text-primary);
 	margin-bottom: 16px;
 }
 
@@ -1315,7 +1315,7 @@
 .about-section-intro {
 	font-size: 1.05rem;
 	line-height: 1.7;
-	color: rgba(255, 255, 255, 0.8);
+	color: var(--text-primary);
 	text-align: center;
 	max-width: 800px;
 	margin: 0 auto 32px;
@@ -1368,7 +1368,7 @@
 
 .principle-description {
 	font-size: 0.9rem;
-	color: rgba(255, 255, 255, 0.7);
+	color: var(--text-secondary);
 	line-height: 1.5;
 	margin: 0;
 }
@@ -1393,7 +1393,7 @@
 /* License Footer */
 .license-footer {
 	padding: 20px;
-	color: rgba(255, 255, 255, 0.5);
+	color: var(--text-tertiary);
 	font-family: "Outfit", sans-serif;
 	font-size: 2rem;
 }
@@ -1477,8 +1477,8 @@
 .contract-code-display {
 	margin-top: 8px;
 	padding: 12px;
-	background: rgba(255, 255, 255, 0.03);
-	border: 1px solid rgba(255, 255, 255, 0.1);
+	background: var(--overlay-light-3);
+	border: 1px solid var(--overlay-light-10);
 	border-radius: 8px;
 	font-family: "monospace";
 	font-size: 0.75rem;
@@ -1551,7 +1551,7 @@
 }
 
 .abi-more-text {
-	color: rgba(255, 255, 255, 0.5);
+	color: var(--text-tertiary);
 	font-size: 0.85rem;
 	align-self: center;
 }
@@ -1565,7 +1565,7 @@
 
 .metadata-item {
 	padding: 8px;
-	background: rgba(255, 255, 255, 0.03);
+	background: var(--overlay-light-3);
 	border-radius: 6px;
 }
 
@@ -1599,7 +1599,7 @@
 }
 
 .verification-text {
-	color: rgba(255, 255, 255, 0.5);
+	color: var(--text-tertiary);
 	font-size: 0.9rem;
 	font-family: "Outfit", sans-serif;
 }
@@ -1612,7 +1612,7 @@
 }
 
 .verification-text-loading {
-	color: rgba(255, 255, 255, 0.5);
+	color: var(--text-tertiary);
 	font-size: 0.9rem;
 	font-family: "Outfit", sans-serif;
 }
@@ -1920,7 +1920,7 @@
 
 .recent-tx-header {
 	font-size: 0.9rem;
-	color: rgba(255, 255, 255, 0.6);
+	color: var(--text-secondary);
 }
 
 .storage-section {
@@ -1965,7 +1965,7 @@
 	gap: 8px;
 	padding: 4px 10px;
 	height: 36px;
-	background: rgba(255, 255, 255, 0.05);
+	background: var(--overlay-light-5);
 	border: 1px solid color-mix(in srgb, var(--network-color, #888) 25%, transparent);
 	border-radius: 8px;
 }
@@ -2033,7 +2033,7 @@
 	align-items: center;
 	gap: 4px;
 	padding-left: 8px;
-	border-left: 1px solid rgba(255, 255, 255, 0.1);
+	border-left: 1px solid var(--overlay-light-10);
 	cursor: pointer;
 }
 
@@ -3053,8 +3053,8 @@
 
 .supporter-card {
 	display: block;
-	background: rgba(255, 255, 255, 0.05);
-	border: 2px solid var(--supporter-color, rgba(255, 255, 255, 0.1));
+	background: var(--overlay-light-5);
+	border: 2px solid var(--supporter-color, var(--overlay-light-10));
 	border-radius: 12px;
 	padding: 16px;
 	text-decoration: none;
@@ -3138,7 +3138,7 @@
 .supporters-cta {
 	margin-top: 32px;
 	padding-top: 24px;
-	border-top: 1px solid rgba(255, 255, 255, 0.1);
+	border-top: 1px solid var(--overlay-light-10);
 }
 
 .supporters-cta p {
@@ -3345,15 +3345,15 @@
 	flex-direction: column;
 	gap: 4px;
 	padding: 12px 16px;
-	background: rgba(255, 255, 255, 0.05);
-	border: 1px solid rgba(255, 255, 255, 0.1);
+	background: var(--overlay-light-5);
+	border: 1px solid var(--overlay-light-10);
 	border-radius: 8px;
 	text-decoration: none;
 	transition: all 0.2s ease;
 }
 
 .profile-link-card:hover {
-	background: rgba(255, 255, 255, 0.08);
+	background: var(--overlay-light-8);
 	border-color: var(--color-primary-alpha-30);
 	transform: translateY(-2px);
 }
@@ -3694,7 +3694,7 @@
 }
 
 .events-more {
-	color: rgba(255, 255, 255, 0.5);
+	color: var(--text-tertiary);
 	font-size: 0.85rem;
 	align-self: center;
 }
@@ -3743,7 +3743,7 @@
 .function-input-name {
 	display: block;
 	font-size: 0.8rem;
-	color: rgba(255, 255, 255, 0.7);
+	color: var(--text-secondary);
 	margin-bottom: 4px;
 	font-family: monospace;
 }
@@ -4017,7 +4017,7 @@
 	font-weight: 600;
 	cursor: pointer;
 	transition: all 0.2s ease;
-	border-right: 1px solid rgba(255, 255, 255, 0.2);
+	border-right: 1px solid var(--overlay-light-20);
 }
 
 .tx-history-search-btn:hover {
@@ -4166,7 +4166,7 @@
 	background: linear-gradient(
 		90deg,
 		transparent 0%,
-		rgba(255, 255, 255, 0.3) 50%,
+		var(--overlay-light-30) 50%,
 		transparent 100%
 	);
 	animation: shimmer 1.5s infinite;
@@ -4298,7 +4298,7 @@
 
 .tx-history-load-more-toggle {
 	border-radius: 0 8px 8px 0;
-	border-left: 1px solid rgba(255, 255, 255, 0.2);
+	border-left: 1px solid var(--overlay-light-20);
 }
 
 /* Load More dropdown opens upwards */
@@ -5019,7 +5019,7 @@
 
 .ens-loading {
 	padding: 12px 16px;
-	color: rgba(255, 255, 255, 0.6);
+	color: var(--text-secondary);
 	font-size: 0.85rem;
 }
 
@@ -5066,7 +5066,7 @@
 
 .ens-text-records-wrapper {
 	margin-left: 16px;
-	border-left: 2px solid rgba(255, 255, 255, 0.1);
+	border-left: 2px solid var(--overlay-light-10);
 	padding-left: 16px;
 }
 
@@ -5109,8 +5109,8 @@
 }
 
 .dashboard-stat-card {
-	background: rgba(255, 255, 255, 0.03);
-	border: 1px solid rgba(255, 255, 255, 0.08);
+	background: var(--bg-secondary);
+	border: 1px solid var(--overlay-light-8);
 	border-radius: 12px;
 	padding: 20px;
 	text-align: center;
@@ -5171,7 +5171,7 @@
 	flex: 1;
 	padding: 6px 8px;
 	border-radius: 8px;
-	background: rgba(255, 255, 255, 0.03);
+	background: var(--overlay-light-3);
 }
 
 .gas-tier-label {
@@ -5221,8 +5221,8 @@
 }
 
 .dashboard-table-section {
-	background: rgba(255, 255, 255, 0.02);
-	border: 1px solid rgba(255, 255, 255, 0.06);
+	background: var(--bg-secondary);
+	border: 1px solid var(--overlay-light-6);
 	border-radius: 12px;
 	padding: 16px;
 }
@@ -5233,7 +5233,7 @@
 	align-items: center;
 	margin-bottom: 12px;
 	padding-bottom: 12px;
-	border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+	border-bottom: 1px solid var(--overlay-light-6);
 }
 
 .dashboard-table-title-link {
@@ -5313,13 +5313,13 @@
 	justify-content: space-between;
 	align-items: center;
 	padding: 10px 12px;
-	background: rgba(255, 255, 255, 0.02);
+	background: var(--overlay-light-2);
 	border-radius: 8px;
 	transition: background 0.2s;
 }
 
 .dashboard-table-row:hover {
-	background: rgba(255, 255, 255, 0.04);
+	background: var(--overlay-light-4);
 }
 
 /* Block Row Styles */
@@ -5379,7 +5379,7 @@
 .dashboard-block-gas {
 	font-size: 0.75rem;
 	color: var(--color-text-muted);
-	background: rgba(255, 255, 255, 0.05);
+	background: var(--overlay-light-5);
 	padding: 2px 6px;
 	border-radius: 4px;
 }
@@ -5435,7 +5435,7 @@
 }
 
 .dashboard-tx-arrow {
-	color: rgba(255, 255, 255, 0.3);
+	color: var(--overlay-light-30);
 	font-size: 0.75rem;
 	flex-shrink: 0;
 }
@@ -5593,16 +5593,16 @@
 	justify-content: space-between;
 	gap: 12px;
 	padding: 10px 14px;
-	background: rgba(255, 255, 255, 0.03);
-	border: 1px solid rgba(255, 255, 255, 0.08);
+	background: var(--overlay-light-3);
+	border: 1px solid var(--overlay-light-8);
 	border-radius: 8px;
 	text-decoration: none;
 	transition: all 0.2s ease;
 }
 
 .search-result-item:hover {
-	background: rgba(255, 255, 255, 0.06);
-	border-color: var(--network-color, rgba(255, 255, 255, 0.15));
+	background: var(--overlay-light-6);
+	border-color: var(--network-color, var(--overlay-light-15));
 }
 
 .search-result-item-content {
@@ -5621,7 +5621,7 @@
 
 .search-result-in {
 	font-size: 0.8rem;
-	color: rgba(255, 255, 255, 0.5);
+	color: var(--text-tertiary);
 }
 
 .search-result-network {
@@ -5731,8 +5731,8 @@
 }
 
 .gas-price-card {
-	background: rgba(255, 255, 255, 0.03);
-	border: 1px solid rgba(255, 255, 255, 0.08);
+	background: var(--overlay-light-3);
+	border: 1px solid var(--overlay-light-8);
 	border-radius: 12px;
 	padding: 24px;
 	text-align: center;
@@ -5777,7 +5777,7 @@
 	justify-content: center;
 	gap: 8px;
 	padding: 12px;
-	background: rgba(255, 255, 255, 0.02);
+	background: var(--overlay-light-2);
 	border-radius: 8px;
 	margin-bottom: 10px;
 }
@@ -5793,8 +5793,8 @@
 
 /* Transaction Cost Table */
 .tx-cost-table {
-	background: rgba(255, 255, 255, 0.02);
-	border: 1px solid rgba(255, 255, 255, 0.06);
+	background: var(--overlay-light-2);
+	border: 1px solid var(--overlay-light-6);
 	border-radius: 12px;
 	overflow: hidden;
 }
@@ -5803,8 +5803,8 @@
 	display: grid;
 	grid-template-columns: 2fr 1fr 1.5fr 1.5fr 1.5fr;
 	padding: 12px 16px;
-	background: rgba(255, 255, 255, 0.03);
-	border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+	background: var(--overlay-light-3);
+	border-bottom: 1px solid var(--overlay-light-6);
 	font-size: 0.75rem;
 	font-weight: 600;
 	text-transform: uppercase;
@@ -5816,7 +5816,7 @@
 	display: grid;
 	grid-template-columns: 2fr 1fr 1.5fr 1.5fr 1.5fr;
 	padding: 16px;
-	border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+	border-bottom: 1px solid var(--overlay-light-4);
 	transition: background 0.2s ease;
 }
 
@@ -5825,7 +5825,7 @@
 }
 
 .tx-cost-row:hover {
-	background: rgba(255, 255, 255, 0.02);
+	background: var(--overlay-light-2);
 }
 
 .tx-cost-col-name {
@@ -5888,7 +5888,7 @@
 	font-size: 0.8rem;
 	color: var(--color-text-muted);
 	padding-top: 16px;
-	border-top: 1px solid rgba(255, 255, 255, 0.06);
+	border-top: 1px solid var(--overlay-light-6);
 }
 
 /* Gas Tracker Responsive */
