@@ -18,6 +18,28 @@
     <title>Openscan</title>
   </head>
   <body>
+    <script>
+      // Handle MetaMask block explorer URL redirect
+      // MetaMask constructs: /tx/0x...#/{chainId}/ or /address/0x...#/{chainId}/
+      // OpenScan needs: /#/{chainId}/tx/0x... or /#/{chainId}/address/0x...
+      (function() {
+        var path = window.location.pathname;
+        var hash = window.location.hash;
+
+        // Match patterns like /tx/0x... or /address/0x...
+        var txMatch = path.match(/^\/tx\/(0x[a-fA-F0-9]+)/);
+        var addrMatch = path.match(/^\/address\/(0x[a-fA-F0-9]{40})/);
+
+        // Extract chain ID from hash (e.g., #/1/ or #/10/)
+        var chainMatch = hash.match(/^#\/(\d+)/);
+
+        if (txMatch && chainMatch) {
+          window.location.replace('/#/' + chainMatch[1] + '/tx/' + txMatch[1]);
+        } else if (addrMatch && chainMatch) {
+          window.location.replace('/#/' + chainMatch[1] + '/address/' + addrMatch[1]);
+        }
+      })();
+    </script>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
     <script type="module" src="/src/index.tsx"></script>
