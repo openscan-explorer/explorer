@@ -1,0 +1,13 @@
+{
+  "name": "@openscan/explorer",
+  "description": "OpenScan Explorer - Pre-built multi-chain blockchain explorer",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/openscan-explorer/explorer.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": ["*"]
+}

@@ -48,7 +48,8 @@
 		"lint": "biome lint",
 		"lint:fix": "biome lint --write --max-diagnostics 1024",
 		"check": "biome check --max-diagnostics 1024",
-		"audit": "bash ./scripts/audit.sh"
+		"audit": "bash ./scripts/audit.sh",
+		"publish:dist": "cd dist && npm publish --tag alpha"
 	},
 	"browserslist": {
 		"production": [

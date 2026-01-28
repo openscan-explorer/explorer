@@ -27,6 +27,7 @@ import {
   LazyChain,
   LazyContact,
   LazyDevTools,
+  LazyGasTracker,
   LazyHome,
   LazyMempool,
   LazyProfile,
@@ -114,6 +115,7 @@ function AppContent() {
               <Route path="profile/:profileType/:profileId" element={<LazyProfile />} />
               <Route path="supporters" element={<LazySupporters />} />
               <Route path=":networkId" element={<LazyChain />} />
+              <Route path=":networkId/gastracker" element={<LazyGasTracker />} />
               <Route path=":networkId/blocks" element={<LazyBlocks />} />
               <Route path=":networkId/block/:filter" element={<LazyBlock />} />
               <Route path=":networkId/txs" element={<LazyTxs />} />

@@ -12,6 +12,14 @@ export interface NetworkStats {
   metadata: any;
 }
 
+export interface GasPrices {
+  low: string; // Wei hex - 25th percentile priority fee
+  average: string; // Wei hex - 50th percentile priority fee
+  high: string; // Wei hex - 75th percentile priority fee
+  baseFee: string; // Current base fee (EIP-1559)
+  lastBlock: string; // Block number hex
+}
+
 export interface Block {
   difficulty: string;
   extraData: string;

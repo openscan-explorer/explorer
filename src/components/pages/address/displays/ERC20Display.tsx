@@ -3,15 +3,12 @@ import { useContext, useEffect, useMemo, useState } from "react";
 import { AppContext } from "../../../../context";
 import { useSourcify } from "../../../../hooks/useSourcify";
 import { fetchToken, getAssetUrl, type TokenMetadata } from "../../../../services/MetadataService";
-import type {
-  Address,
-  DecodedContenthash,
-  ENSRecords,
-  ENSReverseResult,
-  RPCMetadata,
-} from "../../../../types";
-import { AddressHeader, ContractDetails, TransactionHistory } from "../shared";
-import ENSRecordsDetails from "../shared/ENSRecordsDisplay";
+import type { Address, ENSReverseResult, RPCMetadata } from "../../../../types";
+import { hexToUtf8 } from "../../../../utils/erc20Utils";
+import { AddressHeader } from "../shared";
+import ContractInfoCard from "../shared/ContractInfoCard";
+import ContractInfoCards from "../shared/ContractInfoCards";
+import ERC20TokenInfoCard from "../shared/ERC20TokenInfoCard";
 
 interface ERC20DisplayProps {
   address: Address;
@@ -23,9 +20,6 @@ interface ERC20DisplayProps {
   // ENS props
   ensName?: string | null;
   reverseResult?: ENSReverseResult | null;
-  ensRecords?: ENSRecords | null;
-  decodedContenthash?: DecodedContenthash | null;
-  ensLoading?: boolean;
   isMainnet?: boolean;
 }
 
@@ -38,9 +32,6 @@ const ERC20Display: React.FC<ERC20DisplayProps> = ({
   onProviderSelect,
   ensName,
   reverseResult,
-  ensRecords,
-  decodedContenthash,
-  ensLoading = false,
   isMainnet = true,
 }) => {
   const { jsonFiles, rpcUrls } = useContext(AppContext);
@@ -117,7 +108,7 @@ const ERC20Display: React.FC<ERC20DisplayProps> = ({
             const lengthHex = data.slice(64, 128);
             const length = parseInt(lengthHex, 16);
             const strHex = data.slice(128, 128 + length * 2);
-            return Buffer.from(strHex, "hex").toString("utf8");
+            return hexToUtf8(strHex);
           }
           return "";
         } catch {
@@ -183,7 +174,7 @@ const ERC20Display: React.FC<ERC20DisplayProps> = ({
     [isVerified, sourcifyData, parsedLocalData],
   );
 
-  const hasVerifiedContract = isVerified || parsedLocalData;
+  const hasVerifiedContract = isVerified || !!parsedLocalData;
 
   // Combine token data from metadata and on-chain
   const tokenName = tokenMetadata?.name || onChainData?.name;
@@ -193,19 +184,6 @@ const ERC20Display: React.FC<ERC20DisplayProps> = ({
   const tokenLogo = tokenMetadata?.logo
     ? getAssetUrl(tokenMetadata.logo)
     : getAssetUrl(`assets/tokens/${networkId}/${addressHash.toLowerCase()}.png`);
-
-  // Format total supply
-  const formattedTotalSupply = useMemo(() => {
-    if (!tokenTotalSupply || tokenDecimals === undefined) return null;
-    try {
-      const supply = BigInt(tokenTotalSupply);
-      const divisor = BigInt(10 ** tokenDecimals);
-      const whole = supply / divisor;
-      return whole.toLocaleString();
-    } catch {
-      return tokenTotalSupply;
-    }
-  }, [tokenTotalSupply, tokenDecimals]);
 
   return (
     <div className="block-display-card">
@@ -221,134 +199,39 @@ const ERC20Display: React.FC<ERC20DisplayProps> = ({
       />
 
       <div className="address-section-content">
-        {/* Token Details Section */}
-        <div className="tx-details">
-          <div className="tx-section">
-            <span className="tx-section-title">Token Details</span>
-          </div>
-
-          {/* Token Logo and Name */}
-          <div className="tx-row">
-            <span className="tx-label">Token:</span>
-            <span className="tx-value">
-              <div className="token-info-row">
-                <img
-                  src={tokenLogo}
-                  alt={tokenSymbol || "Token"}
-                  className="token-logo"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).style.display = "none";
-                  }}
-                />
-                <span className="token-name-symbol">
-                  {tokenName && <span className="token-name">{tokenName}</span>}
-                  {tokenSymbol && <span className="token-symbol">({tokenSymbol})</span>}
-                </span>
-              </div>
-            </span>
-          </div>
-
-          {/* Decimals */}
-          {tokenDecimals !== undefined && (
-            <div className="tx-row">
-              <span className="tx-label">Decimals:</span>
-              <span className="tx-value">{tokenDecimals}</span>
-            </div>
-          )}
-
-          {/* Total Supply */}
-          {formattedTotalSupply && (
-            <div className="tx-row">
-              <span className="tx-label">Total Supply:</span>
-              <span className="tx-value">
-                {formattedTotalSupply} {tokenSymbol}
-              </span>
-            </div>
-          )}
-
-          {/* Balance */}
-          <div className="tx-row">
-            <span className="tx-label">Contract Balance:</span>
-            <span className="tx-value">
-              <span className="tx-value-highlight">
-                {(() => {
-                  try {
-                    const eth = Number(address.balance) / 1e18;
-                    return `${eth.toFixed(6)} ETH`;
-                  } catch {
-                    return address.balance;
-                  }
-                })()}
-              </span>
-            </span>
-          </div>
-
-          {/* Nonce (Transactions Sent) */}
-          <div className="tx-row">
-            <span className="tx-label">Nonce (Txns Sent):</span>
-            <span className="tx-value">{Number(address.txCount).toLocaleString()}</span>
-          </div>
-
-          {/* Verification Status */}
-          <div className="tx-row">
-            <span className="tx-label">Contract Verified:</span>
-            <span className="tx-value">
-              {sourcifyLoading ? (
-                <span className="verification-checking">Checking Sourcify...</span>
-              ) : hasVerifiedContract ? (
-                <span className="flex-align-center-gap-8">
-                  <span className="tx-value-highlight">✓ Verified</span>
-                  {contractData?.match && (
-                    <span className="match-badge match-badge-full">
-                      {contractData.match === "perfect"
-                        ? parsedLocalData
-                          ? "Local JSON"
-                          : "Perfect Match"
-                        : "Partial Match"}
-                    </span>
-                  )}
-                </span>
-              ) : (
-                <span className="verification-not-verified">Not Verified</span>
-              )}
-            </span>
-          </div>
-        </div>
-
-        {/* ENS Records Section */}
-        {(ensName || reverseResult?.ensName || ensLoading) && (
-          <ENSRecordsDetails
-            ensName={ensName || null}
-            reverseResult={reverseResult}
-            records={ensRecords}
-            decodedContenthash={decodedContenthash}
-            loading={ensLoading}
-            isMainnet={isMainnet}
-          />
-        )}
-
-        {/* Contract Verification Details */}
-        {hasVerifiedContract && contractData && (
-          <ContractDetails
-            addressHash={addressHash}
-            networkId={networkId}
-            code={address.code}
-            contractData={contractData}
-            isLocalArtifact={!!parsedLocalData && !isVerified}
-            sourcifyUrl={
-              sourcifyData
-                ? `https://repo.sourcify.dev/contracts/full_match/${networkId}/${addressHash}/`
-                : undefined
-            }
-          />
-        )}
-
-        {/* Transaction History */}
-        <TransactionHistory
-          networkId={networkId}
+        {/* Overview + More Info Cards */}
+        <ContractInfoCards
+          address={address}
           addressHash={addressHash}
-          contractAbi={contractData?.abi}
-          txCount={Number(address.txCount)}
+          networkId={Number(networkId)}
+          ensName={ensName}
+          reverseResult={reverseResult}
+          isMainnet={isMainnet}
+        />
+
+        {/* Token Info Card */}
+        <ERC20TokenInfoCard
+          tokenName={tokenName}
+          tokenSymbol={tokenSymbol}
+          tokenDecimals={tokenDecimals}
+          tokenTotalSupply={tokenTotalSupply}
+          tokenLogo={tokenLogo}
+        />
+
+        {/* Contract Info Card (includes Contract Details) */}
+        <ContractInfoCard
+          address={address}
+          addressHash={addressHash}
+          networkId={networkId}
+          contractData={contractData}
+          hasVerifiedContract={hasVerifiedContract}
+          sourcifyLoading={sourcifyLoading}
+          isLocalArtifact={!!parsedLocalData && !isVerified}
+          sourcifyUrl={
+            sourcifyData
+              ? `https://repo.sourcify.dev/contracts/full_match/${networkId}/${addressHash}/`
+              : undefined
+          }
         />
       </div>
     </div>

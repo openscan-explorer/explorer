@@ -306,9 +306,53 @@ OpenScan is free for all users. The project is sustained by subscriptions from t
 
 Contributions are welcome! Please read our [Contributing Guide](CONTRIBUTING.md) before submitting a Pull Request.
 
+### Git Workflow
+
+We follow a structured branching strategy:
+
+```
+feature/fix branches → release/vX.Y.Z → dev (staging) → main (production)
+```
+
+1. **Feature branches**: Create from the release branch, PR back to release branch
+2. **Release branches**: Collect features for a release, merge to `dev` for QA
+3. **Dev branch**: Staging/QA environment - fixes during QA go here
+4. **Main branch**: Production - receives merges from `dev` after QA approval
+
+### Commit Convention
+
+Follow [Conventional Commits](https://www.conventionalcommits.org/):
+
+```
+feat(scope): add new feature
+fix(scope): fix a bug
+refactor(scope): code refactoring
+docs(scope): documentation changes
+```
+
+### Resources
+
 - Report bugs and request features via [GitHub Issues](https://github.com/openscan-explorer/explorer/issues)
 - All code is publicly auditable and open for review
 - Community bounties available for bug fixes and documentation improvements
+
+## Claude Code Configuration
+
+This project includes [Claude Code](https://claude.ai/code) configuration for AI-assisted development:
+
+```
+.claude/
+├── CLAUDE.md           # Project overview and imports
+├── settings.json       # Shared permissions
+└── rules/
+    ├── commands.md     # Development commands
+    ├── architecture.md # Architecture patterns
+    ├── code-style.md   # Code style requirements
+    ├── workflow.md     # Git workflow and PR/issue templates
+    └── patterns.md     # Important coding patterns
+```
+
+The configuration provides Claude with project context, coding standards, and workflow guidelines.
 
 ## License
 

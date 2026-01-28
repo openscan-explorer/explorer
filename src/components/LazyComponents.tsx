@@ -19,6 +19,7 @@ const Profile = lazy(() => import("./pages/profile"));
 const Supporters = lazy(() => import("./pages/supporters"));
 const Contact = lazy(() => import("./pages/contact"));
 const Search = lazy(() => import("./pages/search"));
+const GasTracker = lazy(() => import("./pages/gastracker"));
 
 // Higher-order component to wrap lazy components with Suspense
 // biome-ignore lint/suspicious/noExplicitAny: <TODO>
@@ -51,5 +52,6 @@ export const LazyProfile = withSuspense(Profile);
 export const LazySupporters = withSuspense(Supporters);
 export const LazyContact = withSuspense(Contact);
 export const LazySearch = withSuspense(Search);
+export const LazyGasTracker = withSuspense(GasTracker);
 // Default exports for backward compatibility
 export { Home };

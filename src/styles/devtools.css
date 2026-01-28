@@ -878,7 +878,7 @@
 }
 
 .devtools-error-dismiss {
-	background: rgba(255, 255, 255, 0.2);
+	background: var(--overlay-light-20);
 	border: none;
 	color: white;
 	padding: 4px 8px;
@@ -888,7 +888,7 @@
 }
 
 .devtools-error-dismiss:hover {
-	background: rgba(255, 255, 255, 0.3);
+	background: var(--overlay-light-30);
 }
 
 /* ================================================

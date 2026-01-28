@@ -215,6 +215,49 @@ export interface AddressWithType {
   addressType: AddressType;
 }
 
+// EIP-7702 delegation designator prefix (0xef0100)
+const EIP7702_DELEGATION_PREFIX = "0xef0100";
+
+/**
+ * Check if code is an EIP-7702 delegation designator
+ * EIP-7702 allows EOAs to delegate to a contract implementation
+ * Format: 0xef0100 + 20-byte address (total 23 bytes / 46 hex chars + 0x prefix)
+ */
+function isEIP7702Delegation(code: string | null | undefined): boolean {
+  if (!code) return false;
+  const normalized = code.toLowerCase();
+  return normalized.startsWith(EIP7702_DELEGATION_PREFIX) && normalized.length === 48; // 0x + 46 hex chars
+}
+
+/**
+ * Extract the delegate address from EIP-7702 code
+ * Returns null if not a valid EIP-7702 delegation
+ */
+export function getEIP7702DelegateAddress(code: string | null | undefined): string | null {
+  if (!isEIP7702Delegation(code) || !code) return null;
+  // Extract the 20-byte address after 0xef0100 prefix
+  const addressHex = code.slice(8); // Remove "0xef0100"
+  return `0x${addressHex}`;
+}
+
+/**
+ * Check if code is an EIP-7702 delegation (exported version)
+ */
+export function checkEIP7702Delegation(code: string | null | undefined): boolean {
+  return isEIP7702Delegation(code);
+}
+
+/**
+ * Check if an address has contract code
+ * Handles various RPC response formats
+ */
+function hasContractCode(code: string | null | undefined): boolean {
+  if (!code) return false;
+  // Normalize and check - empty code can be "0x", "0x0", "0x00", "", etc.
+  const normalized = code.toLowerCase().replace(/^0x0*/, "");
+  return normalized.length > 0;
+}
+
 /**
  * Fetch address data and detect its type in a single flow
  * This combines the getAddress and detectAddressType operations
@@ -227,13 +270,19 @@ export async function fetchAddressWithType(
   // Step 1: Fetch basic address data (balance, code, txCount)
   const address = await fetchAddressData(addressHash, rpcUrl);
 
-  // Step 2: Determine address type based on code
-  if (!address.code || address.code === "0x") {
+  // Step 2: Check for EIP-7702 delegation (EOA with delegated code)
+  if (isEIP7702Delegation(address.code)) {
+    // It's an EOA with EIP-7702 delegation - still treat as account
+    return { address, addressType: "account" };
+  }
+
+  // Step 3: Determine address type based on code
+  if (!hasContractCode(address.code)) {
     // It's an EOA (no code)
     return { address, addressType: "account" };
   }
 
-  // Step 3: It's a contract - determine what type
+  // Step 4: It's a contract - determine what type
   const addressType = await determineContractType(addressHash, chainId, rpcUrl);
 
   return { address, addressType };
