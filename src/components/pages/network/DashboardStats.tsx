@@ -1,26 +1,17 @@
 import type React from "react";
+import { Link } from "react-router-dom";
+import type { GasPrices } from "../../../types";
 import { formatPrice } from "../../../services/PriceService";
+import { formatGasPriceWithUnit } from "../../../utils/formatUtils";
 
 interface DashboardStatsProps {
   price: number | null;
   gasPrice: string | null;
+  gasPrices: GasPrices | null;
   blockNumber: string | null;
   currency: string;
   loading: boolean;
-}
-
-function formatGasPrice(gasPriceHex: string | null): string {
-  if (!gasPriceHex) return "—";
-  try {
-    const gasPriceWei = BigInt(gasPriceHex);
-    const gasPriceGwei = Number(gasPriceWei) / 1e9;
-    if (gasPriceGwei < 1) {
-      return `${gasPriceGwei.toFixed(4)} Gwei`;
-    }
-    return `${gasPriceGwei.toFixed(2)} Gwei`;
-  } catch {
-    return "—";
-  }
+  networkId: number;
 }
 
 function formatBlockNumber(blockNumberHex: string | null): string {
@@ -36,10 +27,15 @@ function formatBlockNumber(blockNumberHex: string | null): string {
 const DashboardStats: React.FC<DashboardStatsProps> = ({
   price,
   gasPrice,
+  gasPrices,
   blockNumber,
   currency,
   loading,
+  networkId,
 }) => {
+  // Use gas tiers if available, otherwise fall back to single gas price
+  const hasGasTiers = gasPrices !== null;
+
   return (
     <div className="dashboard-stats-row">
       <div className="dashboard-stat-card">
@@ -49,15 +45,39 @@ const DashboardStats: React.FC<DashboardStatsProps> = ({
         </div>
       </div>
 
-      <div className="dashboard-stat-card">
-        <div className="dashboard-stat-label">Gas Price</div>
-        <div className={`dashboard-stat-value ${loading ? "dashboard-stat-loading" : ""}`}>
-          {formatGasPrice(gasPrice)}
+      {hasGasTiers ? (
+        <div className="dashboard-stat-card dashboard-stat-card-gas">
+          <Link to={`/${networkId}/gastracker`} className="dashboard-stat-label-link">
+            Gas Price →
+          </Link>
+          <div className={`dashboard-gas-tiers ${loading ? "dashboard-stat-loading" : ""}`}>
+            <div className="gas-tier gas-tier-low">
+              <span className="gas-tier-label">Low</span>
+              <span className="gas-tier-value">{formatGasPriceWithUnit(gasPrices.low)}</span>
+            </div>
+            <div className="gas-tier gas-tier-avg">
+              <span className="gas-tier-label">Avg</span>
+              <span className="gas-tier-value">{formatGasPriceWithUnit(gasPrices.average)}</span>
+            </div>
+            <div className="gas-tier gas-tier-high">
+              <span className="gas-tier-label">High</span>
+              <span className="gas-tier-value">{formatGasPriceWithUnit(gasPrices.high)}</span>
+            </div>
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="dashboard-stat-card">
+          <Link to={`/${networkId}/gastracker`} className="dashboard-stat-label-link">
+            Gas Price →
+          </Link>
+          <div className={`dashboard-stat-value ${loading ? "dashboard-stat-loading" : ""}`}>
+            {formatGasPriceWithUnit(gasPrice)}
+          </div>
+        </div>
+      )}
 
       <div className="dashboard-stat-card">
-        <div className="dashboard-stat-label">Block</div>
+        <div className="dashboard-stat-label">Latest Block</div>
         <div className={`dashboard-stat-value ${loading ? "dashboard-stat-loading" : ""}`}>
           {formatBlockNumber(blockNumber)}
         </div>

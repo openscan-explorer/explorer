@@ -1,8 +1,10 @@
 import type React from "react";
-import { useCallback, useContext, useMemo, useState } from "react";
+import { useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { MetaMaskIcon } from "../../common/MetaMaskIcon";
 import { getEnabledNetworks } from "../../../config/networks";
-import { AppContext } from "../../../context/AppContext";
+import { AppContext, useNetworks } from "../../../context/AppContext";
 import { useSettings } from "../../../context/SettingsContext";
+import { useMetaMaskExplorer } from "../../../hooks/useMetaMaskExplorer";
 import { clearSupportersCache } from "../../../services/MetadataService";
 import type { RPCUrls, RpcUrlsContextType } from "../../../types";
 
@@ -48,6 +50,8 @@ const getProviderBadge = (url: string): string | null => {
 const Settings: React.FC = () => {
   const { rpcUrls, setRpcUrls } = useContext(AppContext);
   const { settings, updateSettings } = useSettings();
+  const { enabledNetworks } = useNetworks();
+  const { isMetaMaskAvailable, isSupported, setAsDefaultExplorer } = useMetaMaskExplorer();
   const [localRpc, setLocalRpc] = useState<Record<number, string | RPCUrls>>({
     ...rpcUrls,
   });
@@ -64,6 +68,14 @@ const Settings: React.FC = () => {
     infura: false,
     alchemy: false,
   });
+  const [metamaskStatus, setMetamaskStatus] = useState<
+    Record<number, "idle" | "loading" | "success" | "error">
+  >({});
+
+  // Sync localRpc when context rpcUrls changes (e.g., after save)
+  useEffect(() => {
+    setLocalRpc({ ...rpcUrls });
+  }, [rpcUrls]);
 
   const updateField = (key: keyof RpcUrlsContextType, value: string) => {
     setLocalRpc((prev) => ({ ...prev, [key]: value }));
@@ -221,6 +233,41 @@ const Settings: React.FC = () => {
       setFetchingChainId(null);
     }
   }, []);
+
+  // Handle setting OpenScan as MetaMask default explorer
+  const handleSetMetaMaskExplorer = useCallback(
+    async (chainId: number) => {
+      const network = enabledNetworks.find((n) => n.networkId === chainId);
+      if (!network) return;
+
+      // Get the RPC URLs for this network from context
+      const networkRpcUrls = rpcUrls[chainId] || [];
+
+      setMetamaskStatus((prev) => ({ ...prev, [chainId]: "loading" }));
+
+      const result = await setAsDefaultExplorer(
+        {
+          chainId: network.networkId,
+          name: network.name,
+          shortName: network.shortName,
+          currency: network.currency,
+        },
+        networkRpcUrls,
+      );
+
+      setMetamaskStatus((prev) => ({
+        ...prev,
+        [chainId]: result.success ? "success" : "error",
+      }));
+
+      if (result.success) {
+        setTimeout(() => {
+          setMetamaskStatus((prev) => ({ ...prev, [chainId]: "idle" }));
+        }, 3000);
+      }
+    },
+    [enabledNetworks, rpcUrls, setAsDefaultExplorer],
+  );
 
   const deleteRpc = useCallback((chainId: number, index: number) => {
     setLocalRpc((prev) => {
@@ -622,22 +669,51 @@ const Settings: React.FC = () => {
                 return (
                   <div key={chain.id} className="settings-chain-item">
                     {/* Collapsible Header */}
-                    <button
-                      type="button"
-                      className="settings-chain-header"
-                      onClick={() => toggleChainExpanded(chain.id)}
-                    >
-                      <div className="settings-chain-header-left">
+                    <div className="settings-chain-header">
+                      <button
+                        type="button"
+                        className="settings-chain-header-toggle"
+                        onClick={() => toggleChainExpanded(chain.id)}
+                      >
                         <span className={`settings-chain-chevron ${isExpanded ? "expanded" : ""}`}>
                           ▶
                         </span>
                         <span className="settings-chain-name-text">{chain.name}</span>
                         <span className="settings-chain-id-badge">Chain ID: {chain.id}</span>
-                      </div>
+                      </button>
+                      {isMetaMaskAvailable && (
+                        <button
+                          type="button"
+                          className={`settings-metamask-button ${metamaskStatus[chain.id] === "success" ? "success" : ""} ${metamaskStatus[chain.id] === "loading" ? "loading" : ""}`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleSetMetaMaskExplorer(chain.id);
+                          }}
+                          disabled={
+                            !isSupported(chain.id) || metamaskStatus[chain.id] === "loading"
+                          }
+                          title={
+                            !isSupported(chain.id)
+                              ? "Not supported for this chain"
+                              : metamaskStatus[chain.id] === "success"
+                                ? "OpenScan configured!"
+                                : "Set OpenScan as the default block explorer in MetaMask"
+                          }
+                        >
+                          <MetaMaskIcon size={16} />
+                          <span>
+                            {metamaskStatus[chain.id] === "loading"
+                              ? "Configuring..."
+                              : metamaskStatus[chain.id] === "success"
+                                ? "Configured!"
+                                : "Use as default explorer"}
+                          </span>
+                        </button>
+                      )}
                       <span className="settings-chain-rpc-count">
                         {rpcCount} RPC{rpcCount !== 1 ? "s" : ""}
                       </span>
-                    </button>
+                    </div>
 
                     {/* Collapsible Content */}
                     {isExpanded && (

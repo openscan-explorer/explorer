@@ -34,14 +34,14 @@ export const colors = {
 
   // Light Mode
   light: {
-    bgPrimary: "#31457a",
-    bgSecondary: "#ffffff",
-    bgTertiary: "#e5e7eb",
-    textPrimary: "#1a1d26",
-    textSecondary: "#6b7280",
-    textTertiary: "#9ca3af",
-    border: "#e5e7eb",
-    borderSecondary: "#d1d5db",
+    bgPrimary: "#ffffff",
+    bgSecondary: "#f8fafc",
+    bgTertiary: "#f1f5f9",
+    textPrimary: "#0f172a",
+    textSecondary: "#475569",
+    textTertiary: "#94a3b8",
+    border: "#e2e8f0",
+    borderSecondary: "#cbd5e1",
   },
 } as const;
 
@@ -189,10 +189,16 @@ export const cssVariables = `
   /* Overlay Utilities (for dark theme - light overlays on dark bg) */
   --overlay-light-2: rgba(255, 255, 255, 0.02);
   --overlay-light-3: rgba(255, 255, 255, 0.03);
+  --overlay-light-4: rgba(255, 255, 255, 0.04);
   --overlay-light-5: rgba(255, 255, 255, 0.05);
+  --overlay-light-6: rgba(255, 255, 255, 0.06);
+  --overlay-light-8: rgba(255, 255, 255, 0.08);
   --overlay-light-10: rgba(255, 255, 255, 0.1);
   --overlay-light-15: rgba(255, 255, 255, 0.15);
   --overlay-light-20: rgba(255, 255, 255, 0.2);
+  --overlay-light-25: rgba(255, 255, 255, 0.25);
+  --overlay-light-30: rgba(255, 255, 255, 0.3);
+  --overlay-light-40: rgba(255, 255, 255, 0.4);
   --overlay-dark-5: rgba(0, 0, 0, 0.05);
   --overlay-dark-10: rgba(0, 0, 0, 0.1);
   --overlay-dark-20: rgba(0, 0, 0, 0.2);
@@ -218,13 +224,13 @@ export const cssVariables = `
   --color-info-hover: #2563eb;
   --color-info-subtle: rgba(59, 130, 246, 0.08);
 
-  --bg-gradient-start: #1f2d52;
+  --bg-gradient-start: #f8fafc;
   --bg-primary: ${colors.light.bgPrimary};
   --bg-secondary: ${colors.light.bgSecondary};
   --bg-tertiary: ${colors.light.bgTertiary};
   --bg-card: ${colors.light.bgSecondary};
-  --bg-card-hover: #f9fafb;
-  --bg-input: ${colors.light.bgSecondary};
+  --bg-card-hover: ${colors.light.bgTertiary};
+  --bg-input: ${colors.light.bgPrimary};
   --bg-tooltip: ${colors.dark.bgPrimary};
   --bg-modal-overlay: rgba(0, 0, 0, 0.4);
 
@@ -244,12 +250,13 @@ export const cssVariables = `
   --btn-disabled-bg: ${colors.light.bgTertiary};
   --btn-disabled-text: ${colors.light.textTertiary};
 
-  --input-bg: ${colors.light.bgSecondary};
-  --input-border: ${colors.light.borderSecondary};
+  --input-bg: ${colors.light.bgPrimary};
+  --input-border: ${colors.light.border};
+  --input-text: ${colors.light.textPrimary};
   --input-placeholder: ${colors.light.textTertiary};
 
-  --table-header-bg: #f9fafb;
-  --table-row-bg-hover: ${colors.light.bgPrimary};
+  --table-header-bg: ${colors.light.bgTertiary};
+  --table-row-bg-hover: ${colors.light.bgTertiary};
   --table-border: ${colors.light.border};
 
   --badge-success-bg: rgba(16, 185, 129, 0.1);
@@ -274,10 +281,16 @@ export const cssVariables = `
   /* Overlay Utilities (for light theme - dark overlays on light bg) */
   --overlay-light-2: rgba(0, 0, 0, 0.02);
   --overlay-light-3: rgba(0, 0, 0, 0.03);
-  --overlay-light-5: rgba(0, 0, 0, 0.03);
-  --overlay-light-10: rgba(0, 0, 0, 0.05);
-  --overlay-light-15: rgba(0, 0, 0, 0.08);
-  --overlay-light-20: rgba(0, 0, 0, 0.1);
+  --overlay-light-4: rgba(0, 0, 0, 0.03);
+  --overlay-light-5: rgba(0, 0, 0, 0.04);
+  --overlay-light-6: rgba(0, 0, 0, 0.05);
+  --overlay-light-8: rgba(0, 0, 0, 0.06);
+  --overlay-light-10: rgba(0, 0, 0, 0.07);
+  --overlay-light-15: rgba(0, 0, 0, 0.1);
+  --overlay-light-20: rgba(0, 0, 0, 0.12);
+  --overlay-light-25: rgba(0, 0, 0, 0.15);
+  --overlay-light-30: rgba(0, 0, 0, 0.18);
+  --overlay-light-40: rgba(0, 0, 0, 0.25);
   --overlay-dark-5: rgba(0, 0, 0, 0.03);
   --overlay-dark-10: rgba(0, 0, 0, 0.05);
   --overlay-dark-20: rgba(0, 0, 0, 0.1);

@@ -12,6 +12,14 @@ export interface NetworkStats {
   metadata: any;
 }
 
+export interface GasPrices {
+  low: string; // Wei hex - 25th percentile priority fee
+  average: string; // Wei hex - 50th percentile priority fee
+  high: string; // Wei hex - 75th percentile priority fee
+  baseFee: string; // Current base fee (EIP-1559)
+  lastBlock: string; // Block number hex
+}
+
 export interface Block {
   difficulty: string;
   extraData: string;
@@ -565,4 +573,17 @@ export interface ENSReverseResult {
 export interface DecodedContenthash {
   type: string;
   url: string;
+}
+
+// ==================== ETHEREUM PROVIDER TYPES ====================
+
+/**
+ * Ethereum provider interface for wallet interactions (e.g., MetaMask)
+ * Based on EIP-1193 and common wallet extensions
+ */
+export interface EthereumProvider {
+  isMetaMask?: boolean;
+  request: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
+  on?: (event: string, callback: (...args: unknown[]) => void) => void;
+  removeListener?: (event: string, callback: (...args: unknown[]) => void) => void;
 }

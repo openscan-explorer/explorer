@@ -776,8 +776,8 @@
 }
 
 .network-card {
-	background: rgba(255, 255, 255, 0.05);
-	border: 2px solid rgba(255, 255, 255, 0.1);
+	background: var(--overlay-light-5);
+	border: 2px solid var(--overlay-light-10);
 	border-radius: 12px;
 	padding: 16px;
 	transition: all 0.3s ease;
@@ -787,7 +787,7 @@
 
 .network-card-link:hover .network-card {
 	transform: translateY(-4px);
-	border-color: var(--network-color, rgba(255, 255, 255, 0.1));
+	border-color: var(--network-color, var(--overlay-light-10));
 	box-shadow: 0 8px 32px color-mix(in srgb, var(--network-color, #000) 25%, transparent);
 }
 
@@ -858,7 +858,7 @@
 
 .testnet-toggle-btn {
 	background: transparent;
-	border: 1px solid rgba(255, 255, 255, 0.2);
+	border: 1px solid var(--overlay-light-20);
 	color: var(--color-text-muted);
 	padding: 8px 20px;
 	border-radius: 6px;
@@ -872,8 +872,8 @@
 
 .testnet-toggle-btn:hover {
 	color: var(--color-text);
-	border-color: rgba(255, 255, 255, 0.4);
-	background-color: rgba(255, 255, 255, 0.05);
+	border-color: var(--overlay-light-40);
+	background-color: var(--overlay-light-5);
 }
 
 /* ==========================================================================
@@ -1047,7 +1047,7 @@
 
 .page-subtitle {
 	font-size: 1.2rem;
-	color: rgba(255, 255, 255, 0.7);
+	color: var(--text-secondary);
 	font-family: "Outfit", sans-serif;
 	max-width: 600px;
 	margin: 0 auto;
@@ -1099,8 +1099,8 @@
 
 /* Feature Cards */
 .feature-card {
-	background: rgba(255, 255, 255, 0.03);
-	border: 1px solid rgba(255, 255, 255, 0.1);
+	background: var(--overlay-light-3);
+	border: 1px solid var(--overlay-light-10);
 	border-radius: 12px;
 	padding: 24px;
 	transition: all 0.2s ease;
@@ -1121,7 +1121,7 @@
 
 .feature-card-description {
 	font-size: 0.95rem;
-	color: rgba(255, 255, 255, 0.7);
+	color: var(--text-secondary);
 	font-family: "Outfit", sans-serif;
 	line-height: 1.6;
 	margin: 0;
@@ -1163,7 +1163,7 @@
 
 .version-info-label {
 	font-size: 0.85rem;
-	color: rgba(255, 255, 255, 0.6);
+	color: var(--text-secondary);
 	margin-bottom: 8px;
 	font-family: "Outfit", sans-serif;
 }
@@ -1228,7 +1228,7 @@
 .network-chain-id {
 	font-size: 0.85rem;
 	font-family: "monospace";
-	color: rgba(255, 255, 255, 0.6);
+	color: var(--text-secondary);
 }
 
 /* Open Source Card */
@@ -1253,7 +1253,7 @@
 
 .opensource-description {
 	font-size: 1.1rem;
-	color: rgba(255, 255, 255, 0.7);
+	color: var(--text-secondary);
 	font-family: "Outfit", sans-serif;
 	line-height: 1.6;
 	max-width: 800px;
@@ -1300,7 +1300,7 @@
 .about-overview-text p {
 	font-size: 1.05rem;
 	line-height: 1.7;
-	color: rgba(255, 255, 255, 0.8);
+	color: var(--text-primary);
 	margin-bottom: 16px;
 }
 
@@ -1315,7 +1315,7 @@
 .about-section-intro {
 	font-size: 1.05rem;
 	line-height: 1.7;
-	color: rgba(255, 255, 255, 0.8);
+	color: var(--text-primary);
 	text-align: center;
 	max-width: 800px;
 	margin: 0 auto 32px;
@@ -1368,7 +1368,7 @@
 
 .principle-description {
 	font-size: 0.9rem;
-	color: rgba(255, 255, 255, 0.7);
+	color: var(--text-secondary);
 	line-height: 1.5;
 	margin: 0;
 }
@@ -1393,7 +1393,7 @@
 /* License Footer */
 .license-footer {
 	padding: 20px;
-	color: rgba(255, 255, 255, 0.5);
+	color: var(--text-tertiary);
 	font-family: "Outfit", sans-serif;
 	font-size: 2rem;
 }
@@ -1477,8 +1477,8 @@
 .contract-code-display {
 	margin-top: 8px;
 	padding: 12px;
-	background: rgba(255, 255, 255, 0.03);
-	border: 1px solid rgba(255, 255, 255, 0.1);
+	background: var(--overlay-light-3);
+	border: 1px solid var(--overlay-light-10);
 	border-radius: 8px;
 	font-family: "monospace";
 	font-size: 0.75rem;
@@ -1551,7 +1551,7 @@
 }
 
 .abi-more-text {
-	color: rgba(255, 255, 255, 0.5);
+	color: var(--text-tertiary);
 	font-size: 0.85rem;
 	align-self: center;
 }
@@ -1565,7 +1565,7 @@
 
 .metadata-item {
 	padding: 8px;
-	background: rgba(255, 255, 255, 0.03);
+	background: var(--overlay-light-3);
 	border-radius: 6px;
 }
 
@@ -1599,7 +1599,7 @@
 }
 
 .verification-text {
-	color: rgba(255, 255, 255, 0.5);
+	color: var(--text-tertiary);
 	font-size: 0.9rem;
 	font-family: "Outfit", sans-serif;
 }
@@ -1612,7 +1612,7 @@
 }
 
 .verification-text-loading {
-	color: rgba(255, 255, 255, 0.5);
+	color: var(--text-tertiary);
 	font-size: 0.9rem;
 	font-family: "Outfit", sans-serif;
 }
@@ -1920,7 +1920,7 @@
 
 .recent-tx-header {
 	font-size: 0.9rem;
-	color: rgba(255, 255, 255, 0.6);
+	color: var(--text-secondary);
 }
 
 .storage-section {
@@ -1965,14 +1965,9 @@
 	gap: 8px;
 	padding: 4px 10px;
 	height: 36px;
-	background: rgba(255, 255, 255, 0.05);
+	background: var(--overlay-light-5);
 	border: 1px solid color-mix(in srgb, var(--network-color, #888) 25%, transparent);
 	border-radius: 8px;
-	transition: all 0.2s ease;
-}
-
-.network-block-indicator:hover {
-	background: rgba(255, 255, 255, 0.08);
 }
 
 .network-block-pulse {
@@ -2031,6 +2026,15 @@
 	color: var(--text-primary);
 	font-weight: 500;
 	line-height: 1.2;
+}
+
+.network-gas-tracker {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	padding-left: 8px;
+	border-left: 1px solid var(--overlay-light-10);
+	cursor: pointer;
 }
 
 /* Pagination */
@@ -3049,8 +3053,8 @@
 
 .supporter-card {
 	display: block;
-	background: rgba(255, 255, 255, 0.05);
-	border: 2px solid var(--supporter-color, rgba(255, 255, 255, 0.1));
+	background: var(--overlay-light-5);
+	border: 2px solid var(--supporter-color, var(--overlay-light-10));
 	border-radius: 12px;
 	padding: 16px;
 	text-decoration: none;
@@ -3134,7 +3138,7 @@
 .supporters-cta {
 	margin-top: 32px;
 	padding-top: 24px;
-	border-top: 1px solid rgba(255, 255, 255, 0.1);
+	border-top: 1px solid var(--overlay-light-10);
 }
 
 .supporters-cta p {
@@ -3341,15 +3345,15 @@
 	flex-direction: column;
 	gap: 4px;
 	padding: 12px 16px;
-	background: rgba(255, 255, 255, 0.05);
-	border: 1px solid rgba(255, 255, 255, 0.1);
+	background: var(--overlay-light-5);
+	border: 1px solid var(--overlay-light-10);
 	border-radius: 8px;
 	text-decoration: none;
 	transition: all 0.2s ease;
 }
 
 .profile-link-card:hover {
-	background: rgba(255, 255, 255, 0.08);
+	background: var(--overlay-light-8);
 	border-color: var(--color-primary-alpha-30);
 	transform: translateY(-2px);
 }
@@ -3690,7 +3694,7 @@
 }
 
 .events-more {
-	color: rgba(255, 255, 255, 0.5);
+	color: var(--text-tertiary);
 	font-size: 0.85rem;
 	align-self: center;
 }
@@ -3739,7 +3743,7 @@
 .function-input-name {
 	display: block;
 	font-size: 0.8rem;
-	color: rgba(255, 255, 255, 0.7);
+	color: var(--text-secondary);
 	margin-bottom: 4px;
 	font-family: monospace;
 }
@@ -4013,7 +4017,7 @@
 	font-weight: 600;
 	cursor: pointer;
 	transition: all 0.2s ease;
-	border-right: 1px solid rgba(255, 255, 255, 0.2);
+	border-right: 1px solid var(--overlay-light-20);
 }
 
 .tx-history-search-btn:hover {
@@ -4162,7 +4166,7 @@
 	background: linear-gradient(
 		90deg,
 		transparent 0%,
-		rgba(255, 255, 255, 0.3) 50%,
+		var(--overlay-light-30) 50%,
 		transparent 100%
 	);
 	animation: shimmer 1.5s infinite;
@@ -4294,7 +4298,7 @@
 
 .tx-history-load-more-toggle {
 	border-radius: 0 8px 8px 0;
-	border-left: 1px solid rgba(255, 255, 255, 0.2);
+	border-left: 1px solid var(--overlay-light-20);
 }
 
 /* Load More dropdown opens upwards */
@@ -4389,6 +4393,17 @@
 	border-radius: 50%;
 	object-fit: cover;
 	background: rgba(0, 0, 0, 0.1);
+}
+
+.token-logo-placeholder {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: var(--color-primary-alpha-15);
+	color: var(--color-primary);
+	font-weight: 600;
+	font-size: 0.9rem;
+	flex-shrink: 0;
 }
 
 .token-name-symbol {
@@ -5015,7 +5030,7 @@
 
 .ens-loading {
 	padding: 12px 16px;
-	color: rgba(255, 255, 255, 0.6);
+	color: var(--text-secondary);
 	font-size: 0.85rem;
 }
 
@@ -5062,7 +5077,7 @@
 
 .ens-text-records-wrapper {
 	margin-left: 16px;
-	border-left: 2px solid rgba(255, 255, 255, 0.1);
+	border-left: 2px solid var(--overlay-light-10);
 	padding-left: 16px;
 }
 
@@ -5105,8 +5120,8 @@
 }
 
 .dashboard-stat-card {
-	background: rgba(255, 255, 255, 0.03);
-	border: 1px solid rgba(255, 255, 255, 0.08);
+	background: var(--bg-secondary);
+	border: 1px solid var(--overlay-light-8);
 	border-radius: 12px;
 	padding: 20px;
 	text-align: center;
@@ -5118,6 +5133,7 @@
 	text-transform: uppercase;
 	letter-spacing: 0.05em;
 	margin-bottom: 8px;
+	text-align: center;
 }
 
 .dashboard-stat-value {
@@ -5131,6 +5147,82 @@
 	opacity: 0.5;
 }
 
+/* Clickable stat label */
+.dashboard-stat-label-link {
+	display: block;
+	font-size: 0.8rem;
+	color: var(--color-text-muted);
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	margin-bottom: 8px;
+	text-align: center;
+	text-decoration: none;
+	transition: color 0.2s ease;
+}
+
+.dashboard-stat-label-link:hover {
+	color: var(--color-primary);
+}
+
+/* Gas Price Tiers */
+.dashboard-stat-card-gas {
+	padding: 16px 12px;
+}
+
+.dashboard-gas-tiers {
+	display: flex;
+	justify-content: space-between;
+	gap: 8px;
+}
+
+.gas-tier {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	flex: 1;
+	padding: 6px 8px;
+	border-radius: 8px;
+	background: var(--overlay-light-3);
+}
+
+.gas-tier-label {
+	font-size: 0.7rem;
+	color: var(--color-text-muted);
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	margin-bottom: 4px;
+}
+
+.gas-tier-value {
+	font-family: "Outfit", sans-serif;
+	font-size: 0.95rem;
+	font-weight: 600;
+}
+
+.gas-tier-low .gas-tier-label {
+	color: #4ade80;
+}
+
+.gas-tier-low .gas-tier-value {
+	color: #4ade80;
+}
+
+.gas-tier-avg .gas-tier-label {
+	color: #fbbf24;
+}
+
+.gas-tier-avg .gas-tier-value {
+	color: #fbbf24;
+}
+
+.gas-tier-high .gas-tier-label {
+	color: #f87171;
+}
+
+.gas-tier-high .gas-tier-value {
+	color: #f87171;
+}
+
 /* Dashboard Tables Row */
 .dashboard-tables-row {
 	display: grid;
@@ -5140,8 +5232,8 @@
 }
 
 .dashboard-table-section {
-	background: rgba(255, 255, 255, 0.02);
-	border: 1px solid rgba(255, 255, 255, 0.06);
+	background: var(--bg-secondary);
+	border: 1px solid var(--overlay-light-6);
 	border-radius: 12px;
 	padding: 16px;
 }
@@ -5152,7 +5244,7 @@
 	align-items: center;
 	margin-bottom: 12px;
 	padding-bottom: 12px;
-	border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+	border-bottom: 1px solid var(--overlay-light-6);
 }
 
 .dashboard-table-title-link {
@@ -5232,13 +5324,13 @@
 	justify-content: space-between;
 	align-items: center;
 	padding: 10px 12px;
-	background: rgba(255, 255, 255, 0.02);
+	background: var(--overlay-light-2);
 	border-radius: 8px;
 	transition: background 0.2s;
 }
 
 .dashboard-table-row:hover {
-	background: rgba(255, 255, 255, 0.04);
+	background: var(--overlay-light-4);
 }
 
 /* Block Row Styles */
@@ -5298,7 +5390,7 @@
 .dashboard-block-gas {
 	font-size: 0.75rem;
 	color: var(--color-text-muted);
-	background: rgba(255, 255, 255, 0.05);
+	background: var(--overlay-light-5);
 	padding: 2px 6px;
 	border-radius: 4px;
 }
@@ -5354,7 +5446,7 @@
 }
 
 .dashboard-tx-arrow {
-	color: rgba(255, 255, 255, 0.3);
+	color: var(--overlay-light-30);
 	font-size: 0.75rem;
 	flex-shrink: 0;
 }
@@ -5394,6 +5486,10 @@
 
 	.dashboard-stat-value {
 		font-size: 1.25rem;
+	}
+
+	.gas-tier-value {
+		font-size: 0.85rem;
 	}
 
 	.dashboard-table-row {
@@ -5508,16 +5604,16 @@
 	justify-content: space-between;
 	gap: 12px;
 	padding: 10px 14px;
-	background: rgba(255, 255, 255, 0.03);
-	border: 1px solid rgba(255, 255, 255, 0.08);
+	background: var(--overlay-light-3);
+	border: 1px solid var(--overlay-light-8);
 	border-radius: 8px;
 	text-decoration: none;
 	transition: all 0.2s ease;
 }
 
 .search-result-item:hover {
-	background: rgba(255, 255, 255, 0.06);
-	border-color: var(--network-color, rgba(255, 255, 255, 0.15));
+	background: var(--overlay-light-6);
+	border-color: var(--network-color, var(--overlay-light-15));
 }
 
 .search-result-item-content {
@@ -5536,7 +5632,7 @@
 
 .search-result-in {
 	font-size: 0.8rem;
-	color: rgba(255, 255, 255, 0.5);
+	color: var(--text-tertiary);
 }
 
 .search-result-network {
@@ -5597,4 +5693,1017 @@
 	.search-result-item {
 		padding: 8px 12px;
 	}
+}
+
+/* ============================================
+   Gas Tracker Page Styles
+   ============================================ */
+
+.gas-tracker-header {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	text-align: center;
+}
+
+.gas-tracker-back-link {
+	font-size: 0.9rem;
+	color: var(--color-primary-muted);
+	text-decoration: none;
+	transition: color 0.2s ease;
+}
+
+.gas-tracker-back-link:hover {
+	color: var(--color-primary);
+}
+
+.gas-tracker-section-title {
+	font-size: 1.25rem;
+	font-weight: 600;
+	color: var(--color-text);
+	text-align: center;
+	margin: 0 0px 20px 0px;
+}
+
+.gas-tracker-section-subtitle {
+	font-size: 0.85rem;
+	color: var(--color-text-muted);
+	margin-bottom: 20px;
+	text-align: center;
+	margin: 0 0px 20px 0px;
+}
+
+/* Gas Price Cards */
+.gas-price-cards {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 16px;
+	margin-bottom: 20px;
+}
+
+.gas-price-card {
+	background: var(--overlay-light-3);
+	border: 1px solid var(--overlay-light-8);
+	border-radius: 12px;
+	padding: 24px;
+	text-align: center;
+}
+
+.gas-price-tier-label {
+	font-size: 0.85rem;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	margin-bottom: 8px;
+}
+
+.gas-price-tier-value {
+	font-family: "Outfit", sans-serif;
+	font-size: 1.75rem;
+	font-weight: 700;
+	margin-bottom: 8px;
+}
+
+.gas-price-tier-time {
+	font-size: 0.8rem;
+	color: var(--color-text-muted);
+}
+
+.gas-price-low .gas-price-tier-label,
+.gas-price-low .gas-price-tier-value {
+	color: #4ade80;
+}
+
+.gas-price-avg .gas-price-tier-label,
+.gas-price-avg .gas-price-tier-value {
+	color: #fbbf24;
+}
+
+.gas-price-high .gas-price-tier-label,
+.gas-price-high .gas-price-tier-value {
+	color: #f87171;
+}
+
+.gas-base-fee {
+	display: flex;
+	justify-content: center;
+	gap: 8px;
+	padding: 12px;
+	background: var(--overlay-light-2);
+	border-radius: 8px;
+	margin-bottom: 10px;
+}
+
+.gas-base-fee-label {
+	color: var(--color-text-muted);
+}
+
+.gas-base-fee-value {
+	font-weight: 600;
+	color: var(--color-text);
+}
+
+/* Transaction Cost Table */
+.tx-cost-table {
+	background: var(--overlay-light-2);
+	border: 1px solid var(--overlay-light-6);
+	border-radius: 12px;
+	overflow: hidden;
+}
+
+.tx-cost-header {
+	display: grid;
+	grid-template-columns: 2fr 1fr 1.5fr 1.5fr 1.5fr;
+	padding: 12px 16px;
+	background: var(--overlay-light-3);
+	border-bottom: 1px solid var(--overlay-light-6);
+	font-size: 0.75rem;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	color: var(--color-text-muted);
+}
+
+.tx-cost-row {
+	display: grid;
+	grid-template-columns: 2fr 1fr 1.5fr 1.5fr 1.5fr;
+	padding: 16px;
+	border-bottom: 1px solid var(--overlay-light-4);
+	transition: background 0.2s ease;
+}
+
+.tx-cost-row:last-child {
+	border-bottom: none;
+}
+
+.tx-cost-row:hover {
+	background: var(--overlay-light-2);
+}
+
+.tx-cost-col-name {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.tx-cost-name {
+	font-weight: 600;
+	color: var(--color-text);
+}
+
+.tx-cost-desc {
+	font-size: 0.75rem;
+	color: var(--color-text-muted);
+}
+
+.tx-cost-col-gas {
+	font-family: "JetBrains Mono", monospace;
+	font-size: 0.85rem;
+	color: var(--color-text-muted);
+	display: flex;
+	align-items: center;
+}
+
+.tx-cost-col-low,
+.tx-cost-col-avg,
+.tx-cost-col-high {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+
+.tx-cost-eth {
+	font-family: "JetBrains Mono", monospace;
+	font-size: 0.85rem;
+	color: var(--color-text);
+}
+
+.tx-cost-usd {
+	font-size: 0.75rem;
+	color: var(--color-text-muted);
+}
+
+.tx-cost-col-low .tx-cost-eth {
+	color: #4ade80;
+}
+
+.tx-cost-col-avg .tx-cost-eth {
+	color: #fbbf24;
+}
+
+.tx-cost-col-high .tx-cost-eth {
+	color: #f87171;
+}
+
+.gas-tracker-updated {
+	text-align: center;
+	font-size: 0.8rem;
+	color: var(--color-text-muted);
+	padding-top: 16px;
+	border-top: 1px solid var(--overlay-light-6);
+}
+
+/* Gas Tracker Responsive */
+@media (max-width: 900px) {
+	.gas-price-cards {
+		grid-template-columns: repeat(3, 1fr);
+	}
+
+	.tx-cost-header,
+	.tx-cost-row {
+		grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+	}
+}
+
+@media (max-width: 640px) {
+	.gas-tracker-header {
+		flex-direction: column;
+		align-items: center;
+		gap: 12px;
+	}
+
+	.gas-price-cards {
+		grid-template-columns: 1fr;
+	}
+
+	.gas-price-card {
+		padding: 16px;
+	}
+
+	.gas-price-tier-value {
+		font-size: 1.5rem;
+	}
+
+	.tx-cost-table {
+		overflow-x: auto;
+	}
+
+	.tx-cost-header,
+	.tx-cost-row {
+		min-width: 600px;
+	}
+}
+
+/* ==========================================================================
+   TOKEN HOLDINGS SECTION
+   Displays ERC20 token balances for an address
+   ========================================================================== */
+
+.token-holdings-section {
+	margin-top: 16px;
+}
+
+.token-holdings-list {
+	display: flex;
+	flex-direction: column;
+	gap: 0;
+}
+
+.token-holding-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 12px 16px;
+	border-bottom: 1px solid var(--color-primary-alpha-10);
+	transition: background 0.2s ease;
+	text-decoration: none;
+	color: inherit;
+	cursor: pointer;
+}
+
+.token-holding-row:last-child {
+	border-bottom: none;
+}
+
+.token-holding-row:hover {
+	background: var(--color-primary-alpha-15);
+}
+
+.token-holding-row:hover .token-name {
+	color: var(--color-primary);
+}
+
+.token-holding-info {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.token-holding-details {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	flex-wrap: wrap;
+}
+
+.token-holding-balance {
+	font-weight: 600;
+	color: var(--text-primary);
+	font-size: 0.95rem;
+}
+
+/* Token Tier Badges */
+.token-tier-badge {
+	font-size: 0.7rem;
+	padding: 2px 6px;
+	border-radius: 4px;
+	font-weight: 600;
+	text-transform: uppercase;
+}
+
+.token-tier-badge.tier-3 {
+	background: var(--color-success-alpha-10);
+	color: var(--color-success);
+}
+
+.token-tier-badge.tier-2 {
+	background: var(--color-info-alpha-10);
+	color: var(--color-info);
+}
+
+.token-tier-badge.tier-1 {
+	background: var(--color-warning-alpha-10);
+	color: var(--color-warning);
+}
+
+.token-custom-badge {
+	font-size: 0.7rem;
+	padding: 2px 6px;
+	border-radius: 4px;
+	font-weight: 600;
+	background: var(--color-accent-alpha-10);
+	color: var(--color-accent);
+	text-transform: uppercase;
+}
+
+/* Token Holdings Actions */
+.token-holdings-actions {
+	display: flex;
+	gap: 12px;
+	padding: 12px 16px;
+	border-top: 1px solid var(--color-primary-alpha-10);
+}
+
+/* Token Holdings States */
+.token-holdings-loading,
+.token-holdings-empty {
+	color: var(--text-secondary);
+	font-style: italic;
+}
+
+.token-holdings-error {
+	padding: 12px 16px;
+	background: var(--color-error-alpha-10);
+	color: var(--color-error);
+	font-size: 0.9rem;
+	border-radius: 4px;
+	margin: 8px 16px;
+}
+
+/* ==========================================================================
+   CUSTOM TOKEN MODAL
+   Modal for adding custom ERC20 tokens
+   ========================================================================== */
+
+.custom-token-modal {
+	max-width: 480px;
+}
+
+.custom-token-modal .modal-body {
+	padding: 16px 0;
+}
+
+.custom-token-modal .form-group {
+	margin-bottom: 16px;
+}
+
+.custom-token-modal .form-label {
+	display: block;
+	margin-bottom: 8px;
+	font-weight: 500;
+	color: var(--text-secondary);
+	font-size: 0.9rem;
+}
+
+.custom-token-input {
+	width: 100%;
+	font-family: "JetBrains Mono", "Fira Code", monospace;
+	font-size: 0.85rem;
+}
+
+.custom-token-validation-error {
+	margin-top: 6px;
+	font-size: 0.8rem;
+	color: var(--color-error);
+}
+
+.custom-token-loading {
+	padding: 16px;
+	text-align: center;
+	color: var(--text-secondary);
+	font-style: italic;
+}
+
+.custom-token-error {
+	padding: 12px;
+	background: var(--color-error-alpha-10);
+	color: var(--color-error);
+	border-radius: 6px;
+	font-size: 0.9rem;
+}
+
+/* Custom Token Preview */
+.custom-token-preview {
+	background: var(--color-primary-alpha-5);
+	border-radius: 8px;
+	padding: 16px;
+	margin-top: 16px;
+}
+
+.custom-token-preview-header {
+	font-weight: 600;
+	color: var(--text-primary);
+	margin-bottom: 12px;
+	font-size: 0.95rem;
+}
+
+.custom-token-preview-row {
+	display: flex;
+	justify-content: space-between;
+	padding: 6px 0;
+	font-size: 0.9rem;
+}
+
+.custom-token-preview-row:not(:last-child) {
+	border-bottom: 1px solid var(--color-primary-alpha-10);
+}
+
+.custom-token-preview-label {
+	color: var(--text-secondary);
+}
+
+.custom-token-preview-value {
+	color: var(--text-primary);
+	font-weight: 500;
+}
+
+.custom-token-balance {
+	color: var(--color-primary);
+	font-weight: 600;
+}
+
+/* Token Holdings Responsive */
+@media (max-width: 640px) {
+	.token-holding-row {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 8px;
+	}
+
+	.token-holding-balance {
+		margin-left: 44px;
+	}
+
+	.token-holdings-actions {
+		flex-direction: column;
+	}
+
+	.token-holdings-actions .btn {
+		width: 100%;
+	}
+}
+
+/* ==========================================================================
+   Account Info Cards - Horizontal Layout
+   ========================================================================== */
+
+.account-info-cards {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 16px;
+	margin-bottom: 16px;
+}
+
+.account-card {
+	background: var(--color-surface);
+	border: 1px solid var(--color-primary-alpha-10);
+	border-radius: 8px;
+	padding: 16px;
+}
+
+.account-card-title {
+	font-size: 0.75rem;
+	text-transform: uppercase;
+	color: var(--text-secondary);
+	margin-bottom: 12px;
+	letter-spacing: 0.05em;
+	font-weight: 600;
+}
+
+.account-card-row {
+	display: flex;
+	gap: 4px;
+	align-items: center;
+	padding: 8px 0;
+	border-bottom: 1px solid var(--color-primary-alpha-8);
+}
+
+.account-card-row:last-child {
+	border-bottom: none;
+}
+
+.account-card-label {
+	font-size: 0.85rem;
+	color: var(--text-secondary);
+	font-weight: 500;
+}
+
+.account-card-value {
+	font-size: 0.9rem;
+	font-weight: 600;
+	color: var(--text-primary);
+}
+
+.account-card-empty {
+	color: var(--text-secondary);
+	font-style: italic;
+	font-weight: 400;
+}
+
+.account-card-usd {
+	color: var(--color-success);
+	font-weight: 600;
+}
+
+.account-card-price {
+	color: var(--text-secondary);
+	font-weight: 400;
+	font-size: 0.8rem;
+	margin-left: 6px;
+}
+
+.account-card-loading {
+	color: var(--text-secondary);
+	font-style: italic;
+	font-weight: 400;
+}
+
+.account-card-link {
+	color: var(--color-primary);
+	text-decoration: none;
+	font-family: "JetBrains Mono", "Fira Code", monospace;
+	font-size: 0.85rem;
+}
+
+.account-card-link:hover {
+	text-decoration: underline;
+}
+
+.account-card-token-holdings {
+	margin-top: 8px;
+	border-top: 1px solid var(--color-primary-alpha-8);
+	padding-top: 8px;
+}
+
+/* ENS Badge Small - for card layout */
+.ens-badge-small {
+	display: inline-block;
+	padding: 2px 6px;
+	border-radius: 4px;
+	font-size: 0.7rem;
+	font-weight: 500;
+	margin-left: 8px;
+}
+
+.ens-badge-small.ens-badge--verified {
+	background: var(--color-success-alpha-15);
+	color: var(--color-success);
+}
+
+.ens-badge-small.ens-badge--unverified {
+	background: var(--color-warning-alpha-15);
+	color: var(--color-warning);
+}
+
+/* Token Holdings Compact/Collapsible Styles */
+.token-holdings-compact {
+	width: 100%;
+}
+
+.token-holdings-toggle {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	width: 100%;
+	padding: 8px 0;
+	background: none;
+	border: none;
+	cursor: pointer;
+	font-family: inherit;
+	text-align: left;
+}
+
+.token-holdings-toggle:hover {
+	opacity: 0.8;
+}
+
+.token-holdings-toggle-label {
+	font-size: 0.85rem;
+	color: var(--text-secondary);
+	font-weight: 500;
+}
+
+.token-holdings-toggle-count {
+	font-size: 0.85rem;
+	color: var(--color-primary);
+	font-weight: 600;
+	margin-left: auto;
+	margin-right: 8px;
+}
+
+.token-holdings-toggle-arrow {
+	font-size: 0.9rem;
+	color: var(--text-secondary);
+	font-weight: 600;
+	width: 16px;
+	text-align: center;
+}
+
+.token-holdings-compact-expanded {
+	margin-top: 0;
+}
+
+.token-holdings-compact-expanded .tx-section {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.token-holdings-collapse-btn {
+	background: none;
+	border: none;
+	cursor: pointer;
+	font-size: 1rem;
+	color: var(--text-secondary);
+	padding: 4px 8px;
+	line-height: 1;
+	font-weight: 600;
+}
+
+.token-holdings-collapse-btn:hover {
+	color: var(--color-primary);
+}
+
+/* Responsive: Stack cards on mobile */
+@media (max-width: 768px) {
+	.account-info-cards {
+		grid-template-columns: 1fr;
+	}
+}
+
+/* ==========================================================================
+   Contract Info Card
+   ========================================================================== */
+
+.contract-info-card {
+	background: var(--color-surface);
+	border: 1px solid var(--color-primary-alpha-10);
+	border-radius: 8px;
+	padding: 16px;
+	margin-bottom: 16px;
+}
+
+.contract-checking {
+	color: var(--text-secondary);
+	font-style: italic;
+}
+
+.contract-verification-badge {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.contract-verified-icon {
+	color: var(--color-success);
+	font-weight: 600;
+}
+
+.contract-verified-text {
+	color: var(--color-success);
+	font-weight: 600;
+}
+
+.contract-match-badge {
+	display: inline-block;
+	padding: 2px 8px;
+	border-radius: 4px;
+	font-size: 0.75rem;
+	font-weight: 500;
+	background: var(--color-success-alpha-15);
+	color: var(--color-success);
+	margin-left: 4px;
+}
+
+.contract-not-verified {
+	color: var(--text-secondary);
+}
+
+.contract-name {
+	font-weight: 600;
+	color: var(--color-primary);
+}
+
+.account-card-mono {
+	font-family: "JetBrains Mono", "Fira Code", monospace;
+	font-size: 0.85rem;
+}
+
+.contract-bytecode-section {
+	margin-top: 8px;
+	padding-top: 8px;
+	border-top: 1px solid var(--color-primary-alpha-8);
+}
+
+.contract-bytecode-toggle {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	width: 100%;
+	padding: 8px 0;
+	background: none;
+	border: none;
+	cursor: pointer;
+	font-family: inherit;
+}
+
+.contract-bytecode-toggle:hover {
+	opacity: 0.8;
+}
+
+.contract-toggle-icon {
+	font-size: 1rem;
+	color: var(--text-secondary);
+	font-weight: 600;
+}
+
+.contract-bytecode-content {
+	margin-top: 8px;
+	padding: 12px;
+	background: var(--color-surface-secondary);
+	border-radius: 4px;
+	overflow-x: auto;
+	max-height: 200px;
+	overflow-y: auto;
+}
+
+.contract-bytecode-content code {
+	font-family: "JetBrains Mono", "Fira Code", monospace;
+	font-size: 0.8rem;
+	word-break: break-all;
+	white-space: pre-wrap;
+	color: var(--text-primary);
+}
+
+/* ==========================================================================
+   ERC20 Token Info Card
+   ========================================================================== */
+
+.erc20-token-info-card {
+	background: var(--color-surface);
+	border: 1px solid var(--color-primary-alpha-10);
+	border-radius: 8px;
+	padding: 16px;
+	margin-bottom: 16px;
+}
+
+.erc20-token-display {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.erc20-token-logo {
+	width: 20px;
+	height: 20px;
+	border-radius: 50%;
+	object-fit: cover;
+}
+
+.erc20-token-name-symbol {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.erc20-token-name {
+	font-weight: 600;
+	color: var(--text-primary);
+}
+
+.erc20-token-symbol {
+	color: var(--text-secondary);
+	font-size: 0.9rem;
+}
+
+/* ==========================================================================
+   Contract Details Section (inside Contract Info Card)
+   ========================================================================== */
+
+.contract-details-section {
+	margin-top: 12px;
+	padding-top: 12px;
+	border-top: 1px solid var(--color-primary-alpha-8);
+}
+
+.contract-details-toggle {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	width: 100%;
+	padding: 8px 0;
+	background: none;
+	border: none;
+	cursor: pointer;
+	font-family: inherit;
+}
+
+.contract-details-toggle:hover {
+	opacity: 0.8;
+}
+
+.contract-details-content {
+	margin-top: 8px;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.contract-collapsible-item {
+	border: 1px solid var(--color-primary-alpha-8);
+	border-radius: 6px;
+	overflow: hidden;
+}
+
+.contract-collapsible-toggle {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	width: 100%;
+	padding: 10px 12px;
+	background: var(--color-surface-secondary);
+	border: none;
+	cursor: pointer;
+	font-family: inherit;
+	font-size: 0.85rem;
+	font-weight: 500;
+	color: var(--text-primary);
+}
+
+.contract-collapsible-toggle:hover {
+	background: var(--color-primary-alpha-8);
+}
+
+.contract-toggle-icon-small {
+	font-size: 0.75rem;
+	color: var(--text-secondary);
+}
+
+.contract-code-content {
+	padding: 12px;
+	background: var(--color-surface-secondary);
+	overflow-x: auto;
+	max-height: 300px;
+	overflow-y: auto;
+}
+
+.contract-code-content code {
+	font-family: "JetBrains Mono", "Fira Code", monospace;
+	font-size: 0.8rem;
+	word-break: break-all;
+	white-space: pre-wrap;
+	color: var(--text-primary);
+}
+
+.contract-source-files {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	padding: 8px;
+}
+
+/* ==========================================================================
+   NFT Collection Info Card
+   ========================================================================== */
+
+.nft-collection-info-card {
+	background: var(--color-surface);
+	border: 1px solid var(--color-primary-alpha-10);
+	border-radius: 8px;
+	padding: 16px;
+	margin-bottom: 16px;
+}
+
+.nft-collection-display {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.nft-collection-logo {
+	width: 24px;
+	height: 24px;
+	border-radius: 4px;
+	object-fit: cover;
+}
+
+.nft-collection-name-symbol {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.nft-collection-name {
+	font-weight: 600;
+	color: var(--text-primary);
+}
+
+.nft-collection-symbol {
+	color: var(--text-secondary);
+	font-size: 0.9rem;
+}
+
+.nft-token-lookup-section {
+	margin-top: 8px;
+	padding-top: 8px;
+	border-top: 1px solid var(--color-primary-alpha-8);
+}
+
+.nft-token-lookup-row {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.nft-token-input {
+	flex: 1;
+	padding: 6px 10px;
+	border: 1px solid var(--color-primary-alpha-15);
+	border-radius: 4px;
+	background: var(--color-surface-secondary);
+	color: var(--text-primary);
+	font-size: 0.85rem;
+	font-family: "JetBrains Mono", "Fira Code", monospace;
+	max-width: 150px;
+}
+
+.nft-token-input:focus {
+	outline: none;
+	border-color: var(--color-primary);
+}
+
+.nft-token-input::placeholder {
+	color: var(--text-secondary);
+	opacity: 0.7;
+}
+
+.nft-view-button {
+	padding: 6px 12px;
+	background: var(--color-primary);
+	color: white;
+	border: none;
+	border-radius: 4px;
+	font-size: 0.85rem;
+	font-weight: 500;
+	cursor: pointer;
+	text-decoration: none;
+	transition: opacity 0.15s ease;
+}
+
+.nft-view-button:hover {
+	opacity: 0.9;
+}
+
+.nft-view-button.disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+	pointer-events: none;
+}
+
+/* Token Standard Badges */
+.token-standard-badge {
+	display: inline-block;
+	padding: 2px 8px;
+	border-radius: 4px;
+	font-size: 0.75rem;
+	font-weight: 600;
+}
+
+.token-standard-erc721 {
+	background: var(--color-info-alpha-15);
+	color: var(--color-info);
+}
+
+.token-standard-erc1155 {
+	background: var(--color-warning-alpha-15);
+	color: var(--color-warning);
 }

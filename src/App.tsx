@@ -27,6 +27,7 @@ import {
   LazyChain,
   LazyContact,
   LazyDevTools,
+  LazyGasTracker,
   LazyHome,
   LazyMempool,
   LazyProfile,
@@ -37,6 +38,7 @@ import {
   LazyTokenDetails,
   LazyTx,
   LazyTxs,
+  preloadAllRoutes,
 } from "./components/LazyComponents";
 import { SettingsProvider, useSettings, useTheme } from "./context/SettingsContext";
 import { useAppReady, useOnAppReady } from "./hooks/useAppReady";
@@ -80,6 +82,13 @@ function AppContent() {
   const { fullyReady } = useAppReady();
   const { settings } = useSettings();
 
+  // Preload all route chunks once the app is ready
+  useEffect(() => {
+    if (fullyReady) {
+      preloadAllRoutes();
+    }
+  }, [fullyReady]);
+
   return (
     <>
       {!fullyReady ? (
@@ -114,6 +123,7 @@ function AppContent() {
               <Route path="profile/:profileType/:profileId" element={<LazyProfile />} />
               <Route path="supporters" element={<LazySupporters />} />
               <Route path=":networkId" element={<LazyChain />} />
+              <Route path=":networkId/gastracker" element={<LazyGasTracker />} />
               <Route path=":networkId/blocks" element={<LazyBlocks />} />
               <Route path=":networkId/block/:filter" element={<LazyBlock />} />
               <Route path=":networkId/txs" element={<LazyTxs />} />

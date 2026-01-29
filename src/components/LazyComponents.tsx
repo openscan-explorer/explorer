@@ -19,6 +19,7 @@ const Profile = lazy(() => import("./pages/profile"));
 const Supporters = lazy(() => import("./pages/supporters"));
 const Contact = lazy(() => import("./pages/contact"));
 const Search = lazy(() => import("./pages/search"));
+const GasTracker = lazy(() => import("./pages/gastracker"));
 
 // Higher-order component to wrap lazy components with Suspense
 // biome-ignore lint/suspicious/noExplicitAny: <TODO>
@@ -51,5 +52,33 @@ export const LazyProfile = withSuspense(Profile);
 export const LazySupporters = withSuspense(Supporters);
 export const LazyContact = withSuspense(Contact);
 export const LazySearch = withSuspense(Search);
+export const LazyGasTracker = withSuspense(GasTracker);
+
+/**
+ * Preload all route chunks after app loads.
+ * This ensures navigation between pages is instant (no chunk download delay).
+ */
+export function preloadAllRoutes() {
+  console.log("Preloading all route chunks...");
+  import("./pages/home");
+  import("./pages/network");
+  import("./pages/blocks");
+  import("./pages/block");
+  import("./pages/txs");
+  import("./pages/tx");
+  import("./pages/address");
+  import("./pages/tokenDetails");
+  import("./pages/mempool");
+  import("./pages/settings");
+  import("./pages/devtools");
+  import("./pages/about");
+  import("./pages/subscriptions");
+  import("./pages/profile");
+  import("./pages/supporters");
+  import("./pages/contact");
+  import("./pages/search");
+  import("./pages/gastracker");
+}
+
 // Default exports for backward compatibility
 export { Home };
