@@ -34,6 +34,7 @@ interface SearchResult {
     receivedCount: number;
     internalCount: number;
     rpcCalls: number;
+    elapsedMs: number;
   };
 }
 
@@ -63,8 +64,105 @@ export class AddressTransactionSearch {
   private balanceCache: Map<string, bigint> = new Map();
   private requestDelay = 0; // ms between requests
 
+  // Adaptive branching configuration
+  // Can be increased later when RPC type detection is added (e.g., for localhost/private RPCs)
+  private static readonly MAX_SEGMENTS = 8; // Max segments per split (safe for public RPCs)
+  private static readonly BATCH_SIZE = 4; // Max parallel state fetches (4 blocks = 8 RPC calls)
+
   constructor(client: EthereumClient) {
     this.client = client;
+  }
+
+  /**
+   * Determine optimal segment count based on transaction density.
+   * Uses nonce delta (exact outgoing tx count) as the primary indicator.
+   *
+   * - nonceDelta = 0 and no balance change → skip range (returns 0)
+   * - nonceDelta = 0 but balance changed → binary (2) - can't estimate incoming txs
+   * - nonceDelta 1-2 → binary (2 segments)
+   * - nonceDelta 3-10 → 4 segments
+   * - nonceDelta > 10 → MAX_SEGMENTS (8)
+   */
+  private getOptimalSegmentCount(
+    startState: AddressState,
+    endState: AddressState,
+    blockRange: number,
+  ): number {
+    const nonceDelta = endState.nonce - startState.nonce;
+    const balanceChanged = startState.balance !== endState.balance;
+
+    // No activity in this range
+    if (nonceDelta === 0 && !balanceChanged) {
+      return 0;
+    }
+
+    // For small ranges, always use binary - segmentation overhead not worth it
+    if (blockRange <= 100) {
+      return 2;
+    }
+
+    // Nonce delta gives us exact outgoing tx count
+    // All values capped at MAX_SEGMENTS
+    if (nonceDelta > 0) {
+      if (nonceDelta <= 2) return Math.min(2, AddressTransactionSearch.MAX_SEGMENTS);
+      if (nonceDelta <= 10) return Math.min(4, AddressTransactionSearch.MAX_SEGMENTS);
+      return AddressTransactionSearch.MAX_SEGMENTS;
+    }
+
+    // Balance-only changes (incoming txs): conservative binary search
+    // We can't estimate incoming tx count from balance delta
+    return 2;
+  }
+
+  /**
+   * Calculate N evenly-spaced boundary blocks for segmentation.
+   * Returns array of segmentCount + 1 boundaries (including start and end).
+   */
+  private calculateBoundaries(
+    startBlock: number,
+    endBlock: number,
+    segmentCount: number,
+  ): number[] {
+    const segmentSize = Math.floor((endBlock - startBlock) / segmentCount);
+    const boundaries: number[] = [startBlock];
+    for (let i = 1; i < segmentCount; i++) {
+      boundaries.push(startBlock + segmentSize * i);
+    }
+    boundaries.push(endBlock);
+    return boundaries;
+  }
+
+  /**
+   * Fetch states for multiple blocks in batches (rate-limit safe).
+   * Uses BATCH_SIZE to limit parallel requests.
+   */
+  private async getStatesInBatches(
+    address: string,
+    blocks: number[],
+  ): Promise<Map<number, AddressState>> {
+    const results = new Map<number, AddressState>();
+
+    for (let i = 0; i < blocks.length; i += AddressTransactionSearch.BATCH_SIZE) {
+      const batch = blocks.slice(i, i + AddressTransactionSearch.BATCH_SIZE);
+
+      // Fetch batch in parallel
+      const batchPromises = batch.map(async (block) => {
+        const state = await this.getState(address, block);
+        return { block, state };
+      });
+
+      const batchResults = await Promise.all(batchPromises);
+      for (const { block, state } of batchResults) {
+        results.set(block, state);
+      }
+
+      // Delay between batches if rate limiting enabled
+      if (i + AddressTransactionSearch.BATCH_SIZE < blocks.length && this.requestDelay > 0) {
+        await this.delay(this.requestDelay);
+      }
+    }
+
+    return results;
   }
 
   /**
@@ -361,6 +459,8 @@ export class AddressTransactionSearch {
   ): Promise<SearchResult> {
     const { limit = 100, toBlock, fromBlock, onProgress, onTransactionsFound } = options;
     const normalizedAddress = address.toLowerCase();
+    const searchStartTime = performance.now();
+
     console.log(
       "[AddressTransactionSearch] Starting search, limit:",
       limit,
@@ -396,6 +496,8 @@ export class AddressTransactionSearch {
       initialState.balance === finalState.balance &&
       finalState.nonce === 0
     ) {
+      const elapsedMs = Math.round(performance.now() - searchStartTime);
+      console.log("[AddressTransactionSearch] No activity found. Elapsed:", elapsedMs, "ms");
       return {
         blocks: [],
         transactions: [],
@@ -406,6 +508,7 @@ export class AddressTransactionSearch {
           receivedCount: 0,
           internalCount: 0,
           rpcCalls: this.nonceCache.size + this.balanceCache.size,
+          elapsedMs,
         },
       };
     }
@@ -416,15 +519,16 @@ export class AddressTransactionSearch {
     const processedBlocks = new Set<number>();
 
     /**
-     * Unified recursive search - finds blocks where EITHER nonce OR balance changed
+     * Adaptive recursive search - finds blocks where EITHER nonce OR balance changed
+     * Uses nonce delta to determine optimal segment count (2, 4, or 8 segments)
      * Searches RIGHT (newest) first, then LEFT (older)
      * Immediately fetches transactions when important block is found
      */
     const search = async (
-      startBlock: number,
-      endBlock: number,
-      startState: AddressState,
-      endState: AddressState,
+      searchStartBlock: number,
+      searchEndBlock: number,
+      searchStartState: AddressState,
+      searchEndState: AddressState,
       depth = 0,
     ): Promise<void> => {
       // Check limit - stop if we have enough transactions (0 means no limit)
@@ -439,20 +543,20 @@ export class AddressTransactionSearch {
       }
 
       // Base case: adjacent blocks
-      if (endBlock - startBlock <= 1) {
-        const nonceChanged = startState.nonce !== endState.nonce;
-        const balanceChanged = startState.balance !== endState.balance;
+      if (searchEndBlock - searchStartBlock <= 1) {
+        const nonceChanged = searchStartState.nonce !== searchEndState.nonce;
+        const balanceChanged = searchStartState.balance !== searchEndState.balance;
 
-        if ((nonceChanged || balanceChanged) && !processedBlocks.has(endBlock)) {
-          foundBlocks.add(endBlock);
-          processedBlocks.add(endBlock);
+        if ((nonceChanged || balanceChanged) && !processedBlocks.has(searchEndBlock)) {
+          foundBlocks.add(searchEndBlock);
+          processedBlocks.add(searchEndBlock);
 
           // Immediately fetch transactions from this block
           // If only balance changed (not nonce), search for internal transactions
           const searchForInternal = balanceChanged && !nonceChanged;
           await this.delay(this.requestDelay);
           const blockTxs = await this.fetchBlockTransactions(
-            endBlock,
+            searchEndBlock,
             normalizedAddress,
             searchForInternal,
           );
@@ -463,7 +567,7 @@ export class AddressTransactionSearch {
               "[Search] Found",
               blockTxs.length,
               "txs in block",
-              endBlock,
+              searchEndBlock,
               "- Total:",
               allTransactions.length,
             );
@@ -474,37 +578,114 @@ export class AddressTransactionSearch {
         return;
       }
 
-      // Check if anything changed in this range
-      const nonceChanged = startState.nonce !== endState.nonce;
-      const balanceChanged = startState.balance !== endState.balance;
+      // Determine optimal segment count based on activity density
+      const blockRange = searchEndBlock - searchStartBlock;
+      const segmentCount = this.getOptimalSegmentCount(
+        searchStartState,
+        searchEndState,
+        blockRange,
+      );
 
-      // Nothing changed, skip this range
-      if (!nonceChanged && !balanceChanged) {
+      // Skip if no activity detected
+      if (segmentCount === 0) {
         return;
       }
 
-      // Get midpoint state
-      const midBlock = Math.floor((startBlock + endBlock) / 2);
-      await this.delay(this.requestDelay);
-      const midState = await this.getState(address, midBlock);
+      // For binary (2 segments), use optimized path
+      if (segmentCount <= 2) {
+        const midBlock = Math.floor((searchStartBlock + searchEndBlock) / 2);
+        await this.delay(this.requestDelay);
+        const midState = await this.getState(address, midBlock);
 
-      // Check which halves have changes
-      const leftNonceChanged = startState.nonce !== midState.nonce;
-      const leftBalanceChanged = startState.balance !== midState.balance;
-      const rightNonceChanged = midState.nonce !== endState.nonce;
-      const rightBalanceChanged = midState.balance !== endState.balance;
+        const leftChanged =
+          searchStartState.nonce !== midState.nonce ||
+          searchStartState.balance !== midState.balance;
+        const rightChanged =
+          midState.nonce !== searchEndState.nonce || midState.balance !== searchEndState.balance;
 
-      const leftChanged = leftNonceChanged || leftBalanceChanged;
-      const rightChanged = rightNonceChanged || rightBalanceChanged;
+        // Search RIGHT (newest) first to find newest transactions sooner
+        if (rightChanged) {
+          await search(midBlock, searchEndBlock, midState, searchEndState, depth + 1);
+        }
 
-      // Search RIGHT (newest) first to find newest transactions sooner
-      if (rightChanged) {
-        await search(midBlock, endBlock, midState, endState, depth + 1);
+        // Then search LEFT (older) if we still need more transactions
+        if (leftChanged && (limit === 0 || allTransactions.length < limit)) {
+          await search(searchStartBlock, midBlock, searchStartState, midState, depth + 1);
+        }
+        return;
       }
 
-      // Then search LEFT (older) if we still need more transactions (0 means no limit)
-      if (leftChanged && (limit === 0 || allTransactions.length < limit)) {
-        await search(startBlock, midBlock, startState, midState, depth + 1);
+      // Multi-segment adaptive branching (4 or 8 segments)
+      console.log(
+        "[Search] Using",
+        segmentCount,
+        "segments for range",
+        searchStartBlock,
+        "-",
+        searchEndBlock,
+        "(nonce delta:",
+        searchEndState.nonce - searchStartState.nonce,
+        ")",
+      );
+
+      // Calculate boundaries and fetch internal boundary states in batches
+      const boundaries = this.calculateBoundaries(searchStartBlock, searchEndBlock, segmentCount);
+      const internalBlocks = boundaries.slice(1, -1); // Exclude start and end (already known)
+      const stateMap = await this.getStatesInBatches(address, internalBlocks);
+
+      // Add known start/end states
+      stateMap.set(searchStartBlock, searchStartState);
+      stateMap.set(searchEndBlock, searchEndState);
+
+      // Build segments with activity info
+      const segments: Array<{
+        start: number;
+        end: number;
+        startState: AddressState;
+        endState: AddressState;
+        hasChanges: boolean;
+      }> = [];
+
+      for (let i = 0; i < segmentCount; i++) {
+        const segStart = boundaries[i];
+        const segEnd = boundaries[i + 1];
+
+        // Skip if boundaries are missing (shouldn't happen, but TypeScript requires check)
+        if (segStart === undefined || segEnd === undefined) {
+          continue;
+        }
+
+        const segStartState = stateMap.get(segStart);
+        const segEndState = stateMap.get(segEnd);
+
+        if (!segStartState || !segEndState) {
+          console.warn("[Search] Missing state for segment", i, "- skipping");
+          continue;
+        }
+
+        const hasChanges =
+          segStartState.nonce !== segEndState.nonce ||
+          segStartState.balance !== segEndState.balance;
+
+        segments.push({
+          start: segStart,
+          end: segEnd,
+          startState: segStartState,
+          endState: segEndState,
+          hasChanges,
+        });
+      }
+
+      // Process segments RIGHT-TO-LEFT (newest first)
+      for (let i = segments.length - 1; i >= 0; i--) {
+        if (limit > 0 && allTransactions.length >= limit) {
+          break;
+        }
+
+        const segment = segments[i];
+        if (segment?.hasChanges) {
+          await search(segment.start, segment.end, segment.startState, segment.endState, depth + 1);
+        }
       }
     };
 
@@ -530,15 +711,15 @@ export class AddressTransactionSearch {
     const sentCount = limitedTxs.filter((t) => t.type === "sent").length;
     const receivedCount = limitedTxs.filter((t) => t.type === "received").length;
     const internalCount = limitedTxs.filter((t) => t.type === "internal").length;
+    const rpcCalls = this.nonceCache.size + this.balanceCache.size;
+    const elapsedMs = Math.round(performance.now() - searchStartTime);
 
     console.log(
-      "[AddressTransactionSearch] Search complete. Total found:",
-      allTransactions.length,
-      "Returning:",
-      limitedTxs.length,
-      "(internal:",
-      internalCount,
-      ")",
+      `[AddressTransactionSearch] Search complete:`,
+      `\n  Transactions: ${limitedTxs.length} (sent: ${sentCount}, received: ${receivedCount}, internal: ${internalCount})`,
+      `\n  Blocks with activity: ${sortedBlocks.length}`,
+      `\n  RPC calls: ${rpcCalls} (nonce: ${this.nonceCache.size}, balance: ${this.balanceCache.size})`,
+      `\n  Elapsed: ${elapsedMs}ms (${(elapsedMs / 1000).toFixed(2)}s)`,
     );
 
     return {
@@ -550,7 +731,8 @@ export class AddressTransactionSearch {
         sentCount,
         receivedCount,
         internalCount,
-        rpcCalls: this.nonceCache.size + this.balanceCache.size,
+        rpcCalls,
+        elapsedMs,
       },
     };
   }
