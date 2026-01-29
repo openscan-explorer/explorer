@@ -574,3 +574,16 @@ export interface DecodedContenthash {
   type: string;
   url: string;
 }
+
+// ==================== ETHEREUM PROVIDER TYPES ====================
+
+/**
+ * Ethereum provider interface for wallet interactions (e.g., MetaMask)
+ * Based on EIP-1193 and common wallet extensions
+ */
+export interface EthereumProvider {
+  isMetaMask?: boolean;
+  request: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
+  on?: (event: string, callback: (...args: unknown[]) => void) => void;
+  removeListener?: (event: string, callback: (...args: unknown[]) => void) => void;
+}
