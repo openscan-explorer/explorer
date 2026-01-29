@@ -38,6 +38,7 @@ import {
   LazyTokenDetails,
   LazyTx,
   LazyTxs,
+  preloadAllRoutes,
 } from "./components/LazyComponents";
 import { SettingsProvider, useSettings, useTheme } from "./context/SettingsContext";
 import { useAppReady, useOnAppReady } from "./hooks/useAppReady";
@@ -80,6 +81,13 @@ function AppContent() {
 
   const { fullyReady } = useAppReady();
   const { settings } = useSettings();
+
+  // Preload all route chunks once the app is ready
+  useEffect(() => {
+    if (fullyReady) {
+      preloadAllRoutes();
+    }
+  }, [fullyReady]);
 
   return (
     <>
