@@ -19,19 +19,19 @@ export function NetworkBlockIndicator({ className }: NetworkBlockIndicatorProps)
   const [gasPrice, setGasPrice] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Extract networkId from the pathname (e.g., /1/blocks -> 1)
-  const networkId = useMemo(() => {
+  // Extract chainId from the pathname (e.g., /1/blocks -> 1)
+  const chainId = useMemo(() => {
     const pathSegments = location.pathname.split("/").filter(Boolean);
     return pathSegments[0] && !Number.isNaN(Number(pathSegments[0]))
       ? Number(pathSegments[0])
       : null;
   }, [location.pathname]);
 
-  const network = networkId ? getNetwork(networkId) : undefined;
-  const dataService = useDataService(networkId || 1);
+  const network = chainId ? getNetwork(chainId) : undefined;
+  const dataService = useDataService(chainId || 1);
 
   useEffect(() => {
-    if (!networkId) {
+    if (!chainId) {
       setBlockNumber(null);
       setGasPrice(null);
       return;
@@ -41,6 +41,7 @@ export function NetworkBlockIndicator({ className }: NetworkBlockIndicatorProps)
     let intervalId: NodeJS.Timeout | null = null;
 
     const fetchData = async () => {
+      const networkId = `eip155:${chainId}`;
       try {
         const urls = getRPCUrls(networkId, rpcUrls);
         const client = new RpcClient(urls[0] || "");
@@ -56,8 +57,8 @@ export function NetworkBlockIndicator({ className }: NetworkBlockIndicatorProps)
         }
       }
 
-      // Fetch gas price
-      if (dataService && rpcUrls[networkId]) {
+      // Fetch gas price (only for EVM networks)
+      if (dataService?.isEVM() && rpcUrls[networkId]) {
         try {
           const gasPricesResult = await dataService.networkAdapter.getGasPrices();
           if (isMounted && gasPricesResult.data) {
@@ -81,9 +82,9 @@ export function NetworkBlockIndicator({ className }: NetworkBlockIndicatorProps)
         clearInterval(intervalId);
       }
     };
-  }, [networkId, rpcUrls, dataService]);
+  }, [chainId, rpcUrls, dataService]);
 
-  if (!networkId || !network) return null;
+  if (!chainId || !network) return null;
 
   return (
     <div
@@ -106,11 +107,11 @@ export function NetworkBlockIndicator({ className }: NetworkBlockIndicatorProps)
         }
         role="button"
         tabIndex={0}
-        onClick={() => navigate(`/${networkId}/gastracker`)}
+        onClick={() => navigate(`/${chainId}/gastracker`)}
         onKeyDown={(e) => {
           if (e.key === "Enter" || e.key === " ") {
             e.preventDefault();
-            navigate(`/${networkId}/gastracker`);
+            navigate(`/${chainId}/gastracker`);
           }
         }}
       >

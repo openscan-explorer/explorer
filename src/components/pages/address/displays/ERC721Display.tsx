@@ -58,7 +58,8 @@ const ERC721Display: React.FC<ERC721DisplayProps> = ({
   useEffect(() => {
     const fetchOnChainData = async () => {
       const chainId = Number(networkId);
-      const rpcUrlsForChain = rpcUrls[chainId as keyof typeof rpcUrls];
+      const rpcNetworkId = `eip155:${chainId}`;
+      const rpcUrlsForChain = rpcUrls[rpcNetworkId];
       if (!rpcUrlsForChain) return;
 
       const rpcUrl = Array.isArray(rpcUrlsForChain) ? rpcUrlsForChain[0] : rpcUrlsForChain;

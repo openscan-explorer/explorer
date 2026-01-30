@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import Markdown from "react-markdown";
 import { fetchNetworkProfile, isSubscriptionActive } from "../../../services/MetadataService";
 import type { NetworkConfig } from "../../../types";
+import { getChainIdFromNetwork } from "../../../utils/networkResolver";
 import TierBadge from "../../common/TierBadge";
 
 interface ProfileDisplayProps {
@@ -69,7 +70,7 @@ const ProfileDisplay: React.FC<ProfileDisplayProps> = React.memo(({ network }) =
       {profileState === "collapsed" && (
         <button type="button" className="profile-expand-button" onClick={handleExpandClick}>
           <span className="profile-expand-text">More about {network?.name}</span>
-          {network?.networkId !== 1 && (
+          {getChainIdFromNetwork(network) !== 1 && (
             <TierBadge subscription={network?.subscription} size="small" />
           )}
           <span className="profile-expand-icon">▼</span>
@@ -101,7 +102,7 @@ const ProfileDisplay: React.FC<ProfileDisplayProps> = React.memo(({ network }) =
           <div className="profile-header">
             <h2 className="profile-title">About {network?.name}</h2>
             <div className="profile-header-actions">
-              {network?.networkId !== 1 && (
+              {getChainIdFromNetwork(network) !== 1 && (
                 <TierBadge subscription={network?.subscription} size="medium" showSuffix />
               )}
               <button

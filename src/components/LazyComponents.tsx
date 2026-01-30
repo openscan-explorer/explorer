@@ -4,6 +4,7 @@ import Loading from "./common/Loading";
 // Lazy load page components
 const Home = lazy(() => import("./pages/home"));
 const Chain = lazy(() => import("./pages/network"));
+const BitcoinNetwork = lazy(() => import("./pages/bitcoin"));
 const Blocks = lazy(() => import("./pages/blocks"));
 const Block = lazy(() => import("./pages/block"));
 const Txs = lazy(() => import("./pages/txs"));
@@ -37,6 +38,7 @@ export const withSuspense = (Component: React.ComponentType<any>) => {
 // Export lazy components wrapped with Suspense
 export const LazyHome = withSuspense(Home);
 export const LazyChain = withSuspense(Chain);
+export const LazyBitcoinNetwork = withSuspense(BitcoinNetwork);
 export const LazyBlocks = withSuspense(Blocks);
 export const LazyBlock = withSuspense(Block);
 export const LazyTxs = withSuspense(Txs);
@@ -62,6 +64,7 @@ export function preloadAllRoutes() {
   console.log("Preloading all route chunks...");
   import("./pages/home");
   import("./pages/network");
+  import("./pages/bitcoin");
   import("./pages/blocks");
   import("./pages/block");
   import("./pages/txs");

@@ -129,7 +129,8 @@ export default function Address() {
         setAddressData(addressData);
 
         // Detect address type using the utility
-        const rpcUrlsForChain = rpcUrls[numericNetworkId as keyof typeof rpcUrls];
+        const rpcNetworkId = `eip155:${numericNetworkId}`;
+        const rpcUrlsForChain = rpcUrls[rpcNetworkId];
         const rpcUrl = Array.isArray(rpcUrlsForChain) ? rpcUrlsForChain[0] : rpcUrlsForChain;
 
         if (rpcUrl) {

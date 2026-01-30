@@ -30,7 +30,7 @@ export default function BlockPage() {
   const block = useSelectedData(blockResult, selectedProvider);
 
   useEffect(() => {
-    if (!dataService || blockNumber === undefined) {
+    if (!dataService || blockNumber === undefined || !dataService.isEVM()) {
       setLoading(false);
       return;
     }

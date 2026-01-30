@@ -82,7 +82,8 @@ const NFTTokenDetails: React.FC = () => {
   const numericNetworkId = Number(networkId) || 1;
 
   // Get RPC URL
-  const rpcUrlsForChain = rpcUrls[numericNetworkId as keyof typeof rpcUrls];
+  const rpcNetworkId = `eip155:${numericNetworkId}`;
+  const rpcUrlsForChain = rpcUrls[rpcNetworkId];
   const rpcUrl = Array.isArray(rpcUrlsForChain) ? rpcUrlsForChain[0] : rpcUrlsForChain;
 
   // Detect NFT type

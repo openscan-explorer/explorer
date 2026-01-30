@@ -32,14 +32,15 @@ const AccountInfoCards: React.FC<AccountInfoCardsProps> = ({
   // Fetch native token price
   useEffect(() => {
     const fetchPrice = async () => {
-      const rpcUrlsForChain = rpcUrls[networkId as keyof typeof rpcUrls];
+      const rpcNetworkId = `eip155:${networkId}`;
+      const rpcUrlsForChain = rpcUrls[rpcNetworkId];
       if (!rpcUrlsForChain) return;
 
       const rpcUrl = Array.isArray(rpcUrlsForChain) ? rpcUrlsForChain[0] : rpcUrlsForChain;
       if (!rpcUrl) return;
 
       // Get mainnet RPC for L2s
-      const mainnetRpcUrls = rpcUrls[1];
+      const mainnetRpcUrls = rpcUrls["eip155:1"];
       const mainnetRpcUrl = Array.isArray(mainnetRpcUrls) ? mainnetRpcUrls[0] : mainnetRpcUrls;
 
       setPriceLoading(true);

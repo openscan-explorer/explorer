@@ -253,7 +253,8 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
       try {
         // Get RPC URL for the current chain
         const networkIdNum = Number(networkId);
-        const rpcUrlsForChain = rpcUrls[networkIdNum as keyof typeof rpcUrls];
+        const rpcNetworkId = `eip155:${networkIdNum}`;
+        const rpcUrlsForChain = rpcUrls[rpcNetworkId];
 
         if (!rpcUrlsForChain) {
           throw new Error(`No RPC URL configured for chain ${networkId}`);

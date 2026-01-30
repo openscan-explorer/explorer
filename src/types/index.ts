@@ -1,6 +1,13 @@
 import type { EthLog } from "@openscan/network-connectors";
 import type React from "react";
 
+// ==================== NETWORK TYPES ====================
+
+/**
+ * Network type - EVM or Bitcoin
+ */
+export type NetworkType = "evm" | "bitcoin";
+
 // ==================== CORE DOMAIN TYPES ====================
 
 export interface NetworkStats {
@@ -116,6 +123,38 @@ export interface TransactionReceiptOptimism extends TransactionReceipt {
   l1FeeScalar: string;
 }
 
+// ==================== BITCOIN TYPES ====================
+
+/**
+ * Bitcoin network statistics from getblockchaininfo + getmempoolinfo
+ */
+export interface BitcoinNetworkStats {
+  blockHeight: number;
+  difficulty: number;
+  mempoolSize: number;
+  mempoolBytes: number;
+  chain: string;
+  bestBlockHash: string;
+  connections?: number;
+}
+
+/**
+ * Bitcoin block data
+ */
+export interface BitcoinBlock {
+  hash: string;
+  height: number;
+  time: number;
+  nTx: number;
+  size: number;
+  weight: number;
+  merkleRoot: string;
+  previousBlockHash?: string;
+  version: number;
+  bits: string;
+  nonce: number;
+}
+
 export interface Address {
   address: string;
   balance: string;
@@ -209,7 +248,7 @@ export interface IAppContext {
   enabledNetworks: NetworkConfig[];
   networksLoading: boolean;
   networksError: string | null;
-  getNetwork: (networkId: number) => NetworkConfig | undefined;
+  getNetwork: (networkId: string | number) => NetworkConfig | undefined;
   reloadNetworks: () => Promise<void>;
 }
 
@@ -243,7 +282,9 @@ export interface NetworkLink {
  * Network configuration interface
  */
 export interface NetworkConfig {
-  networkId: number;
+  type: NetworkType;
+  networkId: string; // CAIP-2 format (e.g., "eip155:1", "bip122:000...")
+  slug?: string; // URL routing (e.g., "btc", "eth", "1")
   name: string;
   shortName: string;
   description?: string;
@@ -266,8 +307,8 @@ export interface NetworkConfig {
 
 export type RPCUrls = string[];
 
-// RPC URLs are now dynamically loaded from metadata, so we use a flexible Record type
-export type RpcUrlsContextType = Record<number, RPCUrls>;
+// RPC URLs are keyed by networkId (CAIP-2 format, e.g., "eip155:1", "bip122:000...")
+export type RpcUrlsContextType = Record<string, RPCUrls>;
 
 // ==================== SETTINGS TYPES ====================
 

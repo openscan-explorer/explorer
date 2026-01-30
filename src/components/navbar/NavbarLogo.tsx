@@ -4,6 +4,7 @@ import type { NetworkConfig } from "../../config/networks";
 import { getSubdomainForNetwork, subdomainConfig } from "../../config/subdomains";
 import { useNetworks } from "../../context/AppContext";
 import { getBaseDomainUrl, getSubdomain, getSubdomainRedirect } from "../../utils/subdomainUtils";
+import { getChainIdFromNetwork } from "../../utils/networkResolver";
 import NetworkIcon from "../common/NetworkIcon";
 
 // OpenScan cube SVG component
@@ -75,7 +76,7 @@ export default function NavbarLogo() {
   const { enabledNetworks } = useNetworks();
   const network = useMemo(() => {
     if (!activeNetworkId) return undefined;
-    return enabledNetworks.find((n) => n.networkId === activeNetworkId);
+    return enabledNetworks.find((n) => getChainIdFromNetwork(n) === activeNetworkId);
   }, [activeNetworkId, enabledNetworks]);
 
   // Get all networks that have subdomain support (enabled networks with subdomain config)
@@ -86,8 +87,8 @@ export default function NavbarLogo() {
 
     const networks: NetworkConfig[] = [];
     for (const config of networkSubdomains) {
-      const networkId = Number(config.redirect.slice(1));
-      const networkConfig = enabledNetworks.find((n) => n.networkId === networkId);
+      const chainId = Number(config.redirect.slice(1));
+      const networkConfig = enabledNetworks.find((n) => getChainIdFromNetwork(n) === chainId);
       if (networkConfig) {
         networks.push(networkConfig);
       }
@@ -97,7 +98,7 @@ export default function NavbarLogo() {
 
   // Other networks (not the current one) for the dropdown
   const otherNetworks = useMemo(() => {
-    return networksWithSubdomain.filter((n) => n.networkId !== activeNetworkId);
+    return networksWithSubdomain.filter((n) => getChainIdFromNetwork(n) !== activeNetworkId);
   }, [networksWithSubdomain, activeNetworkId]);
 
   // Determine if we're currently on the subdomain for this network
@@ -192,10 +193,10 @@ export default function NavbarLogo() {
           {/* Other networks with subdomain support */}
           {otherNetworks.map((otherNetwork) => (
             <button
-              key={otherNetwork.networkId}
+              key={getChainIdFromNetwork(otherNetwork)}
               type="button"
               className="navbar-logo-dropdown-item"
-              onClick={() => handleGoToNetwork(otherNetwork.networkId)}
+              onClick={() => handleGoToNetwork(getChainIdFromNetwork(otherNetwork))}
             >
               <NetworkIcon network={otherNetwork} size={24} />
               <span>{otherNetwork.name}</span>

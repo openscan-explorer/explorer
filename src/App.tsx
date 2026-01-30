@@ -24,7 +24,6 @@ import {
   LazyAddress,
   LazyBlock,
   LazyBlocks,
-  LazyChain,
   LazyContact,
   LazyDevTools,
   LazyGasTracker,
@@ -40,6 +39,7 @@ import {
   LazyTxs,
   preloadAllRoutes,
 } from "./components/LazyComponents";
+import NetworkRouter from "./components/NetworkRouter";
 import { SettingsProvider, useSettings, useTheme } from "./context/SettingsContext";
 import { useAppReady, useOnAppReady } from "./hooks/useAppReady";
 
@@ -122,7 +122,7 @@ function AppContent() {
               <Route path="subscriptions" element={<LazySubscriptions />} />
               <Route path="profile/:profileType/:profileId" element={<LazyProfile />} />
               <Route path="supporters" element={<LazySupporters />} />
-              <Route path=":networkId" element={<LazyChain />} />
+              <Route path=":networkId" element={<NetworkRouter />} />
               <Route path=":networkId/gastracker" element={<LazyGasTracker />} />
               <Route path=":networkId/blocks" element={<LazyBlocks />} />
               <Route path=":networkId/block/:filter" element={<LazyBlock />} />

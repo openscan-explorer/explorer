@@ -33,7 +33,8 @@ const CustomTokenModal: React.FC<CustomTokenModalProps> = ({
   const [validationError, setValidationError] = useState<string | null>(null);
 
   const getRpcUrl = useCallback((): string | null => {
-    const rpcUrlsForChain = rpcUrls[networkId as keyof typeof rpcUrls];
+    const rpcNetworkId = `eip155:${networkId}`;
+    const rpcUrlsForChain = rpcUrls[rpcNetworkId];
     if (!rpcUrlsForChain) return null;
     const url = Array.isArray(rpcUrlsForChain) ? rpcUrlsForChain[0] : rpcUrlsForChain;
     return url ?? null;
