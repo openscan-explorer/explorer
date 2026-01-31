@@ -3,34 +3,35 @@ import { Link, useSearchParams } from "react-router-dom";
 import { getEnabledNetworks, getNetworkLogoUrlById } from "../../../config/networks";
 import { ENSService } from "../../../services/ENS/ENSService";
 import type { NetworkConfig } from "../../../types";
+import { getChainIdFromNetwork } from "../../../utils/networkResolver";
 
 type SearchType = "address" | "transaction" | "block" | "ens" | "unknown";
 
 interface SearchTypeConfig {
   badge: string;
-  getRoute: (networkId: number, query: string) => string;
+  getRoute: (chainId: number, query: string) => string;
 }
 
 const SEARCH_TYPE_CONFIG: Record<SearchType, SearchTypeConfig> = {
   address: {
     badge: "Address",
-    getRoute: (networkId, query) => `/${networkId}/address/${query}`,
+    getRoute: (chainId, query) => `/${chainId}/address/${query}`,
   },
   transaction: {
     badge: "TX Hash",
-    getRoute: (networkId, query) => `/${networkId}/tx/${query}`,
+    getRoute: (chainId, query) => `/${chainId}/tx/${query}`,
   },
   block: {
     badge: "Block",
-    getRoute: (networkId, query) => `/${networkId}/block/${query}`,
+    getRoute: (chainId, query) => `/${chainId}/block/${query}`,
   },
   ens: {
     badge: "ENS",
-    getRoute: (networkId, query) => `/${networkId}/address/${query}`,
+    getRoute: (chainId, query) => `/${chainId}/address/${query}`,
   },
   unknown: {
     badge: "Unknown",
-    getRoute: (networkId, query) => `/${networkId}/address/${query}`,
+    getRoute: (chainId, query) => `/${chainId}/address/${query}`,
   },
 };
 
@@ -75,8 +76,9 @@ interface NetworkListItemProps {
 
 function NetworkListItem({ network, query, searchType }: NetworkListItemProps) {
   const config = SEARCH_TYPE_CONFIG[searchType];
-  const route = config.getRoute(network.networkId, query);
-  const logoUrl = getNetworkLogoUrlById(network.networkId);
+  const chainId = getChainIdFromNetwork(network);
+  const route = chainId ? config.getRoute(chainId, query) : "#";
+  const logoUrl = chainId ? getNetworkLogoUrlById(chainId) : undefined;
 
   return (
     <Link
@@ -113,13 +115,13 @@ export default function Search() {
   const searchType = useMemo(() => detectSearchType(query), [query]);
   const config = SEARCH_TYPE_CONFIG[searchType];
 
-  // Get networks to display
+  // Get networks to display (only EVM networks with chainId)
   const networks = useMemo(() => {
-    const allNetworks = getEnabledNetworks();
+    const allNetworks = getEnabledNetworks().filter((n) => getChainIdFromNetwork(n) !== undefined);
 
     // For ENS names, only show Ethereum mainnet
     if (searchType === "ens") {
-      return allNetworks.filter((n) => n.networkId === 1);
+      return allNetworks.filter((n) => getChainIdFromNetwork(n) === 1);
     }
 
     // For unknown types, don't show any networks

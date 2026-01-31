@@ -1,12 +1,14 @@
 /**
- * Hook for fetching network dashboard data with auto-refresh
+ * Hook for fetching EVM network dashboard data with auto-refresh
  * Combines network stats, price, latest blocks, and transactions
+ * Note: For Bitcoin networks, use useBitcoinDashboard instead
  */
 
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { AppContext } from "../context/AppContext";
 import { getNativeTokenPrice } from "../services/PriceService";
-import type { Block, GasPrices, NetworkStats, Transaction } from "../types";
+import type { Block, GasPrices, NetworkConfig, NetworkStats, Transaction } from "../types";
+import { getChainIdFromNetwork } from "../utils/networkResolver";
 import { useDataService } from "./useDataService";
 
 const REFRESH_INTERVAL = 10000; // 10 seconds
@@ -37,31 +39,35 @@ const initialState: DashboardData = {
   lastUpdated: null,
 };
 
-export function useNetworkDashboard(networkId: number): DashboardData {
+export function useNetworkDashboard(network: NetworkConfig | number): DashboardData {
   const { rpcUrls } = useContext(AppContext);
-  const dataService = useDataService(networkId);
+  const dataService = useDataService(network);
   const [data, setData] = useState<DashboardData>(initialState);
   const isFetchingRef = useRef(false);
 
+  // Get networkId for RPC lookups and chainId for EVM-specific operations (price)
+  const networkId = typeof network === "number" ? `eip155:${network}` : network.networkId;
+  const chainId = typeof network === "number" ? network : getChainIdFromNetwork(network);
   // Get RPC URL for the network and mainnet (for L2 ETH price)
   const rpcUrl = rpcUrls[networkId]?.[0] || null;
-  const mainnetRpcUrl = rpcUrls[1]?.[0] || null;
+  const mainnetRpcUrl = rpcUrls["eip155:1"]?.[0] || null;
 
   const fetchDashboardData = useCallback(async () => {
-    if (!dataService || isFetchingRef.current) {
+    if (!dataService || !dataService.isEVM() || isFetchingRef.current) {
       return;
     }
 
     isFetchingRef.current = true;
 
     try {
+      const adapter = dataService.getEVMAdapter();
       // Fetch network stats, gas prices, and price in parallel
       // For L2s, price is fetched from mainnet pools
       const [statsResult, gasPricesResult, priceResult] = await Promise.all([
-        dataService.networkAdapter.getNetworkStats(),
-        dataService.networkAdapter.getGasPrices().catch(() => null),
-        rpcUrl
-          ? getNativeTokenPrice(networkId, rpcUrl, mainnetRpcUrl || undefined)
+        adapter.getNetworkStats(),
+        adapter.getGasPrices().catch(() => null),
+        rpcUrl && chainId
+          ? getNativeTokenPrice(chainId, rpcUrl, mainnetRpcUrl || undefined)
           : Promise.resolve(null),
       ]);
 
@@ -76,7 +82,7 @@ export function useNetworkDashboard(networkId: number): DashboardData {
       ).filter((n) => n >= 0);
 
       const blockResults = await Promise.all(
-        blockNumbers.map((num) => dataService.networkAdapter.getBlock(num).catch(() => null)),
+        blockNumbers.map((num) => adapter.getBlock(num).catch(() => null)),
       );
 
       const blocks = blockResults
@@ -97,9 +103,7 @@ export function useNetworkDashboard(networkId: number): DashboardData {
 
       // Fetch transaction details
       const txResults = await Promise.all(
-        allTxHashes.map((hash) =>
-          dataService.networkAdapter.getTransaction(hash).catch(() => null),
-        ),
+        allTxHashes.map((hash) => adapter.getTransaction(hash).catch(() => null)),
       );
 
       const transactions = txResults
@@ -126,7 +130,7 @@ export function useNetworkDashboard(networkId: number): DashboardData {
     } finally {
       isFetchingRef.current = false;
     }
-  }, [dataService, networkId, rpcUrl, mainnetRpcUrl]);
+  }, [dataService, chainId, rpcUrl, mainnetRpcUrl]);
 
   // Initial fetch
   useEffect(() => {

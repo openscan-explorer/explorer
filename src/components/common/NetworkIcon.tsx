@@ -2,6 +2,7 @@ import type React from "react";
 import { useState } from "react";
 import { getNetworkLogoUrl } from "../../services/MetadataService";
 import type { NetworkConfig } from "../../types";
+import { getChainIdFromNetwork } from "../../utils/networkResolver";
 
 interface NetworkIconProps {
   network: NetworkConfig;
@@ -44,8 +45,8 @@ const LocalhostIcon: React.FC<{ color: string; size: number }> = ({ color, size 
 export const NetworkIcon: React.FC<NetworkIconProps> = ({ network, size = 32 }) => {
   const [imageError, setImageError] = useState(false);
 
-  // Use local SVG for localhost (networkId 31337)
-  if (network.networkId === 31337) {
+  // Use local SVG for localhost (chainId 31337)
+  if (getChainIdFromNetwork(network) === 31337) {
     return <LocalhostIcon color={network.color ?? "#4A5568"} size={size} />;
   }
 

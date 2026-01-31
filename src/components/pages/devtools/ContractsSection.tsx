@@ -309,7 +309,8 @@ const ContractsSection: React.FC = () => {
         throw new Error("Storage slot is required");
       }
 
-      const rpcUrlsForChain = rpcUrls[storageChainId as keyof typeof rpcUrls];
+      const rpcNetworkId = `eip155:${storageChainId}`;
+      const rpcUrlsForChain = rpcUrls[rpcNetworkId];
       if (!rpcUrlsForChain || rpcUrlsForChain.length === 0) {
         throw new Error(`No RPC URL configured for chain ${storageChainId}`);
       }

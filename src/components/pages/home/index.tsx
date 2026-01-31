@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import type { NetworkConfig } from "../../../config/networks";
 import { useNetworks } from "../../../context/AppContext";
+import { getChainIdFromNetwork } from "../../../utils/networkResolver";
 import NetworkIcon from "../../common/NetworkIcon";
 import TierBadge from "../../common/TierBadge";
 import HomeSearchBar from "./HomeSearchBar";
@@ -11,9 +12,10 @@ interface NetworkCardProps {
 }
 
 const NetworkCard: React.FC<NetworkCardProps> = ({ network }) => {
+  const chainId = getChainIdFromNetwork(network);
   return (
     <Link
-      to={`/${network.networkId}`}
+      to={`/${chainId ?? network.slug}`}
       className="network-card-link"
       style={{ "--network-color": network.color } as React.CSSProperties}
     >
@@ -25,11 +27,13 @@ const NetworkCard: React.FC<NetworkCardProps> = ({ network }) => {
           <div className="network-card-info">
             <div className="network-card-title-row">
               <h3 className="network-card-title">{network.name}</h3>
-              {network.networkId !== 1 && (
+              {network.networkId !== "eip155:1" && (
                 <TierBadge subscription={network.subscription} size="small" />
               )}
             </div>
-            <div className="network-card-chain-id">Network ID: {network.networkId}</div>
+            {chainId !== undefined && (
+              <div className="network-card-chain-id">Chain ID: {chainId}</div>
+            )}
           </div>
         </div>
       </div>
@@ -43,11 +47,11 @@ export default function Home() {
 
   const { productionNetworks, testnetNetworks } = useMemo(() => {
     const isDevelopment = process.env.REACT_APP_ENVIRONMENT === "development";
-    const localhostNetworkId = 31337;
+    const localhostChainId = 31337;
 
     // In development, treat localhost as a production network (show with other networks)
     const isProductionNetwork = (n: (typeof enabledNetworks)[0]) => {
-      if (isDevelopment && n.networkId === localhostNetworkId) {
+      if (isDevelopment && getChainIdFromNetwork(n) === localhostChainId) {
         return true;
       }
       return !n.isTestnet;

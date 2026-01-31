@@ -16,6 +16,7 @@ import {
 } from "../config/networks";
 import { useWagmiConnection } from "../hooks/useWagmiConnection";
 import type { IAppContext, NetworkConfig, RpcUrlsContextType } from "../types";
+import { getChainIdFromNetwork } from "../utils/networkResolver";
 import { loadJsonFilesFromStorage, saveJsonFilesToStorage } from "../utils/artifactsStorage";
 import { getEffectiveRpcUrls, saveRpcUrlsToStorage } from "../utils/rpcStorage";
 
@@ -43,7 +44,7 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
   const [appReady, setAppReady] = useState<boolean>(false);
   const [resourcesLoaded, setResourcesLoaded] = useState<boolean>(false);
   const [isHydrated, setIsHydrated] = useState<boolean>(false);
-  const [rpcUrls, setRpcUrlsState] = useState<RpcUrlsContextType>({} as RpcUrlsContextType);
+  const [rpcUrls, setRpcUrlsState] = useState<RpcUrlsContextType>(() => getEffectiveRpcUrls());
   // biome-ignore lint/suspicious/noExplicitAny: <TODO>
   const [jsonFiles, setJsonFilesState] = useState<Record<string, any>>(() =>
     loadJsonFilesFromStorage(),
@@ -79,7 +80,10 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
   // Hardhat network config for local development
   const hardhatNetwork: NetworkConfig = useMemo(
     () => ({
-      networkId: 31337,
+      type: "evm" as const,
+      networkId: "eip155:31337",
+      chainId: 31337,
+      slug: "localhost",
       name: "Hardhat",
       shortName: "hardhat",
       description: "Local development network",
@@ -107,7 +111,11 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
       const hardhatInEnv = envNetworks?.split(",").some((id) => id.trim() === "31337");
 
       // Add Hardhat network if in development AND explicitly enabled
-      if (isDevelopment && hardhatInEnv && !loadedNetworks.some((n) => n.networkId === 31337)) {
+      if (
+        isDevelopment &&
+        hardhatInEnv &&
+        !loadedNetworks.some((n) => getChainIdFromNetwork(n) === 31337)
+      ) {
         loadedNetworks.push(hardhatNetwork);
       }
 
@@ -242,7 +250,7 @@ export function useNetworks() {
   };
 }
 
-export function useNetwork(networkId: number): NetworkConfig | undefined {
+export function useNetwork(networkId: string | number): NetworkConfig | undefined {
   const { getNetwork } = useNetworks();
   return getNetwork(networkId);
 }

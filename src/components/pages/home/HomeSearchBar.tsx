@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { NetworkConfig } from "../../../config/networks";
 import { ENSService } from "../../../services/ENS/ENSService";
+import { getChainIdFromNetwork } from "../../../utils/networkResolver";
 import NetworkIcon from "../../common/NetworkIcon";
 
 type SearchType = "address" | "transaction" | "block" | "ens" | null;
@@ -105,17 +106,17 @@ export default function HomeSearchBar({ networks }: HomeSearchBarProps) {
       const term = searchTerm.trim();
       if (!term || !searchType) return;
 
-      const networkId = network.networkId;
+      const chainId = getChainIdFromNetwork(network);
 
       switch (searchType) {
         case "transaction":
-          navigate(`/${networkId}/tx/${term}`);
+          navigate(`/${chainId}/tx/${term}`);
           break;
         case "address":
-          navigate(`/${networkId}/address/${term}`);
+          navigate(`/${chainId}/address/${term}`);
           break;
         case "block":
-          navigate(`/${networkId}/block/${term}`);
+          navigate(`/${chainId}/block/${term}`);
           break;
         case "ens":
           // Navigate directly to the ENS URL - the address page will resolve it
@@ -131,7 +132,7 @@ export default function HomeSearchBar({ networks }: HomeSearchBarProps) {
 
   // For ENS, only show Mainnet in dropdown
   const displayNetworks =
-    searchType === "ens" ? networks.filter((n) => n.networkId === 1) : networks;
+    searchType === "ens" ? networks.filter((n) => getChainIdFromNetwork(n) === 1) : networks;
 
   return (
     <div className="home-search-container" ref={containerRef}>

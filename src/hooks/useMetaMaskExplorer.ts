@@ -1,5 +1,6 @@
 import { useCallback, useMemo } from "react";
 import type { NetworkMetadata } from "../services/MetadataService";
+import { extractChainIdFromNetworkId } from "../utils/networkResolver";
 
 // Networks that cannot use wallet_addEthereumChain
 // Chain ID 1 (Mainnet): MetaMask blocks this for security reasons
@@ -18,11 +19,20 @@ export interface UseMetaMaskExplorerReturn {
 }
 
 /**
+ * Get chainId from network metadata
+ */
+function getChainId(network: NetworkMetadata): number | undefined {
+  return network.chainId ?? extractChainIdFromNetworkId(network.networkId);
+}
+
+/**
  * Build the chain parameters required by wallet_addEthereumChain (EIP-3085)
  */
 function buildChainParams(network: NetworkMetadata, rpcUrls: string[], explorerUrl: string) {
+  const chainId = getChainId(network);
+  if (!chainId) throw new Error("Cannot build chain params without chainId");
   return {
-    chainId: `0x${network.chainId.toString(16)}`,
+    chainId: `0x${chainId.toString(16)}`,
     chainName: network.name,
     nativeCurrency: {
       name: network.currency,
@@ -59,8 +69,14 @@ export function useMetaMaskExplorer(): UseMetaMaskExplorerReturn {
         return { success: false, error: "MetaMask not detected" };
       }
 
+      // Get chainId from network
+      const chainId = getChainId(network);
+      if (!chainId) {
+        return { success: false, error: "Network does not have a valid chainId" };
+      }
+
       // Check if network is supported
-      if (!isSupported(network.chainId)) {
+      if (!isSupported(chainId)) {
         return { success: false, error: "Network not supported for this operation" };
       }
 
@@ -70,7 +86,7 @@ export function useMetaMaskExplorer(): UseMetaMaskExplorerReturn {
       }
 
       // Build the explorer URL using the OpenScan ENS domain
-      const explorerUrl = `https://openscan.eth.link/#/${network.chainId}/`;
+      const explorerUrl = `https://openscan.eth.link/#/${chainId}/`;
 
       // Build chain parameters
       const chainParams = buildChainParams(network, rpcUrls, explorerUrl);

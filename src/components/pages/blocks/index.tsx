@@ -59,7 +59,7 @@ export default function Blocks() {
   const fromBlock = fromBlockParam ? Number(fromBlockParam) : null;
 
   useEffect(() => {
-    if (!dataService) {
+    if (!dataService || !dataService.isEVM()) {
       setLoading(false);
       return;
     }

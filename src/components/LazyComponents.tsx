@@ -4,6 +4,12 @@ import Loading from "./common/Loading";
 // Lazy load page components
 const Home = lazy(() => import("./pages/home"));
 const Chain = lazy(() => import("./pages/network"));
+const BitcoinNetwork = lazy(() => import("./pages/bitcoin"));
+const BitcoinBlockPage = lazy(() => import("./pages/bitcoin/BitcoinBlockPage"));
+const BitcoinBlocksPage = lazy(() => import("./pages/bitcoin/BitcoinBlocksPage"));
+const BitcoinTransactionPage = lazy(() => import("./pages/bitcoin/BitcoinTransactionPage"));
+const BitcoinTransactionsPage = lazy(() => import("./pages/bitcoin/BitcoinTransactionsPage"));
+const BitcoinAddressPage = lazy(() => import("./pages/bitcoin/BitcoinAddressPage"));
 const Blocks = lazy(() => import("./pages/blocks"));
 const Block = lazy(() => import("./pages/block"));
 const Txs = lazy(() => import("./pages/txs"));
@@ -37,6 +43,12 @@ export const withSuspense = (Component: React.ComponentType<any>) => {
 // Export lazy components wrapped with Suspense
 export const LazyHome = withSuspense(Home);
 export const LazyChain = withSuspense(Chain);
+export const LazyBitcoinNetwork = withSuspense(BitcoinNetwork);
+export const LazyBitcoinBlock = withSuspense(BitcoinBlockPage);
+export const LazyBitcoinBlocks = withSuspense(BitcoinBlocksPage);
+export const LazyBitcoinTx = withSuspense(BitcoinTransactionPage);
+export const LazyBitcoinTxs = withSuspense(BitcoinTransactionsPage);
+export const LazyBitcoinAddress = withSuspense(BitcoinAddressPage);
 export const LazyBlocks = withSuspense(Blocks);
 export const LazyBlock = withSuspense(Block);
 export const LazyTxs = withSuspense(Txs);
@@ -62,6 +74,12 @@ export function preloadAllRoutes() {
   console.log("Preloading all route chunks...");
   import("./pages/home");
   import("./pages/network");
+  import("./pages/bitcoin");
+  import("./pages/bitcoin/BitcoinBlockPage");
+  import("./pages/bitcoin/BitcoinBlocksPage");
+  import("./pages/bitcoin/BitcoinTransactionPage");
+  import("./pages/bitcoin/BitcoinTransactionsPage");
+  import("./pages/bitcoin/BitcoinAddressPage");
   import("./pages/blocks");
   import("./pages/block");
   import("./pages/txs");

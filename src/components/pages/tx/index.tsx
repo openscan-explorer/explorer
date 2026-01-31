@@ -98,7 +98,7 @@ export default function Tx() {
           transaction={transaction}
           networkId={networkId}
           currentBlockNumber={currentBlockNumber || undefined}
-          dataService={dataService}
+          dataService={dataService || undefined}
           metadata={transactionResult?.metadata}
           selectedProvider={selectedProvider}
           onProviderSelect={setSelectedProvider}

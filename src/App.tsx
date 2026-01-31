@@ -21,10 +21,6 @@ import "./styles/responsive.css";
 import Loading from "./components/common/Loading";
 import {
   LazyAbout,
-  LazyAddress,
-  LazyBlock,
-  LazyBlocks,
-  LazyChain,
   LazyContact,
   LazyDevTools,
   LazyGasTracker,
@@ -37,9 +33,16 @@ import {
   LazySupporters,
   LazyTokenDetails,
   LazyTx,
-  LazyTxs,
   preloadAllRoutes,
 } from "./components/LazyComponents";
+import {
+  AddressPageRouter,
+  BlockPageRouter,
+  BlocksPageRouter,
+  TxPageRouter,
+  TxsPageRouter,
+} from "./components/NetworkAwareRouters";
+import NetworkRouter from "./components/NetworkRouter";
 import { SettingsProvider, useSettings, useTheme } from "./context/SettingsContext";
 import { useAppReady, useOnAppReady } from "./hooks/useAppReady";
 
@@ -122,13 +125,13 @@ function AppContent() {
               <Route path="subscriptions" element={<LazySubscriptions />} />
               <Route path="profile/:profileType/:profileId" element={<LazyProfile />} />
               <Route path="supporters" element={<LazySupporters />} />
-              <Route path=":networkId" element={<LazyChain />} />
+              <Route path=":networkId" element={<NetworkRouter />} />
               <Route path=":networkId/gastracker" element={<LazyGasTracker />} />
-              <Route path=":networkId/blocks" element={<LazyBlocks />} />
-              <Route path=":networkId/block/:filter" element={<LazyBlock />} />
-              <Route path=":networkId/txs" element={<LazyTxs />} />
-              <Route path=":networkId/tx/:filter" element={<LazyTx />} />
-              <Route path=":networkId/address/:address" element={<LazyAddress />} />
+              <Route path=":networkId/blocks" element={<BlocksPageRouter />} />
+              <Route path=":networkId/block/:filter" element={<BlockPageRouter />} />
+              <Route path=":networkId/txs" element={<TxsPageRouter />} />
+              <Route path=":networkId/tx/:filter" element={<TxPageRouter />} />
+              <Route path=":networkId/address/:address" element={<AddressPageRouter />} />
               <Route path=":networkId/address/:address/:tokenId" element={<LazyTokenDetails />} />
               <Route path=":networkId/mempool" element={<LazyMempool />} />
               <Route path=":networkId/mempool/:filter" element={<LazyTx />} />

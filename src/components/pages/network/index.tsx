@@ -1,6 +1,8 @@
 import { useParams } from "react-router-dom";
 import { useNetwork } from "../../../context/AppContext";
 import { useNetworkDashboard } from "../../../hooks/useNetworkDashboard";
+import { resolveNetwork, getChainIdFromNetwork } from "../../../utils/networkResolver";
+import { getAllNetworks } from "../../../config/networks";
 import Loader from "../../common/Loader";
 import SearchBox from "../../common/SearchBox";
 import DashboardStats from "./DashboardStats";
@@ -10,9 +12,18 @@ import ProfileDisplay from "./NetworkProfileDisplay";
 
 export default function Network() {
   const { networkId } = useParams<{ networkId?: string }>();
-  const numericNetworkId = Number(networkId) || 1;
-  const networkConfig = useNetwork(numericNetworkId);
-  const dashboard = useNetworkDashboard(numericNetworkId);
+  const network = resolveNetwork(networkId || "1", getAllNetworks());
+  const networkConfig = useNetwork(networkId || "1");
+  const dashboard = useNetworkDashboard(
+    network || {
+      type: "evm",
+      networkId: "eip155:1",
+      name: "Ethereum",
+      shortName: "Ethereum",
+      currency: "ETH",
+    },
+  );
+  const chainId = getChainIdFromNetwork(network) || 1;
 
   // Generate title based on network
   // Strip "Ethereum" from network names (e.g., "Ethereum Mainnet" -> "MAINNET")
@@ -55,19 +66,19 @@ export default function Network() {
           blockNumber={dashboard.blockNumber}
           currency={currency}
           loading={dashboard.loading && dashboard.latestBlocks.length === 0}
-          networkId={numericNetworkId}
+          networkId={chainId}
         />
 
         <div className="dashboard-tables-row">
           <LatestBlocksTable
             blocks={dashboard.latestBlocks}
-            networkId={numericNetworkId}
+            networkId={chainId}
             loading={dashboard.loading && dashboard.latestBlocks.length === 0}
             currency={currency}
           />
           <LatestTransactionsTable
             transactions={dashboard.latestTransactions}
-            networkId={numericNetworkId}
+            networkId={chainId}
             currency={currency}
             loading={dashboard.loading && dashboard.latestTransactions.length === 0}
           />
