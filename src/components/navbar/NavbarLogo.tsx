@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useNetworks } from "../../context/AppContext";
 import { getBaseDomainUrl, getSubdomain, getSubdomainRedirect } from "../../utils/subdomainUtils";
-import { getChainIdFromNetwork, resolveNetwork } from "../../utils/networkResolver";
+import { getNetworkUrlPath, resolveNetwork } from "../../utils/networkResolver";
 import NetworkIcon from "../common/NetworkIcon";
 
 // OpenScan cube SVG component
@@ -105,7 +105,7 @@ export default function NavbarLogo() {
 
   const handleGoToNetwork = useCallback(() => {
     if (!currentNetwork) return;
-    const networkId = getChainIdFromNetwork(currentNetwork);
+    const networkId = getNetworkUrlPath(currentNetwork);
     navigate(`/${networkId}`);
     setIsDropdownOpen(false);
   }, [currentNetwork, navigate]);
@@ -166,7 +166,7 @@ export default function NavbarLogo() {
 
           {/* Blocks link */}
           <Link
-            to={`/${getChainIdFromNetwork(currentNetwork)}/blocks`}
+            to={`/${getNetworkUrlPath(currentNetwork)}/blocks`}
             className="navbar-logo-dropdown-item"
             onClick={() => setIsDropdownOpen(false)}
           >
@@ -175,7 +175,7 @@ export default function NavbarLogo() {
 
           {/* Transactions link */}
           <Link
-            to={`/${getChainIdFromNetwork(currentNetwork)}/txs`}
+            to={`/${getNetworkUrlPath(currentNetwork)}/txs`}
             className="navbar-logo-dropdown-item"
             onClick={() => setIsDropdownOpen(false)}
           >

@@ -5,10 +5,28 @@ import {
   LazyAddress,
   LazyBitcoinAddress,
   LazyBitcoinBlock,
+  LazyBitcoinBlocks,
   LazyBitcoinTx,
+  LazyBitcoinTxs,
   LazyBlock,
+  LazyBlocks,
   LazyTx,
+  LazyTxs,
 } from "./LazyComponents";
+
+/**
+ * Network-aware blocks list page router
+ * Routes to BitcoinBlocksPage for Bitcoin networks, LazyBlocks for EVM
+ */
+export function BlocksPageRouter() {
+  const { networkId } = useParams<{ networkId?: string }>();
+  const network = resolveNetwork(networkId || "", getAllNetworks());
+
+  if (network && isBitcoinNetwork(network)) {
+    return <LazyBitcoinBlocks />;
+  }
+  return <LazyBlocks />;
+}
 
 /**
  * Network-aware block page router
@@ -22,6 +40,20 @@ export function BlockPageRouter() {
     return <LazyBitcoinBlock />;
   }
   return <LazyBlock />;
+}
+
+/**
+ * Network-aware transactions list page router
+ * Routes to BitcoinTransactionsPage for Bitcoin networks, LazyTxs for EVM
+ */
+export function TxsPageRouter() {
+  const { networkId } = useParams<{ networkId?: string }>();
+  const network = resolveNetwork(networkId || "", getAllNetworks());
+
+  if (network && isBitcoinNetwork(network)) {
+    return <LazyBitcoinTxs />;
+  }
+  return <LazyTxs />;
 }
 
 /**
