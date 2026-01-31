@@ -718,8 +718,8 @@ export class BitcoinAdapter {
       }
 
       // Extract UTXOs from scan result
-      // biome-ignore lint/suspicious/noExplicitAny: RPC response type varies
       const utxos: BitcoinUTXO[] = (scanData.unspents || []).map(
+        // biome-ignore lint/suspicious/noExplicitAny: RPC response type varies
         (utxo: any): BitcoinUTXO => ({
           txid: utxo.txid,
           vout: utxo.vout,
@@ -759,8 +759,8 @@ export class BitcoinAdapter {
           type: addressType,
           balance,
           utxoCount: utxos.length,
-          // biome-ignore lint/suspicious/noExplicitAny: RPC response type varies
           utxos: utxos.map(
+            // biome-ignore lint/suspicious/noExplicitAny: RPC response type varies
             (utxo: any): BitcoinUTXO => ({
               txid: utxo.txid,
               vout: utxo.vout,

@@ -61,7 +61,6 @@ body {
 }
 
 .navbar-inner {
-  position: relative;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -75,6 +74,12 @@ body {
 
 .navbar-inner:hover {
   box-shadow: 0 6px 24px var(--color-primary-alpha-15);
+}
+
+.navbar-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
 }
 
 .navbar-right {
@@ -193,18 +198,30 @@ body {
 
 .navbar-logo-dropdown {
   position: absolute;
-  top: calc(100% + 8px);
+  top: 100%;
   left: 0;
+  padding-top: 8px;
+  min-width: 180px;
+  z-index: 1000;
+}
+
+.navbar-logo-dropdown::before {
+  content: "";
+  position: absolute;
+  top: 8px;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background: var(--bg-card);
   border: 1px solid var(--border-primary);
   border-radius: 12px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  z-index: 1000;
-  overflow: hidden;
-  min-width: 180px;
+  pointer-events: none;
 }
 
 .navbar-logo-dropdown-item {
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -220,6 +237,14 @@ body {
   text-align: left;
 }
 
+.navbar-logo-dropdown-item:first-child {
+  border-radius: 12px 12px 0 0;
+}
+
+.navbar-logo-dropdown-item:last-child {
+  border-radius: 0 0 12px 12px;
+}
+
 .navbar-logo-dropdown-item:hover {
   background: var(--color-primary-alpha-10);
 }
@@ -228,11 +253,17 @@ body {
   background: var(--overlay-light-10);
 }
 
+a.navbar-logo-dropdown-item {
+  text-decoration: none;
+}
+
 .navbar-logo-dropdown-item svg {
   flex-shrink: 0;
 }
 
 .navbar-logo-dropdown-divider {
+  position: relative;
+  z-index: 1;
   height: 1px;
   background: var(--border-primary);
   margin: 4px 0;
@@ -4264,75 +4295,6 @@ code {
 
 .localhost-network-container {
   margin-top: 24px;
-}
-
-.search-box-container {
-  width: 100%;
-  margin: 0 auto;
-}
-
-.search-form {
-  display: flex;
-  gap: 10px;
-  width: 100%;
-  max-width: 700px;
-  margin: 0 auto;
-}
-
-.search-input {
-  flex: 1;
-  padding: 16px 24px;
-  font-size: 1.1rem;
-  border: 1px solid #e0e0e0;
-  border-radius: 12px;
-  outline: none;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-  background: var(--bg-color, #fff);
-  /* Fallback to white */
-  color: var(--text-color, #000);
-  /* Fallback to black */
-}
-
-/* Dark mode adjustments if we can infer them, or just use generic high contrast */
-@media (prefers-color-scheme: dark) {
-  .search-input {
-    background: #1e1e1e;
-    border-color: #333;
-    color: #fff;
-  }
-}
-
-.search-input:focus {
-  border-color: var(--color-primary);
-  box-shadow: 0 4px 12px var(--color-primary-alpha-15);
-}
-
-.search-button {
-  padding: 16px 32px;
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: white;
-  background-color: var(--color-primary);
-  border: none;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  box-shadow: 0 4px 6px var(--color-primary-alpha-20);
-}
-
-.search-button:hover {
-  background-color: var(--color-primary-muted);
-}
-
-@media (max-width: 600px) {
-  .search-form {
-    flex-direction: column;
-  }
-
-  .search-button {
-    width: 100%;
-  }
 }
 
 /* Components Grid Layout */

@@ -1,9 +1,7 @@
-import { useEffect, useMemo, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useNetworks } from "../../context/AppContext";
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useTheme } from "../../context/SettingsContext";
 import { useSearch } from "../../hooks/useSearch";
-import { resolveNetwork } from "../../utils/networkResolver";
 import NavbarLogo from "./NavbarLogo";
 import { NetworkBlockIndicator } from "./NetworkBlockIndicator";
 import BuildWarningIcon from "./BuildWarningIcon";
@@ -14,7 +12,6 @@ const Navbar = () => {
   const { searchTerm, setSearchTerm, isResolving, error, clearError, handleSearch, networkId } =
     useSearch();
   const { isDarkMode, toggleTheme } = useTheme();
-  const { networks } = useNetworks();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Check if we should show the search box (on any network page including home)
@@ -24,13 +21,6 @@ const Navbar = () => {
     (pathSegments.length === 1 || // Network home page (e.g., /btc, /1)
       (pathSegments[1] && ["blocks", "block", "txs", "tx", "address"].includes(pathSegments[1])));
   const shouldShowSearch = networkId && isOnNetworkPage;
-
-  // Check if current network is Bitcoin
-  const isBitcoin = useMemo(() => {
-    if (!networkId) return false;
-    const network = resolveNetwork(networkId, networks);
-    return network?.type === "bitcoin";
-  }, [networkId, networks]);
 
   // Close mobile menu on route change
   // biome-ignore lint/correctness/useExhaustiveDependencies: intentionally re-run on pathname change
@@ -63,27 +53,12 @@ const Navbar = () => {
     <>
       <nav className="navbar">
         <div className="navbar-inner">
-          {/* Left side - Logo and nav links */}
-          <ul className="navbar-left">
-            <li>
-              <NavbarLogo />
-            </li>
-            {networkId && !isBitcoin && (
-              <>
-                <li className="hide-mobile">
-                  <Link to={`/${networkId}/blocks`}>BLOCKS</Link>
-                </li>
-                <li className="hide-mobile">
-                  <Link to={`/${networkId}/txs`}>TRANSACTIONS</Link>
-                </li>
-              </>
-            )}
-          </ul>
-
-          {/* Search Box - hidden on mobile */}
-          {shouldShowSearch && (
-            <div className="search-container hide-mobile">
-              <form onSubmit={handleSearch} className="search-form">
+          {/* Left side - Logo and Search */}
+          <div className="navbar-left">
+            <NavbarLogo />
+            {/* Search Box - hidden on mobile */}
+            {shouldShowSearch && (
+              <form onSubmit={handleSearch} className="search-form hide-mobile">
                 <input
                   type="text"
                   value={searchTerm}
@@ -91,7 +66,7 @@ const Navbar = () => {
                     setSearchTerm(e.target.value);
                     clearError();
                   }}
-                  placeholder="Search by Address / Tx Hash / Block / ENS"
+                  placeholder="Search by Address / Tx Hash / Block"
                   className="search-input"
                   disabled={isResolving}
                 />
@@ -103,26 +78,26 @@ const Navbar = () => {
                   disabled={isResolving}
                 >
                   <svg
-                    width="20"
-                    height="20"
+                    width="16"
+                    height="16"
                     viewBox="0 0 24 24"
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
                     aria-hidden="true"
                   >
                     <title>Search</title>
-                    <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="2" />
+                    <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="2.5" />
                     <path
                       d="M21 21l-4.35-4.35"
                       stroke="currentColor"
-                      strokeWidth="2"
+                      strokeWidth="2.5"
                       strokeLinecap="round"
                     />
                   </svg>
                 </button>
               </form>
-            </div>
-          )}
+            )}
+          </div>
 
           {/* Right side - Icons and hamburger */}
           <div className="navbar-right">
@@ -368,8 +343,8 @@ const Navbar = () => {
         )}
 
         <nav className="navbar-mobile-menu-items">
-          {/* Network-specific links (hidden for Bitcoin) */}
-          {networkId && !isBitcoin && (
+          {/* Network-specific links */}
+          {networkId && (
             <>
               <button
                 type="button"
@@ -440,42 +415,10 @@ const Navbar = () => {
                 </svg>
                 <span>Transactions</span>
               </button>
-              <button
-                type="button"
-                className="navbar-mobile-menu-item"
-                onClick={() => handleMobileNavigation(`/${networkId}/gastracker`)}
-              >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <title>Gas Tracker</title>
-                  <path
-                    d="M3 22V6a2 2 0 012-2h8a2 2 0 012 2v16"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <path d="M3 22h12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                  <path
-                    d="M13 10h2a2 2 0 012 2v3a2 2 0 002 2h0a2 2 0 002-2V9l-3-3"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <path
-                    d="M7 10h4v4H7z"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-                <span>Gas Tracker</span>
-              </button>
             </>
           )}
 
-          {networkId && !isBitcoin && <div className="navbar-mobile-menu-divider" />}
+          {networkId && <div className="navbar-mobile-menu-divider" />}
 
           {/* Global links */}
           <button

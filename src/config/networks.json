@@ -301,7 +301,7 @@
       "currency": "BTC",
       "color": "#F7931A",
       "isTestnet": false,
-      "logo": "assets/networks/bitcoin-mainnet.svg",
+      "logo": "https://raw.githubusercontent.com/openscan-explorer/explorer-metadata/main/assets/networks/bitcoin-mainnet.svg",
       "rpc": {
         "public": [
           "https://bitcoin-rpc.publicnode.com",

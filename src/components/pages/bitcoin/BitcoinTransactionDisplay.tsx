@@ -103,7 +103,9 @@ const BitcoinTransactionDisplay: React.FC<BitcoinTransactionDisplayProps> = Reac
         <div className="block-display-header">
           <span className="block-label">Transaction</span>
           {isUnconfirmed ? (
-            <span className="block-status-badge block-status-pending">In Mempool (Unconfirmed)</span>
+            <span className="block-status-badge block-status-pending">
+              In Mempool (Unconfirmed)
+            </span>
           ) : (
             transaction.confirmations !== undefined &&
             transaction.confirmations > 0 && (
