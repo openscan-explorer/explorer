@@ -6,10 +6,19 @@
 
 /* Search Form - Navbar */
 .search-container {
-	flex: 1;
+	position: absolute;
+	left: 50%;
+	transform: translateX(-50%);
 	display: flex;
 	justify-content: center;
 	padding: 0 20px;
+	width: 100%;
+	max-width: 540px;
+	pointer-events: none;
+}
+
+.search-container .search-form {
+	pointer-events: auto;
 }
 
 .search-form {

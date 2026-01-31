@@ -21,8 +21,6 @@ import "./styles/responsive.css";
 import Loading from "./components/common/Loading";
 import {
   LazyAbout,
-  LazyAddress,
-  LazyBlock,
   LazyBlocks,
   LazyContact,
   LazyDevTools,
@@ -39,6 +37,7 @@ import {
   LazyTxs,
   preloadAllRoutes,
 } from "./components/LazyComponents";
+import { AddressPageRouter, BlockPageRouter, TxPageRouter } from "./components/NetworkAwareRouters";
 import NetworkRouter from "./components/NetworkRouter";
 import { SettingsProvider, useSettings, useTheme } from "./context/SettingsContext";
 import { useAppReady, useOnAppReady } from "./hooks/useAppReady";
@@ -125,10 +124,10 @@ function AppContent() {
               <Route path=":networkId" element={<NetworkRouter />} />
               <Route path=":networkId/gastracker" element={<LazyGasTracker />} />
               <Route path=":networkId/blocks" element={<LazyBlocks />} />
-              <Route path=":networkId/block/:filter" element={<LazyBlock />} />
+              <Route path=":networkId/block/:filter" element={<BlockPageRouter />} />
               <Route path=":networkId/txs" element={<LazyTxs />} />
-              <Route path=":networkId/tx/:filter" element={<LazyTx />} />
-              <Route path=":networkId/address/:address" element={<LazyAddress />} />
+              <Route path=":networkId/tx/:filter" element={<TxPageRouter />} />
+              <Route path=":networkId/address/:address" element={<AddressPageRouter />} />
               <Route path=":networkId/address/:address/:tokenId" element={<LazyTokenDetails />} />
               <Route path=":networkId/mempool" element={<LazyMempool />} />
               <Route path=":networkId/mempool/:filter" element={<LazyTx />} />

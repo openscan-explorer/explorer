@@ -1,9 +1,11 @@
 import type React from "react";
+import { Link } from "react-router-dom";
 import type { BitcoinBlock } from "../../../types";
 
 interface BitcoinBlocksTableProps {
   blocks: BitcoinBlock[];
   loading: boolean;
+  networkId?: string;
 }
 
 function formatTimeAgo(timestamp: number): string {
@@ -31,18 +33,12 @@ function formatTimeAgo(timestamp: number): string {
   }
 }
 
-function formatSize(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
-}
-
 function truncateHash(hash: string): string {
   if (!hash) return "—";
   return `${hash.slice(0, 8)}...${hash.slice(-6)}`;
 }
 
-const BitcoinBlocksTable: React.FC<BitcoinBlocksTableProps> = ({ blocks, loading }) => {
+const BitcoinBlocksTable: React.FC<BitcoinBlocksTableProps> = ({ blocks, loading, networkId }) => {
   return (
     <div className="dashboard-table-section dashboard-table-section-full">
       <div className="dashboard-table-header">
@@ -58,16 +54,29 @@ const BitcoinBlocksTable: React.FC<BitcoinBlocksTableProps> = ({ blocks, loading
           {blocks.map((block) => (
             <div key={block.hash} className="dashboard-table-row">
               <div className="dashboard-block-info">
-                <span className="dashboard-block-number">#{block.height.toLocaleString()}</span>
+                <span className="dashboard-block-number">
+                  {networkId ? (
+                    <Link to={`/${networkId}/block/${block.height}`} className="link-accent">
+                      #{block.height.toLocaleString()}
+                    </Link>
+                  ) : (
+                    `#${block.height.toLocaleString()}`
+                  )}
+                </span>
                 <span className="dashboard-block-time">{formatTimeAgo(block.time)}</span>
               </div>
               <div className="dashboard-block-details">
                 <span className="dashboard-block-txns">{block.nTx} txns</span>
-                <span className="dashboard-block-gas">{formatSize(block.size)}</span>
               </div>
               <div className="dashboard-block-meta">
                 <span className="dashboard-block-hash" title={block.hash}>
-                  {truncateHash(block.hash)}
+                  {networkId ? (
+                    <Link to={`/${networkId}/block/${block.hash}`} className="link-accent">
+                      {truncateHash(block.hash)}
+                    </Link>
+                  ) : (
+                    truncateHash(block.hash)
+                  )}
                 </span>
               </div>
             </div>

@@ -6,6 +6,7 @@ import type { NetworkConfig } from "../../../types";
 import Loader from "../../common/Loader";
 import BitcoinDashboardStats from "./BitcoinDashboardStats";
 import BitcoinBlocksTable from "./BitcoinBlocksTable";
+import BitcoinTransactionsTable from "./BitcoinTransactionsTable";
 
 // Default Bitcoin network config for fallback
 const DEFAULT_BITCOIN_NETWORK: NetworkConfig = {
@@ -56,10 +57,24 @@ export default function BitcoinNetwork() {
 
         {dashboard.error && <p className="error-text-center">Error: {dashboard.error}</p>}
 
-        <BitcoinDashboardStats stats={dashboard.stats} loading={dashboard.loading} />
+        <BitcoinDashboardStats
+          stats={dashboard.stats}
+          btcPrice={dashboard.btcPrice}
+          feeEstimates={dashboard.feeEstimates}
+          loading={dashboard.loading}
+        />
 
         <div className="dashboard-tables-row">
-          <BitcoinBlocksTable blocks={dashboard.latestBlocks} loading={dashboard.loading} />
+          <BitcoinBlocksTable
+            blocks={dashboard.latestBlocks}
+            loading={dashboard.loading}
+            networkId={networkId}
+          />
+          <BitcoinTransactionsTable
+            transactions={dashboard.latestTransactions}
+            loading={dashboard.loading && dashboard.latestTransactions.length === 0}
+            networkId={networkId}
+          />
         </div>
 
         {network.links && network.links.length > 0 && (

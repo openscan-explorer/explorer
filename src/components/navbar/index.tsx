@@ -1,7 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useNetworks } from "../../context/AppContext";
 import { useTheme } from "../../context/SettingsContext";
 import { useSearch } from "../../hooks/useSearch";
+import { resolveNetwork } from "../../utils/networkResolver";
 import NavbarLogo from "./NavbarLogo";
 import { NetworkBlockIndicator } from "./NetworkBlockIndicator";
 import BuildWarningIcon from "./BuildWarningIcon";
@@ -12,15 +14,23 @@ const Navbar = () => {
   const { searchTerm, setSearchTerm, isResolving, error, clearError, handleSearch, networkId } =
     useSearch();
   const { isDarkMode, toggleTheme } = useTheme();
+  const { networks } = useNetworks();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // Check if we should show the search box (on blocks, block, txs, tx pages)
+  // Check if we should show the search box (on any network page including home)
   const pathSegments = location.pathname.split("/").filter(Boolean);
-  const shouldShowSearch =
-    networkId &&
-    pathSegments.length >= 2 &&
-    pathSegments[1] &&
-    ["blocks", "block", "txs", "tx", "address"].includes(pathSegments[1]);
+  const isOnNetworkPage =
+    pathSegments.length >= 1 &&
+    (pathSegments.length === 1 || // Network home page (e.g., /btc, /1)
+      (pathSegments[1] && ["blocks", "block", "txs", "tx", "address"].includes(pathSegments[1])));
+  const shouldShowSearch = networkId && isOnNetworkPage;
+
+  // Check if current network is Bitcoin
+  const isBitcoin = useMemo(() => {
+    if (!networkId) return false;
+    const network = resolveNetwork(networkId, networks);
+    return network?.type === "bitcoin";
+  }, [networkId, networks]);
 
   // Close mobile menu on route change
   // biome-ignore lint/correctness/useExhaustiveDependencies: intentionally re-run on pathname change
@@ -58,7 +68,7 @@ const Navbar = () => {
             <li>
               <NavbarLogo />
             </li>
-            {networkId && (
+            {networkId && !isBitcoin && (
               <>
                 <li className="hide-mobile">
                   <Link to={`/${networkId}/blocks`}>BLOCKS</Link>
@@ -358,8 +368,8 @@ const Navbar = () => {
         )}
 
         <nav className="navbar-mobile-menu-items">
-          {/* Network-specific links */}
-          {networkId && (
+          {/* Network-specific links (hidden for Bitcoin) */}
+          {networkId && !isBitcoin && (
             <>
               <button
                 type="button"
@@ -465,7 +475,7 @@ const Navbar = () => {
             </>
           )}
 
-          <div className="navbar-mobile-menu-divider" />
+          {networkId && !isBitcoin && <div className="navbar-mobile-menu-divider" />}
 
           {/* Global links */}
           <button

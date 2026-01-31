@@ -70,10 +70,38 @@ export const PRICE_POOLS: Record<number, PricePoolConfig[]> = {
 };
 
 /**
+ * WBTC/stablecoin pools on Ethereum mainnet for BTC price
+ * WBTC has 8 decimals
+ */
+export const WBTC_POOLS: PricePoolConfig[] = [
+  {
+    poolAddress: "0x004375Dff511095CC5A197A54140a24eFEF3A416", // WBTC/USDC Uniswap V2
+    stablecoinDecimals: 6,
+    nativeTokenDecimals: 8, // WBTC has 8 decimals
+    isToken0Native: true, // WBTC is token0, USDC is token1
+    name: "Uniswap V2 WBTC/USDC",
+  },
+  {
+    poolAddress: "0x0de845955E2bF089012F682fE9bC81dD5f11B372", // WBTC/USDT Uniswap V2
+    stablecoinDecimals: 6,
+    nativeTokenDecimals: 8, // WBTC has 8 decimals
+    isToken0Native: true, // WBTC is token0, USDT is token1
+    name: "Uniswap V2 WBTC/USDT",
+  },
+];
+
+/**
  * Get price pool configs for a network
  */
 export function getPricePoolsForNetwork(chainId: number): PricePoolConfig[] {
   return PRICE_POOLS[chainId] || [];
+}
+
+/**
+ * Get WBTC pools for BTC price calculation
+ */
+export function getWBTCPools(): PricePoolConfig[] {
+  return WBTC_POOLS;
 }
 
 /**
