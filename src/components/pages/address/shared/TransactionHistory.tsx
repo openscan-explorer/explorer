@@ -500,9 +500,9 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
                 <span className="address-table-value">{formatValue(tx.value)}</span>
               </td>
               <td>
-                {tx.receipt?.status === "0x1" ? (
+                {tx.receipt?.status === "0x1" || tx.receipt?.status === "1" ? (
                   <span className="table-status-badge table-status-success">✓ Success</span>
-                ) : tx.receipt?.status === "0x0" ? (
+                ) : tx.receipt?.status === "0x0" || tx.receipt?.status === "0" ? (
                   <span className="table-status-badge table-status-failed">✗ Failed</span>
                 ) : (
                   <span className="table-status-badge table-status-pending">⏳ Pending</span>

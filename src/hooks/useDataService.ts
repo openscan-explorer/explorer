@@ -21,7 +21,7 @@ export function useDataService(networkId: number) {
     let limitedRpcUrls = rpcUrls;
 
     if (
-      settings.rpcStrategy === "parallel" &&
+      (settings.rpcStrategy === "parallel" || settings.rpcStrategy === "race") &&
       settings.maxParallelRequests &&
       settings.maxParallelRequests > 0
     ) {
