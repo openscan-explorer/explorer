@@ -1,24 +1,13 @@
 import type React from "react";
 import { Link } from "react-router-dom";
 import type { BitcoinTransaction } from "../../../types";
+import { formatBTC, truncateHash } from "../../../utils/bitcoinFormatters";
+import { calculateTotalOutput } from "../../../utils/bitcoinUtils";
 
 interface BitcoinTransactionsTableProps {
   transactions: BitcoinTransaction[];
   loading: boolean;
   networkId?: string;
-}
-
-function formatBTC(value: number): string {
-  return `${value.toFixed(8)} BTC`;
-}
-
-function truncateHash(hash: string, start = 8, end = 6): string {
-  if (!hash || hash.length <= start + end) return hash || "—";
-  return `${hash.slice(0, start)}...${hash.slice(-end)}`;
-}
-
-function calculateTotalOutput(tx: BitcoinTransaction): number {
-  return tx.vout.reduce((sum, output) => sum + output.value, 0);
 }
 
 const BitcoinTransactionsTable: React.FC<BitcoinTransactionsTableProps> = ({
@@ -44,10 +33,10 @@ const BitcoinTransactionsTable: React.FC<BitcoinTransactionsTableProps> = ({
                 <span className="dashboard-tx-hash">
                   {networkId ? (
                     <Link to={`/${networkId}/tx/${tx.txid}`} className="link-accent tx-mono">
-                      {truncateHash(tx.txid, 10, 8)}
+                      {truncateHash(tx.txid, "medium")}
                     </Link>
                   ) : (
-                    <span className="tx-mono">{truncateHash(tx.txid, 10, 8)}</span>
+                    <span className="tx-mono">{truncateHash(tx.txid, "medium")}</span>
                   )}
                 </span>
               </div>

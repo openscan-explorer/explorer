@@ -1,6 +1,21 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { SATOSHIS_PER_BTC } from "../../../config/bitcoinConstants";
 import type { BitcoinTransaction } from "../../../types";
+import {
+  formatBTC,
+  formatTimeAgo,
+  formatTimestamp,
+  formatUSD,
+  truncateHash,
+} from "../../../utils/bitcoinFormatters";
+import {
+  calculateTotalInput,
+  calculateTotalOutput,
+  hasWitness,
+  isCoinbaseTransaction,
+  isRBFEnabled,
+} from "../../../utils/bitcoinUtils";
 
 interface BitcoinTransactionDisplayProps {
   transaction: BitcoinTransaction;
@@ -8,85 +23,17 @@ interface BitcoinTransactionDisplayProps {
   btcPrice?: number | null;
 }
 
-function formatBTC(value: number): string {
-  return `${value.toFixed(8)} BTC`;
-}
-
-function formatUSD(btcValue: number, btcPrice: number | null | undefined): string | null {
-  if (!btcPrice) return null;
-  const usdValue = btcValue * btcPrice;
-  if (usdValue >= 1000) {
-    return `$${usdValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-  }
-  if (usdValue >= 0.01) {
-    return `$${usdValue.toFixed(2)}`;
-  }
-  return `$${usdValue.toFixed(4)}`;
-}
-
-function formatTimestamp(timestamp: number): string {
-  return new Intl.DateTimeFormat(undefined, {
-    year: "numeric",
-    month: "short",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    timeZoneName: "short",
-  }).format(new Date(timestamp * 1000));
-}
-
-function formatTimeAgo(timestamp: number): string {
-  const diffMs = Date.now() - timestamp * 1000;
-  const diffSeconds = Math.floor(Math.abs(diffMs) / 1000);
-
-  if (diffSeconds < 60) return `${diffSeconds}s ago`;
-  if (diffSeconds < 3600) {
-    const mins = Math.floor(diffSeconds / 60);
-    const secs = diffSeconds % 60;
-    return `${mins}m ${secs}s ago`;
-  }
-  if (diffSeconds < 86400) {
-    const hours = Math.floor(diffSeconds / 3600);
-    const mins = Math.floor((diffSeconds % 3600) / 60);
-    return `${hours}h ${mins}m ago`;
-  }
-  const days = Math.floor(diffSeconds / 86400);
-  const hours = Math.floor((diffSeconds % 86400) / 3600);
-  return `${days}d ${hours}h ago`;
-}
-
-function truncateHash(hash: string, start = 12, end = 8): string {
-  if (hash.length <= start + end) return hash;
-  return `${hash.slice(0, start)}...${hash.slice(-end)}`;
-}
-
-// RBF is enabled if any input has sequence < 0xfffffffe
-function isRBFEnabled(vin: { sequence: number }[]): boolean {
-  return vin.some((input) => input.sequence < 0xfffffffe);
-}
-
-// Has witness data if hash differs from txid or any input has txinwitness
-function hasWitness(tx: BitcoinTransaction): boolean {
-  if (tx.hash !== tx.txid) return true;
-  return tx.vin.some((input) => input.txinwitness && input.txinwitness.length > 0);
-}
-
 const BitcoinTransactionDisplay: React.FC<BitcoinTransactionDisplayProps> = React.memo(
   ({ transaction, networkId, btcPrice }) => {
     // Calculate totals
-    const totalInput = transaction.vin.reduce((sum, input) => {
-      return sum + (input.prevout?.value || 0);
-    }, 0);
-    const totalOutput = transaction.vout.reduce((sum, output) => {
-      return sum + output.value;
-    }, 0);
+    const totalInput = calculateTotalInput(transaction);
+    const totalOutput = calculateTotalOutput(transaction);
     const fee = transaction.fee ?? (totalInput > 0 ? totalInput - totalOutput : 0);
 
-    const firstInput = transaction.vin[0];
-    const isCoinbase = transaction.vin.length === 1 && firstInput && !firstInput.txid;
+    const isCoinbase = isCoinbaseTransaction(transaction);
 
     // Calculate fee rates (in satoshis)
-    const feeSats = fee * 100000000;
+    const feeSats = fee * SATOSHIS_PER_BTC;
     const feePerByte = transaction.size > 0 ? feeSats / transaction.size : 0;
     const feePerVByte = transaction.vsize > 0 ? feeSats / transaction.vsize : 0;
     const feePerWU = transaction.weight > 0 ? feeSats / transaction.weight : 0;
@@ -136,10 +83,10 @@ const BitcoinTransactionDisplay: React.FC<BitcoinTransactionDisplayProps> = Reac
               <span className="tx-value tx-mono">
                 {networkId ? (
                   <Link to={`/${networkId}/block/${transaction.blockhash}`} className="link-accent">
-                    {truncateHash(transaction.blockhash)}
+                    {truncateHash(transaction.blockhash, "long")}
                   </Link>
                 ) : (
-                  truncateHash(transaction.blockhash)
+                  truncateHash(transaction.blockhash, "long")
                 )}
               </span>
             </div>
@@ -341,10 +288,10 @@ const BitcoinTransactionDisplay: React.FC<BitcoinTransactionDisplayProps> = Reac
                             from{" "}
                             {networkId && input.txid ? (
                               <Link to={`/${networkId}/tx/${input.txid}`} className="link-accent">
-                                {truncateHash(input.txid, 8, 6)}:{input.vout}
+                                {truncateHash(input.txid, "short")}:{input.vout}
                               </Link>
                             ) : (
-                              `${truncateHash(input.txid || "", 8, 6)}:${input.vout}`
+                              `${truncateHash(input.txid || "", "short")}:${input.vout}`
                             )}
                           </span>
                         </div>

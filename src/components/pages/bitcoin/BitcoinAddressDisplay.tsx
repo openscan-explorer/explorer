@@ -1,38 +1,13 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { GENESIS_ADDRESS, GENESIS_COINBASE_BTC } from "../../../config/bitcoinConstants";
 import type { BitcoinAddress } from "../../../types";
-
-// Satoshi's Genesis address - the 50 BTC coinbase is unspendable
-const GENESIS_ADDRESS = "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa";
-const GENESIS_COINBASE_BTC = 50;
+import { formatBTC, truncateHash } from "../../../utils/bitcoinFormatters";
+import { getAddressTypeLabel } from "../../../utils/bitcoinUtils";
 
 interface BitcoinAddressDisplayProps {
   address: BitcoinAddress;
   networkId?: string;
-}
-
-function formatBTC(value: number): string {
-  return `${value.toFixed(8)} BTC`;
-}
-
-function getAddressTypeLabel(type: string): string {
-  switch (type) {
-    case "legacy":
-      return "Legacy (P2PKH)";
-    case "p2sh":
-      return "Script Hash (P2SH)";
-    case "segwit":
-      return "Native SegWit (P2WPKH)";
-    case "taproot":
-      return "Taproot (P2TR)";
-    default:
-      return "Unknown";
-  }
-}
-
-function truncateHash(hash: string, start = 12, end = 8): string {
-  if (hash.length <= start + end) return hash;
-  return `${hash.slice(0, start)}...${hash.slice(-end)}`;
 }
 
 const BitcoinAddressDisplay: React.FC<BitcoinAddressDisplayProps> = React.memo(
@@ -136,10 +111,10 @@ const BitcoinAddressDisplay: React.FC<BitcoinAddressDisplayProps> = React.memo(
                       <span className="btc-utxo-hash tx-mono">
                         {networkId ? (
                           <Link to={`/${networkId}/tx/${utxo.txid}`} className="link-accent">
-                            {truncateHash(utxo.txid)}:{utxo.vout}
+                            {truncateHash(utxo.txid, "long")}:{utxo.vout}
                           </Link>
                         ) : (
-                          `${truncateHash(utxo.txid)}:${utxo.vout}`
+                          `${truncateHash(utxo.txid, "long")}:${utxo.vout}`
                         )}
                       </span>
                       <span className="btc-utxo-value tx-value-highlight">

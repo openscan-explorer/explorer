@@ -1,55 +1,18 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import type { BitcoinBlock } from "../../../types";
+import {
+  formatBTC,
+  formatDifficulty,
+  formatSize,
+  formatTimeAgo,
+  formatTimestamp,
+  truncateHash,
+} from "../../../utils/bitcoinFormatters";
 
 interface BitcoinBlockDisplayProps {
   block: BitcoinBlock;
   networkId?: string;
-}
-
-function formatTimestamp(timestamp: number): string {
-  return new Intl.DateTimeFormat(undefined, {
-    year: "numeric",
-    month: "short",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    timeZoneName: "short",
-  }).format(new Date(timestamp * 1000));
-}
-
-function formatTimeAgo(timestamp: number): string {
-  const diffMs = Date.now() - timestamp * 1000;
-  const diffSeconds = Math.floor(Math.abs(diffMs) / 1000);
-
-  if (diffSeconds < 60) return `${diffSeconds} seconds ago`;
-  if (diffSeconds < 3600) return `${Math.floor(diffSeconds / 60)} minutes ago`;
-  if (diffSeconds < 86400) return `${Math.floor(diffSeconds / 3600)} hours ago`;
-  return `${Math.floor(diffSeconds / 86400)} days ago`;
-}
-
-function formatSize(bytes: number): string {
-  if (bytes < 1024) return `${bytes} bytes`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(2)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
-}
-
-function formatBTC(value: number): string {
-  return `${value.toFixed(8)} BTC`;
-}
-
-function formatDifficulty(difficulty: number): string {
-  if (difficulty >= 1e15) return `${(difficulty / 1e15).toFixed(2)} P`;
-  if (difficulty >= 1e12) return `${(difficulty / 1e12).toFixed(2)} T`;
-  if (difficulty >= 1e9) return `${(difficulty / 1e9).toFixed(2)} G`;
-  if (difficulty >= 1e6) return `${(difficulty / 1e6).toFixed(2)} M`;
-  return difficulty.toLocaleString();
-}
-
-function truncateHash(hash: string, start = 12, end = 8): string {
-  if (hash.length <= start + end) return hash;
-  return `${hash.slice(0, start)}...${hash.slice(-end)}`;
 }
 
 const BitcoinBlockDisplay: React.FC<BitcoinBlockDisplayProps> = React.memo(
@@ -85,7 +48,7 @@ const BitcoinBlockDisplay: React.FC<BitcoinBlockDisplayProps> = React.memo(
             )}
             <span className="block-header-divider">•</span>
             <span className="block-header-timestamp">
-              <span className="block-timestamp-age">{formatTimeAgo(block.time)}</span>
+              <span className="block-timestamp-age">{formatTimeAgo(block.time, true)}</span>
               <span className="block-timestamp-full">({formatTimestamp(block.time)})</span>
             </span>
           </div>
@@ -190,10 +153,10 @@ const BitcoinBlockDisplay: React.FC<BitcoinBlockDisplayProps> = React.memo(
               <span className="tx-value tx-mono">
                 {networkId ? (
                   <Link to={`/${networkId}/block/${block.height - 1}`} className="link-accent">
-                    {truncateHash(block.previousBlockHash)}
+                    {truncateHash(block.previousBlockHash, "long")}
                   </Link>
                 ) : (
-                  truncateHash(block.previousBlockHash)
+                  truncateHash(block.previousBlockHash, "long")
                 )}
               </span>
             </div>
@@ -206,10 +169,10 @@ const BitcoinBlockDisplay: React.FC<BitcoinBlockDisplayProps> = React.memo(
               <span className="tx-value tx-mono">
                 {networkId ? (
                   <Link to={`/${networkId}/block/${block.height + 1}`} className="link-accent">
-                    {truncateHash(block.nextBlockHash)}
+                    {truncateHash(block.nextBlockHash, "long")}
                   </Link>
                 ) : (
-                  truncateHash(block.nextBlockHash)
+                  truncateHash(block.nextBlockHash, "long")
                 )}
               </span>
             </div>

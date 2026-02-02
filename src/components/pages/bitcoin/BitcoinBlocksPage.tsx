@@ -1,42 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { BLOCKS_PER_PAGE } from "../../../config/bitcoinConstants";
 import { useDataService } from "../../../hooks/useDataService";
 import type { BitcoinBlock } from "../../../types";
+import { formatTimeAgo, formatTimestamp, truncateHash } from "../../../utils/bitcoinFormatters";
 import Loader from "../../common/Loader";
-
-const BLOCKS_PER_PAGE = 20;
-
-function formatTimeAgo(timestamp: number): string {
-  const diffMs = Date.now() - timestamp * 1000;
-  const diffSeconds = Math.floor(Math.abs(diffMs) / 1000);
-
-  if (diffSeconds < 60) return `${diffSeconds}s ago`;
-  if (diffSeconds < 3600) {
-    const mins = Math.floor(diffSeconds / 60);
-    return `${mins}m ago`;
-  }
-  if (diffSeconds < 86400) {
-    const hours = Math.floor(diffSeconds / 3600);
-    return `${hours}h ago`;
-  }
-  const days = Math.floor(diffSeconds / 86400);
-  return `${days}d ago`;
-}
-
-function formatTimestamp(timestamp: number): string {
-  return new Intl.DateTimeFormat(undefined, {
-    year: "numeric",
-    month: "short",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(new Date(timestamp * 1000));
-}
-
-function truncateHash(hash: string, start = 10, end = 8): string {
-  if (!hash || hash.length <= start + end) return hash || "—";
-  return `${hash.slice(0, start)}...${hash.slice(-end)}`;
-}
 
 export default function BitcoinBlocksPage() {
   const { networkId } = useParams<{ networkId?: string }>();
@@ -205,7 +173,7 @@ export default function BitcoinBlocksPage() {
                       className="table-cell-address"
                       title={block.hash}
                     >
-                      {truncateHash(block.hash)}
+                      {truncateHash(block.hash, "medium")}
                     </Link>
                   </td>
                   <td className="table-cell-text" title={formatTimestamp(block.time)}>

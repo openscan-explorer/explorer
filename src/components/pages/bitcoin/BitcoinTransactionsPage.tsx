@@ -1,40 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { TXS_PER_PAGE } from "../../../config/bitcoinConstants";
 import { useDataService } from "../../../hooks/useDataService";
 import type { BitcoinTransaction } from "../../../types";
+import { formatBTC, formatTimeAgo, truncateHash } from "../../../utils/bitcoinFormatters";
+import { calculateTotalOutput } from "../../../utils/bitcoinUtils";
 import Loader from "../../common/Loader";
-
-const TXS_PER_PAGE = 50;
-
-function formatBTC(value: number): string {
-  return `${value.toFixed(8)} BTC`;
-}
-
-function truncateHash(hash: string, start = 12, end = 8): string {
-  if (!hash || hash.length <= start + end) return hash || "—";
-  return `${hash.slice(0, start)}...${hash.slice(-end)}`;
-}
-
-function calculateTotalOutput(tx: BitcoinTransaction): number {
-  return tx.vout.reduce((sum, output) => sum + output.value, 0);
-}
-
-function formatTimeAgo(timestamp: number): string {
-  const diffMs = Date.now() - timestamp * 1000;
-  const diffSeconds = Math.floor(Math.abs(diffMs) / 1000);
-
-  if (diffSeconds < 60) return `${diffSeconds}s ago`;
-  if (diffSeconds < 3600) {
-    const mins = Math.floor(diffSeconds / 60);
-    return `${mins}m ago`;
-  }
-  if (diffSeconds < 86400) {
-    const hours = Math.floor(diffSeconds / 3600);
-    return `${hours}h ago`;
-  }
-  const days = Math.floor(diffSeconds / 86400);
-  return `${days}d ago`;
-}
 
 export default function BitcoinTransactionsPage() {
   const { networkId } = useParams<{ networkId?: string }>();
@@ -138,7 +109,7 @@ export default function BitcoinTransactionsPage() {
                         className="table-cell-address"
                         title={tx.txid}
                       >
-                        {truncateHash(tx.txid)}
+                        {truncateHash(tx.txid, "long")}
                       </Link>
                     </td>
                     <td>
@@ -148,7 +119,7 @@ export default function BitcoinTransactionsPage() {
                           className="table-cell-number"
                           title={tx.blockhash}
                         >
-                          {truncateHash(tx.blockhash, 8, 6)}
+                          {truncateHash(tx.blockhash, "short")}
                         </Link>
                       ) : (
                         <span className="text-muted">Pending</span>

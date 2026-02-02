@@ -1,41 +1,12 @@
 import type React from "react";
 import { Link } from "react-router-dom";
 import type { BitcoinBlock } from "../../../types";
+import { formatTimeAgo, truncateHash } from "../../../utils/bitcoinFormatters";
 
 interface BitcoinBlocksTableProps {
   blocks: BitcoinBlock[];
   loading: boolean;
   networkId?: string;
-}
-
-function formatTimeAgo(timestamp: number): string {
-  try {
-    const blockTime = timestamp * 1000;
-    const now = Date.now();
-    const diffMs = now - blockTime;
-    const diffSeconds = Math.max(0, Math.floor(diffMs / 1000));
-
-    if (diffSeconds < 60) {
-      return `${diffSeconds}s ago`;
-    }
-    if (diffSeconds < 3600) {
-      const mins = Math.floor(diffSeconds / 60);
-      return `${mins}m ago`;
-    }
-    if (diffSeconds < 86400) {
-      const hours = Math.floor(diffSeconds / 3600);
-      return `${hours}h ago`;
-    }
-    const days = Math.floor(diffSeconds / 86400);
-    return `${days}d ago`;
-  } catch {
-    return "—";
-  }
-}
-
-function truncateHash(hash: string): string {
-  if (!hash) return "—";
-  return `${hash.slice(0, 8)}...${hash.slice(-6)}`;
 }
 
 const BitcoinBlocksTable: React.FC<BitcoinBlocksTableProps> = ({ blocks, loading, networkId }) => {
@@ -72,10 +43,10 @@ const BitcoinBlocksTable: React.FC<BitcoinBlocksTableProps> = ({ blocks, loading
                 <span className="dashboard-block-hash" title={block.hash}>
                   {networkId ? (
                     <Link to={`/${networkId}/block/${block.hash}`} className="link-accent">
-                      {truncateHash(block.hash)}
+                      {truncateHash(block.hash, "short")}
                     </Link>
                   ) : (
-                    truncateHash(block.hash)
+                    truncateHash(block.hash, "short")
                   )}
                 </span>
               </div>
