@@ -2072,6 +2072,13 @@
 	transform: none;
 }
 
+.pagination-info {
+	color: var(--text-secondary);
+	font-size: 0.9rem;
+	font-weight: 500;
+	padding: 0 8px;
+}
+
 /* ================================================
    Utility Classes - Moved from inline styles
    ================================================ */

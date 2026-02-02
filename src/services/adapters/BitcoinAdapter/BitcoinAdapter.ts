@@ -830,4 +830,130 @@ export class BitcoinAdapter {
       return { fast: null, medium: null, slow: null };
     }
   }
+
+  /**
+   * Get mempool summary (sorted entries without full tx details)
+   * Returns total count and entries sorted by fee rate for pagination
+   */
+  async getMempoolSummary(): Promise<{
+    total: number;
+    entries: Array<{
+      txid: string;
+      vsize: number;
+      weight: number;
+      time: number;
+      fee: number;
+      feeRate: number;
+    }>;
+  }> {
+    try {
+      const mempoolResult = await this.client.getRawMempool(true);
+      const mempoolData = extractData<
+        Record<
+          string,
+          {
+            vsize: number;
+            weight: number;
+            time: number;
+            fees: { base: number; modified: number; ancestor: number; descendant: number };
+            depends: string[];
+            spentby: string[];
+            "bip125-replaceable": boolean;
+          }
+        >
+      >(mempoolResult.data);
+
+      if (!mempoolData) {
+        return { total: 0, entries: [] };
+      }
+
+      // Convert to array with txid and calculate fee rate
+      const entries = Object.entries(mempoolData)
+        .map(([txid, entry]) => ({
+          txid,
+          vsize: entry.vsize,
+          weight: entry.weight,
+          time: entry.time,
+          fee: entry.fees.base,
+          feeRate: entry.vsize > 0 ? (entry.fees.base * 100000000) / entry.vsize : 0,
+        }))
+        .sort((a, b) => b.feeRate - a.feeRate);
+
+      return { total: entries.length, entries };
+    } catch (error) {
+      console.error("Error fetching mempool summary:", error);
+      return { total: 0, entries: [] };
+    }
+  }
+
+  /**
+   * Get mempool transactions with details (paginated)
+   * Returns pending transactions sorted by fee rate (highest first)
+   * @param page Page number (1-indexed)
+   * @param pageSize Number of transactions per page (default 100)
+   */
+  async getMempoolTransactions(
+    page = 1,
+    pageSize = 100,
+  ): Promise<{ transactions: BitcoinTransaction[]; total: number }> {
+    try {
+      // Get mempool summary first (fast - no individual tx fetches)
+      const { total, entries } = await this.getMempoolSummary();
+
+      if (total === 0) {
+        return { transactions: [], total: 0 };
+      }
+
+      // Calculate pagination
+      const startIndex = (page - 1) * pageSize;
+      const pageEntries = entries.slice(startIndex, startIndex + pageSize);
+
+      // Fetch full transaction details only for current page (in parallel for speed)
+      const txPromises = pageEntries.map(async (entry) => {
+        try {
+          const txResult = await this.client.getRawTransaction(entry.txid, 1).catch(() => null);
+          // biome-ignore lint/suspicious/noExplicitAny: RPC response varies
+          const txData = txResult ? extractData<any>(txResult.data) : null;
+
+          if (txData) {
+            return {
+              ...this.transformTransaction(txData),
+              fee: entry.fee,
+              time: entry.time,
+            };
+          }
+          // Fallback to minimal entry from mempool data
+          return {
+            txid: entry.txid,
+            hash: entry.txid,
+            version: 2,
+            size: entry.vsize,
+            vsize: entry.vsize,
+            weight: entry.weight,
+            locktime: 0,
+            vin: [],
+            vout: [],
+            confirmations: 0,
+            time: entry.time,
+            fee: entry.fee,
+          };
+        } catch {
+          return null;
+        }
+      });
+
+      const results = await Promise.all(txPromises);
+      const transactions: BitcoinTransaction[] = [];
+      for (const tx of results) {
+        if (tx !== null) {
+          transactions.push(tx);
+        }
+      }
+
+      return { transactions, total };
+    } catch (error) {
+      console.error("Error fetching mempool transactions:", error);
+      return { transactions: [], total: 0 };
+    }
+  }
 }

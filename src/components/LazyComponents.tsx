@@ -10,6 +10,7 @@ const BitcoinBlocksPage = lazy(() => import("./pages/bitcoin/BitcoinBlocksPage")
 const BitcoinTransactionPage = lazy(() => import("./pages/bitcoin/BitcoinTransactionPage"));
 const BitcoinTransactionsPage = lazy(() => import("./pages/bitcoin/BitcoinTransactionsPage"));
 const BitcoinAddressPage = lazy(() => import("./pages/bitcoin/BitcoinAddressPage"));
+const BitcoinMempoolPage = lazy(() => import("./pages/bitcoin/BitcoinMempoolPage"));
 const Blocks = lazy(() => import("./pages/blocks"));
 const Block = lazy(() => import("./pages/block"));
 const Txs = lazy(() => import("./pages/txs"));
@@ -49,6 +50,7 @@ export const LazyBitcoinBlocks = withSuspense(BitcoinBlocksPage);
 export const LazyBitcoinTx = withSuspense(BitcoinTransactionPage);
 export const LazyBitcoinTxs = withSuspense(BitcoinTransactionsPage);
 export const LazyBitcoinAddress = withSuspense(BitcoinAddressPage);
+export const LazyBitcoinMempool = withSuspense(BitcoinMempoolPage);
 export const LazyBlocks = withSuspense(Blocks);
 export const LazyBlock = withSuspense(Block);
 export const LazyTxs = withSuspense(Txs);
@@ -80,6 +82,7 @@ export function preloadAllRoutes() {
   import("./pages/bitcoin/BitcoinTransactionPage");
   import("./pages/bitcoin/BitcoinTransactionsPage");
   import("./pages/bitcoin/BitcoinAddressPage");
+  import("./pages/bitcoin/BitcoinMempoolPage");
   import("./pages/blocks");
   import("./pages/block");
   import("./pages/txs");

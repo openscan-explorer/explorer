@@ -21,6 +21,7 @@ import "./styles/responsive.css";
 import Loading from "./components/common/Loading";
 import {
   LazyAbout,
+  LazyBitcoinMempool,
   LazyBitcoinNetwork,
   LazyChain,
   LazyContact,
@@ -133,7 +134,7 @@ function AppContent() {
               <Route path="btc/txs" element={<TxsPageRouter />} />
               <Route path="btc/tx/:filter" element={<TxPageRouter />} />
               <Route path="btc/address/:address" element={<AddressPageRouter />} />
-              <Route path="btc/mempool" element={<LazyMempool />} />
+              <Route path="btc/mempool" element={<LazyBitcoinMempool />} />
               <Route path="btc/mempool/:filter" element={<TxPageRouter />} />
               {/* Bitcoin Testnet4 routes */}
               <Route path="tbtc" element={<LazyBitcoinNetwork />} />
@@ -142,7 +143,7 @@ function AppContent() {
               <Route path="tbtc/txs" element={<TxsPageRouter />} />
               <Route path="tbtc/tx/:filter" element={<TxPageRouter />} />
               <Route path="tbtc/address/:address" element={<AddressPageRouter />} />
-              <Route path="tbtc/mempool" element={<LazyMempool />} />
+              <Route path="tbtc/mempool" element={<LazyBitcoinMempool />} />
               <Route path="tbtc/mempool/:filter" element={<TxPageRouter />} />
               {/* EVM network routes */}
               <Route path=":networkId" element={<LazyChain />} />
