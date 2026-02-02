@@ -327,6 +327,28 @@
           "description": "Bitcoin Core repository"
         }
       ]
+    },
+    {
+      "type": "bitcoin",
+      "networkId": "bip122:00000000da84f2bafbbc53dee25a72ae",
+      "slug": "tbtc",
+      "name": "Bitcoin Testnet4",
+      "shortName": "BTC Testnet4",
+      "description": "Bitcoin testnet for developers - Testnet4",
+      "currency": "tBTC",
+      "color": "#F7931A",
+      "isTestnet": true,
+      "logo": "assets/networks/bitcoin-mainnet.svg",
+      "rpc": {
+        "public": ["https://bitcoin-testnet-rpc.publicnode.com"]
+      },
+      "links": [
+        {
+          "name": "Faucet",
+          "url": "https://mempool.space/testnet4/faucet",
+          "description": "Get testnet BTC"
+        }
+      ]
     }
   ]
 }

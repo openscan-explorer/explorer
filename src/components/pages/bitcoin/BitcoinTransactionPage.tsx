@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { AppContext } from "../../../context/AppContext";
 import { useDataService } from "../../../hooks/useDataService";
 import { getBTCPrice } from "../../../services/PriceService";
@@ -8,9 +8,13 @@ import Loader from "../../common/Loader";
 import BitcoinTransactionDisplay from "./BitcoinTransactionDisplay";
 
 export default function BitcoinTransactionPage() {
-  const { networkId, filter: txid } = useParams<{ networkId?: string; filter?: string }>();
+  const { filter: txid } = useParams<{ filter?: string }>();
+  const location = useLocation();
   const { rpcUrls } = useContext(AppContext);
-  const dataService = useDataService(networkId || "btc");
+
+  // Extract network slug from path (e.g., "/tbtc/tx/..." → "tbtc")
+  const networkSlug = location.pathname.split("/")[1] || "btc";
+  const dataService = useDataService(networkSlug);
 
   const [txResult, setTxResult] = useState<DataWithMetadata<BitcoinTransaction> | null>(null);
   const [btcPrice, setBtcPrice] = useState<number | null>(null);
@@ -76,7 +80,7 @@ export default function BitcoinTransactionPage() {
       {txResult?.data ? (
         <BitcoinTransactionDisplay
           transaction={txResult.data}
-          networkId={networkId}
+          networkId={networkSlug}
           btcPrice={btcPrice}
         />
       ) : (

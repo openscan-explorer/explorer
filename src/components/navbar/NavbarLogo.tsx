@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useNetworks } from "../../context/AppContext";
 import { getBaseDomainUrl, getSubdomain, getSubdomainRedirect } from "../../utils/subdomainUtils";
-import { getNetworkUrlPath, resolveNetwork } from "../../utils/networkResolver";
+import { getNetworkUrlPath, isBitcoinNetwork, resolveNetwork } from "../../utils/networkResolver";
 import NetworkIcon from "../common/NetworkIcon";
 
 // OpenScan cube SVG component
@@ -181,6 +181,17 @@ export default function NavbarLogo() {
           >
             <span>Transactions</span>
           </Link>
+
+          {/* Mempool link (Bitcoin networks only) */}
+          {isBitcoinNetwork(currentNetwork) && (
+            <Link
+              to={`/${getNetworkUrlPath(currentNetwork)}/mempool`}
+              className="navbar-logo-dropdown-item"
+              onClick={() => setIsDropdownOpen(false)}
+            >
+              <span>Mempool</span>
+            </Link>
+          )}
 
           {/* Divider */}
           <div className="navbar-logo-dropdown-divider" />

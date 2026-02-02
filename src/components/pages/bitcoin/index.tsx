@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { useBitcoinDashboard } from "../../../hooks/useBitcoinDashboard";
 import { resolveNetwork } from "../../../utils/networkResolver";
 import { getAllNetworks } from "../../../config/networks";
@@ -21,9 +21,11 @@ const DEFAULT_BITCOIN_NETWORK: NetworkConfig = {
 };
 
 export default function BitcoinNetwork() {
-  // networkId comes from URL param (e.g., "btc", "btc-testnet")
-  const { networkId } = useParams<{ networkId?: string }>();
-  const network = resolveNetwork(networkId || "btc", getAllNetworks()) || DEFAULT_BITCOIN_NETWORK;
+  const location = useLocation();
+
+  // Extract network slug from path (e.g., "/tbtc/..." → "tbtc", "/btc" → "btc")
+  const pathSlug = location.pathname.split("/")[1] || "btc";
+  const network = resolveNetwork(pathSlug, getAllNetworks()) || DEFAULT_BITCOIN_NETWORK;
   const dashboard = useBitcoinDashboard(network);
 
   const networkName = network.name.toUpperCase();

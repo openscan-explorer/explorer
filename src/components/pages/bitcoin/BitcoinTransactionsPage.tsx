@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { TXS_PER_PAGE } from "../../../config/bitcoinConstants";
 import { useDataService } from "../../../hooks/useDataService";
 import type { BitcoinTransaction } from "../../../types";
@@ -8,8 +8,11 @@ import { calculateTotalOutput } from "../../../utils/bitcoinUtils";
 import Loader from "../../common/Loader";
 
 export default function BitcoinTransactionsPage() {
-  const { networkId } = useParams<{ networkId?: string }>();
-  const dataService = useDataService(networkId || "");
+  const location = useLocation();
+
+  // Extract network slug from path (e.g., "/tbtc/txs" → "tbtc")
+  const networkSlug = location.pathname.split("/")[1] || "btc";
+  const dataService = useDataService(networkSlug);
 
   const [transactions, setTransactions] = useState<BitcoinTransaction[]>([]);
   const [loading, setLoading] = useState(true);
@@ -105,7 +108,7 @@ export default function BitcoinTransactionsPage() {
                   <tr key={tx.txid}>
                     <td className="table-cell-mono">
                       <Link
-                        to={`/${networkId}/tx/${tx.txid}`}
+                        to={`/${networkSlug}/tx/${tx.txid}`}
                         className="table-cell-address"
                         title={tx.txid}
                       >
@@ -115,7 +118,7 @@ export default function BitcoinTransactionsPage() {
                     <td>
                       {tx.blockhash ? (
                         <Link
-                          to={`/${networkId}/block/${tx.blockhash}`}
+                          to={`/${networkSlug}/block/${tx.blockhash}`}
                           className="table-cell-number"
                           title={tx.blockhash}
                         >

@@ -1,13 +1,17 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { useDataService } from "../../../hooks/useDataService";
 import type { BitcoinAddress, DataWithMetadata } from "../../../types";
 import Loader from "../../common/Loader";
 import BitcoinAddressDisplay from "./BitcoinAddressDisplay";
 
 export default function BitcoinAddressPage() {
-  const { networkId, address } = useParams<{ networkId?: string; address?: string }>();
-  const dataService = useDataService(networkId || "btc");
+  const { address } = useParams<{ address?: string }>();
+  const location = useLocation();
+
+  // Extract network slug from path (e.g., "/tbtc/address/..." → "tbtc")
+  const networkSlug = location.pathname.split("/")[1] || "btc";
+  const dataService = useDataService(networkSlug);
 
   const [addressResult, setAddressResult] = useState<DataWithMetadata<BitcoinAddress> | null>(null);
   const [loading, setLoading] = useState(true);
@@ -61,7 +65,7 @@ export default function BitcoinAddressPage() {
   return (
     <div className="container-wide page-container-padded">
       {addressResult?.data ? (
-        <BitcoinAddressDisplay address={addressResult.data} networkId={networkId} />
+        <BitcoinAddressDisplay address={addressResult.data} networkId={networkSlug} />
       ) : (
         <div className="page-card">
           <div className="card-content">

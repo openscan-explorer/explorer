@@ -126,7 +126,7 @@ function AppContent() {
               <Route path="subscriptions" element={<LazySubscriptions />} />
               <Route path="profile/:profileType/:profileId" element={<LazyProfile />} />
               <Route path="supporters" element={<LazySupporters />} />
-              {/* Bitcoin routes (must come before :networkId catch-all) */}
+              {/* Bitcoin Mainnet routes (must come before :networkId catch-all) */}
               <Route path="btc" element={<LazyBitcoinNetwork />} />
               <Route path="btc/blocks" element={<BlocksPageRouter />} />
               <Route path="btc/block/:filter" element={<BlockPageRouter />} />
@@ -134,7 +134,16 @@ function AppContent() {
               <Route path="btc/tx/:filter" element={<TxPageRouter />} />
               <Route path="btc/address/:address" element={<AddressPageRouter />} />
               <Route path="btc/mempool" element={<LazyMempool />} />
-              <Route path="btc/mempool/:filter" element={<LazyTx />} />
+              <Route path="btc/mempool/:filter" element={<TxPageRouter />} />
+              {/* Bitcoin Testnet4 routes */}
+              <Route path="tbtc" element={<LazyBitcoinNetwork />} />
+              <Route path="tbtc/blocks" element={<BlocksPageRouter />} />
+              <Route path="tbtc/block/:filter" element={<BlockPageRouter />} />
+              <Route path="tbtc/txs" element={<TxsPageRouter />} />
+              <Route path="tbtc/tx/:filter" element={<TxPageRouter />} />
+              <Route path="tbtc/address/:address" element={<AddressPageRouter />} />
+              <Route path="tbtc/mempool" element={<LazyMempool />} />
+              <Route path="tbtc/mempool/:filter" element={<TxPageRouter />} />
               {/* EVM network routes */}
               <Route path=":networkId" element={<LazyChain />} />
               <Route path=":networkId/gastracker" element={<LazyGasTracker />} />

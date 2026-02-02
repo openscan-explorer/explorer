@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { BLOCKS_PER_PAGE } from "../../../config/bitcoinConstants";
 import { useDataService } from "../../../hooks/useDataService";
 import type { BitcoinBlock } from "../../../types";
@@ -7,10 +7,13 @@ import { formatTimeAgo, formatTimestamp, truncateHash } from "../../../utils/bit
 import Loader from "../../common/Loader";
 
 export default function BitcoinBlocksPage() {
-  const { networkId } = useParams<{ networkId?: string }>();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const dataService = useDataService(networkId || "");
+
+  // Extract network slug from path (e.g., "/tbtc/blocks" → "tbtc")
+  const networkSlug = location.pathname.split("/")[1] || "btc";
+  const dataService = useDataService(networkSlug);
 
   const [blocks, setBlocks] = useState<BitcoinBlock[]>([]);
   const [loading, setLoading] = useState(true);
@@ -75,9 +78,9 @@ export default function BitcoinBlocksPage() {
     const newFromBlock = Math.min(newestBlockInPage + BLOCKS_PER_PAGE, latestBlockHeight);
 
     if (newFromBlock >= latestBlockHeight) {
-      navigate(`/${networkId}/blocks`);
+      navigate(`/${networkSlug}/blocks`);
     } else {
-      navigate(`/${networkId}/blocks?fromBlock=${newFromBlock}`);
+      navigate(`/${networkSlug}/blocks?fromBlock=${newFromBlock}`);
     }
   };
 
@@ -87,12 +90,12 @@ export default function BitcoinBlocksPage() {
     const newFromBlock = oldestBlockInPage - 1;
 
     if (newFromBlock >= 0) {
-      navigate(`/${networkId}/blocks?fromBlock=${newFromBlock}`);
+      navigate(`/${networkSlug}/blocks?fromBlock=${newFromBlock}`);
     }
   };
 
   const goToLatest = () => {
-    navigate(`/${networkId}/blocks`);
+    navigate(`/${networkSlug}/blocks`);
   };
 
   // Determine if we can navigate
@@ -163,13 +166,16 @@ export default function BitcoinBlocksPage() {
               {blocks.map((block) => (
                 <tr key={block.hash}>
                   <td>
-                    <Link to={`/${networkId}/block/${block.height}`} className="table-cell-number">
+                    <Link
+                      to={`/${networkSlug}/block/${block.height}`}
+                      className="table-cell-number"
+                    >
                       {block.height.toLocaleString()}
                     </Link>
                   </td>
                   <td className="table-cell-mono">
                     <Link
-                      to={`/${networkId}/block/${block.hash}`}
+                      to={`/${networkSlug}/block/${block.hash}`}
                       className="table-cell-address"
                       title={block.hash}
                     >
