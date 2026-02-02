@@ -4,6 +4,7 @@ import { resolveNetwork } from "../../../utils/networkResolver";
 import { getAllNetworks } from "../../../config/networks";
 import type { NetworkConfig } from "../../../types";
 import Loader from "../../common/Loader";
+import SearchBox from "../../common/SearchBox";
 import BitcoinDashboardStats from "./BitcoinDashboardStats";
 import BitcoinBlocksTable from "./BitcoinBlocksTable";
 import BitcoinTransactionsTable from "./BitcoinTransactionsTable";
@@ -20,20 +21,10 @@ const DEFAULT_BITCOIN_NETWORK: NetworkConfig = {
 };
 
 export default function BitcoinNetwork() {
+  // networkId comes from URL param (e.g., "btc", "btc-testnet")
   const { networkId } = useParams<{ networkId?: string }>();
   const network = resolveNetwork(networkId || "btc", getAllNetworks()) || DEFAULT_BITCOIN_NETWORK;
   const dashboard = useBitcoinDashboard(network);
-
-  if (!resolveNetwork(networkId || "btc", getAllNetworks())) {
-    return (
-      <div className="container-wide">
-        <div className="block-display-card">
-          <h1 className="home-title">Network Not Found</h1>
-          <p className="error-text-center">The requested network could not be found.</p>
-        </div>
-      </div>
-    );
-  }
 
   const networkName = network.name.toUpperCase();
   const networkColor = network.color || "#F7931A";
@@ -50,6 +41,7 @@ export default function BitcoinNetwork() {
           </span>
         </h1>
         {network.description && <p className="network-description">{network.description}</p>}
+        <SearchBox />
 
         {dashboard.loading && dashboard.latestBlocks.length === 0 && (
           <Loader text="Loading Bitcoin network data..." />
@@ -68,12 +60,12 @@ export default function BitcoinNetwork() {
           <BitcoinBlocksTable
             blocks={dashboard.latestBlocks}
             loading={dashboard.loading}
-            networkId={networkId}
+            networkId={network.slug}
           />
           <BitcoinTransactionsTable
             transactions={dashboard.latestTransactions}
             loading={dashboard.loading && dashboard.latestTransactions.length === 0}
-            networkId={networkId}
+            networkId={network.slug}
           />
         </div>
 
