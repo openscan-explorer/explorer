@@ -21,6 +21,8 @@ import "./styles/responsive.css";
 import Loading from "./components/common/Loading";
 import {
   LazyAbout,
+  LazyBitcoinNetwork,
+  LazyChain,
   LazyContact,
   LazyDevTools,
   LazyGasTracker,
@@ -42,7 +44,6 @@ import {
   TxPageRouter,
   TxsPageRouter,
 } from "./components/NetworkAwareRouters";
-import NetworkRouter from "./components/NetworkRouter";
 import { SettingsProvider, useSettings, useTheme } from "./context/SettingsContext";
 import { useAppReady, useOnAppReady } from "./hooks/useAppReady";
 
@@ -125,7 +126,17 @@ function AppContent() {
               <Route path="subscriptions" element={<LazySubscriptions />} />
               <Route path="profile/:profileType/:profileId" element={<LazyProfile />} />
               <Route path="supporters" element={<LazySupporters />} />
-              <Route path=":networkId" element={<NetworkRouter />} />
+              {/* Bitcoin routes (must come before :networkId catch-all) */}
+              <Route path="btc" element={<LazyBitcoinNetwork />} />
+              <Route path="btc/blocks" element={<BlocksPageRouter />} />
+              <Route path="btc/block/:filter" element={<BlockPageRouter />} />
+              <Route path="btc/txs" element={<TxsPageRouter />} />
+              <Route path="btc/tx/:filter" element={<TxPageRouter />} />
+              <Route path="btc/address/:address" element={<AddressPageRouter />} />
+              <Route path="btc/mempool" element={<LazyMempool />} />
+              <Route path="btc/mempool/:filter" element={<LazyTx />} />
+              {/* EVM network routes */}
+              <Route path=":networkId" element={<LazyChain />} />
               <Route path=":networkId/gastracker" element={<LazyGasTracker />} />
               <Route path=":networkId/blocks" element={<BlocksPageRouter />} />
               <Route path=":networkId/block/:filter" element={<BlockPageRouter />} />
