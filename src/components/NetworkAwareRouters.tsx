@@ -1,6 +1,18 @@
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { getAllNetworks } from "../config/networks";
 import { isBitcoinNetwork, resolveNetwork } from "../utils/networkResolver";
+
+/**
+ * Helper to get network from URL - tries params first, then path segment
+ */
+function useNetworkFromUrl() {
+  const { networkId } = useParams<{ networkId?: string }>();
+  const location = useLocation();
+  // Extract from path if not in params (e.g., "/btc/block/123" → "btc")
+  const pathSlug = location.pathname.split("/")[1] || "";
+  const slug = networkId || pathSlug;
+  return resolveNetwork(slug, getAllNetworks());
+}
 import {
   LazyAddress,
   LazyBitcoinAddress,
@@ -19,8 +31,7 @@ import {
  * Routes to BitcoinBlocksPage for Bitcoin networks, LazyBlocks for EVM
  */
 export function BlocksPageRouter() {
-  const { networkId } = useParams<{ networkId?: string }>();
-  const network = resolveNetwork(networkId || "", getAllNetworks());
+  const network = useNetworkFromUrl();
 
   if (network && isBitcoinNetwork(network)) {
     return <LazyBitcoinBlocks />;
@@ -33,8 +44,7 @@ export function BlocksPageRouter() {
  * Routes to BitcoinBlockPage for Bitcoin networks, LazyBlock for EVM
  */
 export function BlockPageRouter() {
-  const { networkId } = useParams<{ networkId?: string }>();
-  const network = resolveNetwork(networkId || "", getAllNetworks());
+  const network = useNetworkFromUrl();
 
   if (network && isBitcoinNetwork(network)) {
     return <LazyBitcoinBlock />;
@@ -47,8 +57,7 @@ export function BlockPageRouter() {
  * Routes to BitcoinTransactionsPage for Bitcoin networks, LazyTxs for EVM
  */
 export function TxsPageRouter() {
-  const { networkId } = useParams<{ networkId?: string }>();
-  const network = resolveNetwork(networkId || "", getAllNetworks());
+  const network = useNetworkFromUrl();
 
   if (network && isBitcoinNetwork(network)) {
     return <LazyBitcoinTxs />;
@@ -61,8 +70,7 @@ export function TxsPageRouter() {
  * Routes to BitcoinTransactionPage for Bitcoin networks, LazyTx for EVM
  */
 export function TxPageRouter() {
-  const { networkId } = useParams<{ networkId?: string }>();
-  const network = resolveNetwork(networkId || "", getAllNetworks());
+  const network = useNetworkFromUrl();
 
   if (network && isBitcoinNetwork(network)) {
     return <LazyBitcoinTx />;
@@ -75,8 +83,7 @@ export function TxPageRouter() {
  * Routes to BitcoinAddressPage for Bitcoin networks, LazyAddress for EVM
  */
 export function AddressPageRouter() {
-  const { networkId } = useParams<{ networkId?: string }>();
-  const network = resolveNetwork(networkId || "", getAllNetworks());
+  const network = useNetworkFromUrl();
 
   if (network && isBitcoinNetwork(network)) {
     return <LazyBitcoinAddress />;

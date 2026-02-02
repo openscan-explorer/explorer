@@ -109,7 +109,8 @@ export class BitcoinAdapter {
         hash: string;
         height: number;
         time: number;
-        nTx: number;
+        nTx?: number;
+        tx?: string[];
         size: number;
         weight: number;
         merkleroot: string;
@@ -124,7 +125,7 @@ export class BitcoinAdapter {
           hash: blockData.hash,
           height: blockData.height,
           time: blockData.time,
-          nTx: blockData.nTx,
+          nTx: blockData.nTx || blockData.tx?.length || 0,
           size: blockData.size,
           weight: blockData.weight,
           merkleRoot: blockData.merkleroot,
@@ -175,7 +176,7 @@ export class BitcoinAdapter {
         hash: string;
         height: number;
         time: number;
-        nTx: number;
+        nTx?: number;
         merkleroot: string;
         previousblockhash?: string;
         version: number;
@@ -188,7 +189,7 @@ export class BitcoinAdapter {
           hash: headerData.hash,
           height: headerData.height,
           time: headerData.time,
-          nTx: headerData.nTx,
+          nTx: headerData.nTx || 0,
           size: 0, // Not available in header
           weight: 0, // Not available in header
           merkleRoot: headerData.merkleroot,
@@ -421,10 +422,18 @@ export class BitcoinAdapter {
       blockHash = blockHashOrHeight;
     }
 
-    // Get block with verbosity 2 (includes full transaction data)
-    const blockResult = await this.client.getBlock(blockHash, 2);
+    // Fetch block with verbosity 2 and header in parallel
+    // Header gives us reliable nTx count, verbosity 2 gives full tx data for stats
+    const [blockResult, headerResult] = await Promise.all([
+      this.client.getBlock(blockHash, 2),
+      this.client.getBlockHeader(blockHash, true).catch(() => null),
+    ]);
+
     // biome-ignore lint/suspicious/noExplicitAny: RPC response varies
     const blockData = extractData<any>(blockResult.data);
+    const headerData = headerResult
+      ? extractData<{ nTx?: number; size?: number; weight?: number }>(headerResult.data)
+      : null;
 
     if (!blockData) {
       throw new Error(`Block ${blockHashOrHeight} not found`);
@@ -499,9 +508,9 @@ export class BitcoinAdapter {
       hash: blockData.hash,
       height: blockData.height,
       time: blockData.time,
-      nTx: blockData.nTx,
-      size: blockData.size,
-      weight: blockData.weight,
+      nTx: headerData?.nTx || blockData.nTx || txids.length,
+      size: headerData?.size || blockData.size,
+      weight: headerData?.weight || blockData.weight,
       merkleRoot: blockData.merkleroot,
       previousBlockHash: blockData.previousblockhash,
       nextBlockHash: blockData.nextblockhash,
