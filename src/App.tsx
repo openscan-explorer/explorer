@@ -21,8 +21,16 @@ import "./styles/responsive.css";
 import Loading from "./components/common/Loading";
 import {
   LazyAbout,
+  LazyAddress,
+  LazyBitcoinAddress,
+  LazyBitcoinBlock,
+  LazyBitcoinBlocks,
   LazyBitcoinMempool,
   LazyBitcoinNetwork,
+  LazyBitcoinTx,
+  LazyBitcoinTxs,
+  LazyBlock,
+  LazyBlocks,
   LazyChain,
   LazyContact,
   LazyDevTools,
@@ -36,15 +44,9 @@ import {
   LazySupporters,
   LazyTokenDetails,
   LazyTx,
+  LazyTxs,
   preloadAllRoutes,
 } from "./components/LazyComponents";
-import {
-  AddressPageRouter,
-  BlockPageRouter,
-  BlocksPageRouter,
-  TxPageRouter,
-  TxsPageRouter,
-} from "./components/NetworkAwareRouters";
 import { SettingsProvider, useSettings, useTheme } from "./context/SettingsContext";
 import { useAppReady, useOnAppReady } from "./hooks/useAppReady";
 
@@ -129,30 +131,30 @@ function AppContent() {
               <Route path="supporters" element={<LazySupporters />} />
               {/* Bitcoin Mainnet routes (must come before :networkId catch-all) */}
               <Route path="btc" element={<LazyBitcoinNetwork />} />
-              <Route path="btc/blocks" element={<BlocksPageRouter />} />
-              <Route path="btc/block/:filter" element={<BlockPageRouter />} />
-              <Route path="btc/txs" element={<TxsPageRouter />} />
-              <Route path="btc/tx/:filter" element={<TxPageRouter />} />
-              <Route path="btc/address/:address" element={<AddressPageRouter />} />
+              <Route path="btc/blocks" element={<LazyBitcoinBlocks />} />
+              <Route path="btc/block/:filter" element={<LazyBitcoinBlock />} />
+              <Route path="btc/txs" element={<LazyBitcoinTxs />} />
+              <Route path="btc/tx/:filter" element={<LazyBitcoinTx />} />
+              <Route path="btc/address/:address" element={<LazyBitcoinAddress />} />
               <Route path="btc/mempool" element={<LazyBitcoinMempool />} />
-              <Route path="btc/mempool/:filter" element={<TxPageRouter />} />
+              <Route path="btc/mempool/:filter" element={<LazyBitcoinTx />} />
               {/* Bitcoin Testnet4 routes */}
               <Route path="tbtc" element={<LazyBitcoinNetwork />} />
-              <Route path="tbtc/blocks" element={<BlocksPageRouter />} />
-              <Route path="tbtc/block/:filter" element={<BlockPageRouter />} />
-              <Route path="tbtc/txs" element={<TxsPageRouter />} />
-              <Route path="tbtc/tx/:filter" element={<TxPageRouter />} />
-              <Route path="tbtc/address/:address" element={<AddressPageRouter />} />
+              <Route path="tbtc/blocks" element={<LazyBitcoinBlocks />} />
+              <Route path="tbtc/block/:filter" element={<LazyBitcoinBlock />} />
+              <Route path="tbtc/txs" element={<LazyBitcoinTxs />} />
+              <Route path="tbtc/tx/:filter" element={<LazyBitcoinTx />} />
+              <Route path="tbtc/address/:address" element={<LazyBitcoinAddress />} />
               <Route path="tbtc/mempool" element={<LazyBitcoinMempool />} />
-              <Route path="tbtc/mempool/:filter" element={<TxPageRouter />} />
+              <Route path="tbtc/mempool/:filter" element={<LazyBitcoinTx />} />
               {/* EVM network routes */}
               <Route path=":networkId" element={<LazyChain />} />
               <Route path=":networkId/gastracker" element={<LazyGasTracker />} />
-              <Route path=":networkId/blocks" element={<BlocksPageRouter />} />
-              <Route path=":networkId/block/:filter" element={<BlockPageRouter />} />
-              <Route path=":networkId/txs" element={<TxsPageRouter />} />
-              <Route path=":networkId/tx/:filter" element={<TxPageRouter />} />
-              <Route path=":networkId/address/:address" element={<AddressPageRouter />} />
+              <Route path=":networkId/blocks" element={<LazyBlocks />} />
+              <Route path=":networkId/block/:filter" element={<LazyBlock />} />
+              <Route path=":networkId/txs" element={<LazyTxs />} />
+              <Route path=":networkId/tx/:filter" element={<LazyTx />} />
+              <Route path=":networkId/address/:address" element={<LazyAddress />} />
               <Route path=":networkId/address/:address/:tokenId" element={<LazyTokenDetails />} />
               <Route path=":networkId/mempool" element={<LazyMempool />} />
               <Route path=":networkId/mempool/:filter" element={<LazyTx />} />
