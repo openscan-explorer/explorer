@@ -22,7 +22,7 @@ const BuildWarningIcon: React.FC<BuildWarningIconProps> = ({ className = "" }) =
     return ICON_COLORS[ENVIRONMENT as keyof typeof ICON_COLORS] || ICON_COLORS.default;
   }, []);
 
-  if (ENVIRONMENT === "production") {
+  if (ENVIRONMENT === "production" || ENVIRONMENT === "development") {
     return null;
   }
 

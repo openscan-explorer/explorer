@@ -265,6 +265,13 @@ body {
   transform: translateY(-1px);
 }
 
+.navbar-toggle-btn.navbar-toggle-active,
+.navbar-toggle-btn.navbar-toggle-active:hover {
+  background: var(--color-primary-alpha-20, rgba(99, 102, 241, 0.2));
+  border-color: var(--color-primary-alpha-30, rgba(99, 102, 241, 0.3));
+  color: #ffffff;
+}
+
 /* Navbar error bar - full width below navbar */
 .navbar-error-bar {
   display: flex;

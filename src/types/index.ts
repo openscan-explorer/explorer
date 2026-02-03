@@ -288,6 +288,7 @@ export interface UserSettings {
   rpcStrategy?: "fallback" | "parallel";
   maxParallelRequests?: number;
   apiKeys?: ApiKeys;
+  superUserMode?: boolean;
 }
 
 /**
@@ -299,6 +300,7 @@ export const DEFAULT_SETTINGS: UserSettings = {
   rpcStrategy: "fallback",
   maxParallelRequests: 3,
   apiKeys: {},
+  superUserMode: false,
 };
 
 /**
