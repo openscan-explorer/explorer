@@ -6,14 +6,20 @@ import { formatTimeAgo, truncateHash } from "../../../utils/bitcoinFormatters";
 interface BitcoinBlocksTableProps {
   blocks: BitcoinBlock[];
   loading: boolean;
-  networkId?: string;
+  networkId: string;
 }
 
 const BitcoinBlocksTable: React.FC<BitcoinBlocksTableProps> = ({ blocks, loading, networkId }) => {
   return (
     <div className="dashboard-table-section dashboard-table-section-full">
       <div className="dashboard-table-header">
-        <h3 className="dashboard-table-title">Latest Blocks</h3>
+        <Link to={`/${networkId}/blocks`} className="dashboard-table-title-link">
+          <h3 className="dashboard-table-title">Latest Blocks</h3>
+          <span className="dashboard-title-arrow">↗</span>
+        </Link>
+        <Link to={`/${networkId}/blocks`} className="dashboard-view-all">
+          View all →
+        </Link>
       </div>
 
       {loading && blocks.length === 0 ? (
@@ -25,30 +31,22 @@ const BitcoinBlocksTable: React.FC<BitcoinBlocksTableProps> = ({ blocks, loading
           {blocks.map((block) => (
             <div key={block.hash} className="dashboard-table-row">
               <div className="dashboard-block-info">
-                <span className="dashboard-block-number">
-                  {networkId ? (
-                    <Link to={`/${networkId}/block/${block.height}`} className="link-accent">
-                      #{block.height.toLocaleString()}
-                    </Link>
-                  ) : (
-                    `#${block.height.toLocaleString()}`
-                  )}
-                </span>
+                <Link to={`/${networkId}/block/${block.height}`} className="dashboard-block-number">
+                  #{block.height.toLocaleString()}
+                </Link>
                 <span className="dashboard-block-time">{formatTimeAgo(block.time)}</span>
               </div>
               <div className="dashboard-block-details">
                 <span className="dashboard-block-txns">{block.nTx} txns</span>
               </div>
               <div className="dashboard-block-meta">
-                <span className="dashboard-block-hash" title={block.hash}>
-                  {networkId ? (
-                    <Link to={`/${networkId}/block/${block.hash}`} className="link-accent">
-                      {truncateHash(block.hash, "short")}
-                    </Link>
-                  ) : (
-                    truncateHash(block.hash, "short")
-                  )}
-                </span>
+                <Link
+                  to={`/${networkId}/block/${block.hash}`}
+                  className="dashboard-block-hash"
+                  title={block.hash}
+                >
+                  {truncateHash(block.hash, "short")}
+                </Link>
               </div>
             </div>
           ))}

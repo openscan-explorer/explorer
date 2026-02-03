@@ -62,12 +62,12 @@ export default function BitcoinNetwork() {
           <BitcoinBlocksTable
             blocks={dashboard.latestBlocks}
             loading={dashboard.loading}
-            networkId={network.slug}
+            networkId={pathSlug}
           />
           <BitcoinTransactionsTable
             transactions={dashboard.latestTransactions}
             loading={dashboard.loadingTransactions}
-            networkId={network.slug}
+            networkId={pathSlug}
           />
         </div>
 

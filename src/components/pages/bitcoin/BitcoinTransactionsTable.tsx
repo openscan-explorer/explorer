@@ -7,7 +7,7 @@ import { calculateTotalOutput } from "../../../utils/bitcoinUtils";
 interface BitcoinTransactionsTableProps {
   transactions: BitcoinTransaction[];
   loading: boolean;
-  networkId?: string;
+  networkId: string;
 }
 
 const BitcoinTransactionsTable: React.FC<BitcoinTransactionsTableProps> = ({
@@ -18,7 +18,13 @@ const BitcoinTransactionsTable: React.FC<BitcoinTransactionsTableProps> = ({
   return (
     <div className="dashboard-table-section dashboard-table-section-full">
       <div className="dashboard-table-header">
-        <h3 className="dashboard-table-title">Latest Transactions</h3>
+        <Link to={`/${networkId}/txs`} className="dashboard-table-title-link">
+          <h3 className="dashboard-table-title">Latest Transactions</h3>
+          <span className="dashboard-title-arrow">↗</span>
+        </Link>
+        <Link to={`/${networkId}/txs`} className="dashboard-view-all">
+          View all →
+        </Link>
       </div>
 
       {loading && transactions.length === 0 ? (
@@ -30,15 +36,9 @@ const BitcoinTransactionsTable: React.FC<BitcoinTransactionsTableProps> = ({
           {transactions.map((tx) => (
             <div key={tx.txid} className="dashboard-table-row">
               <div className="dashboard-tx-info">
-                <span className="dashboard-tx-hash">
-                  {networkId ? (
-                    <Link to={`/${networkId}/tx/${tx.txid}`} className="link-accent tx-mono">
-                      {truncateHash(tx.txid, "medium")}
-                    </Link>
-                  ) : (
-                    <span className="tx-mono">{truncateHash(tx.txid, "medium")}</span>
-                  )}
-                </span>
+                <Link to={`/${networkId}/tx/${tx.txid}`} className="dashboard-tx-hash tx-mono">
+                  {truncateHash(tx.txid, "medium")}
+                </Link>
               </div>
               <div className="dashboard-tx-details">
                 <span className="dashboard-tx-ios">
