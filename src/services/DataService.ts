@@ -10,7 +10,7 @@ export class DataService {
   constructor(
     networkId: SupportedChainId,
     rpcUrlsMap: RpcUrlsContextType,
-    strategy: "fallback" | "parallel" = "fallback",
+    strategy: "fallback" | "parallel" | "race" = "fallback",
   ) {
     const rpcUrls = getRPCUrls(networkId, rpcUrlsMap);
     const networkClient = ClientFactory.createTypedClient<typeof networkId>(networkId, {

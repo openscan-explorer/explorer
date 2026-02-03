@@ -30,12 +30,11 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "22"
+          node-version: "24"
           registry-url: "https://registry.npmjs.org"
 
       - name: Publish to npm
         uses: JS-DevTools/npm-publish@v4
         with:
+          registry: "https://registry.npmjs.org/"
           package: ./dist
-          access: public
-          provenance: true

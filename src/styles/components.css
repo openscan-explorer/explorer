@@ -2875,6 +2875,19 @@
 	color: var(--text-secondary);
 }
 
+.rpc-indicator-race-info {
+	padding: 8px 16px;
+	background: var(--overlay-light-5);
+	border-bottom: 1px solid var(--overlay-light-10);
+	font-size: 12px;
+	color: var(--text-secondary);
+}
+
+.rpc-indicator-item.race-winner {
+	background: var(--color-info-alpha-10);
+	border-left: 3px solid var(--color-info);
+}
+
 .rpc-indicator-item-time {
 	margin-top: 4px;
 	font-size: 10px;

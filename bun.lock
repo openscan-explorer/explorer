@@ -5,7 +5,7 @@
     "": {
       "name": "openscan",
       "dependencies": {
-        "@openscan/network-connectors": "^1.0.0",
+        "@openscan/network-connectors": "^1.3.0",
         "@rainbow-me/rainbowkit": "^2.2.8",
         "@react-native-async-storage/async-storage": "^1.24.0",
         "@testing-library/dom": "^10.4.0",
@@ -273,7 +273,7 @@
 
     "@noble/hashes": ["@noble/hashes@1.8.0", "", {}, "sha512-jCs9ldd7NwzpgXDIf6P3+NrHh9/sD6CQdxHyjQI+h/6rDNo88ypBxxz45UDuZHz9r3tNz7N/VInSVoVdtXEI4A=="],
 
-    "@openscan/network-connectors": ["@openscan/network-connectors@1.0.0", "", {}, "sha512-ECxpAMbQm/oxW82uqsR/yp3BdTWRZspK6XswsR4K2nGlvLzlvLs0iWiS+NqdTPvF++4fTLDm9SDhNd0jzSY7Tw=="],
+    "@openscan/network-connectors": ["@openscan/network-connectors@1.3.0", "", {}, "sha512-Z0HPtOMq+Mqw5sGSv57uuJtVMGwtg/49wzV/LUiXhY8BRLf46refTa+91p2S/ryq6mWEV8pgXL7CaprUbPkkww=="],
 
     "@paulmillr/qr": ["@paulmillr/qr@0.2.1", "", {}, "sha512-IHnV6A+zxU7XwmKFinmYjUcwlyK9+xkG3/s9KcQhI9BjQKycrJ1JRO+FbNYPwZiPKW3je/DR0k7w8/gLa5eaxQ=="],
 
