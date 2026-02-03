@@ -7,6 +7,7 @@ import {
   formatTimeAgo,
   formatTimestamp,
   formatUSD,
+  truncateBlockHash,
   truncateHash,
 } from "../../../utils/bitcoinFormatters";
 import {
@@ -83,10 +84,10 @@ const BitcoinTransactionDisplay: React.FC<BitcoinTransactionDisplayProps> = Reac
               <span className="tx-value tx-mono">
                 {networkId ? (
                   <Link to={`/${networkId}/block/${transaction.blockhash}`} className="link-accent">
-                    {truncateHash(transaction.blockhash, "long")}
+                    {truncateBlockHash(transaction.blockhash)}
                   </Link>
                 ) : (
-                  truncateHash(transaction.blockhash, "long")
+                  truncateBlockHash(transaction.blockhash)
                 )}
               </span>
             </div>

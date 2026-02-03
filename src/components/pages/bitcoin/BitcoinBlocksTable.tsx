@@ -1,7 +1,7 @@
 import type React from "react";
 import { Link } from "react-router-dom";
 import type { BitcoinBlock } from "../../../types";
-import { formatTimeAgo, truncateHash } from "../../../utils/bitcoinFormatters";
+import { formatTimeAgo, truncateBlockHash } from "../../../utils/bitcoinFormatters";
 
 interface BitcoinBlocksTableProps {
   blocks: BitcoinBlock[];
@@ -42,10 +42,10 @@ const BitcoinBlocksTable: React.FC<BitcoinBlocksTableProps> = ({ blocks, loading
               <div className="dashboard-block-meta">
                 <Link
                   to={`/${networkId}/block/${block.hash}`}
-                  className="dashboard-block-hash"
+                  className="dashboard-block-miner"
                   title={block.hash}
                 >
-                  {truncateHash(block.hash, "short")}
+                  {truncateBlockHash(block.hash)}
                 </Link>
               </div>
             </div>

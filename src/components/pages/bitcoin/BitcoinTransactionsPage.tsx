@@ -3,7 +3,12 @@ import { Link, useLocation } from "react-router-dom";
 import { TXS_PER_PAGE } from "../../../config/bitcoinConstants";
 import { useDataService } from "../../../hooks/useDataService";
 import type { BitcoinTransaction } from "../../../types";
-import { formatBTC, formatTimeAgo, truncateHash } from "../../../utils/bitcoinFormatters";
+import {
+  formatBTC,
+  formatTimeAgo,
+  truncateBlockHash,
+  truncateHash,
+} from "../../../utils/bitcoinFormatters";
 import { calculateTotalOutput } from "../../../utils/bitcoinUtils";
 import Loader from "../../common/Loader";
 
@@ -122,7 +127,7 @@ export default function BitcoinTransactionsPage() {
                           className="table-cell-number"
                           title={tx.blockhash}
                         >
-                          {truncateHash(tx.blockhash, "short")}
+                          {truncateBlockHash(tx.blockhash)}
                         </Link>
                       ) : (
                         <span className="text-muted">Pending</span>

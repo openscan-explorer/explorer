@@ -7,7 +7,7 @@ import {
   formatSize,
   formatTimeAgo,
   formatTimestamp,
-  truncateHash,
+  truncateBlockHash,
 } from "../../../utils/bitcoinFormatters";
 
 interface BitcoinBlockDisplayProps {
@@ -161,10 +161,10 @@ const BitcoinBlockDisplay: React.FC<BitcoinBlockDisplayProps> = React.memo(
                   <span className="tx-value tx-mono">
                     {networkId ? (
                       <Link to={`/${networkId}/block/${block.height - 1}`} className="link-accent">
-                        {truncateHash(block.previousBlockHash, "long")}
+                        {truncateBlockHash(block.previousBlockHash)}
                       </Link>
                     ) : (
-                      truncateHash(block.previousBlockHash, "long")
+                      truncateBlockHash(block.previousBlockHash)
                     )}
                   </span>
                 </div>
@@ -177,10 +177,10 @@ const BitcoinBlockDisplay: React.FC<BitcoinBlockDisplayProps> = React.memo(
                   <span className="tx-value tx-mono">
                     {networkId ? (
                       <Link to={`/${networkId}/block/${block.height + 1}`} className="link-accent">
-                        {truncateHash(block.nextBlockHash, "long")}
+                        {truncateBlockHash(block.nextBlockHash)}
                       </Link>
                     ) : (
-                      truncateHash(block.nextBlockHash, "long")
+                      truncateBlockHash(block.nextBlockHash)
                     )}
                   </span>
                 </div>

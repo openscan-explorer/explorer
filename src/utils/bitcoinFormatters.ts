@@ -48,6 +48,32 @@ export function truncateHash(
 }
 
 /**
+ * Truncate a Bitcoin block hash, skipping leading zeros to show the unique part
+ * Bitcoin block hashes have many leading zeros due to proof-of-work
+ * @param hash - The block hash to truncate
+ * @param startChars - Number of characters to show at start (default 8)
+ * @param endChars - Number of characters to show at end (default 6)
+ */
+export function truncateBlockHash(hash: string, startChars = 8, endChars = 6): string {
+  if (!hash) return "—";
+
+  // Find the first non-zero character
+  let firstNonZero = 0;
+  for (let i = 0; i < hash.length; i++) {
+    if (hash[i] !== "0") {
+      firstNonZero = i;
+      break;
+    }
+  }
+
+  // Get the unique part (after leading zeros)
+  const uniquePart = hash.slice(firstNonZero);
+  if (uniquePart.length <= startChars + endChars) return uniquePart;
+
+  return `${uniquePart.slice(0, startChars)}...${uniquePart.slice(-endChars)}`;
+}
+
+/**
  * Format a Unix timestamp as relative time (e.g., "5m ago", "2h ago")
  * @param timestamp - Unix timestamp in seconds
  * @param verbose - If true, use verbose format ("5 minutes ago" instead of "5m ago")

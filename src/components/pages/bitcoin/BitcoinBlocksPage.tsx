@@ -3,7 +3,11 @@ import { Link, useLocation, useNavigate, useSearchParams } from "react-router-do
 import { BLOCKS_PER_PAGE } from "../../../config/bitcoinConstants";
 import { useDataService } from "../../../hooks/useDataService";
 import type { BitcoinBlock } from "../../../types";
-import { formatTimeAgo, formatTimestamp, truncateHash } from "../../../utils/bitcoinFormatters";
+import {
+  formatTimeAgo,
+  formatTimestamp,
+  truncateBlockHash,
+} from "../../../utils/bitcoinFormatters";
 import Loader from "../../common/Loader";
 
 export default function BitcoinBlocksPage() {
@@ -179,7 +183,7 @@ export default function BitcoinBlocksPage() {
                       className="table-cell-address"
                       title={block.hash}
                     >
-                      {truncateHash(block.hash, "medium")}
+                      {truncateBlockHash(block.hash)}
                     </Link>
                   </td>
                   <td className="table-cell-text" title={formatTimestamp(block.time)}>
