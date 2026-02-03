@@ -1344,12 +1344,14 @@
   /* RPC tags - more compact on mobile */
   .settings-rpc-tags {
     gap: 6px;
+    width: 100%;
+    overflow-x: hidden;
   }
 
   .settings-rpc-tag {
     padding: 4px 8px;
     font-size: 0.7rem;
-    max-width: calc(100vw - 80px);
+    max-width: 100%;
   }
 
   .settings-rpc-tag-index {
@@ -1388,7 +1390,7 @@
   }
 
   .settings-rpc-tag-url {
-    max-width: 150px;
+    max-width: 120px;
   }
 
   .settings-chain-name {
