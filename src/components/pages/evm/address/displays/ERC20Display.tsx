@@ -2,7 +2,11 @@ import type React from "react";
 import { useContext, useEffect, useMemo, useState } from "react";
 import { AppContext } from "../../../../../context";
 import { useSourcify } from "../../../../../hooks/useSourcify";
-import { fetchToken, getAssetUrl, type TokenMetadata } from "../../../../../services/MetadataService";
+import {
+  fetchToken,
+  getAssetUrl,
+  type TokenMetadata,
+} from "../../../../../services/MetadataService";
 import type { Address, ENSReverseResult, RPCMetadata } from "../../../../../types";
 import { hexToUtf8 } from "../../../../../utils/erc20Utils";
 import { AddressHeader } from "../shared";

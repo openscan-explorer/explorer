@@ -76,107 +76,116 @@ const BitcoinBlockDisplay: React.FC<BitcoinBlockDisplayProps> = React.memo(
             </div>
           )}
 
-          {/* Block Reward */}
-          {block.blockReward !== undefined && (
-            <div className="tx-row">
-              <span className="tx-label">Block Reward:</span>
-              <span className="tx-value tx-value-highlight">{formatBTC(block.blockReward)}</span>
-            </div>
-          )}
-
-          {/* Total Fees */}
-          {block.totalFees !== undefined && (
-            <div className="tx-row">
-              <span className="tx-label">Total Fees:</span>
-              <span className="tx-value">{formatBTC(block.totalFees)}</span>
-            </div>
-          )}
-
-          {/* Fee Rate Stats */}
-          {block.feeRateAvg !== undefined && block.feeRateMedian !== undefined && (
-            <div className="tx-row">
-              <span className="tx-label">Fee Rate:</span>
-              <span className="tx-value">
-                Avg: {block.feeRateAvg.toFixed(2)} sat/vB | Median: {block.feeRateMedian.toFixed(2)}{" "}
-                sat/vB
-              </span>
-            </div>
-          )}
-
-          {/* Transactions */}
-          <div className="tx-row">
-            <span className="tx-label">Transactions:</span>
-            <span className="tx-value">
-              <span className="tx-value-highlight">{block.nTx.toLocaleString()}</span> transactions
-              {block.inputCount !== undefined && block.outputCount !== undefined && (
-                <span className="btc-io-counts">
-                  {" "}
-                  ({block.inputCount.toLocaleString()} inputs, {block.outputCount.toLocaleString()}{" "}
-                  outputs)
-                </span>
+          <div className="btc-tx-details-grid">
+            {/* Left Column */}
+            <div className="btc-tx-details-column">
+              {/* Block Reward */}
+              {block.blockReward !== undefined && (
+                <div className="tx-row">
+                  <span className="tx-label">Block Reward:</span>
+                  <span className="tx-value tx-value-highlight">{formatBTC(block.blockReward)}</span>
+                </div>
               )}
-            </span>
+
+              {/* Total Fees */}
+              {block.totalFees !== undefined && (
+                <div className="tx-row">
+                  <span className="tx-label">Total Fees:</span>
+                  <span className="tx-value">{formatBTC(block.totalFees)}</span>
+                </div>
+              )}
+
+              {/* Fee Rate Stats */}
+              {block.feeRateAvg !== undefined && block.feeRateMedian !== undefined && (
+                <div className="tx-row">
+                  <span className="tx-label">Fee Rate:</span>
+                  <span className="tx-value">
+                    Avg: {block.feeRateAvg.toFixed(2)} sat/vB | Median: {block.feeRateMedian.toFixed(2)}{" "}
+                    sat/vB
+                  </span>
+                </div>
+              )}
+
+              {/* Transactions */}
+              <div className="tx-row">
+                <span className="tx-label">Transactions:</span>
+                <span className="tx-value">
+                  <span className="tx-value-highlight">{block.nTx.toLocaleString()}</span> transactions
+                  {block.inputCount !== undefined && block.outputCount !== undefined && (
+                    <span className="btc-io-counts">
+                      {" "}
+                      ({block.inputCount.toLocaleString()} inputs, {block.outputCount.toLocaleString()}{" "}
+                      outputs)
+                    </span>
+                  )}
+                </span>
+              </div>
+
+              {/* Total Output Value */}
+              {block.totalOutputValue !== undefined && (
+                <div className="tx-row">
+                  <span className="tx-label">Total Output:</span>
+                  <span className="tx-value">{formatBTC(block.totalOutputValue)}</span>
+                </div>
+              )}
+
+            </div>
+            {/* Right Column */}
+            <div className="btc-tx-details-column">
+
+              {/* Difficulty */}
+              {block.difficulty !== undefined && (
+                <div className="tx-row">
+                  <span className="tx-label">Difficulty:</span>
+                  <span className="tx-value">{formatDifficulty(block.difficulty)}</span>
+                </div>
+              )}
+
+              {/* Size */}
+              <div className="tx-row">
+                <span className="tx-label">Size:</span>
+                <span className="tx-value">{formatSize(block.size)}</span>
+              </div>
+
+              {/* Weight */}
+              <div className="tx-row">
+                <span className="tx-label">Weight:</span>
+                <span className="tx-value">{block.weight.toLocaleString()} WU</span>
+              </div>
+
+              {/* Previous Block */}
+              {block.previousBlockHash && (
+                <div className="tx-row">
+                  <span className="tx-label">Previous Block:</span>
+                  <span className="tx-value tx-mono">
+                    {networkId ? (
+                      <Link to={`/${networkId}/block/${block.height - 1}`} className="link-accent">
+                        {truncateHash(block.previousBlockHash, "long")}
+                      </Link>
+                    ) : (
+                      truncateHash(block.previousBlockHash, "long")
+                    )}
+                  </span>
+                </div>
+              )}
+
+              {/* Next Block */}
+              {block.nextBlockHash && (
+                <div className="tx-row">
+                  <span className="tx-label">Next Block:</span>
+                  <span className="tx-value tx-mono">
+                    {networkId ? (
+                      <Link to={`/${networkId}/block/${block.height + 1}`} className="link-accent">
+                        {truncateHash(block.nextBlockHash, "long")}
+                      </Link>
+                    ) : (
+                      truncateHash(block.nextBlockHash, "long")
+                    )}
+                  </span>
+                </div>
+              )}
+            </div>
           </div>
-
-          {/* Total Output Value */}
-          {block.totalOutputValue !== undefined && (
-            <div className="tx-row">
-              <span className="tx-label">Total Output:</span>
-              <span className="tx-value">{formatBTC(block.totalOutputValue)}</span>
-            </div>
-          )}
-
-          {/* Difficulty */}
-          {block.difficulty !== undefined && (
-            <div className="tx-row">
-              <span className="tx-label">Difficulty:</span>
-              <span className="tx-value">{formatDifficulty(block.difficulty)}</span>
-            </div>
-          )}
-
-          {/* Size */}
-          <div className="tx-row">
-            <span className="tx-label">Size:</span>
-            <span className="tx-value">{formatSize(block.size)}</span>
-          </div>
-
-          {/* Weight */}
-          <div className="tx-row">
-            <span className="tx-label">Weight:</span>
-            <span className="tx-value">{block.weight.toLocaleString()} WU</span>
-          </div>
-
-          {/* Previous Block */}
-          {block.previousBlockHash && (
-            <div className="tx-row">
-              <span className="tx-label">Previous Block:</span>
-              <span className="tx-value tx-mono">
-                {networkId ? (
-                  <Link to={`/${networkId}/block/${block.height - 1}`} className="link-accent">
-                    {truncateHash(block.previousBlockHash, "long")}
-                  </Link>
-                ) : (
-                  truncateHash(block.previousBlockHash, "long")
-                )}
-              </span>
-            </div>
-          )}
-
-          {/* Next Block */}
-          {block.nextBlockHash && (
-            <div className="tx-row">
-              <span className="tx-label">Next Block:</span>
-              <span className="tx-value tx-mono">
-                {networkId ? (
-                  <Link to={`/${networkId}/block/${block.height + 1}`} className="link-accent">
-                    {truncateHash(block.nextBlockHash, "long")}
-                  </Link>
-                ) : (
-                  truncateHash(block.nextBlockHash, "long")
-                )}
-              </span>
-            </div>
-          )}
 
           {/* Coinbase Message */}
           {block.coinbaseMessage && (

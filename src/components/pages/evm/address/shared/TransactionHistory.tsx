@@ -3,7 +3,12 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { toFunctionSelector } from "viem";
 import { useDataService } from "../../../../../hooks/useDataService";
-import type { ABI, AddressTransactionsResult, FunctionABI, Transaction } from "../../../../../types";
+import type {
+  ABI,
+  AddressTransactionsResult,
+  FunctionABI,
+  Transaction,
+} from "../../../../../types";
 
 // Transaction cache utilities
 const TX_CACHE_PREFIX = "tx_cache_";
