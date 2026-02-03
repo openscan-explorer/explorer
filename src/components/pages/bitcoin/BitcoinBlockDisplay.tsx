@@ -83,7 +83,9 @@ const BitcoinBlockDisplay: React.FC<BitcoinBlockDisplayProps> = React.memo(
               {block.blockReward !== undefined && (
                 <div className="tx-row">
                   <span className="tx-label">Block Reward:</span>
-                  <span className="tx-value tx-value-highlight">{formatBTC(block.blockReward)}</span>
+                  <span className="tx-value tx-value-highlight">
+                    {formatBTC(block.blockReward)}
+                  </span>
                 </div>
               )}
 
@@ -100,8 +102,8 @@ const BitcoinBlockDisplay: React.FC<BitcoinBlockDisplayProps> = React.memo(
                 <div className="tx-row">
                   <span className="tx-label">Fee Rate:</span>
                   <span className="tx-value">
-                    Avg: {block.feeRateAvg.toFixed(2)} sat/vB | Median: {block.feeRateMedian.toFixed(2)}{" "}
-                    sat/vB
+                    Avg: {block.feeRateAvg.toFixed(2)} sat/vB | Median:{" "}
+                    {block.feeRateMedian.toFixed(2)} sat/vB
                   </span>
                 </div>
               )}
@@ -110,12 +112,13 @@ const BitcoinBlockDisplay: React.FC<BitcoinBlockDisplayProps> = React.memo(
               <div className="tx-row">
                 <span className="tx-label">Transactions:</span>
                 <span className="tx-value">
-                  <span className="tx-value-highlight">{block.nTx.toLocaleString()}</span> transactions
+                  <span className="tx-value-highlight">{block.nTx.toLocaleString()}</span>{" "}
+                  transactions
                   {block.inputCount !== undefined && block.outputCount !== undefined && (
                     <span className="btc-io-counts">
                       {" "}
-                      ({block.inputCount.toLocaleString()} inputs, {block.outputCount.toLocaleString()}{" "}
-                      outputs)
+                      ({block.inputCount.toLocaleString()} inputs,{" "}
+                      {block.outputCount.toLocaleString()} outputs)
                     </span>
                   )}
                 </span>
@@ -128,11 +131,9 @@ const BitcoinBlockDisplay: React.FC<BitcoinBlockDisplayProps> = React.memo(
                   <span className="tx-value">{formatBTC(block.totalOutputValue)}</span>
                 </div>
               )}
-
             </div>
             {/* Right Column */}
             <div className="btc-tx-details-column">
-
               {/* Difficulty */}
               {block.difficulty !== undefined && (
                 <div className="tx-row">

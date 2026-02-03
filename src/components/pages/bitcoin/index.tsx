@@ -66,7 +66,7 @@ export default function BitcoinNetwork() {
           />
           <BitcoinTransactionsTable
             transactions={dashboard.latestTransactions}
-            loading={dashboard.loading && dashboard.latestTransactions.length === 0}
+            loading={dashboard.loadingTransactions}
             networkId={network.slug}
           />
         </div>

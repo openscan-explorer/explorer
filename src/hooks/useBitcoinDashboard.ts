@@ -25,6 +25,7 @@ export interface BitcoinDashboardData {
   btcPrice: number | null;
   feeEstimates: BitcoinFeeEstimates | null;
   loading: boolean;
+  loadingTransactions: boolean;
   error: string | null;
   lastUpdated: number | null;
 }
@@ -36,6 +37,7 @@ const initialState: BitcoinDashboardData = {
   btcPrice: null,
   feeEstimates: null,
   loading: true,
+  loadingTransactions: true,
   error: null,
   lastUpdated: null,
 };
@@ -85,6 +87,7 @@ export function useBitcoinDashboard(network: NetworkConfig): BitcoinDashboardDat
       setData((prev) => ({
         ...prev,
         latestTransactions: txsResult,
+        loadingTransactions: false,
       }));
     } catch (err) {
       setData((prev) => ({
