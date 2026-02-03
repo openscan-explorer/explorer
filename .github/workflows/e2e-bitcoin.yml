@@ -1,4 +1,4 @@
-name: E2E Tests
+name: E2E Tests - Bitcoin
 
 on:
   pull_request:
@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  e2e:
+  e2e-bitcoin:
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
@@ -27,8 +27,8 @@ jobs:
       - name: Build application
         run: ./scripts/build-production.sh
 
-      - name: Run E2E tests (EVM chains)
-        run: bun run test:e2e --ignore-pattern="**/bitcoin/**"
+      - name: Run Bitcoin E2E tests
+        run: bun run test:e2e e2e/tests/bitcoin/
         env:
           CI: true
 
@@ -36,6 +36,6 @@ jobs:
         uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: playwright-report
+          name: playwright-report-bitcoin
           path: playwright-report/
           retention-days: 7
