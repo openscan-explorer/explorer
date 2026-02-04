@@ -1,4 +1,4 @@
-name: E2E Tests
+name: E2E Tests - Ethereum Mainnet
 
 on:
   pull_request:
@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  e2e:
+  e2e-mainnet:
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
@@ -27,15 +27,17 @@ jobs:
       - name: Build application
         run: ./scripts/build-production.sh
 
-      - name: Run E2E tests
-        run: bun run test:e2e
+      - name: Run Ethereum Mainnet E2E tests
+        run: bun run test:e2e:eth-mainnet
         env:
           CI: true
+          INFURA_API_KEY: ${{ secrets.INFURA_API_KEY }}
+          ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_API_KEY }}
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: playwright-report
+          name: playwright-report-mainnet
           path: playwright-report/
           retention-days: 7

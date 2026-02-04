@@ -1,14 +1,14 @@
-import { test, expect } from "../fixtures/test";
-import { BlockPage } from "../pages/block.page";
-import { AddressPage } from "../pages/address.page";
-import { TransactionPage } from "../pages/transaction.page";
-import { OPTIMISM } from "../fixtures/optimism";
+import { test, expect } from "../../fixtures/test";
+import { BlockPage } from "../../pages/block.page";
+import { AddressPage } from "../../pages/address.page";
+import { TransactionPage } from "../../pages/transaction.page";
+import { OPTIMISM } from "../../fixtures/optimism";
 import {
   waitForBlockContent,
   waitForTxContent,
   waitForAddressContent,
   DEFAULT_TIMEOUT,
-} from "../helpers/wait";
+} from "../../helpers/wait";
 
 const CHAIN_ID = OPTIMISM.chainId;
 
