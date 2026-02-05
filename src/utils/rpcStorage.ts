@@ -1,11 +1,12 @@
 import { getAllNetworks } from "../config/networks";
 import type { RpcUrlsContextType } from "../types";
+import { getNetworkRpcKey } from "./networkResolver";
 
-const STORAGE_KEY = "OPENSCAN_RPC_URLS_V1";
+const STORAGE_KEY = "OPENSCAN_RPC_URLS_V3"; // Version bump for networkId-based keys
 
 /**
  * Get default RPC endpoints from loaded network metadata
- * Returns RPC URLs for all networks that have been loaded from metadata
+ * Returns RPC URLs for all networks, keyed by networkId (CAIP-2 format)
  */
 export function getDefaultRpcEndpoints(): RpcUrlsContextType {
   const networks = getAllNetworks();
@@ -13,7 +14,8 @@ export function getDefaultRpcEndpoints(): RpcUrlsContextType {
 
   for (const network of networks) {
     if (network.rpc?.public && network.rpc.public.length > 0) {
-      endpoints[network.networkId] = network.rpc.public;
+      const key = getNetworkRpcKey(network);
+      endpoints[key] = network.rpc.public;
     }
   }
 
@@ -32,6 +34,7 @@ function isValidRpcMap(obj: any): obj is RpcUrlsContextType {
 
 /**
  * Load RPC urls from localStorage. Returns null if nothing found or invalid.
+ * Keys are networkId strings (CAIP-2 format)
  */
 export function loadRpcUrlsFromStorage(): RpcUrlsContextType | null {
   try {
@@ -39,16 +42,7 @@ export function loadRpcUrlsFromStorage(): RpcUrlsContextType | null {
     if (!raw) return null;
     const parsed = JSON.parse(raw) as Record<string, string[]>;
     if (!isValidRpcMap(parsed)) return null;
-    // keys are strings from JSON -> convert to numbers
-    const result: RpcUrlsContextType = {};
-    for (const k of Object.keys(parsed)) {
-      const n = Number(k);
-      if (Number.isNaN(n)) continue;
-      const val = parsed[k];
-      if (!val) continue;
-      result[n] = val;
-    }
-    return result;
+    return parsed;
   } catch (err) {
     console.warn("Failed to parse RPC urls from storage", err);
     return null;
@@ -56,19 +50,12 @@ export function loadRpcUrlsFromStorage(): RpcUrlsContextType | null {
 }
 
 /**
- * Save RPC urls to localStorage. Keys should be numeric network ids.
+ * Save RPC urls to localStorage.
+ * Keys are networkId strings (CAIP-2 format)
  */
 export function saveRpcUrlsToStorage(map: RpcUrlsContextType): void {
   try {
-    // convert keys to strings for JSON
-    const serialized: Record<string, string[]> = {};
-    for (const k of Object.keys(map)) {
-      const n = Number(k);
-      const val = map[n];
-      if (!val) continue;
-      serialized[String(n)] = val;
-    }
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(serialized));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(map));
   } catch (err) {
     console.warn("Failed to save RPC urls to storage", err);
   }
@@ -76,21 +63,20 @@ export function saveRpcUrlsToStorage(map: RpcUrlsContextType): void {
 
 /**
  * Return the effective rpc urls by merging defaults with any stored overrides.
- * Stored values override default for a networkId; missing networks fall back to defaults.
- * Defaults are fetched from loaded network metadata.
+ * Stored values override default for a network; missing networks fall back to defaults.
+ * Keys are networkId strings (CAIP-2 format)
  */
 export function getEffectiveRpcUrls(): RpcUrlsContextType {
   const defaults = getDefaultRpcEndpoints();
   const stored = loadRpcUrlsFromStorage();
   if (!stored) return defaults;
-  // merge copy
+
+  // Merge: stored values override defaults
   const merged: RpcUrlsContextType = { ...defaults };
   for (const k of Object.keys(stored)) {
-    const n = Number(k);
-    if (Number.isNaN(n)) continue;
-    const val = stored[n];
+    const val = stored[k];
     if (!val || !Array.isArray(val) || val.length === 0) continue;
-    merged[n] = val;
+    merged[k] = val;
   }
   return merged;
 }

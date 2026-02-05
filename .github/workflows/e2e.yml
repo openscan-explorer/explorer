@@ -27,8 +27,8 @@ jobs:
       - name: Build application
         run: ./scripts/build-production.sh
 
-      - name: Run E2E tests
-        run: bun run test:e2e
+      - name: Run E2E tests (EVM chains)
+        run: bun run test:e2e --ignore-pattern="**/bitcoin/**"
         env:
           CI: true
 

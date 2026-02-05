@@ -2072,6 +2072,13 @@
 	transform: none;
 }
 
+.pagination-info {
+	color: var(--text-secondary);
+	font-size: 0.9rem;
+	font-weight: 500;
+	padding: 0 8px;
+}
+
 /* ================================================
    Utility Classes - Moved from inline styles
    ================================================ */
@@ -5160,6 +5167,18 @@
 	opacity: 0.5;
 }
 
+.dashboard-stat-subvalue {
+	font-size: 0.75rem;
+	color: var(--color-text-muted);
+	margin-top: 4px;
+}
+
+.btc-fee-rates {
+	display: flex;
+	gap: 12px;
+	justify-content: center;
+}
+
 /* Clickable stat label */
 .dashboard-stat-label-link {
 	display: block;
@@ -5242,6 +5261,7 @@
 	grid-template-columns: 1fr 1fr;
 	gap: 24px;
 	margin: 6px 0;
+	align-items: stretch;
 }
 
 .dashboard-table-section {
@@ -6719,4 +6739,556 @@
 .token-standard-erc1155 {
 	background: var(--color-warning-alpha-15);
 	color: var(--color-warning);
+}
+
+/* ================================
+   Bitcoin-Specific Styles
+   ================================ */
+
+/* Bitcoin Transaction Section (Inputs/Outputs) */
+.btc-tx-section {
+	margin-top: 20px;
+	border-top: 1px solid var(--border-primary);
+	padding-top: 15px;
+}
+
+.btc-tx-section-header {
+	margin-bottom: 10px;
+}
+
+.btc-tx-section-toggle {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	width: 100%;
+	background: transparent;
+	border: none;
+	cursor: pointer;
+	padding: 8px 12px;
+	border-radius: 6px;
+	transition: background-color 0.15s ease;
+}
+
+.btc-tx-section-toggle:hover {
+	background: var(--bg-tertiary);
+}
+
+.btc-tx-section-title {
+	font-weight: 600;
+	font-size: 0.95rem;
+	color: var(--text-primary);
+}
+
+.btc-tx-section-arrow {
+	font-size: 0.85rem;
+	color: var(--text-secondary);
+	font-weight: 600;
+}
+
+/* Bitcoin Inputs/Outputs Container */
+.btc-inputs-outputs {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	padding: 10px;
+	background: var(--bg-tertiary);
+	border-radius: 8px;
+}
+
+/* Individual Input/Output Item */
+.btc-io-item {
+	display: flex;
+	gap: 12px;
+	padding: 10px;
+	background: var(--bg-secondary);
+	border-radius: 6px;
+	border: 1px solid var(--border-primary);
+}
+
+.btc-io-index {
+	min-width: 24px;
+	height: 24px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: var(--color-primary-alpha-15);
+	color: var(--color-primary);
+	border-radius: 4px;
+	font-size: 0.75rem;
+	font-weight: 600;
+}
+
+.btc-io-content {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	min-width: 0;
+}
+
+.btc-io-address {
+	word-break: break-all;
+}
+
+.btc-io-coinbase {
+	color: var(--color-warning);
+	font-weight: 600;
+	font-style: italic;
+}
+
+.btc-io-details {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 12px;
+	align-items: center;
+	font-size: 0.85rem;
+}
+
+.btc-io-value {
+	font-weight: 600;
+	color: var(--color-primary);
+}
+
+.btc-io-txref {
+	color: var(--text-secondary);
+}
+
+.btc-io-type {
+	padding: 2px 6px;
+	background: var(--bg-tertiary);
+	border-radius: 4px;
+	font-size: 0.75rem;
+	color: var(--text-secondary);
+}
+
+/* Coinbase Badge */
+.btc-coinbase-badge {
+	display: inline-block;
+	padding: 4px 10px;
+	background: var(--color-warning-alpha-15);
+	color: var(--color-warning);
+	border-radius: 4px;
+	font-weight: 600;
+	font-size: 0.85rem;
+}
+
+/* Fee Rate Display */
+.btc-fee-rate {
+	margin-left: 8px;
+	color: var(--text-secondary);
+	font-size: 0.9rem;
+}
+
+/* Bitcoin Address Type Badge */
+.btc-address-type-badge {
+	display: inline-block;
+	padding: 4px 10px;
+	background: var(--color-info-alpha-15);
+	color: var(--color-info);
+	border-radius: 4px;
+	font-weight: 600;
+	font-size: 0.8rem;
+}
+
+/* UTXO List Styles */
+.btc-utxo-list {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	padding: 10px;
+	background: var(--bg-tertiary);
+	border-radius: 8px;
+}
+
+.btc-utxo-item {
+	display: flex;
+	gap: 12px;
+	align-items: center;
+	padding: 8px 12px;
+	background: var(--bg-secondary);
+	border-radius: 6px;
+	border: 1px solid var(--border-primary);
+}
+
+.btc-utxo-index {
+	min-width: 20px;
+	color: var(--text-secondary);
+	font-size: 0.8rem;
+}
+
+.btc-utxo-content {
+	flex: 1;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 12px;
+	align-items: center;
+	min-width: 0;
+}
+
+.btc-utxo-hash {
+	word-break: break-all;
+}
+
+.btc-utxo-value {
+	font-weight: 600;
+}
+
+.btc-utxo-confirmations {
+	color: var(--text-secondary);
+	font-size: 0.85rem;
+}
+
+/* Bitcoin Transaction List (in address view) */
+.btc-tx-list {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	padding: 10px;
+	background: var(--bg-tertiary);
+	border-radius: 8px;
+}
+
+.btc-tx-list-item {
+	display: flex;
+	gap: 12px;
+	align-items: center;
+	padding: 8px 12px;
+	background: var(--bg-secondary);
+	border-radius: 6px;
+	border: 1px solid var(--border-primary);
+}
+
+.btc-tx-index {
+	min-width: 24px;
+	color: var(--text-secondary);
+	font-size: 0.8rem;
+}
+
+.btc-tx-hash {
+	word-break: break-all;
+}
+
+.btc-tx-list-more {
+	padding: 10px;
+	text-align: center;
+	color: var(--text-secondary);
+	font-style: italic;
+}
+
+/* Bitcoin Block Transaction List */
+.btc-block-txs {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	padding: 10px;
+	background: var(--bg-tertiary);
+	border-radius: 8px;
+	max-height: 400px;
+	overflow-y: auto;
+}
+
+.btc-block-tx-item {
+	display: flex;
+	gap: 12px;
+	align-items: center;
+	padding: 6px 10px;
+	background: var(--bg-secondary);
+	border-radius: 4px;
+	font-size: 0.85rem;
+}
+
+.btc-block-tx-index {
+	min-width: 32px;
+	color: var(--text-secondary);
+	font-size: 0.8rem;
+}
+
+.btc-block-tx-hash {
+	word-break: break-all;
+}
+
+.btc-block-tx-more {
+	padding: 10px;
+	text-align: center;
+	color: var(--text-secondary);
+	font-style: italic;
+}
+
+/* Bitcoin Empty State */
+.btc-empty-state {
+	padding: 20px;
+	text-align: center;
+}
+
+/* Bitcoin Technical Details Toggle */
+.btc-technical-details {
+	margin-top: 20px;
+	border-top: 1px solid var(--border-primary);
+	padding-top: 15px;
+}
+
+/* Bitcoin Genesis Address Notice */
+.btc-genesis-notice {
+	margin: 15px 0;
+	padding: 15px;
+	background: var(--color-warning-alpha-15);
+	border: 1px solid var(--color-warning);
+	border-radius: 8px;
+	color: var(--text-primary);
+}
+
+.btc-genesis-notice strong {
+	display: block;
+	margin-bottom: 8px;
+	color: var(--color-warning);
+	font-size: 1rem;
+}
+
+.btc-genesis-notice p {
+	margin: 0;
+	font-size: 0.9rem;
+	line-height: 1.5;
+	color: var(--text-secondary);
+}
+
+/* Dashboard Scrollable Table */
+.dashboard-table-scrollable {
+	max-height: 500px;
+	overflow-y: auto;
+}
+
+/* Bitcoin Dashboard Tables - Equal Height */
+.dashboard-table-section-full {
+	display: flex;
+	flex-direction: column;
+}
+
+.dashboard-table-section-full .dashboard-table-compact {
+	flex: 1;
+	max-height: 290px;
+	overflow-y: auto;
+	scrollbar-width: none; /* Firefox */
+	-ms-overflow-style: none; /* IE/Edge */
+}
+
+.dashboard-table-section-full .dashboard-table-compact::-webkit-scrollbar {
+	display: none; /* Chrome/Safari/Opera */
+}
+
+/* Dashboard Transaction Row Styles */
+.dashboard-tx-info {
+	flex: 1;
+	min-width: 0;
+}
+
+.dashboard-tx-hash {
+	font-size: 0.9rem;
+}
+
+.dashboard-tx-details {
+	flex-shrink: 0;
+}
+
+.dashboard-tx-ios {
+	font-size: 0.85rem;
+	color: var(--text-secondary);
+	white-space: nowrap;
+}
+
+.dashboard-tx-value {
+	flex-shrink: 0;
+	text-align: right;
+	min-width: 120px;
+}
+
+.dashboard-tx-value .tx-value-highlight {
+	font-size: 0.85rem;
+}
+
+/* Bitcoin Miner Badge */
+.btc-miner-badge {
+	display: inline-block;
+	padding: 4px 10px;
+	background: var(--color-primary-alpha-15);
+	color: var(--color-primary);
+	border-radius: 4px;
+	font-weight: 600;
+	font-size: 0.9rem;
+}
+
+/* Bitcoin I/O Counts (inline with transaction count) */
+.btc-io-counts {
+	color: var(--text-secondary);
+	font-size: 0.9rem;
+}
+
+/* Bitcoin Coinbase Message */
+.btc-coinbase-message {
+	display: inline-block;
+	padding: 8px 12px;
+	background: var(--bg-tertiary);
+	border: 1px solid var(--border-primary);
+	border-radius: 6px;
+	font-family: monospace;
+	font-size: 0.85rem;
+	word-break: break-word;
+	max-width: 100%;
+	color: var(--text-secondary);
+}
+
+/* Bitcoin Coinbase Hex (in technical details) */
+.btc-coinbase-hex {
+	display: block;
+	padding: 8px;
+	background: var(--bg-tertiary);
+	border-radius: 4px;
+	word-break: break-all;
+	font-size: 0.75rem;
+	max-height: 100px;
+	overflow-y: auto;
+}
+
+/* Bitcoin inline value display */
+.btc-value-inline {
+	color: var(--text-secondary);
+	margin-left: 8px;
+}
+
+/* Bitcoin transaction flags (Yes/No indicators) */
+.btc-flag-yes {
+	color: var(--color-success);
+	font-weight: 500;
+}
+
+.btc-flag-no {
+	color: var(--text-secondary);
+}
+
+/* Bitcoin USD value display */
+.btc-usd-value {
+	margin-left: 8px;
+	color: var(--text-muted);
+	font-size: 0.875rem;
+}
+
+.btc-io-usd {
+	color: var(--text-muted);
+	font-size: 0.8rem;
+}
+
+.btc-io-value-group {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+
+.btc-io-column-totals {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+	gap: 2px;
+}
+
+.btc-io-column-usd {
+	font-size: 0.75rem;
+	color: var(--text-muted);
+}
+
+/* Bitcoin Mempool Status */
+.btc-mempool-status {
+	color: var(--color-warning);
+	font-style: italic;
+}
+
+/* Bitcoin Transaction Details Two-Column Grid */
+.btc-tx-details-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 24px;
+	margin-top: 16px;
+}
+
+.btc-tx-details-column {
+	display: flex;
+	flex-direction: column;
+	gap: 0;
+}
+
+.btc-tx-details-column .tx-row {
+	padding: 8px 16px;
+	border-bottom: 1px solid var(--overlay-light-3);
+}
+
+.btc-tx-details-column .tx-row:last-child {
+	border-bottom: none;
+}
+
+@media (max-width: 768px) {
+	.btc-tx-details-grid {
+		grid-template-columns: 1fr;
+		gap: 0;
+	}
+}
+
+/* Bitcoin Inputs/Outputs Two-Column Layout */
+.btc-io-columns {
+	display: grid;
+	grid-template-columns: 1fr auto 1fr;
+	gap: 16px;
+	margin-top: 24px;
+	align-items: start;
+}
+
+.btc-io-column {
+	background: var(--bg-secondary);
+	border: 1px solid var(--overlay-light-6);
+	border-radius: 12px;
+	overflow: hidden;
+}
+
+.btc-io-column-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 12px 16px;
+	background: var(--overlay-light-3);
+	border-bottom: 1px solid var(--overlay-light-6);
+}
+
+.btc-io-column-title {
+	font-weight: 600;
+	color: var(--color-primary-muted);
+}
+
+.btc-io-column-total {
+	font-size: 0.875rem;
+	color: var(--text-secondary);
+	font-family: "JetBrains Mono", monospace;
+}
+
+.btc-io-column-content {
+	max-height: 400px;
+	overflow-y: auto;
+	scrollbar-width: thin;
+}
+
+.btc-io-arrow {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: var(--color-primary);
+	opacity: 0.6;
+	padding-top: 50px;
+}
+
+/* Responsive: Stack columns on mobile */
+@media (max-width: 900px) {
+	.btc-io-columns {
+		grid-template-columns: 1fr;
+	}
+
+	.btc-io-arrow {
+		padding: 8px 0;
+		transform: rotate(90deg);
+	}
 }
