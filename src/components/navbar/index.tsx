@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { useTheme } from "../../context/SettingsContext";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useSettings } from "../../context/SettingsContext";
 import { useSearch } from "../../hooks/useSearch";
 import NavbarLogo from "./NavbarLogo";
 import { NetworkBlockIndicator } from "./NetworkBlockIndicator";
@@ -11,7 +11,7 @@ const Navbar = () => {
   const location = useLocation();
   const { searchTerm, setSearchTerm, isResolving, error, clearError, handleSearch, networkId } =
     useSearch();
-  const { isDarkMode, toggleTheme } = useTheme();
+  const { isDarkMode, toggleTheme, isSuperUser, toggleSuperUserMode } = useSettings();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Check if we should show the search box (on any network page including home)
@@ -109,10 +109,10 @@ const Navbar = () => {
               <li>
                 <button
                   type="button"
-                  onClick={() => navigate("/devtools")}
-                  className="navbar-toggle-btn"
-                  aria-label="Dev Tools"
-                  title="Dev Tools"
+                  onClick={toggleSuperUserMode}
+                  className={`navbar-toggle-btn ${isSuperUser ? "navbar-toggle-active" : ""}`}
+                  aria-label={isSuperUser ? "Disable Super User Mode" : "Enable Super User Mode"}
+                  title={isSuperUser ? "Disable Super User Mode" : "Enable Super User Mode"}
                 >
                   <svg
                     width="18"
@@ -122,17 +122,55 @@ const Navbar = () => {
                     xmlns="http://www.w3.org/2000/svg"
                     aria-hidden="true"
                   >
-                    <title>Dev Tools</title>
-                    <path
-                      d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"
+                    <title>Super User Mode</title>
+                    <polyline
+                      points="4 17 10 11 4 5"
                       stroke="currentColor"
                       strokeWidth="2"
                       strokeLinecap="round"
                       strokeLinejoin="round"
                     />
+                    <line
+                      x1="12"
+                      y1="19"
+                      x2="20"
+                      y2="19"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                    />
                   </svg>
                 </button>
               </li>
+              {isSuperUser && (
+                <li>
+                  <button
+                    type="button"
+                    onClick={() => navigate("/devtools")}
+                    className="navbar-toggle-btn"
+                    aria-label="Dev Tools"
+                    title="Dev Tools"
+                  >
+                    <svg
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      aria-hidden="true"
+                    >
+                      <title>Dev Tools</title>
+                      <path
+                        d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </button>
+                </li>
+              )}
               <li>
                 <button
                   type="button"
@@ -445,23 +483,25 @@ const Navbar = () => {
             </svg>
             <span>Home</span>
           </button>
-          <button
-            type="button"
-            className="navbar-mobile-menu-item"
-            onClick={() => handleMobileNavigation("/devtools")}
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <title>Dev Tools</title>
-              <path
-                d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-            <span>Dev Tools</span>
-          </button>
+          {isSuperUser && (
+            <button
+              type="button"
+              className="navbar-mobile-menu-item"
+              onClick={() => handleMobileNavigation("/devtools")}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <title>Dev Tools</title>
+                <path
+                  d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              <span>Dev Tools</span>
+            </button>
+          )}
           <button
             type="button"
             className="navbar-mobile-menu-item"
@@ -535,6 +575,34 @@ const Navbar = () => {
               </svg>
             )}
             <span>{isDarkMode ? "Light Mode" : "Dark Mode"}</span>
+          </button>
+
+          {/* Super User Mode toggle */}
+          <button
+            type="button"
+            className={`navbar-mobile-menu-item ${isSuperUser ? "navbar-mobile-menu-item-active" : ""}`}
+            onClick={toggleSuperUserMode}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <title>Super User Mode</title>
+              <polyline
+                points="4 17 10 11 4 5"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <line
+                x1="12"
+                y1="19"
+                x2="20"
+                y2="19"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
+            </svg>
+            <span>{isSuperUser ? "Disable Super User Mode" : "Enable Super User Mode"}</span>
           </button>
 
           <div className="navbar-mobile-menu-divider" />
