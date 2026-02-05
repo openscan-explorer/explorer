@@ -230,27 +230,25 @@ export class AddressTransactionSearch {
 
   /**
    * Find the smallest recent block range containing address activity.
-   * Splits the chain into segments and scans right-to-left to find
-   * the most recent segment with a state change.
+   * Uses exponential (galloping) search from the chain tip: checks the last
+   * 100K blocks, then 200K, 400K, 800K, etc., doubling each step.
    *
    * This is used as Phase 1 of the auto-search: quickly narrow down
    * the search range before running the full binary search tree.
    *
    * @param address - Address to check
-   * @param segments - Number of segments to split the chain into (default 50)
+   * @param initialRange - Initial block range to check from tip (default 100,000)
    * @returns { fromBlock, toBlock } for the narrowest recent range, or null if no activity
    */
   async findRecentActivityRange(
     address: string,
-    segments = 50,
+    initialRange = 100_000,
+    signal?: AbortSignal,
   ): Promise<{ fromBlock: number; toBlock: number } | null> {
     const blockNumberResult = await this.client.blockNumber();
     const latestBlock = hexToNumber(extractData(blockNumberResult.data) || "0x0");
 
     if (latestBlock === 0) return null;
-
-    const segmentSize = Math.floor(latestBlock / segments);
-    if (segmentSize === 0) return { fromBlock: 0, toBlock: latestBlock };
 
     // Get state at latest block
     const latestState = await this.getState(address, latestBlock);
@@ -260,19 +258,27 @@ export class AddressTransactionSearch {
       return null;
     }
 
-    // Scan boundaries right-to-left, comparing each to latest state
-    for (let i = segments - 1; i >= 0; i--) {
-      const boundaryBlock = i * segmentSize;
-      const boundaryState = await this.getState(address, boundaryBlock);
+    // Exponential search: check last 100K, 200K, 400K, 800K, ... blocks
+    let range = initialRange;
+    let prevBoundary = latestBlock;
 
-      const nonceChanged = boundaryState.nonce !== latestState.nonce;
-      const balanceChanged = boundaryState.balance !== latestState.balance;
+    while (true) {
+      if (signal?.aborted) return null;
 
-      if (nonceChanged || balanceChanged) {
-        // Activity between this boundary and the next one
-        const nextBoundary = Math.min((i + 1) * segmentSize, latestBlock);
-        return { fromBlock: boundaryBlock, toBlock: nextBoundary };
+      const boundary = Math.max(latestBlock - range, 0);
+      const boundaryState = await this.getState(address, boundary);
+
+      if (
+        boundaryState.nonce !== latestState.nonce ||
+        boundaryState.balance !== latestState.balance
+      ) {
+        return { fromBlock: boundary, toBlock: prevBoundary };
       }
+
+      if (boundary === 0) break;
+
+      prevBoundary = boundary;
+      range *= 2;
     }
 
     // State at block 0 equals latest → edge case
@@ -526,9 +532,10 @@ export class AddressTransactionSearch {
       fromBlock?: number; // Stop searching at this block (inclusive) - for "search recent" functionality
       onProgress?: ProgressCallback;
       onTransactionsFound?: TransactionFoundCallback;
+      signal?: AbortSignal;
     } = {},
   ): Promise<SearchResult> {
-    const { limit = 100, toBlock, fromBlock, onProgress, onTransactionsFound } = options;
+    const { limit = 100, toBlock, fromBlock, onProgress, onTransactionsFound, signal } = options;
     const normalizedAddress = address.toLowerCase();
     const searchStartTime = performance.now();
 
@@ -602,6 +609,9 @@ export class AddressTransactionSearch {
       searchEndState: AddressState,
       depth = 0,
     ): Promise<void> => {
+      // Check if search was aborted
+      if (signal?.aborted) return;
+
       // Check limit - stop if we have enough transactions (0 means no limit)
       if (limit > 0 && allTransactions.length >= limit) {
         console.log(
@@ -749,6 +759,7 @@ export class AddressTransactionSearch {
 
       // Process segments RIGHT-TO-LEFT (newest first)
       for (let i = segments.length - 1; i >= 0; i--) {
+        if (signal?.aborted) break;
         if (limit > 0 && allTransactions.length >= limit) {
           break;
         }

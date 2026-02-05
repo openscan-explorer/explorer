@@ -200,32 +200,34 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
   }, [addressHash, numericNetworkId]);
 
   // Auto-search: on mount with no cache, find recent activity range then search
-  // Phase 1: Split chain into 50 segments, scan right-to-left for most recent activity
-  // Phase 2: Run binary search tree within the narrowed segment
+  // Phase 1: Exponential search from chain tip to find most recent activity range
+  // Phase 2: Run binary search tree within the narrowed range
   useEffect(() => {
     if (!dataService || !addressHash || hasCachedData || searchTriggered) return;
 
-    let cancelled = false;
+    const abortController = new AbortController();
 
-    dataService.networkAdapter.findRecentActivityRange(addressHash).then((range) => {
-      if (cancelled) return;
+    dataService.networkAdapter
+      .findRecentActivityRange(addressHash, undefined, abortController.signal)
+      .then((range) => {
+        if (abortController.signal.aborted) return;
 
-      if (range) {
-        searchToBlockRef.current = range.fromBlock;
-      } else {
-        searchToBlockRef.current = undefined;
-      }
+        if (range) {
+          searchToBlockRef.current = range.fromBlock;
+        } else {
+          searchToBlockRef.current = undefined;
+        }
 
-      loadMoreFromBlockRef.current = undefined;
-      isAutoSearchRef.current = true;
-      setAutoSearchPending(false);
-      setSearchLimit(5);
-      setSearchTriggered(true);
-      setSearchVersion((v) => v + 1);
-    });
+        loadMoreFromBlockRef.current = undefined;
+        isAutoSearchRef.current = true;
+        setAutoSearchPending(false);
+        setSearchLimit(5);
+        setSearchTriggered(true);
+        setSearchVersion((v) => v + 1);
+      });
 
     return () => {
-      cancelled = true;
+      abortController.abort();
     };
   }, [dataService, addressHash, hasCachedData, searchTriggered]);
 
@@ -236,6 +238,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
       return;
     }
 
+    const abortController = new AbortController();
     searchIdRef.current += 1;
     const currentSearchId = searchIdRef.current;
     const toBlock = loadMoreFromBlockRef.current;
@@ -252,7 +255,8 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
       setHasCachedData(false);
     }
 
-    const isSearchActive = () => searchIdRef.current === currentSearchId;
+    const isSearchActive = () =>
+      searchIdRef.current === currentSearchId && !abortController.signal.aborted;
 
     const wrappedCallback = (newTxs: Transaction[]) => {
       if (!isSearchActive()) return;
@@ -260,7 +264,14 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
     };
 
     dataService.networkAdapter
-      .getAddressTransactions(addressHash, fromBlock, toBlock, searchLimit, wrappedCallback)
+      .getAddressTransactions(
+        addressHash,
+        fromBlock,
+        toBlock,
+        searchLimit,
+        wrappedCallback,
+        abortController.signal,
+      )
       .then((rawResult) => {
         if (!isSearchActive()) return;
 
@@ -329,6 +340,10 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
         loadMoreFromBlockRef.current = undefined;
         searchToBlockRef.current = undefined;
       });
+
+    return () => {
+      abortController.abort();
+    };
   }, [
     dataService,
     addressHash,

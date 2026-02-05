@@ -113,6 +113,7 @@ export abstract class NetworkAdapter {
     toBlock?: number | "latest",
     limit = 100,
     onTransactionsFound?: (txs: Transaction[]) => void,
+    signal?: AbortSignal,
   ): Promise<AddressTransactionsResult> {
     if (!this.txSearch) {
       return {
@@ -134,6 +135,7 @@ export abstract class NetworkAdapter {
               onTransactionsFound(cleanTxs);
             }
           : undefined,
+        signal,
       });
 
       if (result.transactions.length === 0) {
@@ -177,15 +179,16 @@ export abstract class NetworkAdapter {
 
   /**
    * Find the smallest recent block range with address activity.
-   * Splits the chain into segments and scans right-to-left.
+   * Uses exponential search from the chain tip.
    * Used for fast initial search on address page load.
    */
   async findRecentActivityRange(
     address: string,
-    segments?: number,
+    initialRange?: number,
+    signal?: AbortSignal,
   ): Promise<{ fromBlock: number; toBlock: number } | null> {
     if (!this.txSearch) return null;
-    return this.txSearch.findRecentActivityRange(address, segments);
+    return this.txSearch.findRecentActivityRange(address, initialRange, signal);
   }
 
   /**
