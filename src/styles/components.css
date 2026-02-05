@@ -4259,6 +4259,18 @@
 	color: var(--text-secondary);
 }
 
+.tx-search-progress-detail {
+	display: flex;
+	justify-content: center;
+	margin-top: 4px;
+}
+
+.tx-search-progress-detail-text {
+	font-size: 0.75rem;
+	color: var(--text-secondary);
+	font-family: monospace;
+}
+
 .tx-history-cancel-btn {
 	padding: 4px 12px;
 	font-size: 0.8rem;

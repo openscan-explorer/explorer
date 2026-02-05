@@ -104,6 +104,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
   const [searchLimit, setSearchLimit] = useState(100);
   const [searchingTxs, setSearchingTxs] = useState(false);
   const [searchVersion, setSearchVersion] = useState(0);
+  const [searchStatus, setSearchStatus] = useState<string>("");
   const loadMoreFromBlockRef = useRef<number | undefined>(undefined);
   const searchToBlockRef = useRef<number | undefined>(undefined);
   const searchIdRef = useRef(0);
@@ -263,6 +264,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
 
     setSearchingTxs(true);
     setTransactionsResult(null);
+    setSearchStatus("");
 
     if (!isLoadMore && !isSearchRecent) {
       setTransactionDetails([]);
@@ -278,6 +280,16 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
       handleTransactionsFound(newTxs);
     };
 
+    const progressCallback = (progress: {
+      message?: string;
+      blockRange?: { from: number; to: number };
+    }) => {
+      if (!isSearchActive()) return;
+      if (progress.message) {
+        setSearchStatus(progress.message);
+      }
+    };
+
     dataService.networkAdapter
       .getAddressTransactions(
         addressHash,
@@ -286,6 +298,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
         searchLimit,
         wrappedCallback,
         abortController.signal,
+        progressCallback,
       )
       .then((rawResult) => {
         if (!isSearchActive()) return;
@@ -732,6 +745,11 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
               Cancel
             </button>
           </div>
+          {searchStatus && (
+            <div className="tx-search-progress-detail">
+              <span className="tx-search-progress-detail-text">{searchStatus}</span>
+            </div>
+          )}
         </div>
       </div>
     );

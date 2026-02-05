@@ -69,6 +69,8 @@ interface SearchProgress {
   phase: "searching" | "fetching";
   current: number;
   total: number;
+  message?: string;
+  blockRange?: { from: number; to: number };
 }
 
 type ProgressCallback = (progress: SearchProgress) => void;
@@ -624,6 +626,15 @@ export class AddressTransactionSearch {
         return;
       }
 
+      // Report progress with current search range
+      onProgress?.({
+        phase: "searching",
+        current: allTransactions.length,
+        total: limit > 0 ? limit : 0,
+        message: `Scanning blocks ${searchStartBlock.toLocaleString()} - ${searchEndBlock.toLocaleString()}`,
+        blockRange: { from: searchStartBlock, to: searchEndBlock },
+      });
+
       // Base case: adjacent blocks
       if (searchEndBlock - searchStartBlock <= 1) {
         const nonceChanged = searchStartState.nonce !== searchEndState.nonce;
@@ -636,6 +647,13 @@ export class AddressTransactionSearch {
           // Immediately fetch transactions from this block
           // If only balance changed (not nonce), search for internal transactions
           if (signal?.aborted) return;
+          onProgress?.({
+            phase: "fetching",
+            current: allTransactions.length,
+            total: limit > 0 ? limit : 0,
+            message: `Fetching block ${searchEndBlock.toLocaleString()}`,
+            blockRange: { from: searchEndBlock, to: searchEndBlock },
+          });
           const searchForInternal = balanceChanged && !nonceChanged;
           const blockTxs = await this.fetchBlockTransactions(
             searchEndBlock,

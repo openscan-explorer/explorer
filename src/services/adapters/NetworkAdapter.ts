@@ -105,6 +105,8 @@ export abstract class NetworkAdapter {
    * @param toBlock - Ending block (optional)
    * @param limit - Maximum number of transactions to return
    * @param onTransactionsFound - Callback for streaming results
+   * @param signal - AbortSignal for cancellation
+   * @param onProgress - Callback for search progress updates
    * @returns List of transactions
    */
   async getAddressTransactions(
@@ -114,6 +116,10 @@ export abstract class NetworkAdapter {
     limit = 100,
     onTransactionsFound?: (txs: Transaction[]) => void,
     signal?: AbortSignal,
+    onProgress?: (progress: {
+      message?: string;
+      blockRange?: { from: number; to: number };
+    }) => void,
   ): Promise<AddressTransactionsResult> {
     if (!this.txSearch) {
       return {
@@ -133,6 +139,11 @@ export abstract class NetworkAdapter {
           ? (txs) => {
               const cleanTxs = txs.map(({ type: _type, ...tx }) => tx as Transaction);
               onTransactionsFound(cleanTxs);
+            }
+          : undefined,
+        onProgress: onProgress
+          ? (progress) => {
+              onProgress({ message: progress.message, blockRange: progress.blockRange });
             }
           : undefined,
         signal,
