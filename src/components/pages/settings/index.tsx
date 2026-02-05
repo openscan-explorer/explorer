@@ -7,6 +7,7 @@ import { useSettings } from "../../../context/SettingsContext";
 import { useMetaMaskExplorer } from "../../../hooks/useMetaMaskExplorer";
 import { clearSupportersCache } from "../../../services/MetadataService";
 import type { RPCUrls, RpcUrlsContextType } from "../../../types";
+import { getChainIdFromNetwork } from "../../../utils/networkResolver";
 
 // Infura network slugs by chain ID
 const INFURA_NETWORKS: Record<number, string> = {
@@ -52,14 +53,17 @@ const Settings: React.FC = () => {
   const { settings, updateSettings } = useSettings();
   const { enabledNetworks } = useNetworks();
   const { isMetaMaskAvailable, isSupported, setAsDefaultExplorer } = useMetaMaskExplorer();
-  const [localRpc, setLocalRpc] = useState<Record<number, string | RPCUrls>>({
+  const [localRpc, setLocalRpc] = useState<Record<string, string | RPCUrls>>({
     ...rpcUrls,
   });
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [cacheCleared, setCacheCleared] = useState(false);
-  const [draggedItem, setDraggedItem] = useState<{ chainId: number; index: number } | null>(null);
-  const [fetchingChainId, setFetchingChainId] = useState<number | null>(null);
-  const [expandedChains, setExpandedChains] = useState<Set<number>>(new Set());
+  const [draggedItem, setDraggedItem] = useState<{
+    networkId: string;
+    index: number;
+  } | null>(null);
+  const [fetchingNetworkId, setFetchingNetworkId] = useState<string | null>(null);
+  const [expandedChains, setExpandedChains] = useState<Set<string>>(new Set());
   const [localApiKeys, setLocalApiKeys] = useState({
     infura: settings.apiKeys?.infura || "",
     alchemy: settings.apiKeys?.alchemy || "",
@@ -69,7 +73,7 @@ const Settings: React.FC = () => {
     alchemy: false,
   });
   const [metamaskStatus, setMetamaskStatus] = useState<
-    Record<number, "idle" | "loading" | "success" | "error">
+    Record<string, "idle" | "loading" | "success" | "error">
   >({});
 
   // Sync localRpc when context rpcUrls changes (e.g., after save)
@@ -77,18 +81,18 @@ const Settings: React.FC = () => {
     setLocalRpc({ ...rpcUrls });
   }, [rpcUrls]);
 
-  const updateField = (key: keyof RpcUrlsContextType, value: string) => {
-    setLocalRpc((prev) => ({ ...prev, [key]: value }));
+  const updateField = (networkId: string, value: string) => {
+    setLocalRpc((prev) => ({ ...prev, [networkId]: value }));
   };
 
   // Toggle chain section expand/collapse
-  const toggleChainExpanded = (chainId: number) => {
+  const toggleChainExpanded = (networkId: string) => {
     setExpandedChains((prev) => {
       const newSet = new Set(prev);
-      if (newSet.has(chainId)) {
-        newSet.delete(chainId);
+      if (newSet.has(networkId)) {
+        newSet.delete(networkId);
       } else {
-        newSet.add(chainId);
+        newSet.add(networkId);
       }
       return newSet;
     });
@@ -165,8 +169,8 @@ const Settings: React.FC = () => {
   }, []);
 
   // Helper to get URLs as array from localRpc
-  const getLocalRpcArray = (chainId: number): string[] => {
-    const value = localRpc[chainId];
+  const getLocalRpcArray = (networkId: string): string[] => {
+    const value = localRpc[networkId];
     if (Array.isArray(value)) return [...value];
     if (typeof value === "string") {
       return value
@@ -178,16 +182,19 @@ const Settings: React.FC = () => {
   };
 
   // Helper to get URLs as string for input display
-  const getLocalRpcString = (chainId: number): string => {
-    const value = localRpc[chainId];
+  const getLocalRpcString = (networkId: string): string => {
+    const value = localRpc[networkId];
     if (Array.isArray(value)) return value.join(", ");
     if (typeof value === "string") return value;
     return "";
   };
 
-  // Fetch RPCs from Chainlist API
-  const fetchFromChainlist = useCallback(async (chainId: number) => {
-    setFetchingChainId(chainId);
+  // Fetch RPCs from Chainlist API (only for EVM networks)
+  // networkId: CAIP-2 format (e.g., "eip155:1"), chainId: numeric for Chainlist API
+  const fetchFromChainlist = useCallback(async (networkId: string, chainId: number | undefined) => {
+    // Only EVM networks with numeric chainId are supported by Chainlist
+    if (chainId === undefined) return;
+    setFetchingNetworkId(networkId);
     try {
       const response = await fetch("https://chainlist.org/rpcs.json");
       if (!response.ok) throw new Error("Failed to fetch from Chainlist");
@@ -210,9 +217,9 @@ const Settings: React.FC = () => {
         throw new Error(`No privacy-friendly RPCs found for chain ${chainId}`);
       }
 
-      // Merge with existing URLs, avoiding duplicates
+      // Merge with existing URLs, avoiding duplicates (store by networkId)
       setLocalRpc((prev) => {
-        const currentValue = prev[chainId];
+        const currentValue = prev[networkId];
         const existingUrls = Array.isArray(currentValue)
           ? currentValue
           : typeof currentValue === "string"
@@ -224,30 +231,36 @@ const Settings: React.FC = () => {
         const mergedUrls = Array.from(new Set([...existingUrls, ...newUrls]));
         return {
           ...prev,
-          [chainId]: mergedUrls,
+          [networkId]: mergedUrls,
         };
       });
     } catch (error) {
       console.error("Error fetching from Chainlist:", error);
     } finally {
-      setFetchingChainId(null);
+      setFetchingNetworkId(null);
     }
   }, []);
 
   // Handle setting OpenScan as MetaMask default explorer
+  // networkId: CAIP-2 format, chainId: numeric for MetaMask API
   const handleSetMetaMaskExplorer = useCallback(
-    async (chainId: number) => {
-      const network = enabledNetworks.find((n) => n.networkId === chainId);
+    async (networkId: string, chainId: number | undefined) => {
+      // MetaMask only supports EVM networks with numeric chainId
+      if (chainId === undefined) return;
+
+      const network = enabledNetworks.find((n) => n.networkId === networkId);
       if (!network) return;
 
-      // Get the RPC URLs for this network from context
-      const networkRpcUrls = rpcUrls[chainId] || [];
+      // Get the RPC URLs for this network from context (now keyed by networkId)
+      const networkRpcUrls = rpcUrls[networkId] || [];
 
-      setMetamaskStatus((prev) => ({ ...prev, [chainId]: "loading" }));
+      setMetamaskStatus((prev) => ({ ...prev, [networkId]: "loading" }));
 
       const result = await setAsDefaultExplorer(
         {
-          chainId: network.networkId,
+          type: network.type,
+          networkId: network.networkId,
+          chainId: chainId,
           name: network.name,
           shortName: network.shortName,
           currency: network.currency,
@@ -257,21 +270,21 @@ const Settings: React.FC = () => {
 
       setMetamaskStatus((prev) => ({
         ...prev,
-        [chainId]: result.success ? "success" : "error",
+        [networkId]: result.success ? "success" : "error",
       }));
 
       if (result.success) {
         setTimeout(() => {
-          setMetamaskStatus((prev) => ({ ...prev, [chainId]: "idle" }));
+          setMetamaskStatus((prev) => ({ ...prev, [networkId]: "idle" }));
         }, 3000);
       }
     },
     [enabledNetworks, rpcUrls, setAsDefaultExplorer],
   );
 
-  const deleteRpc = useCallback((chainId: number, index: number) => {
+  const deleteRpc = useCallback((networkId: string, index: number) => {
     setLocalRpc((prev) => {
-      const currentValue = prev[chainId];
+      const currentValue = prev[networkId];
       const currentUrls = Array.isArray(currentValue)
         ? [...currentValue]
         : typeof currentValue === "string"
@@ -283,13 +296,13 @@ const Settings: React.FC = () => {
       currentUrls.splice(index, 1);
       return {
         ...prev,
-        [chainId]: currentUrls,
+        [networkId]: currentUrls,
       };
     });
   }, []);
 
-  const handleDragStart = useCallback((chainId: number, index: number) => {
-    setDraggedItem({ chainId, index });
+  const handleDragStart = useCallback((networkId: string, index: number) => {
+    setDraggedItem({ networkId, index });
   }, []);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
@@ -297,14 +310,14 @@ const Settings: React.FC = () => {
   }, []);
 
   const handleDrop = useCallback(
-    (chainId: number, dropIndex: number) => {
-      if (!draggedItem || draggedItem.chainId !== chainId) {
+    (networkId: string, dropIndex: number) => {
+      if (!draggedItem || draggedItem.networkId !== networkId) {
         setDraggedItem(null);
         return;
       }
 
       setLocalRpc((prev) => {
-        const currentValue = prev[chainId];
+        const currentValue = prev[networkId];
         const currentUrls = Array.isArray(currentValue)
           ? [...currentValue]
           : typeof currentValue === "string"
@@ -318,7 +331,7 @@ const Settings: React.FC = () => {
         currentUrls.splice(dropIndex, 0, draggedUrl);
         return {
           ...prev,
-          [chainId]: currentUrls,
+          [networkId]: currentUrls,
         };
       });
       setDraggedItem(null);
@@ -327,21 +340,17 @@ const Settings: React.FC = () => {
   );
 
   const save = () => {
-    // Convert comma-separated strings into arrays for each chainId
-    const parsed: RpcUrlsContextType = Object.keys(localRpc).reduce((acc, key) => {
-      const k = Number(key) as unknown as keyof RpcUrlsContextType;
-      // biome-ignore lint/suspicious/noExplicitAny: <TODO>
-      const val = (localRpc as any)[k];
+    // Convert comma-separated strings into arrays for each networkId
+    const parsed: RpcUrlsContextType = Object.keys(localRpc).reduce((acc, networkId) => {
+      const val = localRpc[networkId];
       if (typeof val === "string") {
         const arr = val
           .split(",")
           .map((s) => s.trim())
           .filter(Boolean);
-        // biome-ignore lint/suspicious/noExplicitAny: <TODO>
-        (acc as any)[k] = arr;
-      } else {
-        // biome-ignore lint/suspicious/noExplicitAny: <TODO>
-        (acc as any)[k] = val;
+        acc[networkId] = arr;
+      } else if (val !== undefined) {
+        acc[networkId] = val;
       }
       return acc;
     }, {} as RpcUrlsContextType);
@@ -350,11 +359,11 @@ const Settings: React.FC = () => {
     const prevInfuraKey = settings.apiKeys?.infura || "";
     const prevAlchemyKey = settings.apiKeys?.alchemy || "";
 
-    // Process each chain to add/remove provider URLs
+    // Process each EVM chain to add/remove provider URLs (Infura/Alchemy only support EVM)
+    // Map chainId to networkId (CAIP-2 format: "eip155:<chainId>")
     for (const chainId of Object.keys(INFURA_NETWORKS).map(Number)) {
-      const key = chainId as unknown as keyof RpcUrlsContextType;
-      // biome-ignore lint/suspicious/noExplicitAny: <TODO>
-      let urls: string[] = (parsed as any)[key] || [];
+      const networkId = `eip155:${chainId}`;
+      let urls: string[] = (parsed[networkId] as string[]) || [];
 
       // Handle Infura
       const oldInfuraUrl = prevInfuraKey ? getInfuraUrl(chainId, prevInfuraKey) : null;
@@ -369,14 +378,12 @@ const Settings: React.FC = () => {
         urls = [newInfuraUrl, ...urls];
       }
 
-      // biome-ignore lint/suspicious/noExplicitAny: <TODO>
-      (parsed as any)[key] = urls;
+      parsed[networkId] = urls;
     }
 
     for (const chainId of Object.keys(ALCHEMY_NETWORKS).map(Number)) {
-      const key = chainId as unknown as keyof RpcUrlsContextType;
-      // biome-ignore lint/suspicious/noExplicitAny: <TODO>
-      let urls: string[] = (parsed as any)[key] || [];
+      const networkId = `eip155:${chainId}`;
+      let urls: string[] = (parsed[networkId] as string[]) || [];
 
       // Handle Alchemy
       const oldAlchemyUrl = prevAlchemyKey ? getAlchemyUrl(chainId, prevAlchemyKey) : null;
@@ -393,8 +400,7 @@ const Settings: React.FC = () => {
         urls = [newAlchemyUrl, ...urls];
       }
 
-      // biome-ignore lint/suspicious/noExplicitAny: <TODO>
-      (parsed as any)[key] = urls;
+      parsed[networkId] = urls;
     }
 
     // Save API keys to settings
@@ -411,11 +417,16 @@ const Settings: React.FC = () => {
   };
 
   // Get enabled networks from config
+  // Use networkId as primary key for RPC storage, keep chainId for EVM-specific features
   const chainConfigs = useMemo(() => {
-    return getEnabledNetworks().map((network) => ({
-      id: network.networkId,
-      name: network.name,
-    }));
+    return getEnabledNetworks().map((network) => {
+      const chainId = getChainIdFromNetwork(network);
+      return {
+        id: network.networkId, // Primary key for RPC storage (CAIP-2 format)
+        chainId: chainId, // Keep chainId separate for EVM-specific features (Infura, Alchemy, MetaMask)
+        name: network.name,
+      };
+    });
   }, []);
 
   return (
@@ -682,21 +693,23 @@ const Settings: React.FC = () => {
                           ▶
                         </span>
                         <span className="settings-chain-name-text">{chain.name}</span>
-                        <span className="settings-chain-id-badge">Chain ID: {chain.id}</span>
+                        <span className="settings-chain-id-badge">
+                          {chain.chainId !== undefined ? `Chain ${chain.chainId}` : chain.id}
+                        </span>
                       </button>
-                      {isMetaMaskAvailable && (
+                      {isMetaMaskAvailable && chain.chainId !== undefined && (
                         <button
                           type="button"
                           className={`settings-metamask-button ${metamaskStatus[chain.id] === "success" ? "success" : ""} ${metamaskStatus[chain.id] === "loading" ? "loading" : ""}`}
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleSetMetaMaskExplorer(chain.id);
+                            handleSetMetaMaskExplorer(chain.id, chain.chainId);
                           }}
                           disabled={
-                            !isSupported(chain.id) || metamaskStatus[chain.id] === "loading"
+                            !isSupported(chain.chainId) || metamaskStatus[chain.id] === "loading"
                           }
                           title={
-                            !isSupported(chain.id)
+                            !isSupported(chain.chainId)
                               ? "Not supported for this chain"
                               : metamaskStatus[chain.id] === "success"
                                 ? "OpenScan configured!"
@@ -721,28 +734,31 @@ const Settings: React.FC = () => {
                     {/* Collapsible Content */}
                     {isExpanded && (
                       <div className="settings-chain-content">
-                        <div className="settings-chain-actions">
-                          <button
-                            type="button"
-                            className="settings-fetch-rpc-button"
-                            onClick={() => fetchFromChainlist(chain.id)}
-                            disabled={fetchingChainId === chain.id}
-                          >
-                            {fetchingChainId === chain.id ? "Fetching..." : "Fetch from Chainlist"}
-                          </button>
-                        </div>
+                        {/* Only show Chainlist fetch for EVM networks */}
+                        {chain.chainId !== undefined && (
+                          <div className="settings-chain-actions">
+                            <button
+                              type="button"
+                              className="settings-fetch-rpc-button"
+                              onClick={() => fetchFromChainlist(chain.id, chain.chainId)}
+                              disabled={fetchingNetworkId === chain.id}
+                            >
+                              {fetchingNetworkId === chain.id
+                                ? "Fetching..."
+                                : "Fetch from Chainlist"}
+                            </button>
+                          </div>
+                        )}
 
                         <input
                           className="settings-rpc-input"
                           value={getLocalRpcString(chain.id)}
-                          onChange={(e) =>
-                            updateField(chain.id as keyof RpcUrlsContextType, e.target.value)
-                          }
+                          onChange={(e) => updateField(chain.id, e.target.value)}
                           placeholder="https://eth-mainnet.g.alchemy.com/v2/YOUR-API-KEY"
                         />
 
                         {/* Help text for localhost network */}
-                        {chain.id === 31337 && (
+                        {chain.chainId === 31337 && (
                           <div className="settings-help-text">
                             💡 Need to access your local network remotely?{" "}
                             <a
@@ -768,7 +784,7 @@ const Settings: React.FC = () => {
                                   // biome-ignore lint/a11y/noStaticElementInteractions: Drag-and-drop requires these handlers
                                   <div
                                     key={url}
-                                    className={`settings-rpc-tag ${draggedItem?.chainId === chain.id && draggedItem?.index === idx ? "dragging" : ""}`}
+                                    className={`settings-rpc-tag ${draggedItem?.networkId === chain.id && draggedItem?.index === idx ? "dragging" : ""}`}
                                     draggable
                                     onDragStart={() => handleDragStart(chain.id, idx)}
                                     onDragOver={handleDragOver}

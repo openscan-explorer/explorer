@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useTheme } from "../../context/SettingsContext";
+import { useSettings } from "../../context/SettingsContext";
 import { useSearch } from "../../hooks/useSearch";
 import NavbarLogo from "./NavbarLogo";
 import { NetworkBlockIndicator } from "./NetworkBlockIndicator";
@@ -11,16 +11,16 @@ const Navbar = () => {
   const location = useLocation();
   const { searchTerm, setSearchTerm, isResolving, error, clearError, handleSearch, networkId } =
     useSearch();
-  const { isDarkMode, toggleTheme } = useTheme();
+  const { isDarkMode, toggleTheme, isSuperUser, toggleSuperUserMode } = useSettings();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // Check if we should show the search box (on blocks, block, txs, tx pages)
+  // Check if we should show the search box (on any network page including home)
   const pathSegments = location.pathname.split("/").filter(Boolean);
-  const shouldShowSearch =
-    networkId &&
-    pathSegments.length >= 2 &&
-    pathSegments[1] &&
-    ["blocks", "block", "txs", "tx", "address"].includes(pathSegments[1]);
+  const isOnNetworkPage =
+    pathSegments.length >= 1 &&
+    (pathSegments.length === 1 || // Network home page (e.g., /btc, /1)
+      (pathSegments[1] && ["blocks", "block", "txs", "tx", "address"].includes(pathSegments[1])));
+  const shouldShowSearch = networkId && isOnNetworkPage;
 
   // Close mobile menu on route change
   // biome-ignore lint/correctness/useExhaustiveDependencies: intentionally re-run on pathname change
@@ -53,27 +53,12 @@ const Navbar = () => {
     <>
       <nav className="navbar">
         <div className="navbar-inner">
-          {/* Left side - Logo and nav links */}
-          <ul className="navbar-left">
-            <li>
-              <NavbarLogo />
-            </li>
-            {networkId && (
-              <>
-                <li className="hide-mobile">
-                  <Link to={`/${networkId}/blocks`}>BLOCKS</Link>
-                </li>
-                <li className="hide-mobile">
-                  <Link to={`/${networkId}/txs`}>TRANSACTIONS</Link>
-                </li>
-              </>
-            )}
-          </ul>
-
-          {/* Search Box - hidden on mobile */}
-          {shouldShowSearch && (
-            <div className="search-container hide-mobile">
-              <form onSubmit={handleSearch} className="search-form">
+          {/* Left side - Logo and Search */}
+          <div className="navbar-left">
+            <NavbarLogo />
+            {/* Search Box - hidden on mobile */}
+            {shouldShowSearch && (
+              <form onSubmit={handleSearch} className="search-form hide-mobile">
                 <input
                   type="text"
                   value={searchTerm}
@@ -81,7 +66,7 @@ const Navbar = () => {
                     setSearchTerm(e.target.value);
                     clearError();
                   }}
-                  placeholder="Search by Address / Tx Hash / Block / ENS"
+                  placeholder="Search by Address / Tx Hash / Block"
                   className="search-input"
                   disabled={isResolving}
                 />
@@ -93,26 +78,26 @@ const Navbar = () => {
                   disabled={isResolving}
                 >
                   <svg
-                    width="20"
-                    height="20"
+                    width="16"
+                    height="16"
                     viewBox="0 0 24 24"
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
                     aria-hidden="true"
                   >
                     <title>Search</title>
-                    <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="2" />
+                    <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="2.5" />
                     <path
                       d="M21 21l-4.35-4.35"
                       stroke="currentColor"
-                      strokeWidth="2"
+                      strokeWidth="2.5"
                       strokeLinecap="round"
                     />
                   </svg>
                 </button>
               </form>
-            </div>
-          )}
+            )}
+          </div>
 
           {/* Right side - Icons and hamburger */}
           <div className="navbar-right">
@@ -124,10 +109,10 @@ const Navbar = () => {
               <li>
                 <button
                   type="button"
-                  onClick={() => navigate("/devtools")}
-                  className="navbar-toggle-btn"
-                  aria-label="Dev Tools"
-                  title="Dev Tools"
+                  onClick={toggleSuperUserMode}
+                  className={`navbar-toggle-btn ${isSuperUser ? "navbar-toggle-active" : ""}`}
+                  aria-label={isSuperUser ? "Disable Super User Mode" : "Enable Super User Mode"}
+                  title={isSuperUser ? "Disable Super User Mode" : "Enable Super User Mode"}
                 >
                   <svg
                     width="18"
@@ -137,17 +122,55 @@ const Navbar = () => {
                     xmlns="http://www.w3.org/2000/svg"
                     aria-hidden="true"
                   >
-                    <title>Dev Tools</title>
-                    <path
-                      d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"
+                    <title>Super User Mode</title>
+                    <polyline
+                      points="4 17 10 11 4 5"
                       stroke="currentColor"
                       strokeWidth="2"
                       strokeLinecap="round"
                       strokeLinejoin="round"
                     />
+                    <line
+                      x1="12"
+                      y1="19"
+                      x2="20"
+                      y2="19"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                    />
                   </svg>
                 </button>
               </li>
+              {isSuperUser && (
+                <li>
+                  <button
+                    type="button"
+                    onClick={() => navigate("/devtools")}
+                    className="navbar-toggle-btn"
+                    aria-label="Dev Tools"
+                    title="Dev Tools"
+                  >
+                    <svg
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      aria-hidden="true"
+                    >
+                      <title>Dev Tools</title>
+                      <path
+                        d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </button>
+                </li>
+              )}
               <li>
                 <button
                   type="button"
@@ -430,42 +453,10 @@ const Navbar = () => {
                 </svg>
                 <span>Transactions</span>
               </button>
-              <button
-                type="button"
-                className="navbar-mobile-menu-item"
-                onClick={() => handleMobileNavigation(`/${networkId}/gastracker`)}
-              >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <title>Gas Tracker</title>
-                  <path
-                    d="M3 22V6a2 2 0 012-2h8a2 2 0 012 2v16"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <path d="M3 22h12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                  <path
-                    d="M13 10h2a2 2 0 012 2v3a2 2 0 002 2h0a2 2 0 002-2V9l-3-3"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <path
-                    d="M7 10h4v4H7z"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-                <span>Gas Tracker</span>
-              </button>
             </>
           )}
 
-          <div className="navbar-mobile-menu-divider" />
+          {networkId && <div className="navbar-mobile-menu-divider" />}
 
           {/* Global links */}
           <button
@@ -492,23 +483,25 @@ const Navbar = () => {
             </svg>
             <span>Home</span>
           </button>
-          <button
-            type="button"
-            className="navbar-mobile-menu-item"
-            onClick={() => handleMobileNavigation("/devtools")}
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <title>Dev Tools</title>
-              <path
-                d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-            <span>Dev Tools</span>
-          </button>
+          {isSuperUser && (
+            <button
+              type="button"
+              className="navbar-mobile-menu-item"
+              onClick={() => handleMobileNavigation("/devtools")}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <title>Dev Tools</title>
+                <path
+                  d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              <span>Dev Tools</span>
+            </button>
+          )}
           <button
             type="button"
             className="navbar-mobile-menu-item"
@@ -582,6 +575,34 @@ const Navbar = () => {
               </svg>
             )}
             <span>{isDarkMode ? "Light Mode" : "Dark Mode"}</span>
+          </button>
+
+          {/* Super User Mode toggle */}
+          <button
+            type="button"
+            className={`navbar-mobile-menu-item ${isSuperUser ? "navbar-mobile-menu-item-active" : ""}`}
+            onClick={toggleSuperUserMode}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <title>Super User Mode</title>
+              <polyline
+                points="4 17 10 11 4 5"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <line
+                x1="12"
+                y1="19"
+                x2="20"
+                y2="19"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
+            </svg>
+            <span>{isSuperUser ? "Disable Super User Mode" : "Enable Super User Mode"}</span>
           </button>
 
           <div className="navbar-mobile-menu-divider" />

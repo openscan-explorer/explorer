@@ -5,23 +5,15 @@
 */
 
 /* Search Form - Navbar */
-.search-container {
-	flex: 1;
-	display: flex;
-	justify-content: center;
-	padding: 0 20px;
-}
-
 .search-form {
+	position: relative;
 	display: flex;
-	gap: 8px;
-	max-width: 500px;
-	width: 100%;
+	width: 320px;
 }
 
 .search-input {
 	flex: 1;
-	padding: 8px 16px;
+	padding: 8px 40px 8px 16px;
 	border-radius: 8px;
 	border: 1px solid var(--border-primary);
 	background: var(--input-bg);
@@ -38,27 +30,29 @@
 }
 
 .search-button {
-	padding: 8px 16px;
-	border-radius: 8px;
+	position: absolute;
+	right: 4px;
+	top: 50%;
+	transform: translateY(-50%);
+	padding: 6px;
+	border-radius: 6px;
 	border: none;
-	background: var(--btn-primary-bg);
-	color: var(--btn-primary-text);
-	font-family: "Outfit", sans-serif;
-	font-weight: 600;
-	font-size: 0.9rem;
+	color: var(--text-muted);
 	cursor: pointer;
 	transition: all 0.2s ease;
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	background-color: var(--color-primary);
 }
 
 .search-button:hover {
-	background: var(--btn-primary-bg-hover);
+	color: var(--color-primary);
+	background: var(--color-primary-alpha-10);
 }
 
 .search-button:active {
-	transform: scale(0.98);
+	transform: translateY(-50%) scale(0.95);
 }
 
 /* Legacy Input Aliases
