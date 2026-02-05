@@ -287,10 +287,6 @@ export class AddressTransactionSearch {
   }
 
   /**
-   * Find all blocks where an address had activity using unified binary search.
-   * Checks both nonce AND balance changes in a single search.
-   */
-  /**
    * Fetch transactions from a block and filter by address, including receipts
    * Uses parallel receipt fetching for better performance
    * Also detects internal transactions by scanning logs for address mentions
@@ -299,6 +295,7 @@ export class AddressTransactionSearch {
     blockNum: number,
     normalizedAddress: string,
     searchForInternal = false,
+    signal?: AbortSignal,
   ): Promise<Array<Transaction & { type: "sent" | "received" | "internal" }>> {
     const result = await this.client.getBlockByNumber(`0x${blockNum.toString(16)}`, true);
     const block = extractData(result.data);
@@ -329,6 +326,7 @@ export class AddressTransactionSearch {
     const receipts = new Map<string, EthTransactionReceipt | null>();
 
     for (let i = 0; i < directTxs.length; i += RECEIPT_BATCH_SIZE) {
+      if (signal?.aborted) break;
       const batch = directTxs.slice(i, i + RECEIPT_BATCH_SIZE);
       const receiptPromises = batch.map(({ tx }) =>
         this.client
@@ -337,10 +335,7 @@ export class AddressTransactionSearch {
             hash: tx.hash,
             receipt: extractData(receiptResult.data),
           }))
-          .catch((e) => {
-            console.warn(`[TxSearch] Failed to fetch receipt for ${tx.hash}`, e);
-            return { hash: tx.hash, receipt: null };
-          }),
+          .catch(() => ({ hash: tx.hash, receipt: null })),
       );
       const batchResults = await Promise.all(receiptPromises);
       for (const { hash, receipt } of batchResults) {
@@ -355,6 +350,7 @@ export class AddressTransactionSearch {
     });
 
     for (const hash of failedHashes) {
+      if (signal?.aborted) break;
       await this.delay(100);
       try {
         const receiptResult = await this.client.getTransactionReceipt(hash);
@@ -417,6 +413,7 @@ export class AddressTransactionSearch {
       // Process transactions where address was found in input (just need receipt for status)
       const INTERNAL_BATCH_SIZE = 5; // Smaller batch size for rate limiting
       for (let i = 0; i < txsWithAddressInInput.length; i += INTERNAL_BATCH_SIZE) {
+        if (signal?.aborted) break;
         if (i > 0) await this.delay(100); // Delay between batches
         const batch = txsWithAddressInInput.slice(i, i + INTERNAL_BATCH_SIZE);
         const receiptPromises = batch.map(({ tx }) =>
@@ -461,6 +458,7 @@ export class AddressTransactionSearch {
       if (txsWithAddressInInput.length === 0 && txsNeedingReceiptCheck.length > 0) {
         // Check logs for remaining transactions (smaller batches with delays)
         for (let i = 0; i < txsNeedingReceiptCheck.length; i += INTERNAL_BATCH_SIZE) {
+          if (signal?.aborted) break;
           if (i > 0) await this.delay(100); // Delay between batches
           const batch = txsNeedingReceiptCheck.slice(i, i + INTERNAL_BATCH_SIZE);
           const receiptPromises = batch.map(({ tx }) =>
@@ -539,15 +537,6 @@ export class AddressTransactionSearch {
     const normalizedAddress = address.toLowerCase();
     const searchStartTime = performance.now();
 
-    console.log(
-      "[AddressTransactionSearch] Starting search, limit:",
-      limit,
-      "toBlock:",
-      toBlock,
-      "fromBlock:",
-      fromBlock,
-    );
-
     // Clear cache for fresh search (unless continuing from previous search)
     if (!toBlock) {
       this.clearCache();
@@ -575,7 +564,6 @@ export class AddressTransactionSearch {
       finalState.nonce === 0
     ) {
       const elapsedMs = Math.round(performance.now() - searchStartTime);
-      console.log("[AddressTransactionSearch] No activity found. Elapsed:", elapsedMs, "ms");
       return {
         blocks: [],
         transactions: [],
@@ -614,12 +602,6 @@ export class AddressTransactionSearch {
 
       // Check limit - stop if we have enough transactions (0 means no limit)
       if (limit > 0 && allTransactions.length >= limit) {
-        console.log(
-          "[Search] Limit reached, stopping. Found:",
-          allTransactions.length,
-          "Limit:",
-          limit,
-        );
         return;
       }
 
@@ -634,25 +616,18 @@ export class AddressTransactionSearch {
 
           // Immediately fetch transactions from this block
           // If only balance changed (not nonce), search for internal transactions
+          if (signal?.aborted) return;
           const searchForInternal = balanceChanged && !nonceChanged;
           await this.delay(this.requestDelay);
           const blockTxs = await this.fetchBlockTransactions(
             searchEndBlock,
             normalizedAddress,
             searchForInternal,
+            signal,
           );
 
           if (blockTxs.length > 0) {
             allTransactions.push(...blockTxs);
-            console.log(
-              "[Search] Found",
-              blockTxs.length,
-              "txs in block",
-              searchEndBlock,
-              "- Total:",
-              allTransactions.length,
-            );
-            // Notify callback immediately so UI can update
             onTransactionsFound?.(blockTxs);
           }
         }
@@ -697,18 +672,6 @@ export class AddressTransactionSearch {
       }
 
       // Multi-segment adaptive branching (4 or 8 segments)
-      console.log(
-        "[Search] Using",
-        segmentCount,
-        "segments for range",
-        searchStartBlock,
-        "-",
-        searchEndBlock,
-        "(nonce delta:",
-        searchEndState.nonce - searchStartState.nonce,
-        ")",
-      );
-
       // Calculate boundaries and fetch internal boundary states in batches
       const boundaries = this.calculateBoundaries(searchStartBlock, searchEndBlock, segmentCount);
       const internalBlocks = boundaries.slice(1, -1); // Exclude start and end (already known)
@@ -795,14 +758,6 @@ export class AddressTransactionSearch {
     const internalCount = limitedTxs.filter((t) => t.type === "internal").length;
     const rpcCalls = this.nonceCache.size + this.balanceCache.size;
     const elapsedMs = Math.round(performance.now() - searchStartTime);
-
-    console.log(
-      `[AddressTransactionSearch] Search complete:`,
-      `\n  Transactions: ${limitedTxs.length} (sent: ${sentCount}, received: ${receivedCount}, internal: ${internalCount})`,
-      `\n  Blocks with activity: ${sortedBlocks.length}`,
-      `\n  RPC calls: ${rpcCalls} (nonce: ${this.nonceCache.size}, balance: ${this.balanceCache.size})`,
-      `\n  Elapsed: ${elapsedMs}ms (${(elapsedMs / 1000).toFixed(2)}s)`,
-    );
 
     return {
       blocks: sortedBlocks,

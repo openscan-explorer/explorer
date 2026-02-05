@@ -212,18 +212,24 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
       .then((range) => {
         if (abortController.signal.aborted) return;
 
-        if (range) {
-          searchToBlockRef.current = range.fromBlock;
-        } else {
-          searchToBlockRef.current = undefined;
+        if (!range) {
+          // No activity found — show "Search Full History" button instead of searching
+          setAutoSearchPending(false);
+          return;
         }
 
+        searchToBlockRef.current = range.fromBlock;
         loadMoreFromBlockRef.current = undefined;
         isAutoSearchRef.current = true;
         setAutoSearchPending(false);
         setSearchLimit(5);
         setSearchTriggered(true);
         setSearchVersion((v) => v + 1);
+      })
+      .catch(() => {
+        if (abortController.signal.aborted) return;
+        // Network error — fall back to manual search
+        setAutoSearchPending(false);
       });
 
     return () => {
