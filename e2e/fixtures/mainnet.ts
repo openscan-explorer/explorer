@@ -409,11 +409,11 @@ export const MAINNET = {
       tokenUri: "ipfs://QmeSjSinHpPnmXmspMjwiXyN6zS4E9zccariGR3jxcaWtq/1",
       // Properties (5 total for token #1)
       properties: [
-        { trait: "MOUTH", value: "Grin" },
-        { trait: "CLOTHES", value: "Vietnam Jacket" },
-        { trait: "BACKGROUND", value: "Orange" },
-        { trait: "EYES", value: "Blue Beams" },
-        { trait: "FUR", value: "Robot" },
+        { trait: "Mouth", value: "Grin" },
+        { trait: "Clothes", value: "Vietnam Jacket" },
+        { trait: "Background", value: "Orange" },
+        { trait: "Eyes", value: "Blue Beams" },
+        { trait: "Fur", value: "Robot" },
       ],
     },
     // BAYC #100 - Another well-known Bored Ape
@@ -427,11 +427,11 @@ export const MAINNET = {
       tokenUri: "ipfs://QmeSjSinHpPnmXmspMjwiXyN6zS4E9zccariGR3jxcaWtq/100",
       // Properties (5 total for token #100)
       properties: [
-        { trait: "BACKGROUND", value: "Yellow" },
-        { trait: "MOUTH", value: "Bored Cigarette" },
-        { trait: "HAT", value: "Party Hat 2" },
-        { trait: "FUR", value: "Dark Brown" },
-        { trait: "EYES", value: "Wide Eyed" },
+        { trait: "Background", value: "Yellow" },
+        { trait: "Mouth", value: "Bored Cigarette" },
+        { trait: "Hat", value: "Party Hat 2" },
+        { trait: "Fur", value: "Dark Brown" },
+        { trait: "Eyes", value: "Wide Eyed" },
       ],
     },
     // Rarible token - ERC1155

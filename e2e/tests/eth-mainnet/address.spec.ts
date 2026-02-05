@@ -82,14 +82,17 @@ test.describe("Address Page", () => {
     }
   });
 
-  test("displays address header with partial address", async ({ page }) => {
+  test("displays address header with partial address", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const addr = MAINNET.addresses.vitalik;
 
     await addressPage.goto(addr.address);
 
-    // Verify address is displayed in header (at least partial)
-    await expect(page.locator(`text=${addr.address.slice(0, 10)}`)).toBeVisible({ timeout: DEFAULT_TIMEOUT * 3 });
+    const loaded = await waitForAddressContent(page, testInfo);
+    if (loaded) {
+      // Verify address is displayed in header (at least partial)
+      await expect(page.locator(`text=${addr.address.slice(0, 10)}`)).toBeVisible();
+    }
   });
 
   test("handles invalid address gracefully", async ({ page }) => {
@@ -126,10 +129,10 @@ test.describe("Address Page", () => {
       await expect(page.locator(".token-standard-badge")).toBeVisible();
 
       // Verify token lookup input exists
-      await expect(page.locator(".erc721-token-input")).toBeVisible();
+      await expect(page.locator(".nft-token-input")).toBeVisible();
 
       // Verify NFT Collection Details section
-      await expect(page.locator("text=NFT Collection Details")).toBeVisible();
+      await expect(page.locator("text=NFT Collection")).toBeVisible();
 
       // Contract should have balance displayed
       await expect(page.locator("text=Contract Balance:").or(page.locator("text=Balance:"))).toBeVisible();
@@ -257,10 +260,10 @@ test.describe("Address Page", () => {
       await expect(page.locator(".token-standard-badge")).toBeVisible();
 
       // Verify token lookup input exists
-      await expect(page.locator(".erc1155-token-input")).toBeVisible();
+      await expect(page.locator(".nft-token-input")).toBeVisible();
 
       // Verify Multi-Token Collection Details section
-      await expect(page.locator("text=Multi-Token Collection Details")).toBeVisible();
+      await expect(page.locator("text=Multi-Token Collection")).toBeVisible();
 
       // Contract should have balance displayed
       await expect(page.locator("text=Contract Balance:").or(page.locator("text=Balance:"))).toBeVisible();

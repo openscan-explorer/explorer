@@ -104,6 +104,32 @@ export async function waitForAddressContent(page: Page, testInfo: TestInfo): Pro
 }
 
 /**
+ * Wait for transactions page content to load or error to appear.
+ * Returns true if content loaded successfully, false if error or timeout.
+ */
+export async function waitForTxsContent(page: Page, testInfo: TestInfo): Promise<boolean> {
+  const timeout = getTimeout(testInfo);
+  try {
+    await expect(
+      page
+        .locator(".blocks-header-main")
+        .or(page.locator("text=Error:"))
+        .or(page.locator("text=Something went wrong"))
+        .or(page.locator("text=Failed to fetch"))
+        .first()
+    ).toBeVisible({ timeout });
+
+    return (
+      !(await page.locator("text=Error:").isVisible()) &&
+      !(await page.locator("text=Something went wrong").isVisible()) &&
+      !(await page.locator("text=Failed to fetch").isVisible())
+    );
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Wait for token page content to load or error to appear.
  * Returns true if content loaded successfully, false if error or timeout.
  */

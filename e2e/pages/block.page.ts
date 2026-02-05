@@ -29,7 +29,7 @@ export class BlockPage {
   }
 
   async goto(blockNumber: number | string, chainId = "1") {
-    await this.page.goto(`/${chainId}/block/${blockNumber}`);
+    await this.page.goto(`/#/${chainId}/block/${blockNumber}`);
   }
 
   async waitForLoad() {
