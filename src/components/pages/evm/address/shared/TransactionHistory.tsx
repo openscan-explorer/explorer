@@ -108,6 +108,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
   const searchToBlockRef = useRef<number | undefined>(undefined);
   const searchIdRef = useRef(0);
   const isAutoSearchRef = useRef(false);
+  const userCancelledRef = useRef(false);
   const [autoSearchPending, setAutoSearchPending] = useState(true);
 
   // Cache state
@@ -172,6 +173,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
     setSearchLimit(100);
     loadMoreFromBlockRef.current = undefined;
     searchToBlockRef.current = undefined;
+    userCancelledRef.current = false;
     setTransactionsResult(null);
     setTransactionDetails([]);
     transactionHashSet.current.clear();
@@ -203,7 +205,14 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
   // Phase 1: Exponential search from chain tip to find most recent activity range
   // Phase 2: Run binary search tree within the narrowed range
   useEffect(() => {
-    if (!dataService || !addressHash || hasCachedData || searchTriggered) return;
+    if (
+      !dataService ||
+      !addressHash ||
+      hasCachedData ||
+      searchTriggered ||
+      userCancelledRef.current
+    )
+      return;
 
     const abortController = new AbortController();
 
@@ -369,6 +378,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
   };
 
   const handleCancelSearch = () => {
+    userCancelledRef.current = true;
     setSearchTriggered(false);
     setSearchingTxs(false);
   };
@@ -703,6 +713,8 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
           </span>
         </div>
 
+        {transactionDetails.length > 0 && renderTransactionTable(transactionDetails)}
+
         <div className="tx-search-progress">
           <div className="tx-search-progress-bar">
             <div
@@ -721,18 +733,6 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
             </button>
           </div>
         </div>
-
-        {transactionDetails.length > 0 && renderTransactionTable(transactionDetails)}
-
-        {transactionDetails.length === 0 && (
-          <div className="tx-history-searching">
-            <div className="tx-history-searching-spinner" />
-            <p>Searching for transactions...</p>
-            <p className="tx-history-searching-note">
-              Binary searching through blockchain state to find address activity
-            </p>
-          </div>
-        )}
       </div>
     );
   }
@@ -754,6 +754,15 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
             {(transactionsResult.source === "binary_search" ||
               transactionsResult.source === "logs") && (
               <>
+                {hasCachedData && (
+                  <button
+                    type="button"
+                    className="tx-history-refresh-link"
+                    onClick={handleSearchRecent}
+                  >
+                    Search Recent
+                  </button>
+                )}
                 <span className="tx-history-dot">●</span>
                 Found {transactionDetails.length} transactions
               </>
@@ -767,6 +776,9 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
           </span>
         )}
       </div>
+
+      {/* Transaction table - always at top */}
+      {transactionDetails.length > 0 && renderTransactionTable(transactionDetails)}
 
       {/* Completed progress bar - only show after a search has been executed */}
       {searchVersion > 0 && transactionsResult && transactionDetails.length > 0 && (
@@ -809,22 +821,6 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
           {transactionsResult.message}
         </div>
       )}
-
-      {/* Search Recent button - always shown when we have cached data */}
-      {hasCachedData && (
-        <div className="tx-history-search-recent">
-          <button
-            type="button"
-            className="tx-history-search-recent-btn"
-            onClick={handleSearchRecent}
-          >
-            Search Recent Transactions
-          </button>
-        </div>
-      )}
-
-      {/* Transaction table */}
-      {transactionDetails.length > 0 && renderTransactionTable(transactionDetails)}
 
       {/* Load More button with dropdown - hide when search is complete */}
       {transactionDetails.length > 0 && !transactionsResult?.isComplete && (

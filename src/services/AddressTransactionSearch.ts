@@ -6,6 +6,33 @@ import type {
 import type { Transaction } from "../types";
 import { hexToNumber } from "./adapters/EVMAdapter/utils";
 
+interface Semaphore {
+  acquire(): Promise<() => void>;
+}
+
+function createSemaphore(max: number): Semaphore {
+  let active = 0;
+  const queue: Array<() => void> = [];
+  return {
+    acquire(): Promise<() => void> {
+      return new Promise((resolve) => {
+        const tryRun = () => {
+          if (active < max) {
+            active++;
+            resolve(() => {
+              active--;
+              if (queue.length > 0) queue.shift()?.();
+            });
+          } else {
+            queue.push(tryRun);
+          }
+        };
+        tryRun();
+      });
+    },
+  };
+}
+
 /**
  * Binary search based address transaction discovery.
  *
@@ -62,15 +89,19 @@ export class AddressTransactionSearch {
   private client: EthereumClient;
   private nonceCache: Map<string, number> = new Map();
   private balanceCache: Map<string, bigint> = new Map();
-  private requestDelay = 0; // ms between requests
+  private rpcSemaphore: Semaphore = createSemaphore(4);
 
   // Adaptive branching configuration
   // Can be increased later when RPC type detection is added (e.g., for localhost/private RPCs)
   private static readonly MAX_SEGMENTS = 8; // Max segments per split (safe for public RPCs)
-  private static readonly BATCH_SIZE = 4; // Max parallel state fetches (4 blocks = 8 RPC calls)
+  private static readonly BATCH_SIZE = 8; // Max parallel state fetches (8 blocks = 16 RPC calls)
 
   constructor(client: EthereumClient) {
     this.client = client;
+  }
+
+  private rpcLimited<T>(fn: () => Promise<T>): Promise<T> {
+    return this.rpcSemaphore.acquire().then((release) => fn().finally(release));
   }
 
   /**
@@ -155,21 +186,9 @@ export class AddressTransactionSearch {
       for (const { block, state } of batchResults) {
         results.set(block, state);
       }
-
-      // Delay between batches if rate limiting enabled
-      if (i + AddressTransactionSearch.BATCH_SIZE < blocks.length && this.requestDelay > 0) {
-        await this.delay(this.requestDelay);
-      }
     }
 
     return results;
-  }
-
-  /**
-   * Delay helper to avoid rate limiting
-   */
-  private delay(ms: number): Promise<void> {
-    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   /**
@@ -182,7 +201,9 @@ export class AddressTransactionSearch {
       return cached;
     }
 
-    const result = await this.client.getTransactionCount(address, `0x${block.toString(16)}`);
+    const result = await this.rpcLimited(() =>
+      this.client.getTransactionCount(address, `0x${block.toString(16)}`),
+    );
     const nonce = hexToNumber(extractData(result.data) || "0x0");
     this.nonceCache.set(key, nonce);
     return nonce;
@@ -198,21 +219,18 @@ export class AddressTransactionSearch {
       return cached;
     }
 
-    const result = await this.client.getBalance(address, `0x${block.toString(16)}`);
+    const result = await this.rpcLimited(() =>
+      this.client.getBalance(address, `0x${block.toString(16)}`),
+    );
     const balance = BigInt(extractData(result.data) || "0x0");
     this.balanceCache.set(key, balance);
     return balance;
   }
 
   /**
-   * Get both nonce and balance at a block (parallel with optional delay before)
+   * Get both nonce and balance at a block in parallel
    */
   private async getState(address: string, block: number): Promise<AddressState> {
-    // Apply delay before the parallel fetch (for rate limiting if needed)
-    if (this.requestDelay > 0) {
-      await this.delay(this.requestDelay);
-    }
-    // Fetch nonce and balance in parallel
     const [nonce, balance] = await Promise.all([
       this.getNonce(address, block),
       this.getBalance(address, block),
@@ -245,7 +263,7 @@ export class AddressTransactionSearch {
     initialRange = 100_000,
     signal?: AbortSignal,
   ): Promise<{ fromBlock: number; toBlock: number } | null> {
-    const blockNumberResult = await this.client.blockNumber();
+    const blockNumberResult = await this.rpcLimited(() => this.client.blockNumber());
     const latestBlock = hexToNumber(extractData(blockNumberResult.data) || "0x0");
 
     if (latestBlock === 0) return null;
@@ -297,7 +315,9 @@ export class AddressTransactionSearch {
     searchForInternal = false,
     signal?: AbortSignal,
   ): Promise<Array<Transaction & { type: "sent" | "received" | "internal" }>> {
-    const result = await this.client.getBlockByNumber(`0x${blockNum.toString(16)}`, true);
+    const result = await this.rpcLimited(() =>
+      this.client.getBlockByNumber(`0x${blockNum.toString(16)}`, true),
+    );
     const block = extractData(result.data);
     if (!block || !block.transactions) return [];
 
@@ -329,8 +349,7 @@ export class AddressTransactionSearch {
       if (signal?.aborted) break;
       const batch = directTxs.slice(i, i + RECEIPT_BATCH_SIZE);
       const receiptPromises = batch.map(({ tx }) =>
-        this.client
-          .getTransactionReceipt(tx.hash)
+        this.rpcLimited(() => this.client.getTransactionReceipt(tx.hash))
           .then((receiptResult) => ({
             hash: tx.hash,
             receipt: extractData(receiptResult.data),
@@ -343,24 +362,28 @@ export class AddressTransactionSearch {
       }
     }
 
-    // Retry failed receipts sequentially (handles rate-limiting from concurrent strategies)
+    // Retry failed receipts in parallel (semaphore handles backpressure)
     const failedHashes: string[] = [];
     receipts.forEach((receipt, hash) => {
       if (receipt === null) failedHashes.push(hash);
     });
 
-    for (const hash of failedHashes) {
-      if (signal?.aborted) break;
-      await this.delay(100);
-      try {
-        const receiptResult = await this.client.getTransactionReceipt(hash);
-        const receipt = extractData(receiptResult.data);
-        if (receipt) {
-          receipts.set(hash, receipt);
-        }
-      } catch {
-        // Still failed after retry, keep as null
-      }
+    if (failedHashes.length > 0 && !signal?.aborted) {
+      await Promise.all(
+        failedHashes.map(async (hash) => {
+          try {
+            const receiptResult = await this.rpcLimited(() =>
+              this.client.getTransactionReceipt(hash),
+            );
+            const receipt = extractData(receiptResult.data);
+            if (receipt) {
+              receipts.set(hash, receipt);
+            }
+          } catch {
+            // Still failed after retry, keep as null
+          }
+        }),
+      );
     }
 
     // Build direct transaction results
@@ -411,14 +434,12 @@ export class AddressTransactionSearch {
       }
 
       // Process transactions where address was found in input (just need receipt for status)
-      const INTERNAL_BATCH_SIZE = 5; // Smaller batch size for rate limiting
+      const INTERNAL_BATCH_SIZE = 15;
       for (let i = 0; i < txsWithAddressInInput.length; i += INTERNAL_BATCH_SIZE) {
         if (signal?.aborted) break;
-        if (i > 0) await this.delay(100); // Delay between batches
         const batch = txsWithAddressInInput.slice(i, i + INTERNAL_BATCH_SIZE);
         const receiptPromises = batch.map(({ tx }) =>
-          this.client
-            .getTransactionReceipt(tx.hash)
+          this.rpcLimited(() => this.client.getTransactionReceipt(tx.hash))
             .then((receiptResult) => ({
               tx,
               receipt: extractData(receiptResult.data),
@@ -456,14 +477,12 @@ export class AddressTransactionSearch {
       // Only fetch receipts for remaining txs if we didn't find anything in input data
       // This is expensive (many RPC calls) so we skip it if we already found the tx
       if (txsWithAddressInInput.length === 0 && txsNeedingReceiptCheck.length > 0) {
-        // Check logs for remaining transactions (smaller batches with delays)
+        // Check logs for remaining transactions
         for (let i = 0; i < txsNeedingReceiptCheck.length; i += INTERNAL_BATCH_SIZE) {
           if (signal?.aborted) break;
-          if (i > 0) await this.delay(100); // Delay between batches
           const batch = txsNeedingReceiptCheck.slice(i, i + INTERNAL_BATCH_SIZE);
           const receiptPromises = batch.map(({ tx }) =>
-            this.client
-              .getTransactionReceipt(tx.hash)
+            this.rpcLimited(() => this.client.getTransactionReceipt(tx.hash))
               .then((receiptResult) => ({
                 tx,
                 receipt: extractData(receiptResult.data),
@@ -547,11 +566,11 @@ export class AddressTransactionSearch {
     if (toBlock !== undefined) {
       endBlock = toBlock - 1; // Exclusive - don't include the toBlock itself
     } else {
-      const blockNumberResult = await this.client.blockNumber();
+      const blockNumberResult = await this.rpcLimited(() => this.client.blockNumber());
       endBlock = hexToNumber(extractData(blockNumberResult.data) || "0x0");
     }
 
-    // Get initial and final states (getState already handles delay)
+    // Get initial and final states
     // If fromBlock is provided, use it as the lower bound instead of block 0
     const startBlock = fromBlock !== undefined ? fromBlock : 0;
     const initialState = await this.getState(address, startBlock);
@@ -618,7 +637,6 @@ export class AddressTransactionSearch {
           // If only balance changed (not nonce), search for internal transactions
           if (signal?.aborted) return;
           const searchForInternal = balanceChanged && !nonceChanged;
-          await this.delay(this.requestDelay);
           const blockTxs = await this.fetchBlockTransactions(
             searchEndBlock,
             normalizedAddress,
@@ -650,7 +668,6 @@ export class AddressTransactionSearch {
       // For binary (2 segments), use optimized path
       if (segmentCount <= 2) {
         const midBlock = Math.floor((searchStartBlock + searchEndBlock) / 2);
-        await this.delay(this.requestDelay);
         const midState = await this.getState(address, midBlock);
 
         const leftChanged =
@@ -723,9 +740,7 @@ export class AddressTransactionSearch {
       // Process segments RIGHT-TO-LEFT (newest first)
       for (let i = segments.length - 1; i >= 0; i--) {
         if (signal?.aborted) break;
-        if (limit > 0 && allTransactions.length >= limit) {
-          break;
-        }
+        if (limit > 0 && allTransactions.length >= limit) break;
 
         const segment = segments[i];
         if (segment?.hasChanges) {
@@ -781,10 +796,10 @@ export class AddressTransactionSearch {
   async getTransactionRange(
     address: string,
   ): Promise<{ startBlock: number; endBlock: number; totalSent: number } | null> {
-    // Get latest block and current nonce (sequential to avoid rate limiting)
-    const blockNumberResult = await this.client.blockNumber();
-    await this.delay(this.requestDelay);
-    const nonceResult = await this.client.getTransactionCount(address, "latest");
+    const blockNumberResult = await this.rpcLimited(() => this.client.blockNumber());
+    const nonceResult = await this.rpcLimited(() =>
+      this.client.getTransactionCount(address, "latest"),
+    );
 
     const latestBlock = hexToNumber(extractData(blockNumberResult.data) || "0x0");
     const currentNonce = hexToNumber(extractData(nonceResult.data) || "0x0");
@@ -800,7 +815,6 @@ export class AddressTransactionSearch {
 
       while (low < high) {
         const mid = Math.floor((low + high) / 2);
-        await this.delay(this.requestDelay);
         const nonceAtMid = await this.getNonce(address, mid);
 
         if (nonceAtMid < targetNonce) {

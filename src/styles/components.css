@@ -3974,6 +3974,23 @@
 	color: var(--color-error);
 }
 
+.tx-history-refresh-link {
+	background: none;
+	border: none;
+	color: var(--color-primary);
+	cursor: pointer;
+	font-size: 0.8rem;
+	padding: 2px 8px;
+	margin-left: 8px;
+	border-radius: 4px;
+	transition: background-color 0.2s;
+}
+
+.tx-history-refresh-link:hover {
+	background-color: var(--overlay-light-5);
+	text-decoration: underline;
+}
+
 .tx-history-dot {
 	font-size: 0.5rem;
 }

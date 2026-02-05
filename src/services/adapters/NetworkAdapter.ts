@@ -156,10 +156,7 @@ export abstract class NetworkAdapter {
         transactionDetails: txDetails,
         source: "binary_search",
         isComplete: result.stats.totalTxs < limit || limit === 0,
-        message:
-          limit > 0 && result.stats.totalTxs >= limit
-            ? `Showing ${limit} transactions (more may exist)`
-            : undefined,
+        message: undefined,
       };
     } catch (error) {
       console.error("Error searching address transactions:", error);
