@@ -290,6 +290,25 @@ export class AddressTransactionSearch {
       }
     }
 
+    // Retry failed receipts sequentially (handles rate-limiting from concurrent strategies)
+    const failedHashes: string[] = [];
+    receipts.forEach((receipt, hash) => {
+      if (receipt === null) failedHashes.push(hash);
+    });
+
+    for (const hash of failedHashes) {
+      await this.delay(100);
+      try {
+        const receiptResult = await this.client.getTransactionReceipt(hash);
+        const receipt = extractData(receiptResult.data);
+        if (receipt) {
+          receipts.set(hash, receipt);
+        }
+      } catch {
+        // Still failed after retry, keep as null
+      }
+    }
+
     // Build direct transaction results
     const transactions: Array<Transaction & { type: "sent" | "received" | "internal" }> = [];
     for (const { tx, isSent } of directTxs) {

@@ -23,7 +23,7 @@ export class DataService {
   constructor(
     network: NetworkConfig,
     rpcUrlsMap: RpcUrlsContextType,
-    strategy: "fallback" | "parallel" = "fallback",
+    strategy: "fallback" | "parallel" | "race" = "fallback",
   ) {
     this.networkType = network.type;
     const rpcKey = getNetworkRpcKey(network);

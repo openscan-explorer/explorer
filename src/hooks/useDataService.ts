@@ -35,7 +35,7 @@ export function useDataService(networkIdOrConfig: string | number | NetworkConfi
     let limitedRpcUrls = rpcUrls;
 
     if (
-      settings.rpcStrategy === "parallel" &&
+      (settings.rpcStrategy === "parallel" || settings.rpcStrategy === "race") &&
       settings.maxParallelRequests &&
       settings.maxParallelRequests > 0
     ) {

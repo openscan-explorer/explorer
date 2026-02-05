@@ -537,24 +537,27 @@ const Settings: React.FC = () => {
                     <strong>Fallback:</strong> Try endpoints one by one until one succeeds.
                     <br />
                     <strong>Parallel:</strong> Query all endpoints simultaneously.
+                    <br />
+                    <strong>Race:</strong> Query all endpoints and return the fastest response.
                   </div>
                 </div>
                 <select
                   value={settings.rpcStrategy || "fallback"}
                   onChange={(e) =>
                     updateSettings({
-                      rpcStrategy: e.target.value as "fallback" | "parallel",
+                      rpcStrategy: e.target.value as "fallback" | "parallel" | "race",
                     })
                   }
                   className="settings-select"
                 >
                   <option value="fallback">Fallback (Default)</option>
                   <option value="parallel">Parallel</option>
+                  <option value="race">Race (Fastest)</option>
                 </select>
               </div>
 
               {/* Max Parallel Requests - Only show when parallel mode is active */}
-              {settings.rpcStrategy === "parallel" && (
+              {(settings.rpcStrategy === "parallel" || settings.rpcStrategy === "race") && (
                 <div className="settings-item">
                   <div>
                     <div className="settings-item-label">Max Parallel Requests</div>

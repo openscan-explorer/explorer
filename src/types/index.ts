@@ -432,7 +432,7 @@ export interface ApiKeys {
 export interface UserSettings {
   theme?: "light" | "dark" | "auto";
   showBackgroundBlocks?: boolean;
-  rpcStrategy?: "fallback" | "parallel";
+  rpcStrategy?: "fallback" | "parallel" | "race";
   maxParallelRequests?: number;
   apiKeys?: ApiKeys;
 }
@@ -451,13 +451,13 @@ export const DEFAULT_SETTINGS: UserSettings = {
 /**
  * RPC strategy type - re-exported from RPCClient
  */
-export type RPCStrategy = "fallback" | "parallel";
+export type RPCStrategy = "fallback" | "parallel" | "race";
 
 /**
  * Metadata about RPC request when using parallel or fallback strategy
  */
 export interface RPCMetadata {
-  strategy: "parallel" | "fallback";
+  strategy: "parallel" | "fallback" | "race";
   timestamp: number;
   responses: RPCProviderResponse[];
   hasInconsistencies: boolean;
