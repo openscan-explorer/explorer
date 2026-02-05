@@ -107,6 +107,8 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
   const loadMoreFromBlockRef = useRef<number | undefined>(undefined);
   const searchToBlockRef = useRef<number | undefined>(undefined);
   const searchIdRef = useRef(0);
+  const isAutoSearchRef = useRef(false);
+  const [autoSearchPending, setAutoSearchPending] = useState(true);
 
   // Cache state
   const [hasCachedData, setHasCachedData] = useState(false);
@@ -176,12 +178,14 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
     setHasCachedData(false);
     setOldestSearchedBlock(0);
     setSearchVersion(0);
+    setAutoSearchPending(true);
 
     // Try to load from cache
     const cache = loadTxCache(numericNetworkId, addressHash);
     if (cache && cache.transactions.length > 0) {
       setTransactionDetails(cache.transactions);
       setHasCachedData(true);
+      setAutoSearchPending(false);
       setOldestSearchedBlock(cache.oldestSearchedBlock);
       for (const tx of cache.transactions) {
         transactionHashSet.current.add(tx.hash);
@@ -194,6 +198,36 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
       });
     }
   }, [addressHash, numericNetworkId]);
+
+  // Auto-search: on mount with no cache, find recent activity range then search
+  // Phase 1: Split chain into 50 segments, scan right-to-left for most recent activity
+  // Phase 2: Run binary search tree within the narrowed segment
+  useEffect(() => {
+    if (!dataService || !addressHash || hasCachedData || searchTriggered) return;
+
+    let cancelled = false;
+
+    dataService.networkAdapter.findRecentActivityRange(addressHash).then((range) => {
+      if (cancelled) return;
+
+      if (range) {
+        searchToBlockRef.current = range.fromBlock;
+      } else {
+        searchToBlockRef.current = undefined;
+      }
+
+      loadMoreFromBlockRef.current = undefined;
+      isAutoSearchRef.current = true;
+      setAutoSearchPending(false);
+      setSearchLimit(5);
+      setSearchTriggered(true);
+      setSearchVersion((v) => v + 1);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [dataService, addressHash, hasCachedData, searchTriggered]);
 
   // Transaction search effect
   // biome-ignore lint/correctness/useExhaustiveDependencies: oldestSearchedBlock intentionally excluded - effect should not re-run when it changes (causes table clear bug)
@@ -227,10 +261,10 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
 
     dataService.networkAdapter
       .getAddressTransactions(addressHash, fromBlock, toBlock, searchLimit, wrappedCallback)
-      .then((result) => {
+      .then((rawResult) => {
         if (!isSearchActive()) return;
 
-        if (isSearchRecent && result.transactions.length === 0) {
+        if (isSearchRecent && rawResult.transactions.length === 0) {
           setTransactionsResult((prev) => ({
             transactions: prev?.transactions || [],
             source: prev?.source || "binary_search",
@@ -239,6 +273,13 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
           }));
           return;
         }
+
+        // For auto-search: force isComplete to false (we only searched 1/4 of chain)
+        const isAutoSearch = isAutoSearchRef.current;
+        if (isAutoSearch) {
+          isAutoSearchRef.current = false;
+        }
+        const result = isAutoSearch ? { ...rawResult, isComplete: false } : rawResult;
 
         setTransactionsResult(result);
 
@@ -252,7 +293,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
         setTransactionDetails((currentTxs) => {
           if (currentTxs.length > 0) {
             const oldestTxBlock = getOldestBlockFromTxs(currentTxs);
-            const cacheIsComplete = isSearchRecent ? false : result.isComplete;
+            const cacheIsComplete = isSearchRecent || isAutoSearch ? false : result.isComplete;
             let oldestSearched: number;
             if (result.isComplete && !isSearchRecent) {
               oldestSearched = 0;
@@ -520,7 +561,26 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
     </div>
   );
 
-  // Show search button if search hasn't been triggered
+  // Show loading state while auto-search is initializing (finding recent activity range)
+  if (!searchTriggered && autoSearchPending) {
+    return (
+      <div className="tx-details">
+        <div className="tx-section tx-history-header">
+          <span className="tx-section-title">Transaction History</span>
+          <span className="tx-history-status tx-history-status-searching">
+            <div className="tx-history-searching-spinner-inline" />
+            Searching...
+          </span>
+        </div>
+        <div className="tx-history-searching">
+          <div className="tx-history-searching-spinner" />
+          <p>Searching for recent transactions...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show search button if search hasn't been triggered (auto-search didn't apply, e.g. cache loaded)
   if (!searchTriggered) {
     return (
       <div className="tx-details">
@@ -823,9 +883,24 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
         </div>
       )}
 
-      {/* Empty state */}
-      {transactionDetails.length === 0 && !transactionsResult?.message && (
-        <div className="tx-history-empty">No transactions found for this address</div>
+      {/* Empty state - with full search option when auto-search found nothing */}
+      {transactionDetails.length === 0 && transactionsResult && !transactionsResult?.message && (
+        <div className="tx-history-empty">
+          <p>No recent transactions found</p>
+          <button
+            type="button"
+            className="tx-history-search-btn"
+            onClick={() => {
+              searchToBlockRef.current = undefined;
+              loadMoreFromBlockRef.current = undefined;
+              setSearchLimit(selectedLimit);
+              setSearchTriggered(true);
+              setSearchVersion((v) => v + 1);
+            }}
+          >
+            Search Full History
+          </button>
+        </div>
       )}
     </div>
   );

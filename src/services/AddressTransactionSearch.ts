@@ -229,6 +229,58 @@ export class AddressTransactionSearch {
   }
 
   /**
+   * Find the smallest recent block range containing address activity.
+   * Splits the chain into segments and scans right-to-left to find
+   * the most recent segment with a state change.
+   *
+   * This is used as Phase 1 of the auto-search: quickly narrow down
+   * the search range before running the full binary search tree.
+   *
+   * @param address - Address to check
+   * @param segments - Number of segments to split the chain into (default 50)
+   * @returns { fromBlock, toBlock } for the narrowest recent range, or null if no activity
+   */
+  async findRecentActivityRange(
+    address: string,
+    segments = 50,
+  ): Promise<{ fromBlock: number; toBlock: number } | null> {
+    const blockNumberResult = await this.client.blockNumber();
+    const latestBlock = hexToNumber(extractData(blockNumberResult.data) || "0x0");
+
+    if (latestBlock === 0) return null;
+
+    const segmentSize = Math.floor(latestBlock / segments);
+    if (segmentSize === 0) return { fromBlock: 0, toBlock: latestBlock };
+
+    // Get state at latest block
+    const latestState = await this.getState(address, latestBlock);
+
+    // No activity at all if nonce is 0 and balance is 0
+    if (latestState.nonce === 0 && latestState.balance === BigInt(0)) {
+      return null;
+    }
+
+    // Scan boundaries right-to-left, comparing each to latest state
+    for (let i = segments - 1; i >= 0; i--) {
+      const boundaryBlock = i * segmentSize;
+      const boundaryState = await this.getState(address, boundaryBlock);
+
+      const nonceChanged = boundaryState.nonce !== latestState.nonce;
+      const balanceChanged = boundaryState.balance !== latestState.balance;
+
+      if (nonceChanged || balanceChanged) {
+        // Activity between this boundary and the next one
+        const nextBoundary = Math.min((i + 1) * segmentSize, latestBlock);
+        return { fromBlock: boundaryBlock, toBlock: nextBoundary };
+      }
+    }
+
+    // State at block 0 equals latest → edge case
+    // Fall back to searching from block 0
+    return { fromBlock: 0, toBlock: latestBlock };
+  }
+
+  /**
    * Find all blocks where an address had activity using unified binary search.
    * Checks both nonce AND balance changes in a single search.
    */

@@ -176,6 +176,19 @@ export abstract class NetworkAdapter {
   }
 
   /**
+   * Find the smallest recent block range with address activity.
+   * Splits the chain into segments and scans right-to-left.
+   * Used for fast initial search on address page load.
+   */
+  async findRecentActivityRange(
+    address: string,
+    segments?: number,
+  ): Promise<{ fromBlock: number; toBlock: number } | null> {
+    if (!this.txSearch) return null;
+    return this.txSearch.findRecentActivityRange(address, segments);
+  }
+
+  /**
    * Get the latest block number
    * @returns Latest block number
    */
