@@ -4,6 +4,7 @@
  */
 
 import networksData from "../config/networks.json";
+import { logger } from "../utils/logger";
 import { extractChainIdFromNetworkId } from "../utils/networkResolver";
 
 const METADATA_BASE_URL = "https://cdn.jsdelivr.net/npm/@openscan/metadata/dist";
@@ -89,13 +90,13 @@ export async function fetchNetworkProfile(profilePath: string): Promise<string |
     const response = await fetch(url);
 
     if (!response.ok) {
-      console.warn(`Failed to fetch network profile: ${response.statusText}`);
+      logger.warn(`Failed to fetch network profile: ${response.statusText}`);
       return null;
     }
 
     return await response.text();
   } catch (error) {
-    console.error("Error fetching network profile:", error);
+    logger.error("Error fetching network profile:", error);
     return null;
   }
 }
@@ -206,7 +207,7 @@ export async function fetchSupporters(): Promise<Supporter[]> {
 
     return processSupporters(data);
   } catch (error) {
-    console.error("Error fetching supporters:", error);
+    logger.error("Error fetching supporters:", error);
 
     // Return cached data if available, even if stale
     if (supportersCache) {
@@ -499,7 +500,7 @@ export async function fetchApps(): Promise<AppsResponse> {
     appsCacheTime = now;
     return data;
   } catch (error) {
-    console.error("Error fetching apps:", error);
+    logger.error("Error fetching apps:", error);
     if (appsCache) {
       return appsCache;
     }
@@ -529,7 +530,7 @@ export async function fetchOrganizations(): Promise<OrganizationsResponse> {
     orgsCacheTime = now;
     return data;
   } catch (error) {
-    console.error("Error fetching organizations:", error);
+    logger.error("Error fetching organizations:", error);
     if (orgsCache) {
       return orgsCache;
     }
@@ -552,13 +553,13 @@ export async function fetchProfileMarkdown(profilePath: string): Promise<string 
     const response = await fetch(url);
 
     if (!response.ok) {
-      console.warn(`Failed to fetch profile markdown: ${response.statusText}`);
+      logger.warn(`Failed to fetch profile markdown: ${response.statusText}`);
       return null;
     }
 
     return await response.text();
   } catch (error) {
-    console.error("Error fetching profile markdown:", error);
+    logger.error("Error fetching profile markdown:", error);
     return null;
   }
 }
@@ -588,7 +589,7 @@ export async function fetchToken(chainId: number, address: string): Promise<Toke
 
     return await response.json();
   } catch (error) {
-    console.error("Error fetching token:", error);
+    logger.error("Error fetching token:", error);
     return null;
   }
 }
@@ -645,7 +646,7 @@ export async function fetchTokenList(chainId: number): Promise<TokenListResponse
 
     return data;
   } catch (error) {
-    console.error("Error fetching token list:", error);
+    logger.error("Error fetching token list:", error);
 
     // Return cached data if available, even if stale
     if (cached) {
@@ -790,7 +791,7 @@ export async function fetchProfile(
 
     return profileData;
   } catch (error) {
-    console.error(`Error fetching ${profileType} profile:`, error);
+    logger.error(`Error fetching ${profileType} profile:`, error);
     return null;
   }
 }

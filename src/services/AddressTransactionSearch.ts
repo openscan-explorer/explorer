@@ -4,6 +4,7 @@ import type {
   EthTransactionReceipt,
 } from "@openscan/network-connectors";
 import type { Transaction } from "../types";
+import { logger } from "../utils/logger";
 import { hexToNumber } from "./adapters/EVMAdapter/utils";
 
 interface Semaphore {
@@ -738,7 +739,7 @@ export class AddressTransactionSearch {
         const segEndState = stateMap.get(segEnd);
 
         if (!segStartState || !segEndState) {
-          console.warn("[Search] Missing state for segment", i, "- skipping");
+          logger.warn("[Search] Missing state for segment", i, "- skipping");
           continue;
         }
 
