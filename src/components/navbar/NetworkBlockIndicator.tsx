@@ -5,6 +5,7 @@ import { AppContext, useNetworks } from "../../context/AppContext";
 import { RpcClient } from "@openscan/network-connectors";
 import { useDataService } from "../../hooks/useDataService";
 import { formatGasPrice } from "../../utils/formatUtils";
+import { logger } from "../../utils/logger";
 import { resolveNetwork, getNetworkRpcKey } from "../../utils/networkResolver";
 
 interface NetworkBlockIndicatorProps {
@@ -74,12 +75,12 @@ export function NetworkBlockIndicator({ className }: NetworkBlockIndicatorProps)
                 setGasPrice(gasPricesResult.data.average);
               }
             } catch (error) {
-              console.error("Failed to fetch gas price:", error);
+              logger.error("Failed to fetch gas price:", error);
             }
           }
         }
       } catch (error) {
-        console.error("Failed to fetch block number:", error);
+        logger.error("Failed to fetch block number:", error);
         if (isMounted) {
           setIsLoading(false);
         }

@@ -8,6 +8,7 @@ import {
   formatTimestamp,
   truncateBlockHash,
 } from "../../../utils/bitcoinFormatters";
+import { logger } from "../../../utils/logger";
 import Loader from "../../common/Loader";
 
 export default function BitcoinBlocksPage() {
@@ -65,7 +66,7 @@ export default function BitcoinBlocksPage() {
 
         setBlocks(fetchedBlocks);
       } catch (err) {
-        console.error("Error fetching Bitcoin blocks:", err);
+        logger.error("Error fetching Bitcoin blocks:", err);
         setError(err instanceof Error ? err.message : "Failed to fetch blocks");
       } finally {
         setLoading(false);

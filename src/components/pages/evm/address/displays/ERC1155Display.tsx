@@ -9,6 +9,7 @@ import {
 } from "../../../../../services/MetadataService";
 import type { Address, ENSReverseResult, RPCMetadata } from "../../../../../types";
 import { decodeAbiString } from "../../../../../utils/hexUtils";
+import { logger } from "../../../../../utils/logger";
 import { AddressHeader } from "../shared";
 import ContractInfoCard from "../shared/ContractInfoCard";
 import ContractInfoCards from "../shared/ContractInfoCards";
@@ -55,7 +56,9 @@ const ERC1155Display: React.FC<ERC1155DisplayProps> = ({
 
   // Fetch token metadata from explorer-metadata
   useEffect(() => {
-    fetchToken(Number(networkId), addressHash).then(setTokenMetadata).catch(console.error);
+    fetchToken(Number(networkId), addressHash)
+      .then(setTokenMetadata)
+      .catch((err) => logger.error("Failed to fetch token metadata:", err));
   }, [networkId, addressHash]);
 
   // Fetch on-chain ERC1155 data

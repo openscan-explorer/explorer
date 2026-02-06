@@ -1,5 +1,6 @@
 import type React from "react";
 import { useCallback, useContext, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Link, useParams } from "react-router-dom";
 import { AppContext } from "../../../../context";
 import {
@@ -10,8 +11,8 @@ import {
   fetchTokenBalance,
   getImageUrl,
 } from "../../../../utils/erc1155Metadata";
+import { logger } from "../../../../utils/logger";
 import Loader from "../../../common/Loader";
-import { useTranslation } from "react-i18next";
 
 const ERC1155TokenDetails: React.FC = () => {
   const {
@@ -70,7 +71,7 @@ const ERC1155TokenDetails: React.FC = () => {
         setCollectionInfo(collectionResult);
       })
       .catch((err) => {
-        console.error("Error fetching metadata:", err);
+        logger.error("Error fetching metadata:", err);
         setError(err.message || t("tokenDataFetchFail"));
       })
       .finally(() => setLoading(false));

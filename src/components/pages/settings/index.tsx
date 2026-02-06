@@ -9,6 +9,7 @@ import { useMetaMaskExplorer } from "../../../hooks/useMetaMaskExplorer";
 import { SUPPORTED_LANGUAGES } from "../../../i18n";
 import { clearSupportersCache } from "../../../services/MetadataService";
 import type { RPCUrls, RpcUrlsContextType } from "../../../types";
+import { logger } from "../../../utils/logger";
 import { getChainIdFromNetwork } from "../../../utils/networkResolver";
 
 // Infura network slugs by chain ID
@@ -140,7 +141,7 @@ const Settings: React.FC = () => {
           }
         }
       } catch (e) {
-        console.warn("Could not clear IndexedDB:", e);
+        logger.warn("Could not clear IndexedDB:", e);
       }
     }
 
@@ -150,7 +151,7 @@ const Settings: React.FC = () => {
         const cacheNames = await caches.keys();
         await Promise.all(cacheNames.map((name) => caches.delete(name)));
       } catch (e) {
-        console.warn("Could not clear Cache Storage:", e);
+        logger.warn("Could not clear Cache Storage:", e);
       }
     }
 
@@ -160,7 +161,7 @@ const Settings: React.FC = () => {
         const registrations = await navigator.serviceWorker.getRegistrations();
         await Promise.all(registrations.map((reg) => reg.unregister()));
       } catch (e) {
-        console.warn("Could not unregister service workers:", e);
+        logger.warn("Could not unregister service workers:", e);
       }
     }
 
@@ -234,7 +235,7 @@ const Settings: React.FC = () => {
         };
       });
     } catch (error) {
-      console.error("Error fetching from Chainlist:", error);
+      logger.error("Error fetching from Chainlist:", error);
     } finally {
       setFetchingNetworkId(null);
     }

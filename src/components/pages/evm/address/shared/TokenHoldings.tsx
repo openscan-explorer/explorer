@@ -2,6 +2,7 @@ import type React from "react";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { AppContext } from "../../../../../context";
+import { logger } from "../../../../../utils/logger";
 
 interface TokenLogoProps {
   src?: string;
@@ -176,7 +177,7 @@ const TokenHoldings: React.FC<TokenHoldingsProps> = ({
         const tokenHoldings = await fetchSupporterTokenBalances(tokens, rpcUrl);
         setHoldings(tokenHoldings);
       } catch (err) {
-        console.error("Error fetching supporter tokens:", err);
+        logger.error("Error fetching supporter tokens:", err);
         setError("Failed to fetch token holdings");
       } finally {
         setLoading(false);
@@ -231,7 +232,7 @@ const TokenHoldings: React.FC<TokenHoldingsProps> = ({
 
       setPopularLoaded(true);
     } catch (err) {
-      console.error("Error fetching popular tokens:", err);
+      logger.error("Error fetching popular tokens:", err);
       setError("Failed to fetch popular tokens");
     } finally {
       setPopularLoading(false);
