@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import Markdown from "react-markdown";
 import { fetchNetworkProfile, isSubscriptionActive } from "../../../../services/MetadataService";
 import type { NetworkConfig } from "../../../../types";
@@ -12,6 +13,7 @@ interface ProfileDisplayProps {
 type ProfileState = "collapsed" | "loading" | "expanded" | "error";
 
 const ProfileDisplay: React.FC<ProfileDisplayProps> = React.memo(({ network }) => {
+  const { t } = useTranslation("network");
   const [profileState, setProfileState] = useState<ProfileState>("collapsed");
   const [profileContent, setProfileContent] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -69,7 +71,7 @@ const ProfileDisplay: React.FC<ProfileDisplayProps> = React.memo(({ network }) =
       {/* Collapsed state - show button */}
       {profileState === "collapsed" && (
         <button type="button" className="profile-expand-button" onClick={handleExpandClick}>
-          <span className="profile-expand-text">More about {network?.name}</span>
+          <span className="profile-expand-text">{t("moreAbout", { name: network?.name })}</span>
           {getChainIdFromNetwork(network) !== 1 && (
             <TierBadge subscription={network?.subscription} size="small" />
           )}
@@ -80,7 +82,7 @@ const ProfileDisplay: React.FC<ProfileDisplayProps> = React.memo(({ network }) =
       {/* Loading state */}
       {profileState === "loading" && (
         <div className="block-display-card">
-          <div className="text-center profile-loading">Loading network profile...</div>
+          <div className="text-center profile-loading">{t("loadingNetworkProfile")}</div>
         </div>
       )}
 
@@ -88,9 +90,9 @@ const ProfileDisplay: React.FC<ProfileDisplayProps> = React.memo(({ network }) =
       {profileState === "error" && (
         <div className="block-display-card">
           <div className="text-center profile-error">
-            Failed to load profile: {error}
+            {t("failedToLoadProfile", { error })}
             <button type="button" className="profile-retry-button" onClick={handleExpandClick}>
-              Retry
+              {t("retry")}
             </button>
           </div>
         </div>
@@ -100,7 +102,7 @@ const ProfileDisplay: React.FC<ProfileDisplayProps> = React.memo(({ network }) =
       {profileState === "expanded" && profileContent && (
         <div className="block-display-card">
           <div className="profile-header">
-            <h2 className="profile-title">About {network?.name}</h2>
+            <h2 className="profile-title">{t("aboutNetwork", { name: network?.name })}</h2>
             <div className="profile-header-actions">
               {getChainIdFromNetwork(network) !== 1 && (
                 <TierBadge subscription={network?.subscription} size="medium" showSuffix />
@@ -109,7 +111,7 @@ const ProfileDisplay: React.FC<ProfileDisplayProps> = React.memo(({ network }) =
                 type="button"
                 className="profile-collapse-button"
                 onClick={handleExpandClick}
-                aria-label="Collapse profile"
+                aria-label={t("collapseProfile")}
               >
                 ▲
               </button>
@@ -159,7 +161,7 @@ const ProfileDisplay: React.FC<ProfileDisplayProps> = React.memo(({ network }) =
           </div>
           {network?.links && network.links.length > 0 && (
             <div className="profile-links">
-              <h3 className="profile-links-title">Official Links</h3>
+              <h3 className="profile-links-title">{t("officialLinks")}</h3>
               <div className="profile-links-list">
                 {network.links.map((link, index) => (
                   <a

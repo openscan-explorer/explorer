@@ -1,4 +1,5 @@
 import type React from "react";
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import type { Transaction } from "../../../../types";
 
@@ -38,22 +39,24 @@ const LatestTransactionsTable: React.FC<LatestTransactionsTableProps> = ({
   currency,
   loading,
 }) => {
+  const { t } = useTranslation("network");
+
   return (
     <div className="dashboard-table-section">
       <div className="dashboard-table-header">
         <Link to={`/${networkId}/txs`} className="dashboard-table-title-link">
-          <h3 className="dashboard-table-title">Latest Transactions</h3>
+          <h3 className="dashboard-table-title">{t("latestTransactions")}</h3>
           <span className="dashboard-title-arrow">↗</span>
         </Link>
         <Link to={`/${networkId}/txs`} className="dashboard-view-all">
-          View all →
+          {t("viewAll")}
         </Link>
       </div>
 
       {loading && transactions.length === 0 ? (
-        <div className="dashboard-table-loading">Loading transactions...</div>
+        <div className="dashboard-table-loading">{t("loadingTransactions")}</div>
       ) : transactions.length === 0 ? (
-        <div className="dashboard-table-empty">No transactions found</div>
+        <div className="dashboard-table-empty">{t("noTransactionsFound")}</div>
       ) : (
         <div className="dashboard-table-compact">
           {transactions.map((tx) => (
@@ -85,7 +88,7 @@ const LatestTransactionsTable: React.FC<LatestTransactionsTableProps> = ({
                     {truncateAddress(tx.to)}
                   </Link>
                 ) : (
-                  <span className="dashboard-tx-contract">Contract</span>
+                  <span className="dashboard-tx-contract">{t("contractCreation")}</span>
                 )}
               </div>
               <div className="dashboard-tx-value">{formatValue(tx.value, currency)}</div>

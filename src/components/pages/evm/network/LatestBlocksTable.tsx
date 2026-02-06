@@ -1,4 +1,5 @@
 import type React from "react";
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import type { Block } from "../../../../types";
 
@@ -91,22 +92,24 @@ const LatestBlocksTable: React.FC<LatestBlocksTableProps> = ({
   loading,
   currency,
 }) => {
+  const { t } = useTranslation("network");
+
   return (
     <div className="dashboard-table-section">
       <div className="dashboard-table-header">
         <Link to={`/${networkId}/blocks`} className="dashboard-table-title-link">
-          <h3 className="dashboard-table-title">Latest Blocks</h3>
+          <h3 className="dashboard-table-title">{t("latestBlocks")}</h3>
           <span className="dashboard-title-arrow">↗</span>
         </Link>
         <Link to={`/${networkId}/blocks`} className="dashboard-view-all">
-          View all →
+          {t("viewAll")}
         </Link>
       </div>
 
       {loading && blocks.length === 0 ? (
-        <div className="dashboard-table-loading">Loading blocks...</div>
+        <div className="dashboard-table-loading">{t("loadingBlocks")}</div>
       ) : blocks.length === 0 ? (
-        <div className="dashboard-table-empty">No blocks found</div>
+        <div className="dashboard-table-empty">{t("noBlocksFound")}</div>
       ) : (
         <div className="dashboard-table-compact">
           {blocks.map((block) => {
@@ -124,12 +127,12 @@ const LatestBlocksTable: React.FC<LatestBlocksTableProps> = ({
                   <span className="dashboard-block-time">{formatTimeAgo(block.timestamp)}</span>
                 </div>
                 <div className="dashboard-block-details">
-                  <span className="dashboard-block-txns">{txCount} txns</span>
+                  <span className="dashboard-block-txns">{t("txnsCount", { count: txCount })}</span>
                   <span className="dashboard-block-gas" title={`Gas: ${gas.amount}`}>
-                    {gas.percent} Gas Used
+                    {t("gasUsedPercent", { percent: gas.percent })}
                   </span>
                   {reward !== "—" && (
-                    <span className="dashboard-block-reward" title="Burnt fees">
+                    <span className="dashboard-block-reward" title={t("burntFees")}>
                       {reward} {currency}
                     </span>
                   )}

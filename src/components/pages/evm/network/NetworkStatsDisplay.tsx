@@ -1,6 +1,7 @@
 import React from "react";
 import type { NetworkStats, RPCMetadata } from "../../../../types";
 import { RPCIndicator } from "../../../common/RPCIndicator";
+import { useTranslation } from "react-i18next";
 
 interface NetworkStatsDisplayProps {
   networkStats: NetworkStats | null;
@@ -22,11 +23,13 @@ const NetworkStatsDisplay: React.FC<NetworkStatsDisplayProps> = React.memo(
     selectedProvider,
     onProviderSelect,
   }) => {
+    const { t } = useTranslation("network");
+
     if (loading) {
       return (
         <div className="container-wide network-stats-container">
           <div className="block-display-card">
-            <div className="text-center network-stats-loading">Loading network statistics...</div>
+            <div className="text-center network-stats-loading">{t("loadingNetworkStatistics")}</div>
           </div>
         </div>
       );
@@ -37,7 +40,7 @@ const NetworkStatsDisplay: React.FC<NetworkStatsDisplayProps> = React.memo(
         <div className="container-wide network-stats-container">
           <div className="block-display-card">
             <div className="text-center network-stats-error">
-              Error loading network stats: {error}
+              {t("errorLoadingNetworkStats", { error })}
             </div>
           </div>
         </div>
@@ -111,7 +114,7 @@ const NetworkStatsDisplay: React.FC<NetworkStatsDisplayProps> = React.memo(
       <div className="container-wide network-stats-container">
         <div className="block-display-card">
           <div className="flex justify-between items-center mb-medium">
-            <h2 className="network-stats-title margin-0">Network Statistics</h2>
+            <h2 className="network-stats-title margin-0">{t("networkStatistics")}</h2>
             {metadata && selectedProvider !== undefined && onProviderSelect && (
               <RPCIndicator
                 metadata={metadata}
@@ -123,39 +126,39 @@ const NetworkStatsDisplay: React.FC<NetworkStatsDisplayProps> = React.memo(
 
           <div className="data-grid-3">
             <div className="block-detail-item">
-              <span className="detail-label">Current Gas Price</span>
+              <span className="detail-label">{t("currentGasPrice")}</span>
               <span className="detail-value">{formatGasPrice(networkStats.currentGasPrice)}</span>
             </div>
 
             <div className="block-detail-item">
-              <span className="detail-label">Current Block Number</span>
+              <span className="detail-label">{t("currentBlockNumber")}</span>
               <span className="detail-value">
                 {formatBlockNumber(networkStats.currentBlockNumber)}
               </span>
             </div>
 
             <div className="block-detail-item">
-              <span className="detail-label">Sync Status</span>
+              <span className="detail-label">{t("syncStatus")}</span>
               <span className="detail-value">
                 <span className="sync-status-indicator">
                   <span
                     className={`sync-dot ${networkStats.isSyncing ? "sync-dot-warning" : "sync-dot-success"}`}
                   />
-                  {networkStats.isSyncing ? "Syncing" : "Synced"}
+                  {networkStats.isSyncing ? t("syncing") : t("synced")}
                 </span>
               </span>
             </div>
 
             {networkStats.clientVersion && (
               <div className="block-detail-item">
-                <span className="detail-label">Client Version</span>
+                <span className="detail-label">{t("clientVersion")}</span>
                 <span className="detail-value tx-mono">{networkStats.clientVersion}</span>
               </div>
             )}
 
             {protocolVersion && (
               <div className="block-detail-item">
-                <span className="detail-label">Protocol Version</span>
+                <span className="detail-label">{t("protocolVersion")}</span>
                 <span className="detail-value">{protocolVersion}</span>
               </div>
             )}
@@ -163,19 +166,21 @@ const NetworkStatsDisplay: React.FC<NetworkStatsDisplayProps> = React.memo(
             {forkedNetwork && (
               <>
                 <div className="block-detail-item">
-                  <span className="detail-label">Forked Network</span>
-                  <span className="detail-value">Chain ID: {forkedNetwork.networkId}</span>
+                  <span className="detail-label">{t("forkedNetwork")}</span>
+                  <span className="detail-value">
+                    {t("chainIdValue", { id: forkedNetwork.networkId })}
+                  </span>
                 </div>
 
                 <div className="block-detail-item">
-                  <span className="detail-label">Fork Block Number</span>
+                  <span className="detail-label">{t("forkBlockNumber")}</span>
                   <span className="detail-value">
                     {formatBlockNumber(forkedNetwork.blockNumber.toString())}
                   </span>
                 </div>
 
                 <div className="block-detail-item network-stat-full-width">
-                  <span className="detail-label">Fork Block Hash</span>
+                  <span className="detail-label">{t("forkBlockHash")}</span>
                   <span className="detail-value tx-mono fork-hash-value">
                     {forkedNetwork.blockHash}
                   </span>

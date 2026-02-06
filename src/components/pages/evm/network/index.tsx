@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import { useNetwork } from "../../../../context/AppContext";
 import { useNetworkDashboard } from "../../../../hooks/useNetworkDashboard";
@@ -11,6 +12,7 @@ import LatestTransactionsTable from "./LatestTransactionsTable";
 import ProfileDisplay from "./NetworkProfileDisplay";
 
 export default function Network() {
+  const { t } = useTranslation("network");
   const { networkId } = useParams<{ networkId?: string }>();
   const network = resolveNetwork(networkId || "1", getAllNetworks());
   const networkConfig = useNetwork(networkId || "1");
@@ -54,10 +56,12 @@ export default function Network() {
         <SearchBox />
 
         {dashboard.loading && dashboard.latestBlocks.length === 0 && (
-          <Loader text="Loading network data..." />
+          <Loader text={t("loadingNetworkData")} />
         )}
 
-        {dashboard.error && <p className="error-text-center">Error: {dashboard.error}</p>}
+        {dashboard.error && (
+          <p className="error-text-center">{t("errorLoadingData", { error: dashboard.error })}</p>
+        )}
 
         <DashboardStats
           price={dashboard.price}
