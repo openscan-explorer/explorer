@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import { useDataService } from "../../../../hooks/useDataService";
 import { useProviderSelection } from "../../../../hooks/useProviderSelection";
@@ -8,6 +9,7 @@ import Loader from "../../../common/Loader";
 import BlockDisplay from "./BlockDisplay";
 
 export default function BlockPage() {
+  const { t } = useTranslation("block");
   const { networkId, filter } = useParams<{
     networkId?: string;
     filter?: string;
@@ -44,21 +46,21 @@ export default function BlockPage() {
         setBlockResult(result);
       })
       .catch((err) => {
-        setError(err.message || "Failed to fetch block");
+        setError(err.message || t("errors.failedToFetchBlock"));
       })
       .finally(() => setLoading(false));
-  }, [dataService, blockNumber]);
+  }, [dataService, blockNumber, t]);
 
   if (loading) {
     return (
       <div className="container-wide">
         <div className="block-display-card">
           <div className="block-display-header">
-            <span className="block-label">Block</span>
+            <span className="block-label">{t("block")}</span>
             <span className="tx-mono header-subtitle">#{filter}</span>
           </div>
           <div className="card-content-loading">
-            <Loader text="Loading block data..." />
+            <Loader text={t("loadingBlockData")} />
           </div>
         </div>
       </div>
@@ -70,11 +72,11 @@ export default function BlockPage() {
       <div className="container-wide">
         <div className="block-display-card">
           <div className="block-display-header">
-            <span className="block-label">Block</span>
+            <span className="block-label">{t("block")}</span>
             <span className="tx-mono header-subtitle">#{filter}</span>
           </div>
           <div className="card-content">
-            <p className="text-error margin-0">Error: {error}</p>
+            <p className="text-error margin-0">{t("errorPrefix", { error })}</p>
           </div>
         </div>
       </div>
@@ -94,10 +96,10 @@ export default function BlockPage() {
       ) : (
         <div className="block-display-card">
           <div className="block-display-header">
-            <span className="block-label">Block</span>
+            <span className="block-label">{t("block")}</span>
           </div>
           <div className="card-content">
-            <p className="text-muted margin-0">Block not found</p>
+            <p className="text-muted margin-0">{t("blockNotFound")}</p>
           </div>
         </div>
       )}

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { RPCIndicator } from "../../../common/RPCIndicator";
 import { useDataService } from "../../../../hooks/useDataService";
@@ -9,6 +10,7 @@ import Loader from "../../../common/Loader";
 const BLOCKS_PER_PAGE = 10;
 
 export default function Blocks() {
+  const { t } = useTranslation("block");
   const { networkId } = useParams<{ networkId?: string }>();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -93,14 +95,14 @@ export default function Blocks() {
         // biome-ignore lint/suspicious/noExplicitAny: <TODO>
       } catch (err: any) {
         console.error("Error fetching blocks:", err);
-        setError(err.message || "Failed to fetch blocks");
+        setError(err.message || t("errors.failedToFetchBlocks"));
       } finally {
         setLoading(false);
       }
     };
 
     fetchBlocks();
-  }, [dataService, fromBlock]);
+  }, [dataService, fromBlock, t]);
 
   const truncate = (str: string, start = 10, end = 8) => {
     if (!str) return "";
@@ -160,10 +162,10 @@ export default function Blocks() {
       <div className="container-wide">
         <div className="block-display-card">
           <div className="blocks-header">
-            <span className="block-label">Latest Blocks</span>
+            <span className="block-label">{t("latestBlocks")}</span>
           </div>
           <div className="card-content-loading">
-            <Loader text="Loading blocks..." />
+            <Loader text={t("loadingBlocks")} />
           </div>
         </div>
       </div>
@@ -175,10 +177,10 @@ export default function Blocks() {
       <div className="container-wide">
         <div className="block-display-card">
           <div className="blocks-header">
-            <span className="block-label">Latest Blocks</span>
+            <span className="block-label">{t("latestBlocks")}</span>
           </div>
           <div className="card-content">
-            <p className="text-error margin-0">Error: {error}</p>
+            <p className="text-error margin-0">{t("errorPrefix", { error })}</p>
           </div>
         </div>
       </div>
@@ -193,12 +195,15 @@ export default function Blocks() {
       <div className="block-display-card">
         <div className="blocks-header">
           <div className="blocks-header-main">
-            <span className="block-label">Latest Blocks</span>
+            <span className="block-label">{t("latestBlocks")}</span>
             <span className="block-header-divider">•</span>
             <span className="blocks-header-info">
               {isAtLatest
-                ? `Showing ${blocks.length} most recent blocks`
-                : `Showing blocks ${Number(blocks[blocks.length - 1]?.number || 0).toLocaleString()} - ${Number(blocks[0]?.number || 0).toLocaleString()}`}
+                ? t("showingRecent", { count: blocks.length })
+                : t("showingRange", {
+                    oldest: Number(blocks[blocks.length - 1]?.number || 0).toLocaleString(),
+                    newest: Number(blocks[0]?.number || 0).toLocaleString(),
+                  })}
             </span>
           </div>
           {metadata && selectedProvider !== undefined && (
@@ -214,13 +219,13 @@ export default function Blocks() {
           <table className="dash-table">
             <thead>
               <tr>
-                <th>Block</th>
-                <th>Timestamp</th>
-                <th>Txns</th>
-                <th className="hide-mobile">Miner</th>
-                <th>Gas Used</th>
-                <th className="hide-mobile">Gas Limit</th>
-                <th className="hide-mobile">Size</th>
+                <th>{t("tableBlock")}</th>
+                <th>{t("tableTimestamp")}</th>
+                <th>{t("tableTxns")}</th>
+                <th className="hide-mobile">{t("tableMiner")}</th>
+                <th>{t("tableGasUsed")}</th>
+                <th className="hide-mobile">{t("tableGasLimit")}</th>
+                <th className="hide-mobile">{t("tableSize")}</th>
               </tr>
             </thead>
             <tbody>
@@ -251,7 +256,7 @@ export default function Blocks() {
                     {Number(block.gasLimit).toLocaleString()}
                   </td>
                   <td className="table-cell-muted hide-mobile">
-                    {Number(block.size).toLocaleString()} bytes
+                    {Number(block.size).toLocaleString()} {t("bytes")}
                   </td>
                 </tr>
               ))}
@@ -268,25 +273,25 @@ export default function Blocks() {
             className="pagination-btn"
             title="Go to latest blocks"
           >
-            Latest
+            {t("paginationLatest")}
           </button>
           {/** biome-ignore lint/a11y/useButtonType: <TODO> */}
           <button
             onClick={goToNewerBlocks}
             disabled={!canGoNewer}
             className="pagination-btn"
-            title="View newer blocks"
+            title={t("paginationNewer")}
           >
-            ← Newer
+            ← {t("paginationNewer")}
           </button>
           {/** biome-ignore lint/a11y/useButtonType: <TODO> */}
           <button
             onClick={goToOlderBlocks}
             disabled={!canGoOlder}
             className="pagination-btn"
-            title="View older blocks"
+            title={t("paginationOlder")}
           >
-            Older →
+            {t("paginationOlder")} →
           </button>
         </div>
       </div>
