@@ -3974,6 +3974,23 @@
 	color: var(--color-error);
 }
 
+.tx-history-refresh-link {
+	background: none;
+	border: none;
+	color: var(--color-primary);
+	cursor: pointer;
+	font-size: 0.8rem;
+	padding: 2px 8px;
+	margin-left: 8px;
+	border-radius: 4px;
+	transition: background-color 0.2s;
+}
+
+.tx-history-refresh-link:hover {
+	background-color: var(--overlay-light-5);
+	text-decoration: underline;
+}
+
 .tx-history-dot {
 	font-size: 0.5rem;
 }
@@ -4240,6 +4257,18 @@
 .tx-search-progress-text {
 	font-size: 0.85rem;
 	color: var(--text-secondary);
+}
+
+.tx-search-progress-detail {
+	display: flex;
+	justify-content: center;
+	margin-top: 4px;
+}
+
+.tx-search-progress-detail-text {
+	font-size: 0.75rem;
+	color: var(--text-secondary);
+	font-family: monospace;
 }
 
 .tx-history-cancel-btn {
