@@ -34,7 +34,9 @@ const NetworkCard: React.FC<NetworkCardProps> = ({ network }) => {
               )}
             </div>
             {chainId !== undefined && (
-              <div className="network-card-chain-id">{t("chainID")}: {chainId}</div>
+              <div className="network-card-chain-id">
+                {t("chainID")}: {chainId}
+              </div>
             )}
           </div>
         </div>

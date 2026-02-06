@@ -154,7 +154,7 @@ const BlockDisplay: React.FC<BlockDisplayProps> = React.memo(
             <span className="tx-label">{t("transactions")}</span>
             <span className="tx-value">
               <span className="tx-value-highlight">
-                {block.transactions ? block.transactions.length : 0} transactions
+                {block.transactions ? block.transactions.length : 0} {t("transactions")}
               </span>{" "}
               {t("inThisBlock")}
             </span>

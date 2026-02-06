@@ -50,7 +50,7 @@
   "logsDecoded": "Decodificado",
   "logsRawTopics": "Topics Crudos",
   "logsTopics": "Topics",
-  "logsRawData": "Data Cruda",
+  "logsRawData": "Raw Data",
   "logsData": "Data",
   "logsIndexed": "indexed",
   "logsAbi": "ABI",

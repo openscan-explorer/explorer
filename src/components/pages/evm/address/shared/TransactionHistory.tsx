@@ -2,6 +2,7 @@ import type React from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { toFunctionSelector } from "viem";
+import { useTranslation } from "react-i18next";
 import { useDataService } from "../../../../../hooks/useDataService";
 import type {
   ABI,
@@ -123,6 +124,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
   const dropdownRef = useRef<HTMLDivElement>(null);
   const loadMoreDropdownRef = useRef<HTMLDivElement>(null);
 
+  const { t } = useTranslation("address");
   // Close dropdowns when clicking outside
   useEffect(() => {
     if (!dropdownOpen && !loadMoreDropdownOpen) return;
@@ -642,7 +644,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
                 className="tx-history-search-btn"
                 onClick={() => handleStartSearch(selectedLimit)}
               >
-                Search Transactions
+                {t("searchTransactions")}
               </button>
               <button
                 type="button"
@@ -664,7 +666,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
                       setDropdownOpen(false);
                     }}
                   >
-                    Last 5 transactions
+                    {t("last5Txs")}
                   </button>
                   <button
                     type="button"
@@ -674,7 +676,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
                       setDropdownOpen(false);
                     }}
                   >
-                    Last 10 transactions
+                    {t("last10Txs")}
                   </button>
                   <button
                     type="button"
@@ -684,7 +686,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
                       setDropdownOpen(false);
                     }}
                   >
-                    Last 50 transactions
+                    {t("last50Txs")}
                   </button>
                   <button
                     type="button"
@@ -694,15 +696,13 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
                       setDropdownOpen(false);
                     }}
                   >
-                    All transactions
+                    {t("allTxs")}
                   </button>
                 </div>
               )}
             </div>
           </div>
-          <p className="tx-history-search-note">
-            Note: Searching all transactions may take longer for active addresses.
-          </p>
+          <p className="tx-history-search-note">{t("noteSearching")}</p>
         </div>
       </div>
     );
@@ -719,10 +719,10 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
     return (
       <div className="tx-details">
         <div className="tx-section tx-history-header">
-          <span className="tx-section-title">Transaction History</span>
+          <span className="tx-section-title">{t("txHistory")}</span>
           <span className="tx-history-status tx-history-status-searching">
             <div className="tx-history-searching-spinner-inline" />
-            Searching...
+            {t("searching")}
           </span>
         </div>
 
@@ -738,11 +738,11 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
           <div className="tx-search-progress-info">
             <span className="tx-search-progress-text">
               {foundCount === 0
-                ? "Searching for transactions..."
-                : `Found ${foundCount} transaction${foundCount === 1 ? "" : "s"}...`}
+                ? t("searchingForTxs")
+                : t("foundTransactions", { count: foundCount })}
             </span>
             <button type="button" className="tx-history-cancel-btn" onClick={handleCancelSearch}>
-              Cancel
+              {t("cancel")}
             </button>
           </div>
           {searchStatus && (
@@ -758,7 +758,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
   return (
     <div className="tx-details">
       <div className="tx-section tx-history-header">
-        <span className="tx-section-title">Transaction History</span>
+        <span className="tx-section-title">{t("transactionHistory")}</span>
         {transactionsResult && (
           <span
             className={`tx-history-status ${transactionsResult.source === "trace_filter" ? "tx-history-status-complete" : transactionsResult.source === "binary_search" || transactionsResult.source === "logs" ? "tx-history-status-partial" : "tx-history-status-none"}`}
@@ -766,7 +766,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
             {transactionsResult.source === "trace_filter" && (
               <>
                 <span className="tx-history-dot">●</span>
-                Complete history ({transactionDetails.length} transactions)
+                {t("completeHistory", { count: transactionDetails.length })}
               </>
             )}
             {(transactionsResult.source === "binary_search" ||
@@ -782,13 +782,13 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
                   </button>
                 )}
                 <span className="tx-history-dot">●</span>
-                Found {transactionDetails.length} transactions
+                {t("foundTransactions", { count: transactionDetails.length })}
               </>
             )}
             {transactionsResult.source === "none" && (
               <>
                 <span className="tx-history-dot">●</span>
-                No data available
+                {t("noDataAvailable")}
               </>
             )}
           </span>
@@ -822,6 +822,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
         <div className="tx-search-progress-info">
           <span className="tx-search-progress-text">
             Showing {transactionDetails.length} transaction
+            {t("showing", { count: transactionDetails.length })}
             {transactionDetails.length === 1 ? "" : "s"} from blocks{" "}
             {blockRange.oldest.toLocaleString()} to {blockRange.newest.toLocaleString()}
           </span>
@@ -849,7 +850,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
               className="tx-history-load-more-btn"
               onClick={() => handleLoadMore(selectedLimit)}
             >
-              Load More
+              {t("loadMore")}
             </button>
             <button
               type="button"
@@ -857,7 +858,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
               onClick={() => setLoadMoreDropdownOpen(!loadMoreDropdownOpen)}
             >
               <span className="tx-history-dropdown-count">
-                {selectedLimit === 0 ? "All txs" : `${selectedLimit} txs`}
+                {selectedLimit === 0 ? t("allTxs") : `${selectedLimit} txs`}
               </span>
               <span className="tx-history-dropdown-arrow">▼</span>
             </button>
@@ -871,7 +872,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
                     setLoadMoreDropdownOpen(false);
                   }}
                 >
-                  5 more transactions
+                  {t("more5")}
                 </button>
                 <button
                   type="button"
@@ -881,7 +882,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
                     setLoadMoreDropdownOpen(false);
                   }}
                 >
-                  10 more transactions
+                  {t("more10")}
                 </button>
                 <button
                   type="button"
@@ -891,7 +892,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
                     setLoadMoreDropdownOpen(false);
                   }}
                 >
-                  50 more transactions
+                  {t("more50")}
                 </button>
                 <button
                   type="button"
@@ -901,7 +902,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
                     setLoadMoreDropdownOpen(false);
                   }}
                 >
-                  All remaining transactions
+                  {t("allRemaining")}
                 </button>
               </div>
             )}
@@ -913,7 +914,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
       {transactionDetails.length > 0 && (
         <div className="tx-history-clear-cache">
           <button type="button" className="tx-history-clear-cache-btn" onClick={handleClearCache}>
-            Clear tx cache
+            {t("clearTxCache")}
           </button>
         </div>
       )}
@@ -921,7 +922,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
       {/* Empty state - with full search option when auto-search found nothing */}
       {transactionDetails.length === 0 && transactionsResult && !transactionsResult?.message && (
         <div className="tx-history-empty">
-          <p>No recent transactions found</p>
+          <p>{t("noTxFound")}</p>
           <button
             type="button"
             className="tx-history-search-btn"
@@ -933,7 +934,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
               setSearchVersion((v) => v + 1);
             }}
           >
-            Search Full History
+            {t("searchFullHistory")}
           </button>
         </div>
       )}

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useSettings } from "../../context/SettingsContext";
 import { useSearch } from "../../hooks/useSearch";
 import NavbarLogo from "./NavbarLogo";

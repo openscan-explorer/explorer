@@ -52,7 +52,7 @@
   "tableSize": "Tamaño",
   "paginationLatest": "Últimos",
   "paginationNewer": "Más nuevos",
-  "paginationOlder": "Más viejos",
+  "paginationOlder": "Más antiguos",
   "loadingBlockData": "Cargando datos del bloque...",
   "blockNotFound": "Bloque no encontrado",
   "errorPrefix": "Error: {{error}}",

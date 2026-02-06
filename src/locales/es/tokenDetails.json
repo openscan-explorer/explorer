@@ -22,7 +22,7 @@
   "tokenURI": "Token URI",
   "tokenID": "Token ID",
   "links": "Links",
-  "rawMetadata": "Metadata cruda",
+  "rawMetadata": "Raw Metadata",
   "balanceLookup": "Consulta de Balance",
   "addressPlaceHolder": "Ingresá una dirección (0x...)",
   "checking": "Verificando...",

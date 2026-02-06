@@ -29,7 +29,9 @@
     "close": "Cerrar",
     "dismissError": "Descartar error",
     "disableSuperUser": "Desactivar modo Super Usuario",
-    "enableSuperUser": "Activar modo Super Usuario"
+    "enableSuperUser": "Activar modo Super Usuario",
+    "mempool": "Mempool",
+    "txs": "Transacciones"
   },
   "footer": {
     "about": "Acerca de",
@@ -146,5 +148,8 @@
     "submitSubscriptionPR": "Enviar PR de suscripción",
     "viewDaoAddress": "Ver dirección del DAO",
     "footerNote": "Todos los ingresos se reinvierten exclusivamente en el desarrollo y mejora continua de la plataforma."
+  },
+  "buildWarning": {
+    "notProductionBuild": "Esta no es una versión verificada de producción"
   }
 }

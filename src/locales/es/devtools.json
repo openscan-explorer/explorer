@@ -42,9 +42,9 @@
     "unknownNetwork": "Red desconocida: seleccioná un chainId soportado"
   },
   "rawRlp": {
-    "title": "Transacción RLP Cruda",
+    "title": "Transacción raw RLP",
     "signedTransactionLabel": "Transacción Firmada (RLP hex)",
-    "sendRawTransaction": "Enviar Transacción Cruda"
+    "sendRawTransaction": "Enviar raw Transacción"
   },
   "unitConverter": {
     "title": "Conversor de Unidades"
@@ -92,7 +92,7 @@
     "dataHex": "Data (hex)",
     "gasLimitOptional": "Gas Limit (opcional)",
     "gasPriceGwei": "Gas Price (Gwei, opcional)",
-    "txHint": "Firma y publica una transacción cruda. La wallet va a pedir confirmación antes de enviar.",
+    "txHint": "Firma y publica una transacción raw. La wallet va a pedir confirmación antes de enviar.",
     "sendingTx": "Enviando...",
     "sendTx": "Enviar Transacción",
     "signatureLabel": "Firma",

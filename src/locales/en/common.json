@@ -29,7 +29,9 @@
     "close": "Close",
     "dismissError": "Dismiss error",
     "disableSuperUser": "Disable Super User Mode",
-    "enableSuperUser": "Enable Super User Mode"
+    "enableSuperUser": "Enable Super User Mode",
+    "mempool": "Mempool",
+    "txs": "Transactions"
   },
   "footer": {
     "about": "About",

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useNetworks } from "../../context/AppContext";
 import { getBaseDomainUrl, getSubdomain, getSubdomainRedirect } from "../../utils/subdomainUtils";
 import { getNetworkUrlPath, isBitcoinNetwork, resolveNetwork } from "../../utils/networkResolver";
@@ -61,6 +62,7 @@ export default function NavbarLogo() {
   // Get network config from enabled networks
   const { networks } = useNetworks();
 
+  const { t } = useTranslation();
   // Resolve the current network from path or subdomain
   const currentNetwork = useMemo(() => {
     // First try subdomain
@@ -170,7 +172,7 @@ export default function NavbarLogo() {
             className="navbar-logo-dropdown-item"
             onClick={() => setIsDropdownOpen(false)}
           >
-            <span>Blocks</span>
+            <span>{t("nav.blocksMobile")}</span>
           </Link>
 
           {/* Transactions link */}
@@ -179,7 +181,7 @@ export default function NavbarLogo() {
             className="navbar-logo-dropdown-item"
             onClick={() => setIsDropdownOpen(false)}
           >
-            <span>Transactions</span>
+            <span>{t("nav.txs")}</span>
           </Link>
 
           {/* Mempool link (Bitcoin networks only) */}
@@ -189,7 +191,7 @@ export default function NavbarLogo() {
               className="navbar-logo-dropdown-item"
               onClick={() => setIsDropdownOpen(false)}
             >
-              <span>Mempool</span>
+              <span>{t("nav.mempool")}</span>
             </Link>
           )}
 
