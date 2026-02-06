@@ -1,11 +1,13 @@
 import type React from "react";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { type Hex, parseEther, parseGwei } from "viem";
 import { useAccount, useSendTransaction, useSignMessage, useSignTypedData } from "wagmi";
 
 type SignMode = "personal" | "typed" | "transaction";
 
 const MessageSigner: React.FC = () => {
+  const { t } = useTranslation("devtools");
   const { address, isConnected } = useAccount();
   const { signMessageAsync, isPending: isSigningMessage } = useSignMessage();
   const { signTypedDataAsync, isPending: isSigningTypedData } = useSignTypedData();
@@ -158,7 +160,7 @@ const MessageSigner: React.FC = () => {
         className="devtools-tool-header cursor-pointer"
         onClick={() => setShowSigner(!showSigner)}
       >
-        <h3 className="devtools-tool-title">✍️ Message Signer</h3>
+        <h3 className="devtools-tool-title">✍️ {t("messageSigner.title")}</h3>
         <span className="devtools-section-toggle">{showSigner ? "▼" : "▶"}</span>
       </div>
 
@@ -170,13 +172,13 @@ const MessageSigner: React.FC = () => {
               <>
                 <span className="signer-status-indicator connected" />
                 <span>
-                  Connected: {address?.slice(0, 6)}...{address?.slice(-4)}
+                  {t("messageSigner.connected")} {address?.slice(0, 6)}...{address?.slice(-4)}
                 </span>
               </>
             ) : (
               <>
                 <span className="signer-status-indicator disconnected" />
-                <span>Wallet not connected. Please connect your wallet to sign.</span>
+                <span>{t("messageSigner.walletNotConnected")}</span>
               </>
             )}
           </div>
@@ -191,7 +193,7 @@ const MessageSigner: React.FC = () => {
                 clearResults();
               }}
             >
-              Personal Sign
+              {t("messageSigner.personalSign")}
             </button>
             {/* biome-ignore lint/a11y/useButtonType: mode toggle */}
             <button
@@ -201,7 +203,7 @@ const MessageSigner: React.FC = () => {
                 clearResults();
               }}
             >
-              Typed Data (EIP-712)
+              {t("messageSigner.typedData")}
             </button>
             {/* biome-ignore lint/a11y/useButtonType: mode toggle */}
             <button
@@ -211,7 +213,7 @@ const MessageSigner: React.FC = () => {
                 clearResults();
               }}
             >
-              Send Transaction
+              {t("messageSigner.sendTransaction")}
             </button>
           </div>
 
@@ -220,7 +222,7 @@ const MessageSigner: React.FC = () => {
             <div className="devtools-flex-column devtools-gap-12">
               <div className="devtools-flex-column devtools-gap-4">
                 {/* biome-ignore lint/a11y/noLabelWithoutControl: label association */}
-                <label className="input-label">Message to Sign</label>
+                <label className="input-label">{t("messageSigner.messageToSign")}</label>
                 <textarea
                   placeholder="Enter your message here..."
                   value={personalMessage}
@@ -229,17 +231,14 @@ const MessageSigner: React.FC = () => {
                   disabled={!isConnected}
                 />
               </div>
-              <p className="signer-hint">
-                Uses EIP-191 personal_sign. The message will be prefixed with "\x19Ethereum Signed
-                Message:\n" before signing.
-              </p>
+              <p className="signer-hint">{t("messageSigner.personalSignHint")}</p>
               {/* biome-ignore lint/a11y/useButtonType: action button */}
               <button
                 onClick={handlePersonalSign}
                 className="devtools-button"
                 disabled={!isConnected || isPending}
               >
-                {isSigningMessage ? "Signing..." : "Sign Message"}
+                {isSigningMessage ? t("messageSigner.signing") : t("messageSigner.signMessage")}
               </button>
             </div>
           )}
@@ -249,9 +248,7 @@ const MessageSigner: React.FC = () => {
             <div className="devtools-flex-column devtools-gap-12">
               <div className="devtools-flex-column devtools-gap-4">
                 {/* biome-ignore lint/a11y/noLabelWithoutControl: label association */}
-                <label className="input-label">
-                  EIP-712 Typed Data (domain, types, primaryType, message)
-                </label>
+                <label className="input-label">{t("messageSigner.eip712Label")}</label>
                 <textarea
                   placeholder='{"domain": {...}, "types": {...}, "primaryType": "...", "message": {...}}'
                   value={typedDataInput}
@@ -260,17 +257,16 @@ const MessageSigner: React.FC = () => {
                   disabled={!isConnected}
                 />
               </div>
-              <p className="signer-hint">
-                Uses EIP-712 eth_signTypedData_v4. Structured data signing with domain separation
-                for better security and UX.
-              </p>
+              <p className="signer-hint">{t("messageSigner.eip712Hint")}</p>
               {/* biome-ignore lint/a11y/useButtonType: action button */}
               <button
                 onClick={handleTypedDataSign}
                 className="devtools-button"
                 disabled={!isConnected || isPending}
               >
-                {isSigningTypedData ? "Signing..." : "Sign Typed Data"}
+                {isSigningTypedData
+                  ? t("messageSigner.signingTypedData")
+                  : t("messageSigner.signTypedData")}
               </button>
             </div>
           )}
@@ -281,7 +277,7 @@ const MessageSigner: React.FC = () => {
               <div className="signer-tx-grid">
                 <div className="devtools-flex-column devtools-gap-4">
                   {/* biome-ignore lint/a11y/noLabelWithoutControl: label association */}
-                  <label className="input-label">To Address *</label>
+                  <label className="input-label">{t("messageSigner.toAddress")}</label>
                   <input
                     type="text"
                     placeholder="0x..."
@@ -293,7 +289,7 @@ const MessageSigner: React.FC = () => {
                 </div>
                 <div className="devtools-flex-column devtools-gap-4">
                   {/* biome-ignore lint/a11y/noLabelWithoutControl: label association */}
-                  <label className="input-label">Value (ETH)</label>
+                  <label className="input-label">{t("messageSigner.valueEth")}</label>
                   <input
                     type="text"
                     placeholder="0.0"
@@ -307,7 +303,7 @@ const MessageSigner: React.FC = () => {
 
               <div className="devtools-flex-column devtools-gap-4">
                 {/* biome-ignore lint/a11y/noLabelWithoutControl: label association */}
-                <label className="input-label">Data (hex)</label>
+                <label className="input-label">{t("messageSigner.dataHex")}</label>
                 <textarea
                   placeholder="0x..."
                   value={txData}
@@ -320,7 +316,7 @@ const MessageSigner: React.FC = () => {
               <div className="signer-tx-grid">
                 <div className="devtools-flex-column devtools-gap-4">
                   {/* biome-ignore lint/a11y/noLabelWithoutControl: label association */}
-                  <label className="input-label">Gas Limit (optional)</label>
+                  <label className="input-label">{t("messageSigner.gasLimitOptional")}</label>
                   <input
                     type="text"
                     placeholder="21000"
@@ -332,7 +328,7 @@ const MessageSigner: React.FC = () => {
                 </div>
                 <div className="devtools-flex-column devtools-gap-4">
                   {/* biome-ignore lint/a11y/noLabelWithoutControl: label association */}
-                  <label className="input-label">Gas Price (Gwei, optional)</label>
+                  <label className="input-label">{t("messageSigner.gasPriceGwei")}</label>
                   <input
                     type="text"
                     placeholder="Auto"
@@ -344,17 +340,14 @@ const MessageSigner: React.FC = () => {
                 </div>
               </div>
 
-              <p className="signer-hint">
-                Signs and broadcasts a raw transaction. The wallet will prompt for confirmation
-                before sending.
-              </p>
+              <p className="signer-hint">{t("messageSigner.txHint")}</p>
               {/* biome-ignore lint/a11y/useButtonType: action button */}
               <button
                 onClick={handleSendTransaction}
                 className="devtools-button"
                 disabled={!isConnected || isPending}
               >
-                {isSendingTx ? "Sending..." : "Send Transaction"}
+                {isSendingTx ? t("messageSigner.sendingTx") : t("messageSigner.sendTx")}
               </button>
             </div>
           )}
@@ -374,10 +367,10 @@ const MessageSigner: React.FC = () => {
           {signature && (
             <div className="devtools-results">
               <div className="signer-result-header">
-                <span className="sig-result-label">Signature</span>
+                <span className="sig-result-label">{t("messageSigner.signatureLabel")}</span>
                 {/* biome-ignore lint/a11y/useButtonType: copy button */}
                 <button className="devtools-copy-btn" onClick={() => copyToClipboard(signature)}>
-                  Copy
+                  {t("messageSigner.copy")}
                 </button>
               </div>
               <div className="sig-result-value mono signer-signature-value">{signature}</div>
@@ -388,10 +381,10 @@ const MessageSigner: React.FC = () => {
           {txHash && (
             <div className="devtools-results">
               <div className="signer-result-header">
-                <span className="sig-result-label">Transaction Hash</span>
+                <span className="sig-result-label">{t("messageSigner.transactionHash")}</span>
                 {/* biome-ignore lint/a11y/useButtonType: copy button */}
                 <button className="devtools-copy-btn" onClick={() => copyToClipboard(txHash)}>
-                  Copy
+                  {t("messageSigner.copy")}
                 </button>
               </div>
               <div className="sig-result-value mono">{txHash}</div>

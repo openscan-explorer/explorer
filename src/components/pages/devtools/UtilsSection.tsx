@@ -1,5 +1,6 @@
 import type React from "react";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   computeKeccak,
   convertEthUnits,
@@ -23,6 +24,7 @@ type SolidityType =
   | "bytes4";
 
 const UtilsSection: React.FC = () => {
+  const { t } = useTranslation("devtools");
   const [showUnitConverter, setShowUnitConverter] = useState(false);
   const [showKeccakHasher, setShowKeccakHasher] = useState(false);
   const [showHexEncoder, setShowHexEncoder] = useState(false);
@@ -106,7 +108,7 @@ const UtilsSection: React.FC = () => {
           className="devtools-tool-header cursor-pointer"
           onClick={() => setShowUnitConverter(!showUnitConverter)}
         >
-          <h3 className="devtools-tool-title">⇄ Unit Converter</h3>
+          <h3 className="devtools-tool-title">⇄ {t("unitConverter.title")}</h3>
           <span className="devtools-section-toggle">{showUnitConverter ? "▼" : "▶"}</span>
         </div>
         {showUnitConverter && (
@@ -221,7 +223,7 @@ const UtilsSection: React.FC = () => {
           className="devtools-tool-header cursor-pointer"
           onClick={() => setShowKeccakHasher(!showKeccakHasher)}
         >
-          <h3 className="devtools-tool-title">#️⃣ Keccak256 Hasher</h3>
+          <h3 className="devtools-tool-title">#️⃣ {t("keccakHasher.title")}</h3>
           <span className="devtools-section-toggle">{showKeccakHasher ? "▼" : "▶"}</span>
         </div>
         {showKeccakHasher && (
@@ -232,17 +234,17 @@ const UtilsSection: React.FC = () => {
                 onChange={(e) => setKeccakInputType(e.target.value as SolidityType)}
                 className="devtools-select keccak-type-select"
               >
-                <optgroup label="Dynamic Types">
+                <optgroup label={t("keccakHasher.dynamicTypes")}>
                   <option value="string">string</option>
                   <option value="bytes">bytes</option>
                 </optgroup>
-                <optgroup label="Fixed Types">
+                <optgroup label={t("keccakHasher.fixedTypes")}>
                   <option value="address">address</option>
                   <option value="bool">bool</option>
                   <option value="bytes32">bytes32</option>
                   <option value="bytes4">bytes4</option>
                 </optgroup>
-                <optgroup label="Numeric Types">
+                <optgroup label={t("keccakHasher.numericTypes")}>
                   <option value="uint256">uint256</option>
                   <option value="uint128">uint128</option>
                   <option value="uint64">uint64</option>
@@ -255,14 +257,14 @@ const UtilsSection: React.FC = () => {
                 type="text"
                 placeholder={
                   keccakInputType === "string"
-                    ? "Enter text (e.g., transfer(address,uint256))"
+                    ? t("keccakHasher.enterString")
                     : keccakInputType === "address"
-                      ? "Enter address (0x...)"
+                      ? t("keccakHasher.enterAddress")
                       : keccakInputType === "bool"
-                        ? "Enter true/false or 1/0"
+                        ? t("keccakHasher.enterBool")
                         : keccakInputType.startsWith("uint") || keccakInputType.startsWith("int")
-                          ? "Enter number"
-                          : "Enter hex value (0x...)"
+                          ? t("keccakHasher.enterNumber")
+                          : t("keccakHasher.enterHex")
                 }
                 value={keccakInput}
                 onChange={(e) => setKeccakInput(e.target.value)}
@@ -271,7 +273,7 @@ const UtilsSection: React.FC = () => {
             </div>
             {/** biome-ignore lint/a11y/useButtonType: <TODO> */}
             <button onClick={handleComputeKeccak} className="devtools-button">
-              Hash
+              {t("keccakHasher.hash")}
             </button>
 
             {keccakResults && !keccakResults.error && keccakResults.rawHash && (
@@ -279,7 +281,7 @@ const UtilsSection: React.FC = () => {
                 {keccakResults.encodedBytes && (
                   <div className="keccak-result-item">
                     <div className="keccak-result-header">
-                      <span className="keccak-result-label">Encoded Bytes</span>
+                      <span className="keccak-result-label">{t("keccakHasher.encodedBytes")}</span>
                       {/** biome-ignore lint/a11y/useButtonType: <TODO> */}
                       <button
                         // biome-ignore lint/style/noNonNullAssertion: <TODO>
@@ -295,7 +297,7 @@ const UtilsSection: React.FC = () => {
 
                 <div className="keccak-result-item">
                   <div className="keccak-result-header">
-                    <span className="keccak-result-label">Keccak256 Hash</span>
+                    <span className="keccak-result-label">{t("keccakHasher.keccak256Hash")}</span>
                     {/** biome-ignore lint/a11y/useButtonType: <TODO> */}
                     <button
                       // biome-ignore lint/style/noNonNullAssertion: <TODO>
@@ -341,7 +343,9 @@ const UtilsSection: React.FC = () => {
                 {keccakResults.isFunctionSignature && keccakResults.functionSelector && (
                   <div className="keccak-result-item keccak-selector">
                     <div className="keccak-result-header">
-                      <span className="keccak-result-label">🎯 Function Selector (bytes4)</span>
+                      <span className="keccak-result-label">
+                        🎯 {t("keccakHasher.functionSelector")}
+                      </span>
                       {/** biome-ignore lint/a11y/useButtonType: <TODO> */}
                       <button
                         // biome-ignore lint/style/noNonNullAssertion: <TODO>
@@ -372,13 +376,13 @@ const UtilsSection: React.FC = () => {
           className="devtools-tool-header cursor-pointer"
           onClick={() => setShowHexEncoder(!showHexEncoder)}
         >
-          <h3 className="devtools-tool-title">🔤 Hex Encoder/Decoder</h3>
+          <h3 className="devtools-tool-title">🔤 {t("hexEncoder.title")}</h3>
           <span className="devtools-section-toggle">{showHexEncoder ? "▼" : "▶"}</span>
         </div>
         {showHexEncoder && (
           <div className="devtools-flex-column devtools-gap-12">
             <textarea
-              placeholder="Enter text or hex data"
+              placeholder={t("hexEncoder.placeholder")}
               value={encodedData}
               onChange={(e) => setEncodedData(e.target.value)}
               className="devtools-input hex-encoder-textarea"
@@ -386,23 +390,23 @@ const UtilsSection: React.FC = () => {
             <div className="hex-encoder-buttons">
               {/** biome-ignore lint/a11y/useButtonType: <TODO> */}
               <button onClick={() => convertToHex(encodedData)} className="devtools-button">
-                Encode to Hex
+                {t("hexEncoder.encodeToHex")}
               </button>
               {/** biome-ignore lint/a11y/useButtonType: <TODO> */}
               <button onClick={() => convertFromHex(encodedData)} className="devtools-button">
-                Decode from Hex
+                {t("hexEncoder.decodeFromHex")}
               </button>
             </div>
             {decodedData && (
               <div className="devtools-results">
                 <div className="hex-result-header">
-                  <span className="hex-result-label">Result:</span>
+                  <span className="hex-result-label">{t("hexEncoder.result")}</span>
                   {/** biome-ignore lint/a11y/useButtonType: <TODO> */}
                   <button
                     onClick={() => copyToClipboard(decodedData)}
                     className="devtools-copy-btn"
                   >
-                    📋 Copy
+                    📋 {t("hexEncoder.copy")}
                   </button>
                 </div>
                 <div className="hex-result-value">{decodedData}</div>

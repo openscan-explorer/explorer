@@ -1,5 +1,6 @@
 import type React from "react";
 import { useContext, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { AppContext } from "../../../context/AppContext";
 
 const NETWORKS: Record<number, { name: string }> = {
@@ -15,6 +16,7 @@ const NETWORKS: Record<number, { name: string }> = {
 const SOURCIFY_API = "https://sourcify.dev/server";
 
 const ContractsSection: React.FC = () => {
+  const { t } = useTranslation("devtools");
   // Standard JSON Verification
   const [showStandardVerify, setShowStandardVerify] = useState(true);
   const [stdChainId, setStdChainId] = useState<number>(1);
@@ -230,7 +232,7 @@ const ContractsSection: React.FC = () => {
 
     try {
       if (!simAddress) {
-        throw new Error("Address is required");
+        throw new Error(t("similarityVerify.addressIsRequired"));
       }
 
       const response = await fetch(
@@ -284,7 +286,7 @@ const ContractsSection: React.FC = () => {
         if (attempts < maxAttempts) {
           setTimeout(poll, pollInterval);
         } else {
-          setError("Verification timed out. Check status manually.");
+          setError(t("similarityVerify.timeOut"));
         }
         // biome-ignore lint/suspicious/noExplicitAny: <TODO>
       } catch (err: any) {
@@ -303,21 +305,21 @@ const ContractsSection: React.FC = () => {
 
     try {
       if (!storageAddress) {
-        throw new Error("Contract address is required");
+        throw new Error(t("storageReader.contracAddressRequired"));
       }
       if (!storageSlot && storageSlot !== "0") {
-        throw new Error("Storage slot is required");
+        throw new Error(t("storageReader.storageSlotRequired"));
       }
 
       const rpcNetworkId = `eip155:${storageChainId}`;
       const rpcUrlsForChain = rpcUrls[rpcNetworkId];
       if (!rpcUrlsForChain || rpcUrlsForChain.length === 0) {
-        throw new Error(`No RPC URL configured for chain ${storageChainId}`);
+        throw new Error(t("storageReader.noRpcUrlConfiguredForChain", { chainId: storageChainId }));
       }
 
       const rpcUrl = Array.isArray(rpcUrlsForChain) ? rpcUrlsForChain[0] : rpcUrlsForChain;
       if (!rpcUrl) {
-        throw new Error(`No RPC URL configured for chain ${storageChainId}`);
+        throw new Error(t("storageReader.noRpcUrlConfiguredForChain", { chainId: storageChainId }));
       }
 
       // Normalize the slot to hex format
@@ -372,7 +374,7 @@ const ContractsSection: React.FC = () => {
           className="devtools-tool-header cursor-pointer"
           onClick={() => setShowStandardVerify(!showStandardVerify)}
         >
-          <h3 className="devtools-tool-title">✅ Verify Contract (Standard JSON)</h3>
+          <h3 className="devtools-tool-title">✅ {t("contractVerify.title")}</h3>
           <span className="devtools-section-toggle">{showStandardVerify ? "▼" : "▶"}</span>
         </div>
         {showStandardVerify && (
@@ -380,7 +382,7 @@ const ContractsSection: React.FC = () => {
             <div className="sourcify-grid-2col">
               <div className="devtools-flex-column devtools-gap-4">
                 {/** biome-ignore lint/a11y/noLabelWithoutControl: <TODO> */}
-                <label className="input-label">Chain ID</label>
+                <label className="input-label">{t("contractVerify.chainId")}</label>
                 <select
                   className="devtools-input"
                   value={stdChainId}
@@ -395,7 +397,7 @@ const ContractsSection: React.FC = () => {
               </div>
               <div className="devtools-flex-column devtools-gap-4">
                 {/** biome-ignore lint/a11y/noLabelWithoutControl: <TODO> */}
-                <label className="input-label">Contract Address</label>
+                <label className="input-label">{t("contractVerify.contractAddress")}</label>
                 <input
                   type="text"
                   className="devtools-input mono"
@@ -408,7 +410,7 @@ const ContractsSection: React.FC = () => {
 
             <div className="devtools-flex-column devtools-gap-4">
               {/** biome-ignore lint/a11y/noLabelWithoutControl: <TODO> */}
-              <label className="input-label">Contract Name</label>
+              <label className="input-label">{t("contractVerify.contractName")}</label>
               <input
                 type="text"
                 className="devtools-input"
@@ -420,7 +422,7 @@ const ContractsSection: React.FC = () => {
 
             <div className="devtools-flex-column devtools-gap-4">
               {/** biome-ignore lint/a11y/noLabelWithoutControl: <TODO> */}
-              <label className="input-label">Sources (JSON)</label>
+              <label className="input-label">{t("contractVerify.sourcesJson")}</label>
               <textarea
                 className="devtools-input mono sourcify-sources-textarea"
                 placeholder='{"MyContract.sol": {"content": "pragma solidity..."}}'
@@ -431,7 +433,7 @@ const ContractsSection: React.FC = () => {
 
             <div className="devtools-flex-column devtools-gap-4">
               {/** biome-ignore lint/a11y/noLabelWithoutControl: <TODO> */}
-              <label className="input-label">Compiler Settings (JSON)</label>
+              <label className="input-label">{t("contractVerify.compilerSettings")}</label>
               <textarea
                 className="devtools-input mono sourcify-settings-textarea"
                 placeholder='{"optimizer": {"enabled": true, "runs": 200}}'
@@ -446,7 +448,7 @@ const ContractsSection: React.FC = () => {
               onClick={verifyStandardJson}
               disabled={stdVerifying}
             >
-              {stdVerifying ? "Verifying..." : "Verify Contract"}
+              {stdVerifying ? t("contractVerify.verifying") : t("contractVerify.verifyContract")}
             </button>
 
             {stdError && <div className="devtools-error">{stdError}</div>}
@@ -463,7 +465,7 @@ const ContractsSection: React.FC = () => {
           className="devtools-tool-header cursor-pointer"
           onClick={() => setShowMetadataVerify(!showMetadataVerify)}
         >
-          <h3 className="devtools-tool-title">🧾 Verify with Metadata</h3>
+          <h3 className="devtools-tool-title">🧾 {t("metadataVerify.title")}</h3>
           <span className="devtools-section-toggle">{showMetadataVerify ? "▼" : "▶"}</span>
         </div>
         {showMetadataVerify && (
@@ -471,7 +473,7 @@ const ContractsSection: React.FC = () => {
             <div className="sourcify-grid-2col">
               <div className="devtools-flex-column devtools-gap-4">
                 {/** biome-ignore lint/a11y/noLabelWithoutControl: <TODO> */}
-                <label className="input-label">Chain ID</label>
+                <label className="input-label">{t("contractVerify.chainId")}</label>
                 <select
                   className="devtools-input"
                   value={metaChainId}
@@ -486,7 +488,7 @@ const ContractsSection: React.FC = () => {
               </div>
               <div className="devtools-flex-column devtools-gap-4">
                 {/** biome-ignore lint/a11y/noLabelWithoutControl: <TODO> */}
-                <label className="input-label">Contract Address</label>
+                <label className="input-label">{t("contractVerify.contractAddress")}</label>
                 <input
                   type="text"
                   className="devtools-input mono"
@@ -499,7 +501,7 @@ const ContractsSection: React.FC = () => {
 
             <div className="devtools-flex-column devtools-gap-4">
               {/** biome-ignore lint/a11y/noLabelWithoutControl: <TODO> */}
-              <label className="input-label">Metadata JSON</label>
+              <label className="input-label">{t("metadataVerify.metadataJson")}</label>
               <textarea
                 className="devtools-input mono sourcify-metadata-textarea"
                 placeholder='{"compiler": {...}, "sources": {...}, ...}'
@@ -510,7 +512,9 @@ const ContractsSection: React.FC = () => {
 
             {/** biome-ignore lint/a11y/useButtonType: <TODO> */}
             <button className="devtools-button" onClick={verifyMetadata} disabled={metaVerifying}>
-              {metaVerifying ? "Verifying..." : "Verify with Metadata"}
+              {metaVerifying
+                ? t("metadataVerify.verifying")
+                : t("metadataVerify.verifyWithMetadata")}
             </button>
 
             {metaError && <div className="devtools-error">{metaError}</div>}
@@ -527,7 +531,7 @@ const ContractsSection: React.FC = () => {
           className="devtools-tool-header cursor-pointer"
           onClick={() => setShowEtherscanImport(!showEtherscanImport)}
         >
-          <h3 className="devtools-tool-title">🔗 Import to Sourcify from Etherscan</h3>
+          <h3 className="devtools-tool-title">🔗 {t("etherscanImport.title")}</h3>
           <span className="devtools-section-toggle">{showEtherscanImport ? "▼" : "▶"}</span>
         </div>
         {showEtherscanImport && (
@@ -535,7 +539,7 @@ const ContractsSection: React.FC = () => {
             <div className="sourcify-grid-2col">
               <div className="devtools-flex-column devtools-gap-4">
                 {/** biome-ignore lint/a11y/noLabelWithoutControl: <TODO> */}
-                <label className="input-label">Chain ID</label>
+                <label className="input-label">{t("contractVerify.chainId")}</label>
                 <select
                   className="devtools-input"
                   value={etherscanChainId}
@@ -550,7 +554,7 @@ const ContractsSection: React.FC = () => {
               </div>
               <div className="devtools-flex-column devtools-gap-4">
                 {/** biome-ignore lint/a11y/noLabelWithoutControl: <TODO> */}
-                <label className="input-label">Contract Address</label>
+                <label className="input-label">{t("contractVerify.contractAddress")}</label>
                 <input
                   type="text"
                   className="devtools-input mono"
@@ -563,7 +567,7 @@ const ContractsSection: React.FC = () => {
 
             <div className="devtools-flex-column devtools-gap-4">
               {/** biome-ignore lint/a11y/noLabelWithoutControl: <TODO> */}
-              <label className="input-label">Etherscan API Key (Optional)</label>
+              <label className="input-label">{t("etherscanImport.etherscanApiKey")}</label>
               <input
                 type="text"
                 className="devtools-input mono"
@@ -579,7 +583,9 @@ const ContractsSection: React.FC = () => {
               onClick={importFromEtherscan}
               disabled={etherscanImporting}
             >
-              {etherscanImporting ? "Importing..." : "Import from Etherscan"}
+              {etherscanImporting
+                ? t("etherscanImport.importing")
+                : t("etherscanImport.importFromEtherscan")}
             </button>
 
             {etherscanError && <div className="devtools-error">{etherscanError}</div>}
@@ -596,19 +602,17 @@ const ContractsSection: React.FC = () => {
           className="devtools-tool-header cursor-pointer"
           onClick={() => setShowSimilarityVerify(!showSimilarityVerify)}
         >
-          <h3 className="devtools-tool-title">🔍 Verify via Similarity</h3>
+          <h3 className="devtools-tool-title">🔍 {t("similarityVerify.title")}</h3>
           <span className="devtools-section-toggle">{showSimilarityVerify ? "▼" : "▶"}</span>
         </div>
         {showSimilarityVerify && (
           <div className="devtools-flex-column devtools-gap-12">
-            <p className="sourcify-similarity-hint">
-              This will attempt to find a similar verified contract and use it for verification.
-            </p>
+            <p className="sourcify-similarity-hint">{t("similarityVerify.hint")}</p>
 
             <div className="sourcify-grid-2col">
               <div className="devtools-flex-column devtools-gap-4">
                 {/** biome-ignore lint/a11y/noLabelWithoutControl: <TODO> */}
-                <label className="input-label">Chain ID</label>
+                <label className="input-label">{t("contractVerify.chainId")}</label>
                 <select
                   className="devtools-input"
                   value={simChainId}
@@ -623,7 +627,7 @@ const ContractsSection: React.FC = () => {
               </div>
               <div className="devtools-flex-column devtools-gap-4">
                 {/** biome-ignore lint/a11y/noLabelWithoutControl: <TODO> */}
-                <label className="input-label">Contract Address</label>
+                <label className="input-label">{t("contractVerify.contractAddress")}</label>
                 <input
                   type="text"
                   className="devtools-input mono"
@@ -636,7 +640,9 @@ const ContractsSection: React.FC = () => {
 
             {/** biome-ignore lint/a11y/useButtonType: <TODO> */}
             <button className="devtools-button" onClick={verifySimilarity} disabled={simVerifying}>
-              {simVerifying ? "Verifying..." : "Verify via Similarity"}
+              {simVerifying
+                ? t("similarityVerify.verifying")
+                : t("similarityVerify.verifyViaSimilarity")}
             </button>
 
             {simError && <div className="devtools-error">{simError}</div>}
@@ -653,19 +659,17 @@ const ContractsSection: React.FC = () => {
           className="devtools-tool-header cursor-pointer"
           onClick={() => setShowStorageReader(!showStorageReader)}
         >
-          <h3 className="devtools-tool-title">💾 Contract Storage Reader</h3>
+          <h3 className="devtools-tool-title">💾 {t("storageReader.title")}</h3>
           <span className="devtools-section-toggle">{showStorageReader ? "▼" : "▶"}</span>
         </div>
         {showStorageReader && (
           <div className="devtools-flex-column devtools-gap-12">
-            <p className="sourcify-similarity-hint">
-              Read raw storage values from any contract at a specific slot.
-            </p>
+            <p className="sourcify-similarity-hint">{t("storageReader.hint")}</p>
 
             <div className="sourcify-grid-2col">
               <div className="devtools-flex-column devtools-gap-4">
                 {/** biome-ignore lint/a11y/noLabelWithoutControl: <TODO> */}
-                <label className="input-label">Chain ID</label>
+                <label className="input-label">{t("contractVerify.chainId")}</label>
                 <select
                   className="devtools-input"
                   value={storageChainId}
@@ -680,7 +684,7 @@ const ContractsSection: React.FC = () => {
               </div>
               <div className="devtools-flex-column devtools-gap-4">
                 {/** biome-ignore lint/a11y/noLabelWithoutControl: <TODO> */}
-                <label className="input-label">Contract Address</label>
+                <label className="input-label">{t("contractVerify.contractAddress")}</label>
                 <input
                   type="text"
                   className="devtools-input mono"
@@ -693,7 +697,7 @@ const ContractsSection: React.FC = () => {
 
             <div className="devtools-flex-column devtools-gap-4">
               {/** biome-ignore lint/a11y/noLabelWithoutControl: <TODO> */}
-              <label className="input-label">Storage Slot</label>
+              <label className="input-label">{t("storageReader.storageSlot")}</label>
               <input
                 type="text"
                 className="devtools-input mono"
@@ -705,7 +709,7 @@ const ContractsSection: React.FC = () => {
 
             {/** biome-ignore lint/a11y/useButtonType: <TODO> */}
             <button className="devtools-button" onClick={getStorageAt} disabled={storageLoading}>
-              {storageLoading ? "Reading..." : "Read Storage"}
+              {storageLoading ? t("storageReader.reading") : t("storageReader.readStorage")}
             </button>
 
             {storageError && <div className="devtools-error">{storageError}</div>}
@@ -713,7 +717,7 @@ const ContractsSection: React.FC = () => {
               <div className="devtools-results">
                 <div className="devtools-flex-column devtools-gap-4">
                   {/** biome-ignore lint/a11y/noLabelWithoutControl: <TODO> */}
-                  <label className="input-label">Value (hex)</label>
+                  <label className="input-label">{t("storageReader.valueHex")}</label>
                   <pre className="mono sourcify-result-json">{storageValue}</pre>
                 </div>
               </div>
