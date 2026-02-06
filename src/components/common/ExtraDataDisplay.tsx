@@ -1,5 +1,6 @@
 import type React from "react";
 import { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 interface ExtraDataDisplayProps {
   hexData: string;
@@ -7,6 +8,7 @@ interface ExtraDataDisplayProps {
 }
 
 const ExtraDataDisplay: React.FC<ExtraDataDisplayProps> = ({ hexData, showToggle = true }) => {
+  const { t } = useTranslation();
   const [showRaw, setShowRaw] = useState(false);
 
   const decoded = useMemo(() => {
@@ -62,7 +64,7 @@ const ExtraDataDisplay: React.FC<ExtraDataDisplayProps> = ({ hexData, showToggle
           type="button"
           className="extra-data-toggle"
           onClick={() => setShowRaw(!showRaw)}
-          title={showRaw ? "Show decoded" : "Show raw hex"}
+          title={showRaw ? t("extraData.showDecoded") : t("extraData.showRawHex")}
         >
           {showRaw ? "UTF-8" : "Hex"}
         </button>

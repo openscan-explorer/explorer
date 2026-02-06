@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useSettings } from "../../context/SettingsContext";
 import { useSearch } from "../../hooks/useSearch";
@@ -7,6 +8,7 @@ import { NetworkBlockIndicator } from "./NetworkBlockIndicator";
 import BuildWarningIcon from "./BuildWarningIcon";
 
 const Navbar = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const { searchTerm, setSearchTerm, isResolving, error, clearError, handleSearch, networkId } =
@@ -66,15 +68,15 @@ const Navbar = () => {
                     setSearchTerm(e.target.value);
                     clearError();
                   }}
-                  placeholder="Search by Address / Tx Hash / Block"
+                  placeholder={t("nav.searchPlaceholderDesktop")}
                   className="search-input"
                   disabled={isResolving}
                 />
                 <button
                   type="submit"
                   className="search-button"
-                  aria-label="Search"
-                  title="Search"
+                  aria-label={t("nav.searchAriaLabel")}
+                  title={t("nav.searchTitle")}
                   disabled={isResolving}
                 >
                   <svg
@@ -111,7 +113,7 @@ const Navbar = () => {
                   type="button"
                   onClick={toggleSuperUserMode}
                   className={`navbar-toggle-btn ${isSuperUser ? "navbar-toggle-active" : ""}`}
-                  aria-label={isSuperUser ? "Disable Super User Mode" : "Enable Super User Mode"}
+                  aria-label={isSuperUser ? t("nav.disableSuperUser") : t("nav.enableSuperUser")}
                   title={isSuperUser ? "Disable Super User Mode" : "Enable Super User Mode"}
                 >
                   <svg
@@ -176,8 +178,8 @@ const Navbar = () => {
                   type="button"
                   onClick={toggleTheme}
                   className="navbar-toggle-btn"
-                  aria-label={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
-                  title={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
+                  aria-label={isDarkMode ? t("nav.switchToLightMode") : t("nav.switchToDarkMode")}
+                  title={isDarkMode ? t("nav.switchToLightMode") : t("nav.switchToDarkMode")}
                 >
                   {isDarkMode ? (
                     <svg
@@ -188,7 +190,7 @@ const Navbar = () => {
                       xmlns="http://www.w3.org/2000/svg"
                       aria-hidden="true"
                     >
-                      <title>Light mode</title>
+                      <title>{t("nav.lightModeTitle")}</title>
                       <circle cx="12" cy="12" r="5" stroke="currentColor" strokeWidth="2" />
                       <path
                         d="M12 1v2"
@@ -248,7 +250,7 @@ const Navbar = () => {
                       xmlns="http://www.w3.org/2000/svg"
                       aria-hidden="true"
                     >
-                      <title>Dark mode</title>
+                      <title>{t("nav.darkModeTitle")}</title>
                       <path
                         d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"
                         stroke="currentColor"
@@ -265,8 +267,8 @@ const Navbar = () => {
                   type="button"
                   onClick={() => goToSettings()}
                   className="navbar-toggle-btn"
-                  aria-label="Settings"
-                  title="Settings"
+                  aria-label={t("nav.settingsAriaLabel")}
+                  title={t("nav.settingsTitle")}
                 >
                   <svg
                     width="16"
@@ -276,7 +278,7 @@ const Navbar = () => {
                     xmlns="http://www.w3.org/2000/svg"
                     aria-hidden="true"
                   >
-                    <title>Settings</title>
+                    <title>{t("nav.settingsTitle")}</title>
                     <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2" />
                     <path
                       d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"
@@ -293,7 +295,7 @@ const Navbar = () => {
               type="button"
               className="navbar-hamburger"
               onClick={() => setIsMobileMenuOpen(true)}
-              aria-label="Open menu"
+              aria-label={t("nav.openMenuAriaLabel")}
               aria-expanded={isMobileMenuOpen}
             >
               <div className="navbar-hamburger-icon">
@@ -314,7 +316,7 @@ const Navbar = () => {
             type="button"
             className="navbar-mobile-menu-close"
             onClick={() => setIsMobileMenuOpen(false)}
-            aria-label="Close menu"
+            aria-label={t("nav.closeMenuAriaLabel")}
           >
             <svg
               width="24"
@@ -324,7 +326,7 @@ const Navbar = () => {
               xmlns="http://www.w3.org/2000/svg"
               aria-hidden="true"
             >
-              <title>Close</title>
+              <title>{t("nav.close")}</title>
               <path d="M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
               <path d="M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
             </svg>
@@ -348,14 +350,14 @@ const Navbar = () => {
                   setSearchTerm(e.target.value);
                   clearError();
                 }}
-                placeholder="Search address, tx, block, ENS..."
+                placeholder={t("nav.searchPlaceholderMobile")}
                 className="search-input"
                 disabled={isResolving}
               />
               <button
                 type="submit"
                 className="search-button"
-                aria-label="Search"
+                aria-label={t("nav.searchAriaLabel")}
                 disabled={isResolving}
               >
                 <svg
@@ -366,7 +368,7 @@ const Navbar = () => {
                   xmlns="http://www.w3.org/2000/svg"
                   aria-hidden="true"
                 >
-                  <title>Search</title>
+                  <title>{t("nav.searchTitle")}</title>
                   <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="2" />
                   <path
                     d="M21 21l-4.35-4.35"
@@ -390,7 +392,7 @@ const Navbar = () => {
                 onClick={() => handleMobileNavigation(`/${networkId}/blocks`)}
               >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <title>Blocks</title>
+                  <title>{t("nav.blocksMobile")}</title>
                   <rect
                     x="3"
                     y="3"
@@ -428,7 +430,7 @@ const Navbar = () => {
                     strokeWidth="2"
                   />
                 </svg>
-                <span>Blocks</span>
+                <span>{t("nav.blocksMobile")}</span>
               </button>
               <button
                 type="button"
@@ -436,7 +438,7 @@ const Navbar = () => {
                 onClick={() => handleMobileNavigation(`/${networkId}/txs`)}
               >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <title>Transactions</title>
+                  <title>{t("nav.transactionsMobile")}</title>
                   <path
                     d="M12 2v20M2 12h20"
                     stroke="currentColor"
@@ -451,7 +453,7 @@ const Navbar = () => {
                     strokeLinejoin="round"
                   />
                 </svg>
-                <span>Transactions</span>
+                <span>{t("nav.transactionsMobile")}</span>
               </button>
             </>
           )}
@@ -465,7 +467,7 @@ const Navbar = () => {
             onClick={() => handleMobileNavigation("/")}
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <title>Home</title>
+              <title>{t("nav.home")}</title>
               <path
                 d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
                 stroke="currentColor"
@@ -481,7 +483,7 @@ const Navbar = () => {
                 strokeLinejoin="round"
               />
             </svg>
-            <span>Home</span>
+            <span>{t("nav.home")}</span>
           </button>
           {isSuperUser && (
             <button
@@ -508,7 +510,7 @@ const Navbar = () => {
             onClick={() => handleMobileNavigation("/settings")}
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <title>Settings</title>
+              <title>{t("nav.settingsTitle")}</title>
               <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2" />
               <path
                 d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"
@@ -516,7 +518,7 @@ const Navbar = () => {
                 strokeWidth="2"
               />
             </svg>
-            <span>Settings</span>
+            <span>{t("nav.settingsTitle")}</span>
           </button>
 
           <div className="navbar-mobile-menu-divider" />
@@ -531,7 +533,7 @@ const Navbar = () => {
           >
             {isDarkMode ? (
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <title>Light mode</title>
+                <title>{t("nav.lightModeTitle")}</title>
                 <circle cx="12" cy="12" r="5" stroke="currentColor" strokeWidth="2" />
                 <path d="M12 1v2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                 <path d="M12 21v2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
@@ -564,7 +566,7 @@ const Navbar = () => {
               </svg>
             ) : (
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <title>Dark mode</title>
+                <title>{t("nav.darkModeTitle")}</title>
                 <path
                   d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"
                   stroke="currentColor"
@@ -574,7 +576,7 @@ const Navbar = () => {
                 />
               </svg>
             )}
-            <span>{isDarkMode ? "Light Mode" : "Dark Mode"}</span>
+            <span>{isDarkMode ? t("nav.lightMode") : t("nav.darkMode")}</span>
           </button>
 
           {/* Super User Mode toggle */}
@@ -614,7 +616,7 @@ const Navbar = () => {
               target="_blank"
               rel="noopener noreferrer"
               className="navbar-mobile-social-btn"
-              title="View on GitHub"
+              title={t("nav.githubTitle")}
             >
               <svg
                 width="20"
@@ -623,17 +625,17 @@ const Navbar = () => {
                 fill="currentColor"
                 aria-hidden="true"
               >
-                <title>GitHub</title>
+                <title>{t("nav.githubLabel")}</title>
                 <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z" />
               </svg>
-              <span>GitHub</span>
+              <span>{t("nav.githubLabel")}</span>
             </a>
             <a
               href="https://x.com/openscan_eth"
               target="_blank"
               rel="noopener noreferrer"
               className="navbar-mobile-social-btn"
-              title="Follow on X"
+              title={t("nav.xTwitterTitle")}
             >
               <svg
                 width="20"
@@ -642,10 +644,10 @@ const Navbar = () => {
                 fill="currentColor"
                 aria-hidden="true"
               >
-                <title>X (Twitter)</title>
+                <title>{t("nav.xTwitterLabel")}</title>
                 <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
               </svg>
-              <span>X (Twitter)</span>
+              <span>{t("nav.xTwitterLabel")}</span>
             </a>
           </div>
         </nav>
@@ -655,7 +657,7 @@ const Navbar = () => {
       {error && (
         <div className="navbar-error-bar">
           <span>{error}</span>
-          <button type="button" onClick={clearError} aria-label="Dismiss error">
+          <button type="button" onClick={clearError} aria-label={t("nav.dismissError")}>
             &times;
           </button>
         </div>
