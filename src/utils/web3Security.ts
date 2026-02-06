@@ -1,4 +1,5 @@
 import { ethers } from "ethers";
+import { logger } from "./logger";
 
 /**
  * Security utilities for Web3 provider interactions
@@ -112,7 +113,7 @@ export async function createSecureSigner(): Promise<ethers.Signer> {
   }
 
   if (security.warnings.length > 0) {
-    console.warn("Web3 Security Warnings:", security.warnings);
+    logger.warn("Web3 Security Warnings:", security.warnings);
   }
 
   if (!window.ethereum) {
@@ -140,10 +141,10 @@ export async function createSecureSigner(): Promise<ethers.Signer> {
       throw new Error("Invalid signer address received");
     }
 
-    console.log("✅ Secure signer created:", address);
+    logger.debug("Secure signer created:", address);
     return signer;
   } catch (error) {
-    console.error("❌ Error creating secure signer:", error);
+    logger.error("Error creating secure signer:", error);
     throw new Error(
       `Failed to create secure signer: ${error instanceof Error ? error.message : "Unknown error"}`,
     );
