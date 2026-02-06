@@ -5,6 +5,7 @@
 
 import { getNetworkLogoUrl } from "../services/MetadataService";
 import type { NetworkConfig, NetworkType } from "../types";
+import { logger } from "../utils/logger";
 import {
   resolveNetwork,
   extractChainIdFromNetworkId,
@@ -74,7 +75,7 @@ const loadedNetworks: NetworkConfig[] = (networksData.networks as NetworkMetadat
 );
 const networksUpdatedAt: string = networksData.updatedAt;
 
-console.log(
+logger.debug(
   `Loaded ${loadedNetworks.length} networks from local config (updated: ${networksUpdatedAt})`,
 );
 
