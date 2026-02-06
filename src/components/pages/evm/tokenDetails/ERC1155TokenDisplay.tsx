@@ -11,6 +11,7 @@ import {
   getImageUrl,
 } from "../../../../utils/erc1155Metadata";
 import Loader from "../../../common/Loader";
+import { useTranslation } from "react-i18next";
 
 const ERC1155TokenDetails: React.FC = () => {
   const {
@@ -36,6 +37,7 @@ const ERC1155TokenDetails: React.FC = () => {
   const [balanceLoading, setBalanceLoading] = useState(false);
   const [balanceError, setBalanceError] = useState<string | null>(null);
 
+  const { t } = useTranslation("tokenDetails");
   const numericNetworkId = Number(networkId) || 1;
 
   // Get RPC URL
@@ -47,7 +49,7 @@ const ERC1155TokenDetails: React.FC = () => {
   useEffect(() => {
     if (!contractAddress || !tokenId || !rpcUrl) {
       setLoading(false);
-      setError("Missing contract address, token ID, or RPC URL");
+      setError(t("missingValues"));
       return;
     }
 
@@ -62,28 +64,28 @@ const ERC1155TokenDetails: React.FC = () => {
         if (metadataResult.metadata) {
           setMetadata(metadataResult.metadata);
         } else {
-          setError("Failed to fetch token metadata");
+          setError(t("tokenFetchFail"));
         }
         setTokenUri(metadataResult.tokenUri);
         setCollectionInfo(collectionResult);
       })
       .catch((err) => {
         console.error("Error fetching metadata:", err);
-        setError(err.message || "Failed to fetch token metadata");
+        setError(err.message || t("tokenDataFetchFail"));
       })
       .finally(() => setLoading(false));
-  }, [contractAddress, tokenId, rpcUrl]);
+  }, [contractAddress, tokenId, rpcUrl, t]);
 
   // Handle balance lookup
   const handleBalanceLookup = useCallback(async () => {
     if (!balanceAddress || !contractAddress || !tokenId || !rpcUrl) {
-      setBalanceError("Please enter a valid address");
+      setBalanceError(t("invalidAddress"));
       return;
     }
 
     // Validate address format
     if (!/^0x[a-fA-F0-9]{40}$/.test(balanceAddress)) {
-      setBalanceError("Invalid address format");
+      setBalanceError(t("invalidAddressFormat"));
       return;
     }
 
@@ -96,14 +98,14 @@ const ERC1155TokenDetails: React.FC = () => {
       if (result !== null) {
         setBalance(result);
       } else {
-        setBalanceError("Failed to fetch balance");
+        setBalanceError(t("balanceFetchFail"));
       }
     } catch (err) {
-      setBalanceError(err instanceof Error ? err.message : "Failed to fetch balance");
+      setBalanceError(err instanceof Error ? err.message : t("balanceFetchFail"));
     } finally {
       setBalanceLoading(false);
     }
-  }, [balanceAddress, contractAddress, tokenId, rpcUrl]);
+  }, [balanceAddress, contractAddress, tokenId, rpcUrl, t]);
 
   if (loading) {
     return (
@@ -111,7 +113,9 @@ const ERC1155TokenDetails: React.FC = () => {
         <div className="block-display-card">
           <div className="block-display-header">
             <span className="block-label">ERC-1155 Token</span>
-            <span className="tx-mono header-subtitle">Token ID: {tokenId}</span>
+            <span className="tx-mono header-subtitle">
+              {t("tokenID")}: {tokenId}
+            </span>
           </div>
           <div className="card-content-loading">
             <Loader text="Loading token metadata..." />
@@ -127,10 +131,14 @@ const ERC1155TokenDetails: React.FC = () => {
         <div className="block-display-card">
           <div className="block-display-header">
             <span className="block-label">ERC-1155 Token</span>
-            <span className="tx-mono header-subtitle">Token ID: {tokenId}</span>
+            <span className="tx-mono header-subtitle">
+              {t("tokenID")}: {tokenId}
+            </span>
           </div>
           <div className="card-content">
-            <p className="text-error margin-0">Error: {error}</p>
+            <p className="text-error margin-0">
+              {t("errors.error")}: {error}
+            </p>
           </div>
         </div>
       </div>
@@ -164,7 +172,9 @@ const ERC1155TokenDetails: React.FC = () => {
                   )}
                 </Link>
               )}
-              <span className="tx-mono header-subtitle">Token ID: {tokenId}</span>
+              <span className="tx-mono header-subtitle">
+                {t("tokenID")}: {tokenId}
+              </span>
             </div>
           </div>
         </div>
@@ -187,13 +197,13 @@ const ERC1155TokenDetails: React.FC = () => {
 
             <div className="tx-details">
               <div className="tx-section">
-                <span className="tx-section-title">Token Details</span>
+                <span className="tx-section-title">{t("details")}</span>
               </div>
 
               {/* Collection */}
               {collectionName && (
                 <div className="tx-row">
-                  <span className="tx-label">Collection:</span>
+                  <span className="tx-label">{t("collection")}:</span>
                   <span className="tx-value">
                     <Link to={`/${networkId}/address/${contractAddress}`} className="address-link">
                       {collectionName}
@@ -205,7 +215,7 @@ const ERC1155TokenDetails: React.FC = () => {
 
               {/* Contract Address */}
               <div className="tx-row">
-                <span className="tx-label">Contract:</span>
+                <span className="tx-label">{t("contract")}</span>
                 <span className="tx-value">
                   <Link to={`/${networkId}/address/${contractAddress}`} className="address-link">
                     {contractAddress}
@@ -215,13 +225,13 @@ const ERC1155TokenDetails: React.FC = () => {
 
               {/* Token ID */}
               <div className="tx-row">
-                <span className="tx-label">Token ID:</span>
+                <span className="tx-label">{t("tokenID")}:</span>
                 <span className="tx-value tx-mono">{tokenId}</span>
               </div>
 
               {/* Token Standard */}
               <div className="tx-row">
-                <span className="tx-label">Token Standard:</span>
+                <span className="tx-label">{t("tokenStandard")}:</span>
                 <span className="tx-value">
                   <span className="token-standard-badge token-standard-erc1155">ERC-1155</span>
                 </span>
@@ -233,7 +243,7 @@ const ERC1155TokenDetails: React.FC = () => {
           {metadata?.description && (
             <div className="tx-details">
               <div className="tx-section">
-                <span className="tx-section-title">Description</span>
+                <span className="tx-section-title">{t("description")}</span>
               </div>
               <div className="nft-description">{metadata.description}</div>
             </div>
@@ -243,7 +253,7 @@ const ERC1155TokenDetails: React.FC = () => {
           {metadata?.attributes && metadata.attributes.length > 0 && (
             <div className="tx-details">
               <div className="tx-section">
-                <span className="tx-section-title">Properties</span>
+                <span className="tx-section-title">{t("properties")}</span>
                 <span className="tx-section-count">{metadata.attributes.length}</span>
               </div>
               <div className="erc1155-attributes-grid">
@@ -260,13 +270,13 @@ const ERC1155TokenDetails: React.FC = () => {
           {/* Balance Lookup Section */}
           <div className="tx-details">
             <div className="tx-section">
-              <span className="tx-section-title">Balance Lookup</span>
+              <span className="tx-section-title">{t("balanceLookup")}</span>
             </div>
             <div className="erc1155-balance-lookup">
               <div className="erc1155-balance-input-row">
                 <input
                   type="text"
-                  placeholder="Enter address (0x...)"
+                  placeholder={t("addressPlaceHolder")}
                   value={balanceAddress}
                   onChange={(e) => setBalanceAddress(e.target.value)}
                   className="erc1155-balance-input"
@@ -277,7 +287,7 @@ const ERC1155TokenDetails: React.FC = () => {
                   disabled={balanceLoading}
                   className="erc1155-balance-button"
                 >
-                  {balanceLoading ? "Checking..." : "Check Balance"}
+                  {balanceLoading ? t("checking") : t("checkBalance")}
                 </button>
               </div>
 
@@ -285,7 +295,7 @@ const ERC1155TokenDetails: React.FC = () => {
 
               {balance !== null && (
                 <div className="erc1155-balance-result">
-                  <span className="erc1155-balance-label">Balance:</span>
+                  <span className="erc1155-balance-label">{t("balance")}:</span>
                   <span className="erc1155-balance-value">{balance}</span>
                 </div>
               )}
@@ -306,7 +316,7 @@ const ERC1155TokenDetails: React.FC = () => {
                     rel="noopener noreferrer"
                     className="nft-link-button"
                   >
-                    External URL ↗
+                    {t("externalURL")} ↗
                   </a>
                 )}
                 {metadata?.animation_url && (
@@ -320,7 +330,7 @@ const ERC1155TokenDetails: React.FC = () => {
                     rel="noopener noreferrer"
                     className="nft-link-button"
                   >
-                    View Animation ↗
+                    {t("viewAnimation")} ↗
                   </a>
                 )}
               </div>
@@ -331,7 +341,7 @@ const ERC1155TokenDetails: React.FC = () => {
           {tokenUri && (
             <div className="tx-details">
               <div className="tx-section">
-                <span className="tx-section-title">Token URI</span>
+                <span className="tx-section-title">{t("tokenURI")}</span>
               </div>
               <div className="nft-token-uri">
                 <code className="nft-token-uri-code">{tokenUri}</code>
@@ -346,7 +356,7 @@ const ERC1155TokenDetails: React.FC = () => {
                     rel="noopener noreferrer"
                     className="nft-link-button nft-token-uri-link"
                   >
-                    Open URI ↗
+                    {t("openURI")} ↗
                   </a>
                 )}
               </div>
@@ -369,7 +379,7 @@ const ERC1155TokenDetails: React.FC = () => {
                   }
                 }}
               >
-                <span className="tx-section-title">Raw Metadata</span>
+                <span className="tx-section-title">{t("rawMetadata")}</span>
                 <span id="raw-metadata-icon" className="contract-section-toggle">
                   ▶
                 </span>
