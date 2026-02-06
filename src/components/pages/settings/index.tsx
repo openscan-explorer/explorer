@@ -1,10 +1,12 @@
 import type React from "react";
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { MetaMaskIcon } from "../../common/MetaMaskIcon";
 import { getEnabledNetworks } from "../../../config/networks";
 import { AppContext, useNetworks } from "../../../context/AppContext";
 import { useSettings } from "../../../context/SettingsContext";
 import { useMetaMaskExplorer } from "../../../hooks/useMetaMaskExplorer";
+import { SUPPORTED_LANGUAGES } from "../../../i18n";
 import { clearSupportersCache } from "../../../services/MetadataService";
 import type { RPCUrls, RpcUrlsContextType } from "../../../types";
 import { getChainIdFromNetwork } from "../../../utils/networkResolver";
@@ -49,6 +51,7 @@ const getProviderBadge = (url: string): string | null => {
 };
 
 const Settings: React.FC = () => {
+  const { t, i18n } = useTranslation("settings");
   const { rpcUrls, setRpcUrls } = useContext(AppContext);
   const { settings, updateSettings } = useSettings();
   const { enabledNetworks } = useNetworks();
@@ -110,11 +113,7 @@ const Settings: React.FC = () => {
 
   // Clear all site data (like browser dev tools)
   const clearSiteData = useCallback(async () => {
-    if (
-      !window.confirm(
-        "This will clear all settings, RPC configurations, API keys, and cached data. The page will reload. Continue?",
-      )
-    ) {
+    if (!window.confirm(t("cacheData.clearSiteData.confirmMessage"))) {
       return;
     }
 
@@ -166,7 +165,7 @@ const Settings: React.FC = () => {
     }
 
     window.location.reload();
-  }, []);
+  }, [t]);
 
   // Helper to get URLs as array from localRpc
   const getLocalRpcArray = (networkId: string): string[] => {
@@ -436,33 +435,35 @@ const Settings: React.FC = () => {
         <div className="settings-toast-container">
           {saveSuccess && (
             <div className="settings-toast settings-toast-success">
-              ✓ Settings saved successfully!
+              ✓ {t("toasts.settingsSaved")}
             </div>
           )}
           {cacheCleared && (
-            <div className="settings-toast settings-toast-success">✓ Cache cleared!</div>
+            <div className="settings-toast settings-toast-success">
+              ✓ {t("toasts.cacheCleared")}
+            </div>
           )}
         </div>
       )}
 
       <div className="container-medium page-container-padded">
         <div className="page-card settings-container">
-          <h1 className="page-title-small">Settings</h1>
+          <h1 className="page-title-small">{t("pageTitle")}</h1>
 
           {/* Settings Grid: 2x2 layout */}
           <div className="settings-grid">
             {/* Appearance Settings Section */}
             <div className="settings-section no-margin">
-              <h2 className="settings-section-title">🎨 Appearance</h2>
-              <p className="settings-section-description">
-                Customize the visual appearance of the application.
-              </p>
+              <h2 className="settings-section-title">🎨 {t("appearance.title")}</h2>
+              <p className="settings-section-description">{t("appearance.description")}</p>
 
               <div className="settings-item">
                 <div>
-                  <div className="settings-item-label">Funny Background Blocks</div>
+                  <div className="settings-item-label">
+                    {t("appearance.backgroundBlocks.label")}
+                  </div>
                   <div className="settings-item-description">
-                    Show animated isometric blocks in the background
+                    {t("appearance.backgroundBlocks.description")}
                   </div>
                 </div>
                 <label className="settings-toggle">
@@ -483,18 +484,40 @@ const Settings: React.FC = () => {
               </div>
             </div>
 
-            {/* Cache & Data Section */}
+            {/* Language Settings Section */}
             <div className="settings-section no-margin">
-              <h2 className="settings-section-title">🗑️ Cache & Data</h2>
-              <p className="settings-section-description">
-                Manage cached data and application storage.
-              </p>
+              <h2 className="settings-section-title">🌐 {t("language.title")}</h2>
+              <p className="settings-section-description">{t("language.description")}</p>
 
               <div className="settings-item">
                 <div>
-                  <div className="settings-item-label">Clear Cache</div>
+                  <div className="settings-item-label">{t("language.label")}</div>
+                  <div className="settings-item-description">{t("language.selectDescription")}</div>
+                </div>
+                <select
+                  value={i18n.language}
+                  onChange={(e) => i18n.changeLanguage(e.target.value)}
+                  className="settings-select"
+                >
+                  {SUPPORTED_LANGUAGES.map((lang) => (
+                    <option key={lang.code} value={lang.code}>
+                      {lang.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Cache & Data Section */}
+            <div className="settings-section no-margin">
+              <h2 className="settings-section-title">🗑️ {t("cacheData.title")}</h2>
+              <p className="settings-section-description">{t("cacheData.description")}</p>
+
+              <div className="settings-item">
+                <div>
+                  <div className="settings-item-label">{t("cacheData.clearCache.label")}</div>
                   <div className="settings-item-description">
-                    Clear cached metadata without losing your settings.
+                    {t("cacheData.clearCache.description")}
                   </div>
                 </div>
                 <button
@@ -502,15 +525,15 @@ const Settings: React.FC = () => {
                   className="settings-clear-cache-button"
                   onClick={clearAllCaches}
                 >
-                  🗑️ Clear Cache
+                  🗑️ {t("cacheData.clearCache.button")}
                 </button>
               </div>
               <br />
               <div className="settings-item">
                 <div>
-                  <div className="settings-item-label">Clear Site Data</div>
+                  <div className="settings-item-label">{t("cacheData.clearSiteData.label")}</div>
                   <div className="settings-item-description">
-                    Clear all data including settings, RPC configs, and API keys.
+                    {t("cacheData.clearSiteData.description")}
                   </div>
                 </div>
                 <button
@@ -518,27 +541,27 @@ const Settings: React.FC = () => {
                   className="settings-clear-site-data-button"
                   onClick={clearSiteData}
                 >
-                  ⚠️ Clear Site Data
+                  ⚠️ {t("cacheData.clearSiteData.button")}
                 </button>
               </div>
             </div>
 
             {/* RPC Strategy Section */}
             <div className="settings-section no-margin">
-              <h2 className="settings-section-title">⚡ RPC Strategy</h2>
-              <p className="settings-section-description">
-                Choose how requests are sent to multiple RPC endpoints.
-              </p>
+              <h2 className="settings-section-title">⚡ {t("rpcStrategy.title")}</h2>
+              <p className="settings-section-description">{t("rpcStrategy.description")}</p>
 
               <div className="settings-item">
                 <div>
-                  <div className="settings-item-label">Request Strategy</div>
+                  <div className="settings-item-label">
+                    {t("rpcStrategy.requestStrategy.label")}
+                  </div>
                   <div className="settings-item-description">
-                    <strong>Fallback:</strong> Try endpoints one by one until one succeeds.
+                    <strong>Fallback:</strong> {t("rpcStrategy.requestStrategy.fallbackDesc")}
                     <br />
-                    <strong>Parallel:</strong> Query all endpoints simultaneously.
+                    <strong>Parallel:</strong> {t("rpcStrategy.requestStrategy.parallelDesc")}
                     <br />
-                    <strong>Race:</strong> Query all endpoints and return the fastest response.
+                    <strong>Race:</strong> {t("rpcStrategy.requestStrategy.raceDesc")}
                   </div>
                 </div>
                 <select
@@ -550,9 +573,9 @@ const Settings: React.FC = () => {
                   }
                   className="settings-select"
                 >
-                  <option value="fallback">Fallback (Default)</option>
-                  <option value="parallel">Parallel</option>
-                  <option value="race">Race (Fastest)</option>
+                  <option value="fallback">{t("rpcStrategy.requestStrategy.fallback")}</option>
+                  <option value="parallel">{t("rpcStrategy.requestStrategy.parallel")}</option>
+                  <option value="race">{t("rpcStrategy.requestStrategy.race")}</option>
                 </select>
               </div>
 
@@ -560,11 +583,11 @@ const Settings: React.FC = () => {
               {(settings.rpcStrategy === "parallel" || settings.rpcStrategy === "race") && (
                 <div className="settings-item">
                   <div>
-                    <div className="settings-item-label">Max Parallel Requests</div>
+                    <div className="settings-item-label">
+                      {t("rpcStrategy.maxParallelRequests.label")}
+                    </div>
                     <div className="settings-item-description">
-                      Limit how many RPC endpoints are queried simultaneously. Lower values reduce
-                      bandwidth usage. Uses the first N endpoints from your RPC list (reorder by
-                      dragging).
+                      {t("rpcStrategy.maxParallelRequests.description")}
                     </div>
                   </div>
                   <select
@@ -576,12 +599,14 @@ const Settings: React.FC = () => {
                     }
                     className="settings-select"
                   >
-                    <option value={1}>1 endpoint</option>
-                    <option value={2}>2 endpoints</option>
-                    <option value={3}>3 endpoints (Default)</option>
-                    <option value={5}>5 endpoints</option>
-                    <option value={10}>10 endpoints</option>
-                    <option value={0}>Unlimited</option>
+                    <option value={1}>{t("rpcStrategy.maxParallelRequests.option1")}</option>
+                    <option value={2}>{t("rpcStrategy.maxParallelRequests.option2")}</option>
+                    <option value={3}>{t("rpcStrategy.maxParallelRequests.option3")}</option>
+                    <option value={5}>{t("rpcStrategy.maxParallelRequests.option5")}</option>
+                    <option value={10}>{t("rpcStrategy.maxParallelRequests.option10")}</option>
+                    <option value={0}>
+                      {t("rpcStrategy.maxParallelRequests.optionUnlimited")}
+                    </option>
                   </select>
                 </div>
               )}
@@ -589,19 +614,19 @@ const Settings: React.FC = () => {
 
             {/* API Keys Section */}
             <div className="settings-section no-margin">
-              <h2 className="settings-section-title">🔑 API Keys</h2>
-              <p className="settings-section-description">Enter your API keys for RPC providers.</p>
+              <h2 className="settings-section-title">🔑 {t("apiKeys.title")}</h2>
+              <p className="settings-section-description">{t("apiKeys.description")}</p>
 
               <div className="settings-api-key-item">
                 <div className="settings-api-key-header">
-                  <span className="settings-api-key-name">Infura</span>
+                  <span className="settings-api-key-name">{t("apiKeys.infura.name")}</span>
                   <a
                     href="https://app.infura.io/dashboard"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="settings-api-key-link"
                   >
-                    Get Key →
+                    {t("apiKeys.infura.getKey")} →
                   </a>
                 </div>
                 <div className="settings-api-key-input-wrapper">
@@ -612,13 +637,13 @@ const Settings: React.FC = () => {
                     onChange={(e) =>
                       setLocalApiKeys((prev) => ({ ...prev, infura: e.target.value }))
                     }
-                    placeholder="Enter your Infura API key"
+                    placeholder={t("apiKeys.infura.placeholder")}
                   />
                   <button
                     type="button"
                     className="settings-api-key-toggle"
                     onClick={() => setShowApiKeys((prev) => ({ ...prev, infura: !prev.infura }))}
-                    title={showApiKeys.infura ? "Hide API key" : "Show API key"}
+                    title={showApiKeys.infura ? t("apiKeys.toggleHide") : t("apiKeys.toggleShow")}
                   >
                     {showApiKeys.infura ? "👁️" : "👁️‍🗨️"}
                   </button>
@@ -627,14 +652,14 @@ const Settings: React.FC = () => {
 
               <div className="settings-api-key-item">
                 <div className="settings-api-key-header">
-                  <span className="settings-api-key-name">Alchemy</span>
+                  <span className="settings-api-key-name">{t("apiKeys.alchemy.name")}</span>
                   <a
                     href="https://dashboard.alchemy.com/"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="settings-api-key-link"
                   >
-                    Get Key →
+                    {t("apiKeys.alchemy.getKey")} →
                   </a>
                 </div>
                 <div className="settings-api-key-input-wrapper">
@@ -645,13 +670,13 @@ const Settings: React.FC = () => {
                     onChange={(e) =>
                       setLocalApiKeys((prev) => ({ ...prev, alchemy: e.target.value }))
                     }
-                    placeholder="Enter your Alchemy API key"
+                    placeholder={t("apiKeys.alchemy.placeholder")}
                   />
                   <button
                     type="button"
                     className="settings-api-key-toggle"
                     onClick={() => setShowApiKeys((prev) => ({ ...prev, alchemy: !prev.alchemy }))}
-                    title={showApiKeys.alchemy ? "Hide API key" : "Show API key"}
+                    title={showApiKeys.alchemy ? t("apiKeys.toggleHide") : t("apiKeys.toggleShow")}
                   >
                     {showApiKeys.alchemy ? "👁️" : "👁️‍🗨️"}
                   </button>
@@ -663,17 +688,14 @@ const Settings: React.FC = () => {
           {/* Save Button - positioned after general settings */}
           <div className="settings-save-section">
             <button type="button" onClick={save} className="settings-save-button">
-              💾 Save Configuration
+              💾 {t("saveConfiguration")}
             </button>
           </div>
 
           {/* RPC Configuration Section */}
           <div className="settings-section">
-            <h2 className="settings-section-title">🔗 RPC Endpoints</h2>
-            <p className="settings-section-description">
-              Configure RPC URLs for each network. Click on a network to expand and configure its
-              endpoints.
-            </p>
+            <h2 className="settings-section-title">🔗 {t("rpcEndpoints.title")}</h2>
+            <p className="settings-section-description">{t("rpcEndpoints.description")}</p>
 
             <div className="flex-column settings-chain-list">
               {chainConfigs.map((chain) => {
@@ -710,19 +732,19 @@ const Settings: React.FC = () => {
                           }
                           title={
                             !isSupported(chain.chainId)
-                              ? "Not supported for this chain"
+                              ? t("rpcEndpoints.metamask.notSupported")
                               : metamaskStatus[chain.id] === "success"
-                                ? "OpenScan configured!"
-                                : "Set OpenScan as the default block explorer in MetaMask"
+                                ? t("rpcEndpoints.metamask.configured")
+                                : t("rpcEndpoints.metamask.setDefault")
                           }
                         >
                           <MetaMaskIcon size={16} />
                           <span>
                             {metamaskStatus[chain.id] === "loading"
-                              ? "Configuring..."
+                              ? t("rpcEndpoints.metamask.configuring")
                               : metamaskStatus[chain.id] === "success"
-                                ? "Configured!"
-                                : "Use as default explorer"}
+                                ? t("rpcEndpoints.metamask.configuredText")
+                                : t("rpcEndpoints.metamask.useAsDefault")}
                           </span>
                         </button>
                       )}
@@ -744,8 +766,8 @@ const Settings: React.FC = () => {
                               disabled={fetchingNetworkId === chain.id}
                             >
                               {fetchingNetworkId === chain.id
-                                ? "Fetching..."
-                                : "Fetch from Chainlist"}
+                                ? t("rpcEndpoints.fetchButton")
+                                : t("rpcEndpoints.fetchingButton")}
                             </button>
                           </div>
                         )}
@@ -760,14 +782,14 @@ const Settings: React.FC = () => {
                         {/* Help text for localhost network */}
                         {chain.chainId === 31337 && (
                           <div className="settings-help-text">
-                            💡 Need to access your local network remotely?{" "}
+                            💡 {t("rpcEndpoints.localhostHelp")}{" "}
                             <a
                               href="https://dashboard.ngrok.com/get-started/setup"
                               target="_blank"
                               rel="noopener noreferrer"
                               className="settings-link"
                             >
-                              Learn how to set up a tunnel with ngrok
+                              {t("rpcEndpoints.localhostHelpLink")}
                             </a>
                           </div>
                         )}
@@ -778,7 +800,9 @@ const Settings: React.FC = () => {
                           if (rpcArray.length === 0) return null;
                           return (
                             <div className="flex-column settings-rpc-list">
-                              <span className="settings-rpc-list-label">Current RPCs:</span>
+                              <span className="settings-rpc-list-label">
+                                {t("rpcEndpoints.currentRPCs")}
+                              </span>
                               <div className="flex-start settings-rpc-tags">
                                 {rpcArray.map((url, idx) => (
                                   // biome-ignore lint/a11y/noStaticElementInteractions: Drag-and-drop requires these handlers
@@ -806,7 +830,7 @@ const Settings: React.FC = () => {
                                         e.stopPropagation();
                                         deleteRpc(chain.id, idx);
                                       }}
-                                      title="Remove RPC"
+                                      title={t("rpcEndpoints.removeRpc")}
                                     >
                                       ×
                                     </button>
