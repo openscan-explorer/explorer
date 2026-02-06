@@ -4,6 +4,7 @@ import type { NetworkConfig } from "../../../config/networks";
 import { ENSService } from "../../../services/ENS/ENSService";
 import { getChainIdFromNetwork } from "../../../utils/networkResolver";
 import NetworkIcon from "../../common/NetworkIcon";
+import { useTranslation } from "react-i18next";
 
 type SearchType = "address" | "transaction" | "block" | "ens" | null;
 
@@ -48,6 +49,7 @@ export default function HomeSearchBar({ networks }: HomeSearchBarProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
+  const { t } = useTranslation("home");
   const searchType = detectSearchType(searchTerm);
   const showDropdown = isDropdownOpen && searchType !== null;
 
@@ -80,14 +82,12 @@ export default function HomeSearchBar({ networks }: HomeSearchBarProps) {
     if (!term) return;
 
     if (searchType === null) {
-      setError(
-        "Invalid search. Enter an address (0x...), transaction hash, block number, or ENS name.",
-      );
+      setError(t("invalidSearchTerm"));
       setIsDropdownOpen(false);
     } else {
       setIsDropdownOpen(true);
     }
-  }, [searchTerm, searchType]);
+  }, [searchTerm, searchType, t]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -140,7 +140,7 @@ export default function HomeSearchBar({ networks }: HomeSearchBarProps) {
         <input
           type="text"
           className="home-search-input"
-          placeholder="Search by Address / Tx Hash / Block / ENS Name"
+          placeholder={t("searchBy")}
           value={searchTerm}
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
@@ -149,8 +149,8 @@ export default function HomeSearchBar({ networks }: HomeSearchBarProps) {
           type="button"
           className="home-search-button"
           onClick={handleSearchClick}
-          aria-label="Search"
-          title="Search"
+          aria-label={t("search")}
+          title={t("search")}
         >
           {/* biome-ignore lint/a11y/noSvgWithoutTitle: button has aria-label */}
           <svg
