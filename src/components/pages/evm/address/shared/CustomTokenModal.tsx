@@ -2,6 +2,7 @@ import type React from "react";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { AppContext } from "../../../../../context";
 import { fetchToken, getAssetUrl } from "../../../../../services/MetadataService";
+import { useTranslation } from "react-i18next";
 import {
   fetchERC20TokenInfo,
   formatTokenBalance,
@@ -26,6 +27,7 @@ const CustomTokenModal: React.FC<CustomTokenModalProps> = ({
   onTokenFetched,
 }) => {
   const { rpcUrls } = useContext(AppContext);
+  const { t } = useTranslation("address");
   const [tokenAddress, setTokenAddress] = useState("");
   const [loading, setLoading] = useState(false);
   const [tokenInfo, setTokenInfo] = useState<ERC20TokenInfo | null>(null);
@@ -143,7 +145,7 @@ const CustomTokenModal: React.FC<CustomTokenModalProps> = ({
     >
       <div className="modal custom-token-modal">
         <div className="modal-header">
-          <h3 className="modal-title">Fetch Custom Token</h3>
+          <h3 className="modal-title">{t("fetchCustomToken")}</h3>
           <button type="button" className="modal-close" onClick={onClose}>
             &times;
           </button>
@@ -152,7 +154,7 @@ const CustomTokenModal: React.FC<CustomTokenModalProps> = ({
         <div className="modal-body">
           <div className="form-group">
             <label htmlFor="token-address" className="form-label">
-              Token Contract Address
+              {t("tokenContractAddress")}
             </label>
             <input
               id="token-address"
@@ -167,29 +169,31 @@ const CustomTokenModal: React.FC<CustomTokenModalProps> = ({
             )}
           </div>
 
-          {loading && <div className="custom-token-loading">Fetching token information...</div>}
+          {loading && <div className="custom-token-loading">{t("fetchingTokenInfo")}</div>}
 
           {error && <div className="custom-token-error">{error}</div>}
 
           {tokenInfo && !error && (
             <div className="custom-token-preview">
-              <div className="custom-token-preview-header">Token Details</div>
+              <div className="custom-token-preview-header">{t("tokenDetails")}</div>
               <div className="custom-token-preview-row">
-                <span className="custom-token-preview-label">Name:</span>
-                <span className="custom-token-preview-value">{tokenInfo.name || "Unknown"}</span>
+                <span className="custom-token-preview-label">{t("nameLabel")}</span>
+                <span className="custom-token-preview-value">{tokenInfo.name || t("unknown")}</span>
               </div>
               <div className="custom-token-preview-row">
-                <span className="custom-token-preview-label">Symbol:</span>
-                <span className="custom-token-preview-value">{tokenInfo.symbol || "Unknown"}</span>
-              </div>
-              <div className="custom-token-preview-row">
-                <span className="custom-token-preview-label">Decimals:</span>
+                <span className="custom-token-preview-label">{t("symbolLabel")}</span>
                 <span className="custom-token-preview-value">
-                  {tokenInfo.decimals ?? "Unknown"}
+                  {tokenInfo.symbol || t("unknown")}
                 </span>
               </div>
               <div className="custom-token-preview-row">
-                <span className="custom-token-preview-label">Your Balance:</span>
+                <span className="custom-token-preview-label">{t("decimalsLabel")}</span>
+                <span className="custom-token-preview-value">
+                  {tokenInfo.decimals ?? t("unknown")}
+                </span>
+              </div>
+              <div className="custom-token-preview-row">
+                <span className="custom-token-preview-label">{t("yourBalance")}</span>
                 <span className="custom-token-preview-value custom-token-balance">
                   {tokenInfo.balance
                     ? `${formatTokenBalance(tokenInfo.balance, tokenInfo.decimals ?? 18)} ${tokenInfo.symbol || ""}`
@@ -202,7 +206,7 @@ const CustomTokenModal: React.FC<CustomTokenModalProps> = ({
 
         <div className="modal-footer">
           <button type="button" className="btn btn--secondary" onClick={onClose}>
-            Cancel
+            {t("cancel")}
           </button>
           <button
             type="button"
@@ -210,7 +214,7 @@ const CustomTokenModal: React.FC<CustomTokenModalProps> = ({
             onClick={handleAddToken}
             disabled={!tokenInfo || loading || !!error}
           >
-            Add Token
+            {t("addToken")}
           </button>
         </div>
       </div>

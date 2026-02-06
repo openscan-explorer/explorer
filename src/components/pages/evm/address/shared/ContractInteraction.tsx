@@ -6,6 +6,7 @@ import { encodeFunctionData, parseEther } from "viem";
 import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import { AppContext } from "../../../../../context";
 import type { ABI, ABIParameter, EventABI, FunctionABI } from "../../../../../types";
+import { useTranslation } from "react-i18next";
 
 /**
  * Generate a unique key for a function based on its name and input types
@@ -100,6 +101,7 @@ const ContractInteraction: React.FC<ContractInteractionProps> = ({
   networkId,
   abi,
 }) => {
+  const { t } = useTranslation("address");
   const [selectedWriteFunction, setSelectedWriteFunction] = useState<FunctionABI | null>(null);
   const [selectedReadFunction, setSelectedReadFunction] = useState<FunctionABI | null>(null);
   const [functionInputs, setFunctionInputs] = useState<Record<string, string>>({});
@@ -249,7 +251,7 @@ const ContractInteraction: React.FC<ContractInteractionProps> = ({
   return (
     <div className="tx-row-vertical">
       <div className="contract-functions-header">
-        <span className="tx-label">Functions</span>
+        <span className="tx-label">{t("functions")}</span>
         <ConnectButton.Custom>
           {({
             account,
@@ -282,7 +284,7 @@ const ContractInteraction: React.FC<ContractInteractionProps> = ({
                         type="button"
                         className="btn-connect-wallet"
                       >
-                        Connect Wallet
+                        {t("connectWallet")}
                       </button>
                     );
                   }
@@ -290,7 +292,7 @@ const ContractInteraction: React.FC<ContractInteractionProps> = ({
                   if (chain.unsupported) {
                     return (
                       <button onClick={openChainModal} type="button" className="btn-wrong-network">
-                        Wrong Network
+                        {t("wrongNetwork")}
                       </button>
                     );
                   }
@@ -300,7 +302,7 @@ const ContractInteraction: React.FC<ContractInteractionProps> = ({
                       <button onClick={openChainModal} type="button" className="btn-chain-selector">
                         {chain.hasIcon && chain.iconUrl && (
                           <img
-                            alt={chain.name ?? "Chain icon"}
+                            alt={chain.name ?? t("chainIcon")}
                             src={chain.iconUrl}
                             className="chain-icon"
                           />
@@ -323,7 +325,7 @@ const ContractInteraction: React.FC<ContractInteractionProps> = ({
         {readFunctions.length > 0 && (
           <div className="functions-section">
             <div className="functions-section-title functions-section-title-read">
-              Read Functions ({readFunctions.length})
+              {t("readFunctionsCount", { count: readFunctions.length })}
             </div>
             <div className="functions-list">
               {readFunctions.map((func: FunctionABI) => (
@@ -349,7 +351,7 @@ const ContractInteraction: React.FC<ContractInteractionProps> = ({
         {writeFunctions.length > 0 && (
           <div className="functions-section">
             <div className="functions-section-title functions-section-title-write">
-              Write Functions ({writeFunctions.length})
+              {t("writeFunctionsCount", { count: writeFunctions.length })}
             </div>
             <div className="functions-list">
               {writeFunctions.map((func: FunctionABI) => (
@@ -375,7 +377,7 @@ const ContractInteraction: React.FC<ContractInteractionProps> = ({
         {events.length > 0 && (
           <div className="functions-section">
             <div className="functions-section-title functions-section-title-events">
-              Events ({events.length})
+              {t("eventsCount", { count: events.length })}
             </div>
             <div className="functions-list">
               {events.slice(0, 10).map((event: EventABI) => (
@@ -384,7 +386,9 @@ const ContractInteraction: React.FC<ContractInteractionProps> = ({
                 </span>
               ))}
               {events.length > 10 && (
-                <span className="events-more">+{events.length - 10} more</span>
+                <span className="events-more">
+                  {t("eventsMore", { count: events.length - 10 })}
+                </span>
               )}
             </div>
           </div>
@@ -423,7 +427,7 @@ const ContractInteraction: React.FC<ContractInteractionProps> = ({
                 ))}
               </div>
             ) : (
-              <div className="function-no-params">No parameters required</div>
+              <div className="function-no-params">{t("noParametersRequired")}</div>
             )}
 
             {readFunctionResult !== null && (
@@ -431,7 +435,9 @@ const ContractInteraction: React.FC<ContractInteractionProps> = ({
                 className={`function-result ${readFunctionResult?.startsWith("Error") ? "function-result-error" : "function-result-success"}`}
               >
                 <div className="function-result-title">
-                  {readFunctionResult?.startsWith("Error") ? "❌ Error" : "✅ Result"}
+                  {readFunctionResult?.startsWith("Error")
+                    ? `❌ ${t("errorResult")}`
+                    : `✅ ${t("successResult")}`}
                 </div>
                 {readFunctionResult}
               </div>
@@ -444,7 +450,7 @@ const ContractInteraction: React.FC<ContractInteractionProps> = ({
                 disabled={isReadingFunction}
                 className="btn-function-action btn-query"
               >
-                {isReadingFunction ? "Reading..." : "Query"}
+                {isReadingFunction ? t("reading") : t("query")}
               </button>
               <button
                 type="button"
@@ -454,7 +460,7 @@ const ContractInteraction: React.FC<ContractInteractionProps> = ({
                 }}
                 className="btn-cancel"
               >
-                Cancel
+                {t("cancel")}
               </button>
             </div>
           </div>
@@ -466,7 +472,7 @@ const ContractInteraction: React.FC<ContractInteractionProps> = ({
             <div className="function-form-title function-form-title-write">
               {selectedWriteFunction.name}
               {selectedWriteFunction.stateMutability === "payable" && (
-                <span className="payable-badge">payable</span>
+                <span className="payable-badge">{t("payable")}</span>
               )}
             </div>
 
@@ -496,12 +502,12 @@ const ContractInteraction: React.FC<ContractInteractionProps> = ({
                 ))}
               </div>
             ) : (
-              <div className="function-no-params">No parameters required</div>
+              <div className="function-no-params">{t("noParametersRequired")}</div>
             )}
 
             {selectedWriteFunction.stateMutability === "payable" && (
               <label className="function-input-label">
-                <span className="function-input-name">Value (ETH)</span>
+                <span className="function-input-name">{t("valueEth")}</span>
                 <input
                   type="text"
                   // biome-ignore lint/complexity/useLiteralKeys: _value is a special key for ETH value
@@ -523,19 +529,23 @@ const ContractInteraction: React.FC<ContractInteractionProps> = ({
               <div
                 className={`tx-status-box ${isError ? "tx-status-error" : isConfirmed ? "tx-status-success" : "tx-status-pending"}`}
               >
-                {isPending && "⏳ Waiting for wallet confirmation..."}
-                {isConfirming && "⏳ Waiting for transaction confirmation..."}
+                {isPending && `⏳ ${t("waitingWalletConfirmation")}`}
+                {isConfirming && `⏳ ${t("waitingTxConfirmation")}`}
                 {isConfirmed && (
                   <div>
-                    ✅ Transaction confirmed!
+                    ✅ {t("transactionConfirmed")}
                     {hash && (
                       <div className="tx-hash-link">
-                        <Link to={`/${networkId}/tx/${hash}`}>View transaction</Link>
+                        <Link to={`/${networkId}/tx/${hash}`}>{t("viewTransaction")}</Link>
                       </div>
                     )}
                   </div>
                 )}
-                {isError && <div>❌ Error: {error?.message || "Transaction failed"}</div>}
+                {isError && (
+                  <div>
+                    ❌ {t("error")} {error?.message || t("transactionFailed")}
+                  </div>
+                )}
               </div>
             )}
 
@@ -546,14 +556,14 @@ const ContractInteraction: React.FC<ContractInteractionProps> = ({
                 disabled={isPending || isConfirming}
                 className="btn-function-action btn-write-action"
               >
-                {isPending ? "Confirming in Wallet..." : isConfirming ? "Processing..." : "Write"}
+                {isPending ? t("confirmingInWallet") : isConfirming ? t("processing") : t("write")}
               </button>
               <button
                 type="button"
                 onClick={() => setSelectedWriteFunction(null)}
                 className="btn-cancel"
               >
-                Cancel
+                {t("cancel")}
               </button>
             </div>
           </div>

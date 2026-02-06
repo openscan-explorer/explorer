@@ -1,5 +1,6 @@
 import type React from "react";
 import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import {
   checkEIP7702Delegation,
@@ -25,6 +26,8 @@ const AccountOverviewCard: React.FC<AccountOverviewCardProps> = ({
   code,
   networkId,
 }) => {
+  const { t } = useTranslation("address");
+
   const { formattedBalance, balanceNumber } = useMemo(() => {
     try {
       const eth = Number(balance) / 1e18;
@@ -78,20 +81,20 @@ const AccountOverviewCard: React.FC<AccountOverviewCardProps> = ({
 
   return (
     <div className="account-card">
-      <div className="account-card-title">Overview</div>
+      <div className="account-card-title">{t("overview")}</div>
 
       <div className="account-card-row">
-        <span className="account-card-label">Balance:</span>
+        <span className="account-card-label">{t("balance")}:</span>
         <span className="account-card-value">
           {formattedBalance} {currency}
         </span>
       </div>
 
       <div className="account-card-row">
-        <span className="account-card-label">Value:</span>
+        <span className="account-card-label">{t("value")}:</span>
         <span className="account-card-value">
           {priceLoading ? (
-            <span className="account-card-loading">Loading...</span>
+            <span className="account-card-loading">{t("loading")}</span>
           ) : formattedUsdValue ? (
             <>
               <span className="account-card-usd">{formattedUsdValue}</span>
@@ -108,13 +111,13 @@ const AccountOverviewCard: React.FC<AccountOverviewCardProps> = ({
       </div>
 
       <div className="account-card-row">
-        <span className="account-card-label">Txn Count (Nonce):</span>
+        <span className="account-card-label">{t("nonce")}:</span>
         <span className="account-card-value">{txCount.toLocaleString()}</span>
       </div>
 
       {eip7702Delegate && (
         <div className="account-card-row">
-          <span className="account-card-label">EIP-7702 Delegate:</span>
+          <span className="account-card-label">{t("eip7702Delegate")}:</span>
           <span className="account-card-value">
             <Link to={`/${networkId}/address/${eip7702Delegate}`} className="account-card-link">
               {truncateAddress(eip7702Delegate)}

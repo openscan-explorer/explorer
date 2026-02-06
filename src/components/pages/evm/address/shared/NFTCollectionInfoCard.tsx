@@ -1,5 +1,6 @@
 import type React from "react";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 
 interface NFTCollectionInfoCardProps {
@@ -23,6 +24,7 @@ const NFTCollectionInfoCard: React.FC<NFTCollectionInfoCardProps> = ({
   networkId,
   addressHash,
 }) => {
+  const { t } = useTranslation("address");
   const [tokenIdInput, setTokenIdInput] = useState("");
 
   const standardClass =
@@ -36,7 +38,7 @@ const NFTCollectionInfoCard: React.FC<NFTCollectionInfoCardProps> = ({
 
       {/* Collection with Logo */}
       <div className="account-card-row">
-        <span className="account-card-label">Collection:</span>
+        <span className="account-card-label">{t("collection")}:</span>
         <span className="account-card-value">
           <span className="nft-collection-display">
             {collectionLogo && (
@@ -61,7 +63,7 @@ const NFTCollectionInfoCard: React.FC<NFTCollectionInfoCardProps> = ({
 
       {/* Token Standard */}
       <div className="account-card-row">
-        <span className="account-card-label">Token Standard:</span>
+        <span className="account-card-label">{t("tokenStandard")}:</span>
         <span className="account-card-value">
           <span className={`token-standard-badge ${standardClass}`}>{tokenStandard}</span>
         </span>
@@ -70,7 +72,7 @@ const NFTCollectionInfoCard: React.FC<NFTCollectionInfoCardProps> = ({
       {/* Total Supply (ERC721 only) */}
       {totalSupply && (
         <div className="account-card-row">
-          <span className="account-card-label">Total Minted:</span>
+          <span className="account-card-label">{t("totalMinted")}:</span>
           <span className="account-card-value">{Number(totalSupply).toLocaleString()} NFTs</span>
         </div>
       )}
@@ -78,7 +80,7 @@ const NFTCollectionInfoCard: React.FC<NFTCollectionInfoCardProps> = ({
       {/* Metadata URI (ERC1155 only) */}
       {metadataUri && (
         <div className="account-card-row">
-          <span className="account-card-label">Metadata URI:</span>
+          <span className="account-card-label">{t("metadataURI")}:</span>
           <span className="account-card-value account-card-mono">
             {metadataUri.length > 50 ? `${metadataUri.slice(0, 50)}...` : metadataUri}
           </span>
@@ -89,7 +91,7 @@ const NFTCollectionInfoCard: React.FC<NFTCollectionInfoCardProps> = ({
       <div className="nft-token-lookup-section">
         <div className="account-card-row">
           <span className="account-card-label">
-            View {tokenStandard === "ERC-721" ? "NFT" : "Token"}:
+            {t("view")} {tokenStandard === "ERC-721" ? "NFT" : "Token"}:
           </span>
           <span className="account-card-value">
             <div className="nft-token-lookup-row">
@@ -109,7 +111,7 @@ const NFTCollectionInfoCard: React.FC<NFTCollectionInfoCardProps> = ({
                   }
                 }}
               >
-                View
+                {t("view")}
               </Link>
             </div>
           </span>

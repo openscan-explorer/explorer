@@ -46,6 +46,7 @@ import {
   type TokenListItem,
 } from "../../../../../services/MetadataService";
 import { fetchERC20Balances, formatTokenBalance } from "../../../../../utils/erc20Utils";
+import { useTranslation } from "react-i18next";
 import CustomTokenModal from "./CustomTokenModal";
 
 export interface TokenHolding {
@@ -74,6 +75,7 @@ const TokenHoldings: React.FC<TokenHoldingsProps> = ({
   defaultCollapsed = false,
   compact = false,
 }) => {
+  const { t } = useTranslation("address");
   const { rpcUrls } = useContext(AppContext);
   const [holdings, setHoldings] = useState<TokenHolding[]>([]);
   const [loading, setLoading] = useState(false);
@@ -256,9 +258,9 @@ const TokenHoldings: React.FC<TokenHoldingsProps> = ({
   const getTierBadge = (tier?: 1 | 2 | 3) => {
     if (!tier) return null;
     const tierNames: Record<number, string> = {
-      1: "Backer",
-      2: "Partner",
-      3: "Ally",
+      1: t("backer"),
+      2: t("partner"),
+      3: t("ally"),
     };
     return (
       <span className={`token-tier-badge tier-${tier}`} title={`Tier ${tier}: ${tierNames[tier]}`}>
@@ -279,9 +281,9 @@ const TokenHoldings: React.FC<TokenHoldingsProps> = ({
           className="token-holdings-toggle"
           onClick={() => setIsCollapsed(false)}
         >
-          <span className="token-holdings-toggle-label">Token Holdings</span>
+          <span className="token-holdings-toggle-label">{t("tokenHoldings")}</span>
           <span className="token-holdings-toggle-count">
-            {loading ? "Loading..." : `${nonZeroHoldings.length} tokens`}
+            {loading ? t("loading") : t("tokensCount", { count: nonZeroHoldings.length })}
           </span>
           <span className="token-holdings-toggle-arrow">+</span>
         </button>
@@ -294,7 +296,7 @@ const TokenHoldings: React.FC<TokenHoldingsProps> = ({
       className={`tx-details token-holdings-section ${compact ? "token-holdings-compact-expanded" : ""}`}
     >
       <div className="tx-section">
-        <span className="tx-section-title">Token Holdings</span>
+        <span className="tx-section-title">{t("tokenHoldings")}</span>
         {compact && (
           <button
             type="button"
@@ -310,7 +312,7 @@ const TokenHoldings: React.FC<TokenHoldingsProps> = ({
 
       {loading ? (
         <div className="tx-row">
-          <span className="tx-value token-holdings-loading">Loading token holdings...</span>
+          <span className="tx-value token-holdings-loading">{t("loadingTokenHoldings")}</span>
         </div>
       ) : hasAnyTokens ? (
         <div className="token-holdings-list">
@@ -323,10 +325,10 @@ const TokenHoldings: React.FC<TokenHoldingsProps> = ({
               <div className="token-holding-info">
                 <TokenLogo src={holding.logo} symbol={holding.symbol} name={holding.name} />
                 <div className="token-holding-details">
-                  <span className="token-name">{holding.name || "Unknown Token"}</span>
+                  <span className="token-name">{holding.name || t("unknownToken")}</span>
                   {holding.symbol && <span className="token-symbol">({holding.symbol})</span>}
                   {getTierBadge(holding.tier)}
-                  {holding.isCustom && <span className="token-custom-badge">Custom</span>}
+                  {holding.isCustom && <span className="token-custom-badge">{t("custom")}</span>}
                 </div>
               </div>
               <div className="token-holding-balance">
@@ -337,7 +339,7 @@ const TokenHoldings: React.FC<TokenHoldingsProps> = ({
         </div>
       ) : (
         <div className="tx-row">
-          <span className="tx-value token-holdings-empty">No token holdings found</span>
+          <span className="tx-value token-holdings-empty">{t("noTokenHoldings")}</span>
         </div>
       )}
 
@@ -349,17 +351,17 @@ const TokenHoldings: React.FC<TokenHoldingsProps> = ({
           disabled={popularLoading || popularLoaded}
         >
           {popularLoading
-            ? "Loading..."
+            ? t("loading")
             : popularLoaded
-              ? "Popular Tokens Loaded"
-              : "Fetch Popular Tokens"}
+              ? t("popularTokensLoaded")
+              : t("fetchPopularTokens")}
         </button>
         <button
           type="button"
           className="btn btn--secondary btn--sm"
           onClick={() => setShowCustomModal(true)}
         >
-          Fetch Custom Token
+          {t("fetchCustomToken")}
         </button>
       </div>
 

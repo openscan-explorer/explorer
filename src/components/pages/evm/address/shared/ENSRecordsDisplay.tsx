@@ -1,6 +1,7 @@
 import type React from "react";
 import { useState } from "react";
 import type { DecodedContenthash, ENSRecords, ENSReverseResult } from "../../../../../types";
+import { useTranslation } from "react-i18next";
 
 interface ENSRecordsDisplayProps {
   ensName: string | null;
@@ -33,6 +34,7 @@ const ENSRecordsDisplay: React.FC<ENSRecordsDisplayProps> = ({
   loading = false,
   isMainnet = true,
 }) => {
+  const { t } = useTranslation("address");
   const [showAllRecords, setShowAllRecords] = useState(false);
 
   // If not on mainnet, show a notice
@@ -40,9 +42,9 @@ const ENSRecordsDisplay: React.FC<ENSRecordsDisplayProps> = ({
     return (
       <div className="tx-details">
         <div className="tx-section">
-          <span className="tx-section-title">ENS Records</span>
+          <span className="tx-section-title">{t("ensRecords")}</span>
         </div>
-        <div className="ens-notice-warning">ENS records are only available on Ethereum Mainnet</div>
+        <div className="ens-notice-warning">{t("ensMainnetOnly")}</div>
       </div>
     );
   }
@@ -52,9 +54,9 @@ const ENSRecordsDisplay: React.FC<ENSRecordsDisplayProps> = ({
     return (
       <div className="tx-details">
         <div className="tx-section">
-          <span className="tx-section-title">ENS Records</span>
+          <span className="tx-section-title">{t("ensRecords")}</span>
         </div>
-        <div className="ens-loading">Loading ENS records...</div>
+        <div className="ens-loading">{t("loadingEnsRecords")}</div>
       </div>
     );
   }
@@ -70,12 +72,12 @@ const ENSRecordsDisplay: React.FC<ENSRecordsDisplayProps> = ({
   return (
     <div className="tx-details">
       <div className="tx-section">
-        <span className="tx-section-title">ENS Records</span>
+        <span className="tx-section-title">{t("ensRecords")}</span>
       </div>
 
       {/* Primary ENS Name */}
       <div className="tx-row">
-        <span className="tx-label">ENS Name:</span>
+        <span className="tx-label">{t("ensNameLabel")}</span>
         <span className="tx-value">
           <span className="ens-name-wrapper">
             <span className="ens-name">{displayName}</span>
@@ -83,7 +85,7 @@ const ENSRecordsDisplay: React.FC<ENSRecordsDisplayProps> = ({
               <span
                 className={`ens-badge ${reverseResult.verified ? "ens-badge--verified" : "ens-badge--unverified"}`}
               >
-                {reverseResult.verified ? "Primary Name" : "Unverified"}
+                {reverseResult.verified ? t("primaryName") : t("unverified")}
               </span>
             )}
           </span>
@@ -93,14 +95,14 @@ const ENSRecordsDisplay: React.FC<ENSRecordsDisplayProps> = ({
       {/* Avatar */}
       {records?.textRecords?.avatar && (
         <div className="tx-row">
-          <span className="tx-label">Avatar:</span>
+          <span className="tx-label">{t("avatarLabel")}</span>
           <span className="tx-value">
             {records.textRecords.avatar.startsWith("http") ||
             records.textRecords.avatar.startsWith("ipfs") ? (
               <div className="flex items-center gap-3">
                 <img
                   src={records.textRecords.avatar.replace("ipfs://", "https://ipfs.io/ipfs/")}
-                  alt="ENS Avatar"
+                  alt={t("ensAvatar")}
                   className="ens-avatar"
                   onError={(e) => {
                     (e.target as HTMLImageElement).style.display = "none";
@@ -127,7 +129,7 @@ const ENSRecordsDisplay: React.FC<ENSRecordsDisplayProps> = ({
       {/* Contenthash */}
       {records?.contenthash && (
         <div className="tx-row">
-          <span className="tx-label">Content Hash:</span>
+          <span className="tx-label">{t("contentHash")}</span>
           <span className="tx-value">
             {decodedContenthash ? (
               <div className="flex items-center gap-2">
@@ -159,10 +161,10 @@ const ENSRecordsDisplay: React.FC<ENSRecordsDisplayProps> = ({
             onClick={() => setShowAllRecords(!showAllRecords)}
           >
             <span className="tx-label">
-              Text Records ({Object.keys(records.textRecords).length}):
+              {t("textRecordsCount", { count: Object.keys(records.textRecords).length })}
             </span>
             <span className="tx-value text-blue">
-              {showAllRecords ? "Hide" : "Show"} {showAllRecords ? "▼" : "▶"}
+              {showAllRecords ? t("hide") : t("show")} {showAllRecords ? "▼" : "▶"}
             </span>
           </button>
 
@@ -219,7 +221,7 @@ const ENSRecordsDisplay: React.FC<ENSRecordsDisplayProps> = ({
       {/* Link to ENS app */}
       {displayName && (
         <div className="tx-row">
-          <span className="tx-label">ENS App:</span>
+          <span className="tx-label">{t("ensApp")}</span>
           <span className="tx-value">
             <a
               href={`https://app.ens.domains/name/${displayName}`}
@@ -227,7 +229,7 @@ const ENSRecordsDisplay: React.FC<ENSRecordsDisplayProps> = ({
               rel="noopener noreferrer"
               className="ens-app-link"
             >
-              View on ENS App ↗
+              {t("viewOnEnsApp")} ↗
             </a>
           </span>
         </div>
