@@ -1,5 +1,6 @@
 import JSZip from "jszip";
 import { useState } from "react";
+import { logger } from "../utils/logger";
 
 export function useZipJsonReader() {
   const [loading, setLoading] = useState(false);
@@ -14,7 +15,7 @@ export function useZipJsonReader() {
       // biome-ignore lint/suspicious/noExplicitAny: <TODO>
       const results: any = {};
       const entries = Object.keys(zip.files);
-      console.log(entries);
+      logger.debug(entries);
 
       // biome-ignore lint/suspicious/noExplicitAny: <TODO>
       let deployments: any = {};
@@ -69,7 +70,7 @@ export function useZipJsonReader() {
       }
 
       setLoading(false);
-      console.log(results);
+      logger.debug(results);
 
       // Build an address -> artifact map based on each entry's `deployments`
       // biome-ignore lint/suspicious/noExplicitAny: <TODO>
@@ -118,10 +119,10 @@ export function useZipJsonReader() {
         }
       }
 
-      console.log(addressMap);
+      logger.debug(addressMap);
       return addressMap;
     } catch (err) {
-      console.error("Failed to process ZIP file:", err);
+      logger.error("Failed to process ZIP file:", err);
       setError("Failed to process ZIP file. Please ensure it's a valid ZIP archive.");
       setLoading(false);
       return {};

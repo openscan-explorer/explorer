@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { logger } from "../utils/logger";
 
 const STORAGE_KEY_PREFIX = "rpc_selected_provider_";
 
@@ -27,13 +28,13 @@ export function useProviderSelection(
       try {
         sessionStorage.setItem(storageKey, selectedProvider);
       } catch (error) {
-        console.warn("Failed to save provider selection:", error);
+        logger.warn("Failed to save provider selection:", error);
       }
     } else {
       try {
         sessionStorage.removeItem(storageKey);
       } catch (error) {
-        console.warn("Failed to remove provider selection:", error);
+        logger.warn("Failed to remove provider selection:", error);
       }
     }
   }, [selectedProvider, storageKey]);

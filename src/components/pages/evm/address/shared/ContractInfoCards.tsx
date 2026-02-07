@@ -3,6 +3,7 @@ import { useContext, useEffect, useState } from "react";
 import { AppContext } from "../../../../../context";
 import { getNativeTokenPrice } from "../../../../../services/PriceService";
 import type { Address, ENSReverseResult } from "../../../../../types";
+import { logger } from "../../../../../utils/logger";
 import AccountOverviewCard from "./AccountOverviewCard";
 import ContractMoreInfoCard from "./ContractMoreInfoCard";
 
@@ -48,7 +49,7 @@ const ContractInfoCards: React.FC<ContractInfoCardsProps> = ({
         const price = await getNativeTokenPrice(networkId, rpcUrl, mainnetRpcUrl);
         setNativeTokenPrice(price);
       } catch (err) {
-        console.error("Error fetching native token price:", err);
+        logger.error("Error fetching native token price:", err);
         setNativeTokenPrice(null);
       } finally {
         setPriceLoading(false);

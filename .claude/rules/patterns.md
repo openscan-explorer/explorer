@@ -58,3 +58,37 @@ OpenScan includes special support for localhost development:
 - Use `--overlay-light-*` variables for backgrounds that need to work in both themes
 - Use `--text-primary`, `--text-secondary`, `--text-tertiary` for text colors
 - Never hardcode `rgba(255, 255, 255, X)` - use CSS variables instead
+
+## Logger Utility
+
+Always use the logger utility instead of `console.*` methods for runtime logging.
+
+### Usage
+
+```typescript
+import { logger } from "../utils/logger";
+
+logger.debug("Debug info for development");
+logger.info("General information");
+logger.warn("Warning message");
+logger.error("Error message", error);
+```
+
+### Log Level Guidelines
+
+- **debug**: Development-only information (verbose data, state dumps, request/response details)
+- **info**: General operational information (feature activity, successful operations)
+- **warn**: Potential issues that don't break functionality (fallbacks, deprecations, recoverable errors)
+- **error**: Actual errors that affect functionality (failed operations, exceptions)
+
+### Environment Filtering
+
+| Environment | Visible Levels           |
+|-------------|--------------------------|
+| development | debug, info, warn, error |
+| staging     | info, warn, error        |
+| production  | warn, error              |
+
+### Build-time Safety
+
+In production builds, `console.log` calls are stripped via Vite's terser `pure_funcs` option as a safety net for any missed migrations.

@@ -1,5 +1,6 @@
 import { getAllNetworks } from "../config/networks";
 import type { RpcUrlsContextType } from "../types";
+import { logger } from "./logger";
 import { getNetworkRpcKey } from "./networkResolver";
 
 const STORAGE_KEY = "OPENSCAN_RPC_URLS_V3"; // Version bump for networkId-based keys
@@ -44,7 +45,7 @@ export function loadRpcUrlsFromStorage(): RpcUrlsContextType | null {
     if (!isValidRpcMap(parsed)) return null;
     return parsed;
   } catch (err) {
-    console.warn("Failed to parse RPC urls from storage", err);
+    logger.warn("Failed to parse RPC urls from storage", err);
     return null;
   }
 }
@@ -57,7 +58,7 @@ export function saveRpcUrlsToStorage(map: RpcUrlsContextType): void {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(map));
   } catch (err) {
-    console.warn("Failed to save RPC urls to storage", err);
+    logger.warn("Failed to save RPC urls to storage", err);
   }
 }
 

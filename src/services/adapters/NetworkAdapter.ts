@@ -8,6 +8,7 @@ import type {
   AddressTransactionsResult,
   GasPrices,
 } from "../../types";
+import { logger } from "../../utils/logger";
 import { extractData } from "./shared/extractData";
 import { AddressTransactionSearch } from "../AddressTransactionSearch";
 
@@ -170,7 +171,7 @@ export abstract class NetworkAdapter {
         message: undefined,
       };
     } catch (error) {
-      console.error("Error searching address transactions:", error);
+      logger.error("Error searching address transactions:", error);
 
       return {
         transactions: [],

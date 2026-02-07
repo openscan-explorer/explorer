@@ -1,5 +1,6 @@
 import React, { createContext, type ReactNode, useContext, useEffect, useState } from "react";
 import { DEFAULT_SETTINGS, type UserSettings } from "../types";
+import { logger } from "../utils/logger";
 
 interface SettingsContextType {
   settings: UserSettings;
@@ -32,7 +33,7 @@ export const SettingsProvider = React.memo<SettingsProviderProps>(({ children })
         return { ...DEFAULT_SETTINGS, ...parsed };
       }
     } catch (error) {
-      console.warn("Failed to load settings from localStorage:", error);
+      logger.warn("Failed to load settings from localStorage:", error);
     }
     return DEFAULT_SETTINGS;
   });
@@ -64,7 +65,7 @@ export const SettingsProvider = React.memo<SettingsProviderProps>(({ children })
     try {
       localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(settings));
     } catch (error) {
-      console.warn("Failed to save settings to localStorage:", error);
+      logger.warn("Failed to save settings to localStorage:", error);
     }
   }, [settings]);
 

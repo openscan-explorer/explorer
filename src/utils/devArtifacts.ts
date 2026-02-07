@@ -1,4 +1,5 @@
 import { STORAGE_KEY } from "./artifactsStorage";
+import { logger } from "./logger";
 
 declare global {
   const __DEV_ARTIFACTS__: Record<string, unknown> | null;
@@ -28,7 +29,7 @@ export function injectDevArtifacts(): void {
     try {
       const parsed = JSON.parse(existing);
       if (Object.keys(parsed).length > 0) {
-        console.log("[dev-artifacts] localStorage already has artifacts, skipping injection");
+        logger.debug("[dev-artifacts] localStorage already has artifacts, skipping injection");
         return;
       }
     } catch {
@@ -38,10 +39,10 @@ export function injectDevArtifacts(): void {
 
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(__DEV_ARTIFACTS__));
-    console.log(
+    logger.debug(
       `[dev-artifacts] Injected ${Object.keys(__DEV_ARTIFACTS__).length} contract artifacts into localStorage`,
     );
   } catch (err) {
-    console.warn("[dev-artifacts] Failed to inject artifacts into localStorage:", err);
+    logger.warn("[dev-artifacts] Failed to inject artifacts into localStorage:", err);
   }
 }

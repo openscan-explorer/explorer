@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { logger } from "../utils/logger";
 
 export interface SourcifyMatch {
   match: "perfect" | "partial" | null;
@@ -84,7 +85,7 @@ export const useSourcify = (
         setData(contractData);
         setIsVerified(!!contractData.match);
       } catch (err) {
-        console.error("Error fetching Sourcify data:", err);
+        logger.error("Error fetching Sourcify data:", err);
         setError(err instanceof Error ? err.message : "Unknown error occurred");
         setIsVerified(false);
         setData(null);
@@ -167,7 +168,7 @@ export const useSourcifyFiles = (
           setFiles(fileContents);
         }
       } catch (err) {
-        console.error("Error fetching Sourcify files:", err);
+        logger.error("Error fetching Sourcify files:", err);
         setError(err instanceof Error ? err.message : "Unknown error occurred");
         setFiles([]);
       } finally {
@@ -206,7 +207,7 @@ export const checkSourcifyVerification = async (
     }
     return false;
   } catch (err) {
-    console.error("Error checking Sourcify verification:", err);
+    logger.error("Error checking Sourcify verification:", err);
     return false;
   }
 };

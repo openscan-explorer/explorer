@@ -1,4 +1,5 @@
 import { lazy, Suspense } from "react";
+import { logger } from "../utils/logger";
 import Loading from "./common/Loading";
 
 // Lazy load page components - Shared
@@ -77,7 +78,7 @@ export const LazyGasTracker = withSuspense(GasTracker);
  * This ensures navigation between pages is instant (no chunk download delay).
  */
 export function preloadAllRoutes() {
-  console.log("Preloading all route chunks...");
+  logger.debug("Preloading all route chunks...");
   // Shared pages
   import("./pages/home");
   import("./pages/settings");

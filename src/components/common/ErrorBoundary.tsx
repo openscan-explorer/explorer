@@ -1,5 +1,6 @@
 import i18next from "i18next";
 import React, { Component, type ErrorInfo, type ReactNode } from "react";
+import { logger } from "../../utils/logger";
 
 interface Props {
   children: ReactNode;
@@ -25,7 +26,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     // Log error details
-    console.error("ErrorBoundary caught an error:", error, errorInfo);
+    logger.error("ErrorBoundary caught an error:", error, errorInfo);
 
     this.setState({
       error,
@@ -107,7 +108,7 @@ export const useErrorHandler = () => {
   }, []);
 
   const captureError = React.useCallback((error: Error) => {
-    console.error("Error captured:", error);
+    logger.error("Error captured:", error);
     setError(error);
   }, []);
 

@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import type { DataWithMetadata } from "../types";
+import { logger } from "../utils/logger";
 
 /**
  * Hook to extract the correct data based on selected provider
@@ -35,7 +36,7 @@ export function useSelectedData<T>(
 
     if (!providerResponse || !providerResponse.data) {
       // Fallback to default if selected provider not found
-      console.warn(`Selected provider ${selectedProvider} not found or failed, using default`);
+      logger.warn(`Selected provider ${selectedProvider} not found or failed, using default`);
       return result.data;
     }
 

@@ -7,6 +7,7 @@ import { AppContext } from "../../../../context";
 import { useSourcify } from "../../../../hooks/useSourcify";
 import type { DataService } from "../../../../services/DataService";
 import type { TraceResult } from "../../../../services/adapters/NetworkAdapter";
+import { logger } from "../../../../utils/logger";
 import type {
   RPCMetadata,
   Transaction,
@@ -131,7 +132,7 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
             setTraceData(trace);
             setCallTrace(call);
           })
-          .catch((err) => console.error("Error loading trace:", err))
+          .catch((err) => logger.error("Error loading trace:", err))
           .finally(() => setLoadingTrace(false));
       }
     }, [showTrace, isTraceAvailable, dataService, transaction.hash, traceData, callTrace]);

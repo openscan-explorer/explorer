@@ -4,6 +4,7 @@ import { useDataService } from "../../../hooks/useDataService";
 import type { BitcoinNetworkStats, BitcoinTransaction } from "../../../types";
 import { formatBTC, formatTimeAgo, truncateHash } from "../../../utils/bitcoinFormatters";
 import { calculateTotalOutput } from "../../../utils/bitcoinUtils";
+import { logger } from "../../../utils/logger";
 import Loader from "../../common/Loader";
 
 const PAGE_SIZE = 100;
@@ -48,7 +49,7 @@ export default function BitcoinMempoolPage() {
       setTotalCount(mempoolResult.total);
       setError(null);
     } catch (err) {
-      console.error("Error fetching mempool data:", err);
+      logger.error("Error fetching mempool data:", err);
       setError(err instanceof Error ? err.message : "Failed to fetch mempool data");
     } finally {
       setLoading(false);

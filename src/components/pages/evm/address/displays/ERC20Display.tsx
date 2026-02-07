@@ -9,6 +9,7 @@ import {
 } from "../../../../../services/MetadataService";
 import type { Address, ENSReverseResult, RPCMetadata } from "../../../../../types";
 import { hexToUtf8 } from "../../../../../utils/erc20Utils";
+import { logger } from "../../../../../utils/logger";
 import { AddressHeader } from "../shared";
 import ContractInfoCard from "../shared/ContractInfoCard";
 import ContractInfoCards from "../shared/ContractInfoCards";
@@ -56,7 +57,9 @@ const ERC20Display: React.FC<ERC20DisplayProps> = ({
 
   // Fetch token metadata from explorer-metadata
   useEffect(() => {
-    fetchToken(Number(networkId), addressHash).then(setTokenMetadata).catch(console.error);
+    fetchToken(Number(networkId), addressHash)
+      .then(setTokenMetadata)
+      .catch((err) => logger.error("Failed to fetch token metadata:", err));
   }, [networkId, addressHash]);
 
   // Fetch on-chain token data
