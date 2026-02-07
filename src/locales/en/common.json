@@ -1,13 +1,9 @@
 {
   "nav": {
-    "blocks": "BLOCKS",
-    "transactions": "TRANSACTIONS",
     "searchPlaceholderDesktop": "Search by Address / Tx Hash / Block / ENS",
     "searchPlaceholderMobile": "Search address, tx, block, ENS...",
     "searchAriaLabel": "Search",
     "searchTitle": "Search",
-    "devToolsAriaLabel": "Dev Tools",
-    "devToolsTitle": "Dev Tools",
     "switchToLightMode": "Switch to light mode",
     "switchToDarkMode": "Switch to dark mode",
     "lightModeTitle": "Light mode",
@@ -18,7 +14,6 @@
     "closeMenuAriaLabel": "Close menu",
     "blocksMobile": "Blocks",
     "transactionsMobile": "Transactions",
-    "gasTracker": "Gas Tracker",
     "home": "Home",
     "lightMode": "Light Mode",
     "darkMode": "Dark Mode",
@@ -233,7 +228,6 @@
     "backers": "Backers"
   },
   "profile": {
-    "title": "Profile",
     "notFound": "Profile Not Found",
     "loading": "Loading profile...",
     "invalidUrl": "Invalid profile URL. Please provide both profile type and ID.",
@@ -244,9 +238,7 @@
   },
   "extraData": {
     "showDecoded": "Show decoded",
-    "showRawHex": "Show raw hex",
-    "utf8": "UTF-8",
-    "hex": "Hex"
+    "showRawHex": "Show raw hex"
   },
   "searchBox": {
     "placeholder": "Search by Address / Txn Hash / Block / ENS Name",
@@ -264,7 +256,7 @@
     "rpcProviders": "RPC Providers",
     "strategy": "Strategy: {{strategy}}",
     "succeededOnAttempt": "Succeeded on attempt #{{count}}",
-    "fastestResponseWins": "Fastest response wins \u2022 All times shown",
+    "fastestResponseWins": "Fastest response wins • All times shown",
     "responsesDiffer": "Responses differ between providers",
     "selected": "Selected",
     "winner": "Winner",

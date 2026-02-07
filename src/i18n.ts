@@ -6,7 +6,6 @@ import enAddress from "./locales/en/address.json";
 import enBlock from "./locales/en/block.json";
 import enCommon from "./locales/en/common.json";
 import enDevtools from "./locales/en/devtools.json";
-import enErrors from "./locales/en/errors.json";
 import enHome from "./locales/en/home.json";
 import enNetwork from "./locales/en/network.json";
 import enSettings from "./locales/en/settings.json";
@@ -17,7 +16,6 @@ import esAddress from "./locales/es/address.json";
 import esBlock from "./locales/es/block.json";
 import esCommon from "./locales/es/common.json";
 import esDevtools from "./locales/es/devtools.json";
-import esErrors from "./locales/es/errors.json";
 import esHome from "./locales/es/home.json";
 import esNetwork from "./locales/es/network.json";
 import esSettings from "./locales/es/settings.json";
@@ -43,7 +41,6 @@ i18n
         transaction: enTransaction,
         devtools: enDevtools,
         network: enNetwork,
-        errors: enErrors,
         tokenDetails: enTokenDetails,
       },
       es: {
@@ -55,23 +52,12 @@ i18n
         transaction: esTransaction,
         devtools: esDevtools,
         network: esNetwork,
-        errors: esErrors,
         tokenDetails: esTokenDetails,
       },
     },
     fallbackLng: "en",
     defaultNS: "common",
-    ns: [
-      "common",
-      "home",
-      "settings",
-      "address",
-      "block",
-      "transaction",
-      "devtools",
-      "network",
-      "errors",
-    ],
+    ns: ["common", "home", "settings", "address", "block", "transaction", "devtools", "network"],
     interpolation: {
       escapeValue: false,
     },

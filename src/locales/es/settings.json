@@ -78,11 +78,7 @@
     "description": "Configurá las URLs RPC para cada red. Hacé click en una red para desplegar y configurar sus endpoints.",
     "fetchButton": "Obtener desde Chainlist",
     "fetchingButton": "Obteniendo...",
-    "placeholder": "https://eth-mainnet.g.alchemy.com/v2/TU-API-KEY",
     "currentRPCs": "RPCs actuales:",
-    "chainId": "Chain ID: {{chainId}}",
-    "rpcCount_one": "{{count}} RPC",
-    "rpcCount_other": "{{count}} RPCs",
     "removeRpc": "Eliminar RPC",
     "localhostHelp": "¿Necesitás acceder a tu red local de forma remota?",
     "localhostHelpLink": "Aprendé cómo configurar un túnel con ngrok",
@@ -94,11 +90,5 @@
       "configuredText": "¡Configurado!",
       "useAsDefault": "Usar como explorador por defecto"
     }
-  },
-  "errors": {
-    "failedToFetch": "No se pudo obtener la información desde Chainlist",
-    "noRPCsFound": "No se encontraron RPCs para la chain {{chainId}}",
-    "noPrivacyFriendlyRPCs": "No se encontraron RPCs amigables con la privacidad para la chain {{chainId}}",
-    "errorFetchingChainlist": "Error al obtener datos desde Chainlist:"
   }
 }
