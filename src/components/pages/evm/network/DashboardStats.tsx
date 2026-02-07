@@ -1,4 +1,5 @@
 import type React from "react";
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import type { GasPrices } from "../../../../types";
 import { formatPrice } from "../../../../services/PriceService";
@@ -33,13 +34,14 @@ const DashboardStats: React.FC<DashboardStatsProps> = ({
   loading,
   networkId,
 }) => {
+  const { t } = useTranslation("network");
   // Use gas tiers if available, otherwise fall back to single gas price
   const hasGasTiers = gasPrices !== null;
 
   return (
     <div className="dashboard-stats-row">
       <div className="dashboard-stat-card">
-        <div className="dashboard-stat-label">{currency} Price</div>
+        <div className="dashboard-stat-label">{t("currencyPrice", { currency })}</div>
         <div className={`dashboard-stat-value ${loading ? "dashboard-stat-loading" : ""}`}>
           {formatPrice(price)}
         </div>
@@ -48,19 +50,19 @@ const DashboardStats: React.FC<DashboardStatsProps> = ({
       {hasGasTiers ? (
         <div className="dashboard-stat-card dashboard-stat-card-gas">
           <Link to={`/${networkId}/gastracker`} className="dashboard-stat-label-link">
-            Gas Price →
+            {t("gasPriceLink")}
           </Link>
           <div className={`dashboard-gas-tiers ${loading ? "dashboard-stat-loading" : ""}`}>
             <div className="gas-tier gas-tier-low">
-              <span className="gas-tier-label">Low</span>
+              <span className="gas-tier-label">{t("low")}</span>
               <span className="gas-tier-value">{formatGasPriceWithUnit(gasPrices.low)}</span>
             </div>
             <div className="gas-tier gas-tier-avg">
-              <span className="gas-tier-label">Avg</span>
+              <span className="gas-tier-label">{t("avg")}</span>
               <span className="gas-tier-value">{formatGasPriceWithUnit(gasPrices.average)}</span>
             </div>
             <div className="gas-tier gas-tier-high">
-              <span className="gas-tier-label">High</span>
+              <span className="gas-tier-label">{t("high")}</span>
               <span className="gas-tier-value">{formatGasPriceWithUnit(gasPrices.high)}</span>
             </div>
           </div>
@@ -68,7 +70,7 @@ const DashboardStats: React.FC<DashboardStatsProps> = ({
       ) : (
         <div className="dashboard-stat-card">
           <Link to={`/${networkId}/gastracker`} className="dashboard-stat-label-link">
-            Gas Price →
+            {t("gasPriceLink")}
           </Link>
           <div className={`dashboard-stat-value ${loading ? "dashboard-stat-loading" : ""}`}>
             {formatGasPriceWithUnit(gasPrice)}
@@ -77,7 +79,7 @@ const DashboardStats: React.FC<DashboardStatsProps> = ({
       )}
 
       <div className="dashboard-stat-card">
-        <div className="dashboard-stat-label">Latest Block</div>
+        <div className="dashboard-stat-label">{t("latestBlock")}</div>
         <div className={`dashboard-stat-value ${loading ? "dashboard-stat-loading" : ""}`}>
           {formatBlockNumber(blockNumber)}
         </div>

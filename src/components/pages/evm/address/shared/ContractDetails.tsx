@@ -1,6 +1,7 @@
 import type React from "react";
 import { useState } from "react";
 import type { ABI } from "../../../../../types";
+import { useTranslation } from "react-i18next";
 import ContractInteraction from "./ContractInteraction";
 
 interface ContractData {
@@ -38,6 +39,7 @@ const ContractDetails: React.FC<ContractDetailsProps> = ({
   isLocalArtifact = false,
   sourcifyUrl,
 }) => {
+  const { t } = useTranslation("address");
   const [showContractDetails, setShowContractDetails] = useState(false);
 
   // Prepare source files array
@@ -59,7 +61,7 @@ const ContractDetails: React.FC<ContractDetailsProps> = ({
         className="tx-section btn-toggle-section"
         onClick={() => setShowContractDetails(!showContractDetails)}
       >
-        <span className="tx-section-title">Contract Details</span>
+        <span className="tx-section-title">{t("contractDetails")}</span>
         <span className="contract-section-toggle">{showContractDetails ? " ▼" : " ▶"}</span>
       </button>
 
@@ -67,42 +69,42 @@ const ContractDetails: React.FC<ContractDetailsProps> = ({
         <>
           {contractData.compilerVersion && (
             <div className="tx-row">
-              <span className="tx-label">Compiler Version</span>
+              <span className="tx-label">{t("compilerVersion")}</span>
               <span className="tx-value tx-mono">{contractData.compilerVersion}</span>
             </div>
           )}
 
           {contractData.evmVersion && (
             <div className="tx-row">
-              <span className="tx-label">EVM Version</span>
+              <span className="tx-label">{t("evmVersionLabel")}</span>
               <span className="tx-value">{contractData.evmVersion}</span>
             </div>
           )}
 
           {contractData.chainId && (
             <div className="tx-row">
-              <span className="tx-label">Network ID</span>
+              <span className="tx-label">{t("networkIdLabel")}</span>
               <span className="tx-value">{contractData.chainId}</span>
             </div>
           )}
 
           {contractData.name && (
             <div className="tx-row">
-              <span className="tx-label">Contract Name</span>
+              <span className="tx-label">{t("contractName")}</span>
               <span className="tx-value tx-value-success">{contractData.name}</span>
             </div>
           )}
 
           {contractData.verifiedAt && (
             <div className="tx-row">
-              <span className="tx-label">Verified At</span>
+              <span className="tx-label">{t("verifiedAtLabel")}</span>
               <span className="tx-value">{new Date(contractData.verifiedAt).toLocaleString()}</span>
             </div>
           )}
 
           {contractData.match && (
             <div className="tx-row">
-              <span className="tx-label">Match Type</span>
+              <span className="tx-label">{t("matchType")}</span>
               <span
                 className={`tx-value font-weight-600 ${contractData.match === "perfect" ? "text-success" : "text-warning"}`}
               >
@@ -113,14 +115,14 @@ const ContractDetails: React.FC<ContractDetailsProps> = ({
 
           {contractData.metadata?.compiler && (
             <div className="tx-row">
-              <span className="tx-label">Compiler</span>
+              <span className="tx-label">{t("compiler")}</span>
               <span className="tx-value tx-mono">{contractData.metadata.compiler.version}</span>
             </div>
           )}
 
           {contractData.creation_match && (
             <div className="tx-row">
-              <span className="tx-label">Creation Match</span>
+              <span className="tx-label">{t("creationMatch")}</span>
               <span
                 className={`tx-value font-weight-600 ${contractData.creation_match === "perfect" ? "text-success" : "text-warning"}`}
               >
@@ -131,7 +133,7 @@ const ContractDetails: React.FC<ContractDetailsProps> = ({
 
           {contractData.runtime_match && (
             <div className="tx-row">
-              <span className="tx-label">Runtime Match</span>
+              <span className="tx-label">{t("runtimeMatch")}</span>
               <span
                 className={`tx-value font-weight-600 ${contractData.runtime_match === "perfect" ? "text-success" : "text-warning"}`}
               >
@@ -155,7 +157,7 @@ const ContractDetails: React.FC<ContractDetailsProps> = ({
                 }
               }}
             >
-              <span className="tx-label">Contract Bytecode</span>
+              <span className="tx-label">{t("contractBytecode")}</span>
               <span id="bytecode-icon" className="source-toggle-icon">
                 ▶
               </span>
@@ -181,7 +183,7 @@ const ContractDetails: React.FC<ContractDetailsProps> = ({
                   }
                 }}
               >
-                <span className="tx-label">Source Code</span>
+                <span className="tx-label">{t("sourceCode")}</span>
                 <span id="source-code-icon" className="source-toggle-icon">
                   ▶
                 </span>
@@ -213,7 +215,7 @@ const ContractDetails: React.FC<ContractDetailsProps> = ({
                   }
                 }}
               >
-                <span className="tx-label">Raw ABI</span>
+                <span className="tx-label">{t("rawAbi")}</span>
                 <span id="raw-abi-icon" className="source-toggle-icon">
                   ▶
                 </span>
@@ -235,14 +237,14 @@ const ContractDetails: React.FC<ContractDetailsProps> = ({
 
           {sourcifyUrl && (
             <div className="tx-row">
-              <span className="tx-label">Sourcify</span>
+              <span className="tx-label">{t("sourcify")}</span>
               <a
                 href={sourcifyUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="sourcify-link"
               >
-                View Full Contract on Sourcify ↗
+                {t("sourcifyLink")} ↗
               </a>
             </div>
           )}

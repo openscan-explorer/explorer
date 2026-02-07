@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import { useDataService } from "../../../../hooks/useDataService";
 import { useProviderSelection } from "../../../../hooks/useProviderSelection";
@@ -8,6 +9,7 @@ import Loader from "../../../common/Loader";
 import TransactionDisplay from "./TransactionDisplay";
 
 export default function Tx() {
+  const { t } = useTranslation("transaction");
   const { networkId, filter } = useParams<{
     networkId?: string;
     filter?: string;
@@ -64,11 +66,11 @@ export default function Tx() {
       <div className="container-wide">
         <div className="block-display-card">
           <div className="block-display-header">
-            <span className="block-label">Transaction</span>
+            <span className="block-label">{t("transaction")}</span>
             <span className="tx-mono header-subtitle">{txHash}</span>
           </div>
           <div className="card-content-loading">
-            <Loader text="Loading transaction..." />
+            <Loader text={t("loadingTransaction")} />
           </div>
         </div>
       </div>
@@ -80,11 +82,11 @@ export default function Tx() {
       <div className="container-wide">
         <div className="block-display-card">
           <div className="block-display-header">
-            <span className="block-label">Transaction</span>
+            <span className="block-label">{t("transaction")}</span>
             <span className="tx-mono header-subtitle">{txHash}</span>
           </div>
           <div className="card-content">
-            <p className="error-text margin-0">Error: {error}</p>
+            <p className="error-text margin-0">{t("errorPrefix", { error })}</p>
           </div>
         </div>
       </div>
@@ -106,10 +108,10 @@ export default function Tx() {
       ) : (
         <div className="block-display-card">
           <div className="block-display-header">
-            <span className="block-label">Transaction</span>
+            <span className="block-label">{t("transaction")}</span>
           </div>
           <div className="card-content">
-            <p className="text-muted margin-0">Transaction not found</p>
+            <p className="text-muted margin-0">{t("transactionNotFound")}</p>
           </div>
         </div>
       )}

@@ -1,5 +1,6 @@
 import type React from "react";
 import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 
 interface ERC20TokenInfoCardProps {
   tokenName?: string;
@@ -16,6 +17,8 @@ const ERC20TokenInfoCard: React.FC<ERC20TokenInfoCardProps> = ({
   tokenTotalSupply,
   tokenLogo,
 }) => {
+  const { t } = useTranslation("address");
+
   // Format total supply
   const formattedTotalSupply = useMemo(() => {
     if (!tokenTotalSupply || tokenDecimals === undefined) return null;
@@ -31,11 +34,11 @@ const ERC20TokenInfoCard: React.FC<ERC20TokenInfoCardProps> = ({
 
   return (
     <div className="erc20-token-info-card">
-      <div className="account-card-title">Token Info</div>
+      <div className="account-card-title">{t("tokenInfo")}</div>
 
       {/* Token with Logo */}
       <div className="account-card-row">
-        <span className="account-card-label">Token:</span>
+        <span className="account-card-label">{t("token")}:</span>
         <span className="account-card-value">
           <span className="erc20-token-display">
             {tokenLogo && (
@@ -59,7 +62,7 @@ const ERC20TokenInfoCard: React.FC<ERC20TokenInfoCardProps> = ({
       {/* Decimals */}
       {tokenDecimals !== undefined && (
         <div className="account-card-row">
-          <span className="account-card-label">Decimals:</span>
+          <span className="account-card-label">{t("decimals")}:</span>
           <span className="account-card-value">{tokenDecimals}</span>
         </div>
       )}
@@ -67,7 +70,7 @@ const ERC20TokenInfoCard: React.FC<ERC20TokenInfoCardProps> = ({
       {/* Total Supply */}
       {formattedTotalSupply && (
         <div className="account-card-row">
-          <span className="account-card-label">Total Supply:</span>
+          <span className="account-card-label">{t("totalSupply")}:</span>
           <span className="account-card-value">
             {formattedTotalSupply} {tokenSymbol}
           </span>

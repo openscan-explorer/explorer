@@ -1,6 +1,7 @@
 import type React from "react";
 import { useState } from "react";
 import type { Address, ABI } from "../../../../../types";
+import { useTranslation } from "react-i18next";
 import ContractInteraction from "./ContractInteraction";
 
 interface ContractData {
@@ -42,6 +43,7 @@ const ContractInfoCard: React.FC<ContractInfoCardProps> = ({
   isLocalArtifact,
   sourcifyUrl,
 }) => {
+  const { t } = useTranslation("address");
   const [showBytecode, setShowBytecode] = useState(false);
   const [showContractDetails, setShowContractDetails] = useState(false);
   const [showSourceCode, setShowSourceCode] = useState(false);
@@ -70,22 +72,22 @@ const ContractInfoCard: React.FC<ContractInfoCardProps> = ({
 
   return (
     <div className="contract-info-card">
-      <div className="account-card-title">Contract Info</div>
+      <div className="account-card-title">{t("contractInfo")}</div>
 
       {/* Verification Status */}
       <div className="account-card-row">
-        <span className="account-card-label">Status:</span>
+        <span className="account-card-label">{t("status")}:</span>
         <span className="account-card-value">
           {sourcifyLoading ? (
-            <span className="contract-checking">Checking Sourcify...</span>
+            <span className="contract-checking">{t("checkingSourcify")}</span>
           ) : hasVerifiedContract ? (
             <span className="contract-verification-badge">
               <span className="contract-verified-icon">✓</span>
-              <span className="contract-verified-text">Verified</span>
+              <span className="contract-verified-text">{t("verified")}</span>
               {matchBadgeText && <span className="contract-match-badge">{matchBadgeText}</span>}
             </span>
           ) : (
-            <span className="contract-not-verified">Not Verified</span>
+            <span className="contract-not-verified">{t("notVerified")}</span>
           )}
         </span>
       </div>
@@ -93,7 +95,7 @@ const ContractInfoCard: React.FC<ContractInfoCardProps> = ({
       {/* Contract Name */}
       {contractData?.name && (
         <div className="account-card-row">
-          <span className="account-card-label">Contract Name:</span>
+          <span className="account-card-label">{t("contractName")}:</span>
           <span className="account-card-value contract-name">{contractData.name}</span>
         </div>
       )}
@@ -101,7 +103,7 @@ const ContractInfoCard: React.FC<ContractInfoCardProps> = ({
       {/* Compiler Version */}
       {contractData?.compilerVersion && (
         <div className="account-card-row">
-          <span className="account-card-label">Compiler:</span>
+          <span className="account-card-label">{t("compiler")}:</span>
           <span className="account-card-value account-card-mono">
             {contractData.compilerVersion}
           </span>
@@ -111,7 +113,7 @@ const ContractInfoCard: React.FC<ContractInfoCardProps> = ({
       {/* EVM Version */}
       {contractData?.evmVersion && (
         <div className="account-card-row">
-          <span className="account-card-label">EVM Version:</span>
+          <span className="account-card-label">{t("evmVersion")}:</span>
           <span className="account-card-value">{contractData.evmVersion}</span>
         </div>
       )}
@@ -141,7 +143,7 @@ const ContractInfoCard: React.FC<ContractInfoCardProps> = ({
             className="contract-details-toggle"
             onClick={() => setShowContractDetails(!showContractDetails)}
           >
-            <span className="account-card-label">Contract Details</span>
+            <span className="account-card-label">{t("contractDetails")}</span>
             <span className="contract-toggle-icon">{showContractDetails ? "−" : "+"}</span>
           </button>
 
@@ -155,7 +157,7 @@ const ContractInfoCard: React.FC<ContractInfoCardProps> = ({
                     className="contract-collapsible-toggle"
                     onClick={() => setShowBytecode(!showBytecode)}
                   >
-                    <span>Contract Bytecode</span>
+                    <span>{t("contractBytecode")}</span>
                     <span className="contract-toggle-icon-small">{showBytecode ? "▼" : "▶"}</span>
                   </button>
                   {showBytecode && (
@@ -200,7 +202,7 @@ const ContractInfoCard: React.FC<ContractInfoCardProps> = ({
                     className="contract-collapsible-toggle"
                     onClick={() => setShowRawAbi(!showRawAbi)}
                   >
-                    <span>Raw ABI</span>
+                    <span>{t("rawAbi")}</span>
                     <span className="contract-toggle-icon-small">{showRawAbi ? "▼" : "▶"}</span>
                   </button>
                   {showRawAbi && (
@@ -232,7 +234,7 @@ const ContractInfoCard: React.FC<ContractInfoCardProps> = ({
             className="contract-bytecode-toggle"
             onClick={() => setShowBytecode(!showBytecode)}
           >
-            <span className="account-card-label">Contract Bytecode</span>
+            <span className="account-card-label">{t("contractBytecode")}</span>
             <span className="contract-toggle-icon">{showBytecode ? "−" : "+"}</span>
           </button>
           {showBytecode && (

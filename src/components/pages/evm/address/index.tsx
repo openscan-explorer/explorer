@@ -1,4 +1,5 @@
 import { useContext, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useLocation, useParams } from "react-router-dom";
 import { AppContext } from "../../../../context";
 import { useDataService } from "../../../../hooks/useDataService";
@@ -17,6 +18,7 @@ import {
 } from "./displays";
 
 export default function Address() {
+  const { t } = useTranslation("address");
   const { networkId, address: addressParam } = useParams<{
     networkId?: string;
     address?: string;
@@ -69,7 +71,7 @@ export default function Address() {
 
     const mainnetRpcUrls = rpcUrls[1];
     if (!mainnetRpcUrls || mainnetRpcUrls.length === 0) {
-      setEnsError("No Ethereum mainnet RPC configured for ENS resolution");
+      setEnsError(t("noRPCForEnsResolution"));
       setEnsResolving(false);
       return;
     }
@@ -84,16 +86,18 @@ export default function Address() {
         if (resolved) {
           setResolvedAddress(resolved);
         } else {
-          setEnsError(`Could not resolve ENS name: ${addressParam}`);
+          setEnsError(`${t("notResolveENS")}: ${addressParam}`);
         }
       })
       .catch((err) => {
-        setEnsError(`Error resolving ENS: ${err instanceof Error ? err.message : "Unknown error"}`);
+        setEnsError(
+          `${t("errorResolvingENS")}: ${err instanceof Error ? err.message : t("unknownError")}`,
+        );
       })
       .finally(() => {
         setEnsResolving(false);
       });
-  }, [isEnsName, addressParam, rpcUrls]);
+  }, [isEnsName, addressParam, rpcUrls, t]);
 
   // Use ENS hook to get reverse lookup and records
   const {
@@ -154,11 +158,11 @@ export default function Address() {
         }
       })
       .catch((err) => {
-        setError(err.message || "Failed to fetch address data");
+        setError(err.message || t("failedToFetchAddressData"));
         setTypeLoading(false);
       })
       .finally(() => setLoading(false));
-  }, [address, dataService, numericNetworkId, rpcUrls]);
+  }, [address, dataService, numericNetworkId, rpcUrls, t]);
 
   // Show ENS resolving state (must come first before other checks)
   if (isEnsName && (ensResolving || (!resolvedAddress && !ensError))) {
@@ -166,7 +170,7 @@ export default function Address() {
       <div className="container-wide">
         <div className="block-display-card">
           <div className="card-content-loading">
-            <Loader text={`Resolving ENS name: ${addressParam}...`} />
+            <Loader text={t("resolvingEns", { name: addressParam })} />
           </div>
         </div>
       </div>
@@ -180,7 +184,7 @@ export default function Address() {
         <div className="block-display-card">
           <div className="card-content">
             <p className="text-error margin-0">
-              Could not resolve ENS name "{addressParam}": {ensError}
+              {t("notResolveENS")} "{addressParam}": {ensError}
             </p>
           </div>
         </div>
@@ -193,7 +197,7 @@ export default function Address() {
       <div className="container-wide">
         <div className="block-display-card">
           <div className="card-content-loading">
-            <Loader text={loading ? "Loading address data..." : "Detecting address type..."} />
+            <Loader text={loading ? t("loadingAddressData") : t("detectingAddressType")} />
           </div>
         </div>
       </div>
@@ -217,7 +221,7 @@ export default function Address() {
       <div className="container-wide">
         <div className="block-display-card">
           <div className="card-content">
-            <p className="text-muted margin-0">No address provided</p>
+            <p className="text-muted margin-0">{t("noAddressProvided")}</p>
           </div>
         </div>
       </div>
@@ -227,7 +231,7 @@ export default function Address() {
   if (!addressData) {
     return (
       <div className="container-wide">
-        <p>Address data not found</p>
+        <p>{t("addressDataNotFound")}</p>
       </div>
     );
   }

@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import type { NetworkConfig } from "../../../config/networks";
 import { useNetworks } from "../../../context/AppContext";
@@ -13,6 +14,7 @@ interface NetworkCardProps {
 
 const NetworkCard: React.FC<NetworkCardProps> = ({ network }) => {
   const chainId = getChainIdFromNetwork(network);
+  const { t } = useTranslation("home");
   return (
     <Link
       to={`/${chainId ?? network.slug}`}
@@ -32,7 +34,9 @@ const NetworkCard: React.FC<NetworkCardProps> = ({ network }) => {
               )}
             </div>
             {chainId !== undefined && (
-              <div className="network-card-chain-id">Chain ID: {chainId}</div>
+              <div className="network-card-chain-id">
+                {t("chainID")}: {chainId}
+              </div>
             )}
           </div>
         </div>
@@ -42,6 +46,7 @@ const NetworkCard: React.FC<NetworkCardProps> = ({ network }) => {
 };
 
 export default function Home() {
+  const { t } = useTranslation("home");
   const { enabledNetworks, isLoading } = useNetworks();
   const [showTestnets, setShowTestnets] = useState(false);
 
@@ -66,13 +71,13 @@ export default function Home() {
   return (
     <div className="home-container">
       <div className="home-content page-card">
-        <h1 className="home-title">OPENSCAN</h1>
+        <h1 className="home-title">{t("title")}</h1>
 
         <HomeSearchBar networks={enabledNetworks} />
 
         <div className="network-grid">
           {isLoading && productionNetworks.length === 0 ? (
-            <p className="loading-text">Loading networks...</p>
+            <p className="loading-text">{t("loading")}</p>
           ) : (
             productionNetworks.map((network) => (
               <NetworkCard key={network.networkId} network={network} />
@@ -95,7 +100,7 @@ export default function Home() {
                 className="testnet-toggle-btn"
                 onClick={() => setShowTestnets(!showTestnets)}
               >
-                {showTestnets ? "Hide testnets" : "Show testnets"}
+                {showTestnets ? t("hideTestnets") : t("showTestnets")}
               </button>
             </div>
           </>

@@ -1,5 +1,6 @@
 import type React from "react";
 import type { ENSReverseResult } from "../../../../../types";
+import { useTranslation } from "react-i18next";
 import TokenHoldings from "./TokenHoldings";
 
 interface AccountMoreInfoCardProps {
@@ -17,11 +18,12 @@ const AccountMoreInfoCard: React.FC<AccountMoreInfoCardProps> = ({
   networkId,
   isMainnet = true,
 }) => {
+  const { t } = useTranslation("address");
   const displayName = ensName || reverseResult?.ensName;
 
   return (
     <div className="account-card">
-      <div className="account-card-title">More Info</div>
+      <div className="account-card-title">{t("moreInfo")}</div>
 
       {/* ENS Name Row */}
       {isMainnet && (

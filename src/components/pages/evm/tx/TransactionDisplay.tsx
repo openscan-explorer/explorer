@@ -1,4 +1,5 @@
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import LongString from "../../../../components/common/LongString";
 import { RPCIndicator } from "../../../../components/common/RPCIndicator";
@@ -45,6 +46,7 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
     selectedProvider,
     onProviderSelect,
   }) => {
+    const { t } = useTranslation("transaction");
     const [_showRawData, _setShowRawData] = useState(false);
     const [_showLogs, _setShowLogs] = useState(false);
     const [showTrace, setShowTrace] = useState(false);
@@ -250,17 +252,20 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
       [timestampMs, formatTimeAgo],
     );
 
-    const getStatusBadge = useCallback((status?: string) => {
-      if (!status) return null;
-      const isSuccess = status === "0x1" || status === "1";
-      return (
-        <span
-          className={`status-badge ${isSuccess ? "status-badge-success" : "status-badge-failed"}`}
-        >
-          {isSuccess ? "Success" : "Failed"}
-        </span>
-      );
-    }, []);
+    const getStatusBadge = useCallback(
+      (status?: string) => {
+        if (!status) return null;
+        const isSuccess = status === "0x1" || status === "1";
+        return (
+          <span
+            className={`status-badge ${isSuccess ? "status-badge-success" : "status-badge-failed"}`}
+          >
+            {isSuccess ? t("success") : t("failed")}
+          </span>
+        );
+      },
+      [t],
+    );
 
     const confirmations = useMemo(
       () => (currentBlockNumber ? currentBlockNumber - Number(transaction.blockNumber) : null),
@@ -270,7 +275,7 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
     return (
       <div className="block-display-card">
         <div className="block-display-header flex justify-between items-center">
-          <span className="block-label">Transaction Details</span>
+          <span className="block-label">{t("transactionDetails")}</span>
           {metadata && selectedProvider !== undefined && onProviderSelect && (
             <RPCIndicator
               metadata={metadata}
@@ -284,7 +289,7 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
         <div className="tx-details">
           {/* Transaction Hash */}
           <div className="tx-row">
-            <span className="tx-label">Transaction Hash:</span>
+            <span className="tx-label">{t("transactionHash")}</span>
             <span className="tx-value tx-mono">
               <LongString value={transaction.hash} start={20} end={16} />
             </span>
@@ -292,13 +297,13 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
 
           {/* Status */}
           <div className="tx-row">
-            <span className="tx-label">Status:</span>
+            <span className="tx-label">{t("status")}</span>
             <span className="tx-value">{getStatusBadge(transaction.receipt?.status)}</span>
           </div>
 
           {/* Block */}
           <div className="tx-row">
-            <span className="tx-label">Block:</span>
+            <span className="tx-label">{t("block")}</span>
             <span className="tx-value">
               {networkId ? (
                 <Link to={`/${networkId}/block/${transaction.blockNumber}`} className="link-accent">
@@ -309,8 +314,8 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
               )}
               {confirmations !== null && (
                 <span className="tx-confirmations">
-                  {confirmations > 100 ? "+100" : confirmations.toLocaleString()} Block
-                  Confirmations
+                  {confirmations > 100 ? "+100" : confirmations.toLocaleString()}{" "}
+                  {t("blockConfirmations")}
                 </span>
               )}
             </span>
@@ -319,7 +324,7 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
           {/* Timestamp */}
           {formattedTimestamp && (
             <div className="tx-row">
-              <span className="tx-label">Timestamp:</span>
+              <span className="tx-label">{t("timestamp")}</span>
               <span className="tx-value">
                 {timestampAge && <span className="tx-age">{timestampAge}</span>}
                 <span className="tx-timestamp-full">({formattedTimestamp})</span>
@@ -329,7 +334,7 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
 
           {/* From */}
           <div className="tx-row">
-            <span className="tx-label">From:</span>
+            <span className="tx-label">{t("from")}</span>
             <span className="tx-value tx-mono">
               {networkId ? (
                 <Link to={`/${networkId}/address/${transaction.from}`} className="link-accent">
@@ -343,7 +348,7 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
 
           {/* To */}
           <div className="tx-row">
-            <span className="tx-label">{transaction.to ? "To:" : "Interacted With:"}</span>
+            <span className="tx-label">{transaction.to ? t("to") : t("interactedWith")}</span>
             <span className="tx-value tx-mono">
               {transaction.to ? (
                 networkId ? (
@@ -354,7 +359,7 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
                   transaction.to
                 )
               ) : (
-                <span className="contract-creation-badge">Contract Creation</span>
+                <span className="contract-creation-badge">{t("contractCreation")}</span>
               )}
             </span>
           </div>
@@ -362,7 +367,7 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
           {/* Contract Address (if created) */}
           {transaction.receipt?.contractAddress && (
             <div className="tx-row">
-              <span className="tx-label">Contract Created:</span>
+              <span className="tx-label">{t("contractCreated")}</span>
               <span className="tx-value tx-mono">
                 {networkId ? (
                   <Link
@@ -380,13 +385,13 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
 
           {/* Value */}
           <div className="tx-row">
-            <span className="tx-label">Value:</span>
+            <span className="tx-label">{t("value")}</span>
             <span className="tx-value tx-value-highlight">{formatValue(transaction.value)}</span>
           </div>
 
           {/* Transaction Fee */}
           <div className="tx-row">
-            <span className="tx-label">Transaction Fee:</span>
+            <span className="tx-label">{t("transactionFee")}</span>
             <span className="tx-value">
               {transaction.receipt
                 ? formatValue(
@@ -395,19 +400,19 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
                       BigInt(transaction.receipt.effectiveGasPrice)
                     ).toString(),
                   )
-                : "Pending"}
+                : t("pending")}
             </span>
           </div>
 
           {/* Gas Price */}
           <div className="tx-row">
-            <span className="tx-label">Gas Price:</span>
+            <span className="tx-label">{t("gasPrice")}</span>
             <span className="tx-value">{formatGwei(transaction.gasPrice)}</span>
           </div>
 
           {/* Gas Limit & Usage */}
           <div className="tx-row">
-            <span className="tx-label">Gas Limit & Usage:</span>
+            <span className="tx-label">{t("gasLimitUsage")}</span>
             <span className="tx-value">
               {Number(transaction.gas).toLocaleString()}
               {transaction.receipt && (
@@ -431,7 +436,7 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
           {transaction.receipt &&
             transaction.receipt.effectiveGasPrice !== transaction.gasPrice && (
               <div className="tx-row">
-                <span className="tx-label">Effective Gas Price:</span>
+                <span className="tx-label">{t("effectiveGasPrice")}</span>
                 <span className="tx-value">
                   {formatGwei(transaction.receipt.effectiveGasPrice)}
                 </span>
@@ -444,13 +449,13 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
             isArbitrumReceipt(transaction.receipt) && (
               <>
                 <div className="tx-row tx-row-arbitrum">
-                  <span className="tx-label">L1 Block Number:</span>
+                  <span className="tx-label">{t("l1BlockNumber")}</span>
                   <span className="tx-value">
                     {Number(transaction.receipt.l1BlockNumber).toLocaleString()}
                   </span>
                 </div>
                 <div className="tx-row tx-row-arbitrum">
-                  <span className="tx-label">Gas Used for L1:</span>
+                  <span className="tx-label">{t("gasUsedForL1")}</span>
                   <span className="tx-value">
                     {Number(transaction.receipt.gasUsedForL1).toLocaleString()}
                   </span>
@@ -462,21 +467,21 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
           {transaction.receipt && isOptimismReceipt(transaction.receipt) && (
             <>
               <div className={`tx-row ${networkId === "8453" ? "tx-row-base" : "tx-row-optimism"}`}>
-                <span className="tx-label">L1 Fee:</span>
+                <span className="tx-label">{t("l1Fee")}</span>
                 <span className="tx-value">{formatValue(transaction.receipt.l1Fee)}</span>
               </div>
               <div className={`tx-row ${networkId === "8453" ? "tx-row-base" : "tx-row-optimism"}`}>
-                <span className="tx-label">L1 Gas Price:</span>
+                <span className="tx-label">{t("l1GasPrice")}</span>
                 <span className="tx-value">{formatGwei(transaction.receipt.l1GasPrice)}</span>
               </div>
               <div className={`tx-row ${networkId === "8453" ? "tx-row-base" : "tx-row-optimism"}`}>
-                <span className="tx-label">L1 Gas Used:</span>
+                <span className="tx-label">{t("l1GasUsed")}</span>
                 <span className="tx-value">
                   {Number(transaction.receipt.l1GasUsed).toLocaleString()}
                 </span>
               </div>
               <div className={`tx-row ${networkId === "8453" ? "tx-row-base" : "tx-row-optimism"}`}>
-                <span className="tx-label">L1 Fee Scalar:</span>
+                <span className="tx-label">{t("l1FeeScalar")}</span>
                 <span className="tx-value">{transaction.receipt.l1FeeScalar}</span>
               </div>
             </>
@@ -484,17 +489,23 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
 
           {/* Other Attributes (Nonce, Index, Type) */}
           <div className="tx-row">
-            <span className="tx-label">Other Attributes:</span>
+            <span className="tx-label">{t("otherAttributes")}</span>
             <span className="tx-value tx-attrs">
-              <span className="tx-attr">Nonce: {transaction.nonce}</span>
-              <span className="tx-attr">Position: {transaction.transactionIndex}</span>
-              <span className="tx-attr">Type: {transaction.type}</span>
+              <span className="tx-attr">
+                {t("nonce")} {transaction.nonce}
+              </span>
+              <span className="tx-attr">
+                {t("position")} {transaction.transactionIndex}
+              </span>
+              <span className="tx-attr">
+                {t("type")} {transaction.type}
+              </span>
             </span>
           </div>
 
           {/* Input Data */}
           <div className="tx-row tx-row-vertical">
-            <span className="tx-label">Input Data:</span>
+            <span className="tx-label">{t("inputData")}</span>
             {transaction.data && transaction.data !== "0x" ? (
               <div className="tx-input-data">
                 <code>{transaction.data}</code>
@@ -507,7 +518,7 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
           {/* Decoded Input Data */}
           {decodedInput && (
             <div className="tx-row tx-row-vertical">
-              <span className="tx-label">Decoded Input:</span>
+              <span className="tx-label">{t("decodedInput")}</span>
               <div className="tx-decoded-input">
                 <div className="tx-decoded-function">
                   <span className="tx-function-badge">{decodedInput.functionName}</span>
@@ -548,7 +559,7 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
           <div className="tx-section">
             <div className="tx-section-header">
               <span className="tx-section-title">
-                Event Logs ({transaction.receipt.logs.length})
+                {t("eventLogs")} ({transaction.receipt.logs.length})
               </span>
             </div>
             <div className="tx-logs">
@@ -606,7 +617,7 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
                           </span>
                           {abiDecoded && (
                             <span className="tx-abi-badge" title="Decoded using contract ABI">
-                              ABI
+                              {t("logsAbi")}
                             </span>
                           )}
                         </div>
@@ -614,7 +625,7 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
 
                       {/* Address */}
                       <div className="tx-log-row">
-                        <span className="tx-log-label">Address</span>
+                        <span className="tx-log-label">{t("logsAddress")}</span>
                         <span className="tx-log-value tx-mono">
                           {networkId ? (
                             <Link
@@ -632,7 +643,7 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
                       {/* Decoded Parameters */}
                       {displayParams.length > 0 && (
                         <div className="tx-log-row tx-log-params">
-                          <span className="tx-log-label">Decoded</span>
+                          <span className="tx-log-label">{t("logsDecoded")}</span>
                           <div className="tx-log-value">
                             {displayParams.map((param, i) => (
                               // biome-ignore lint/suspicious/noArrayIndexKey: <TODO>
@@ -653,7 +664,9 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
                                     formatDecodedValue(param.value, param.type)
                                   )}
                                 </span>
-                                {param.indexed && <span className="tx-param-indexed">indexed</span>}
+                                {param.indexed && (
+                                  <span className="tx-param-indexed">{t("logsIndexed")}</span>
+                                )}
                               </div>
                             ))}
                           </div>
@@ -664,7 +677,7 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
                       {log.topics && log.topics.length > 0 && (
                         <div className="tx-log-row tx-log-topics">
                           <span className="tx-log-label">
-                            {hasDecoded ? "Raw Topics" : "Topics"}
+                            {hasDecoded ? t("logsRawTopics") : t("logsTopics")}
                           </span>
                           <div className="tx-log-value">
                             {log.topics.map((topic: string, i: number) => (
@@ -680,7 +693,9 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
                       {/* Raw Data */}
                       {log.data && log.data !== "0x" && (
                         <div className="tx-log-row">
-                          <span className="tx-log-label">{hasDecoded ? "Raw Data" : "Data"}</span>
+                          <span className="tx-log-label">
+                            {hasDecoded ? t("logsRawData") : t("logsData")}
+                          </span>
                           <div className="tx-log-value">
                             <code className="tx-log-data">{log.data}</code>
                           </div>
@@ -699,47 +714,47 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
           <div className="collapsible-container">
             {/** biome-ignore lint/a11y/useButtonType: <TODO> */}
             <button className="collapsible-button-purple" onClick={() => setShowTrace(!showTrace)}>
-              {showTrace ? "Hide" : "Show"} Debug Trace
+              {showTrace ? t("hideDebugTrace") : t("showDebugTrace")}
             </button>
 
             {showTrace && (
               <div className="collapsible-content">
-                {loadingTrace && <div className="trace-loading">Loading trace data...</div>}
+                {loadingTrace && <div className="trace-loading">{t("loadingTrace")}</div>}
 
                 {/* Call Trace */}
                 {callTrace && (
                   <div className="trace-container">
-                    <div className="trace-title">Call Trace</div>
+                    <div className="trace-title">{t("callTrace")}</div>
                     <div className="trace-details">
                       <div>
-                        <span className="log-label">Type:</span> {callTrace.type}
+                        <span className="log-label">{t("traceType")}</span> {callTrace.type}
                       </div>
                       <div>
-                        <span className="log-label">From:</span>{" "}
+                        <span className="log-label">{t("traceFrom")}</span>{" "}
                         <LongString value={callTrace.from} start={10} end={8} />
                       </div>
                       <div>
-                        <span className="log-label">To:</span>{" "}
+                        <span className="log-label">{t("traceTo")}</span>{" "}
                         <LongString value={callTrace.to} start={10} end={8} />
                       </div>
                       <div>
-                        <span className="log-label">Value:</span> {callTrace.value}
+                        <span className="log-label">{t("traceValue")}</span> {callTrace.value}
                       </div>
                       <div>
-                        <span className="log-label">Gas:</span> {callTrace.gas}
+                        <span className="log-label">{t("traceGas")}</span> {callTrace.gas}
                       </div>
                       <div>
-                        <span className="log-label">Gas Used:</span> {callTrace.gasUsed}
+                        <span className="log-label">{t("traceGasUsed")}</span> {callTrace.gasUsed}
                       </div>
                       {callTrace.error && (
                         <div className="trace-error">
-                          <span className="log-label">Error:</span> {callTrace.error}
+                          <span className="log-label">{t("traceError")}</span> {callTrace.error}
                         </div>
                       )}
                       {callTrace.calls && callTrace.calls.length > 0 && (
                         <div className="margin-top-10">
                           <div className="trace-calls-header">
-                            Internal Calls ({callTrace.calls.length}):
+                            {t("internalCalls")} ({callTrace.calls.length}):
                           </div>
                           <div className="trace-calls-container">
                             {JSON.stringify(callTrace.calls, null, 2)}
@@ -753,38 +768,42 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
                 {/* Opcode Trace */}
                 {traceData && (
                   <div className="trace-container">
-                    <div className="trace-title">Execution Trace</div>
+                    <div className="trace-title">{t("executionTrace")}</div>
                     <div className="trace-details margin-bottom-15">
                       <div>
-                        <span className="log-label">Total Gas Used:</span> {traceData.gas}
+                        <span className="log-label">{t("opcodeTrace.totalGasUsed")}:</span>{" "}
+                        {traceData.gas}
                       </div>
                       <div>
-                        <span className="log-label">Failed:</span> {traceData.failed ? "Yes" : "No"}
+                        <span className="log-label">{t("opcodeTrace.failed")}:</span>{" "}
+                        {traceData.failed ? t("opcodeTrace.yes") : t("opcodeTrace.no")}
                       </div>
                       <div>
-                        <span className="log-label">Return Value:</span>{" "}
+                        <span className="log-label">{t("opcodeTrace.returnValue")}:</span>{" "}
                         <LongString value={traceData.returnValue || "0x"} start={20} end={20} />
                       </div>
                       <div>
-                        <span className="log-label">Opcodes Executed:</span>{" "}
+                        <span className="log-label">{t("opcodeTrace.executed")}</span>{" "}
                         {traceData.structLogs.length}
                       </div>
                     </div>
 
-                    <div className="trace-opcode-header">Opcode Execution Log:</div>
+                    <div className="trace-opcode-header">{t("opcodeTrace.executionLog")}</div>
                     <div className="trace-opcode-container">
                       {traceData.structLogs.slice(0, 100).map((log, index) => (
                         // biome-ignore lint/suspicious/noArrayIndexKey: <TODO>
                         <div key={index} className="trace-opcode-step">
                           <div className="trace-opcode-name">
-                            Step {index}: {log.op}
+                            {t("opcodeTrace.step")} {index}: {log.op}
                           </div>
                           <div className="trace-opcode-info">
-                            PC: {log.pc} | Gas: {log.gas} | Cost: {log.gasCost} | Depth: {log.depth}
+                            {t("opcodeTrace.PC")}: {log.pc} | {t("opcodeTrace.gas")}: {log.gas} |{" "}
+                            {t("opcodeTrace.cost")}: {log.gasCost} | {t("opcodeTrace.depth")}:{" "}
+                            {log.depth}
                           </div>
                           {log.stack && log.stack.length > 0 && (
                             <div className="trace-opcode-stack">
-                              Stack: [{log.stack.slice(0, 3).join(", ")}
+                              {t("opcodeTrace.stack")}: [{log.stack.slice(0, 3).join(", ")}
                               {log.stack.length > 3 ? "..." : ""}]
                             </div>
                           )}
@@ -792,7 +811,7 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
                       ))}
                       {traceData.structLogs.length > 100 && (
                         <div className="trace-more-text">
-                          ... showing first 100 of {traceData.structLogs.length} steps
+                          {t("opcodeTrace.showingFirst100", { total: traceData.structLogs.length })}
                         </div>
                       )}
                     </div>

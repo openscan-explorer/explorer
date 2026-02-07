@@ -1,6 +1,7 @@
 import type React from "react";
 import { useMemo } from "react";
 import type { Address } from "../../../../../types";
+import { useTranslation } from "react-i18next";
 import TokenHoldings from "./TokenHoldings";
 
 interface BalanceSectionProps {
@@ -16,6 +17,8 @@ const BalanceSection: React.FC<BalanceSectionProps> = ({
   networkId,
   currency = "ETH",
 }) => {
+  const { t } = useTranslation("address");
+
   const formattedBalance = useMemo(() => {
     try {
       const eth = Number(address.balance) / 1e18;
@@ -29,19 +32,21 @@ const BalanceSection: React.FC<BalanceSectionProps> = ({
     <>
       <div className="tx-details">
         <div className="tx-section">
-          <span className="tx-section-title">Balance</span>
+          <span className="tx-section-title">{t("balance")}</span>
         </div>
 
         <div className="tx-row">
-          <span className="tx-label">Balance:</span>
+          <span className="tx-label">{t("balance")}:</span>
           <span className="tx-value">
             <span className="tx-value-highlight">{formattedBalance}</span>
           </span>
         </div>
 
         <div className="tx-row">
-          <span className="tx-label">Nonce (Transactions Sent):</span>
-          <span className="tx-value">{Number(address.txCount).toLocaleString()} txns</span>
+          <span className="tx-label">{t("nonce")}:</span>
+          <span className="tx-value">
+            {Number(address.txCount).toLocaleString()} {t("txns")}
+          </span>
         </div>
       </div>
 

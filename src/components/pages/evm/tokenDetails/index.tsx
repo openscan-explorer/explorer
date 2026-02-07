@@ -3,6 +3,7 @@ import { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { AppContext } from "../../../../context";
 import Loader from "../../../common/Loader";
+import { useTranslation } from "react-i18next";
 import ERC721TokenDetails from "./ERC721TokenDisplay";
 import ERC1155TokenDetails from "./ERC1155TokenDisplay";
 
@@ -79,6 +80,8 @@ const NFTTokenDetails: React.FC = () => {
   const [nftType, setNftType] = useState<NFTType | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const { t } = useTranslation("tokenDetails");
+
   const numericNetworkId = Number(networkId) || 1;
 
   // Get RPC URL
@@ -122,7 +125,7 @@ const NFTTokenDetails: React.FC = () => {
             <span className="block-label">NFT Token</span>
           </div>
           <div className="card-content-loading">
-            <Loader text="Detecting token type..." />
+            <Loader text={t("detectingTokenType")} />
           </div>
         </div>
       </div>

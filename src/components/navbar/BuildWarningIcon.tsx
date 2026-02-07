@@ -1,13 +1,12 @@
 import type React from "react";
 import { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { ENVIRONMENT } from "../../utils/constants";
 
 interface BuildWarningIconProps {
   readonly className?: string;
 }
 
-// Constants outside component to avoid recreating
-const TOOLTIP_TEXT = "This is not a production verified build";
 const ICON_COLORS = {
   development: "#ef4444",
   staging: "#f59e0b",
@@ -15,6 +14,7 @@ const ICON_COLORS = {
 } as const;
 
 const BuildWarningIcon: React.FC<BuildWarningIconProps> = ({ className = "" }) => {
+  const { t } = useTranslation();
   const [showTooltip, setShowTooltip] = useState(false);
 
   // Memoize color calculation
@@ -49,7 +49,9 @@ const BuildWarningIcon: React.FC<BuildWarningIconProps> = ({ className = "" }) =
           strokeLinejoin="round"
         />
       </svg>
-      {showTooltip && <div className="build-warning-tooltip">{TOOLTIP_TEXT}</div>}
+      {showTooltip && (
+        <div className="build-warning-tooltip">{t("buildWarning.notProductionBuild")}</div>
+      )}
     </div>
   );
 };

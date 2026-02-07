@@ -1,0 +1,11 @@
+{
+  "title": "OPENSCAN",
+  "loading": "Loading networks...",
+  "networkId": "Network ID: {{networkId}}",
+  "showTestnets": "Show testnets",
+  "hideTestnets": "Hide testnets",
+  "invalidSearchTerm": "Invalid search. Enter an address (0x...), transaction hash, block number, or ENS name.",
+  "searchBy": "Search by Address / Tx Hash / Block / ENS Name",
+  "search": "Search",
+  "chainID": "Chain ID"
+}

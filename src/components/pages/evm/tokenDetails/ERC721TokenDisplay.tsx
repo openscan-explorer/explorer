@@ -12,6 +12,7 @@ import {
   getImageUrl,
 } from "../../../../utils/erc721Metadata";
 import Loader from "../../../common/Loader";
+import { useTranslation } from "react-i18next";
 
 const ERC721TokenDisplay: React.FC = () => {
   const {
@@ -33,6 +34,7 @@ const ERC721TokenDisplay: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [tokenUri, setTokenUri] = useState<string | null>(null);
 
+  const { t } = useTranslation("tokenDetails");
   const numericNetworkId = Number(networkId) || 1;
 
   // Get RPC URL
@@ -44,7 +46,7 @@ const ERC721TokenDisplay: React.FC = () => {
   useEffect(() => {
     if (!contractAddress || !tokenId || !rpcUrl) {
       setLoading(false);
-      setError("Missing contract address, token ID, or RPC URL");
+      setError(t("missingValues"));
       return;
     }
 
@@ -68,15 +70,15 @@ const ERC721TokenDisplay: React.FC = () => {
 
         // Only show error if we couldn't get metadata AND owner
         if (!metadataResult.metadata && !ownerResult) {
-          setError("Token may not exist or failed to fetch data");
+          setError(t("tokenFetchFail"));
         }
       })
       .catch((err) => {
         console.error("Error fetching token data:", err);
-        setError(err.message || "Failed to fetch token data");
+        setError(err.message || t("tokenDataFetchFail")); // "Failed to fetch token data"
       })
       .finally(() => setLoading(false));
-  }, [contractAddress, tokenId, rpcUrl]);
+  }, [contractAddress, tokenId, rpcUrl, t]);
 
   if (loading) {
     return (
@@ -84,7 +86,7 @@ const ERC721TokenDisplay: React.FC = () => {
         <div className="block-display-card">
           <div className="block-display-header">
             <span className="block-label">ERC-721 NFT</span>
-            <span className="tx-mono header-subtitle">Token ID: {tokenId}</span>
+            <span className="tx-mono header-subtitle">: {tokenId}</span>
           </div>
           <div className="card-content-loading">
             <Loader text="Loading NFT metadata..." />
@@ -100,10 +102,14 @@ const ERC721TokenDisplay: React.FC = () => {
         <div className="block-display-card">
           <div className="block-display-header">
             <span className="block-label">ERC-721 NFT</span>
-            <span className="tx-mono header-subtitle">Token ID: {tokenId}</span>
+            <span className="tx-mono header-subtitle">
+              {t("tokenID")}: {tokenId}
+            </span>
           </div>
           <div className="card-content">
-            <p className="text-error margin-0">Error: {error}</p>
+            <p className="text-error margin-0">
+              {t("errors.error")}: {error}
+            </p>
           </div>
         </div>
       </div>
@@ -137,7 +143,9 @@ const ERC721TokenDisplay: React.FC = () => {
                   )}
                 </Link>
               )}
-              <span className="tx-mono header-subtitle">Token ID: {tokenId}</span>
+              <span className="tx-mono header-subtitle">
+                {t("tokenID")}: {tokenId}
+              </span>
             </div>
           </div>
         </div>
@@ -160,13 +168,13 @@ const ERC721TokenDisplay: React.FC = () => {
 
             <div className="tx-details">
               <div className="tx-section">
-                <span className="tx-section-title">NFT Details</span>
+                <span className="tx-section-title">{t("NFTDetails")}</span>
               </div>
 
               {/* Collection */}
               {collectionName && (
                 <div className="tx-row">
-                  <span className="tx-label">Collection:</span>
+                  <span className="tx-label">{t("NFTCollection")}</span>
                   <span className="tx-value">
                     <Link to={`/${networkId}/address/${contractAddress}`} className="address-link">
                       {collectionName}
@@ -178,7 +186,7 @@ const ERC721TokenDisplay: React.FC = () => {
 
               {/* Contract Address */}
               <div className="tx-row">
-                <span className="tx-label">Contract:</span>
+                <span className="tx-label">{t("contract")}</span>
                 <span className="tx-value">
                   <Link to={`/${networkId}/address/${contractAddress}`} className="address-link">
                     {contractAddress}
@@ -188,13 +196,13 @@ const ERC721TokenDisplay: React.FC = () => {
 
               {/* Token ID */}
               <div className="tx-row">
-                <span className="tx-label">Token ID:</span>
+                <span className="tx-label">{t("tokenID")}:</span>
                 <span className="tx-value tx-mono">{tokenId}</span>
               </div>
 
               {/* Token Standard */}
               <div className="tx-row">
-                <span className="tx-label">Token Standard:</span>
+                <span className="tx-label">{t("tokenStandard")}:</span>
                 <span className="tx-value">
                   <span className="token-standard-badge token-standard-erc721">ERC-721</span>
                 </span>
@@ -203,7 +211,7 @@ const ERC721TokenDisplay: React.FC = () => {
               {/* Total Supply */}
               {collectionInfo?.totalSupply && (
                 <div className="tx-row">
-                  <span className="tx-label">Collection Size:</span>
+                  <span className="tx-label">{t("size")}</span>
                   <span className="tx-value">
                     {Number(collectionInfo.totalSupply).toLocaleString()} NFTs
                   </span>
@@ -213,7 +221,7 @@ const ERC721TokenDisplay: React.FC = () => {
               {/* Owner */}
               {owner && (
                 <div className="tx-row">
-                  <span className="tx-label">Owner:</span>
+                  <span className="tx-label">{t("owner")}</span>
                   <span className="tx-value">
                     <Link to={`/${networkId}/address/${owner}`} className="address-link">
                       {owner}
@@ -225,7 +233,7 @@ const ERC721TokenDisplay: React.FC = () => {
               {/* Approved Address */}
               {approval && (
                 <div className="tx-row">
-                  <span className="tx-label">Approved:</span>
+                  <span className="tx-label">{t("approved")}:</span>
                   <span className="tx-value">
                     <Link to={`/${networkId}/address/${approval}`} className="address-link">
                       {approval}
@@ -240,7 +248,7 @@ const ERC721TokenDisplay: React.FC = () => {
           {metadata?.description && (
             <div className="tx-details">
               <div className="tx-section">
-                <span className="tx-section-title">Description</span>
+                <span className="tx-section-title">{t("description")}</span>
               </div>
               <div className="nft-description">{metadata.description}</div>
             </div>
@@ -250,7 +258,7 @@ const ERC721TokenDisplay: React.FC = () => {
           {metadata?.attributes && metadata.attributes.length > 0 && (
             <div className="tx-details">
               <div className="tx-section">
-                <span className="tx-section-title">Properties</span>
+                <span className="tx-section-title">{t("properties")}</span>
                 <span className="tx-section-count">{metadata.attributes.length}</span>
               </div>
               <div className="erc721-attributes-grid">
@@ -268,7 +276,7 @@ const ERC721TokenDisplay: React.FC = () => {
           {(metadata?.external_url || metadata?.animation_url) && (
             <div className="tx-details">
               <div className="tx-section">
-                <span className="tx-section-title">Links</span>
+                <span className="tx-section-title">{t("links")}</span>
               </div>
               <div className="nft-links">
                 {metadata?.external_url && (
@@ -278,7 +286,7 @@ const ERC721TokenDisplay: React.FC = () => {
                     rel="noopener noreferrer"
                     className="nft-link-button"
                   >
-                    External URL ↗
+                    {t("externalURL")} ↗
                   </a>
                 )}
                 {metadata?.animation_url && (
@@ -292,7 +300,7 @@ const ERC721TokenDisplay: React.FC = () => {
                     rel="noopener noreferrer"
                     className="nft-link-button"
                   >
-                    View Animation ↗
+                    {t("viewAnimation")} ↗
                   </a>
                 )}
               </div>
@@ -303,7 +311,7 @@ const ERC721TokenDisplay: React.FC = () => {
           {tokenUri && (
             <div className="tx-details">
               <div className="tx-section">
-                <span className="tx-section-title">Token URI</span>
+                <span className="tx-section-title">T{t("tokenURI")}</span>
               </div>
               <div className="nft-token-uri">
                 <code className="nft-token-uri-code">{tokenUri}</code>
@@ -318,7 +326,7 @@ const ERC721TokenDisplay: React.FC = () => {
                     rel="noopener noreferrer"
                     className="nft-link-button nft-token-uri-link"
                   >
-                    Open URI ↗
+                    {t("openURI")} ↗
                   </a>
                 )}
               </div>
@@ -341,7 +349,7 @@ const ERC721TokenDisplay: React.FC = () => {
                   }
                 }}
               >
-                <span className="tx-section-title">Raw Metadata</span>
+                <span className="tx-section-title">{t("rawMetadata")}</span>
                 <span id="raw-metadata-icon" className="contract-section-toggle">
                   ▶
                 </span>

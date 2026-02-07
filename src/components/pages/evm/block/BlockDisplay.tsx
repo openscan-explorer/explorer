@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import type { Block, BlockArbitrum, RPCMetadata } from "../../../../types";
 import ExtraDataDisplay from "../../../common/ExtraDataDisplay";
@@ -14,6 +15,7 @@ interface BlockDisplayProps {
 
 const BlockDisplay: React.FC<BlockDisplayProps> = React.memo(
   ({ block, networkId, metadata, selectedProvider, onProviderSelect }) => {
+    const { t } = useTranslation("block");
     const [showWithdrawals, setShowWithdrawals] = useState(false);
     const [showTransactions, setShowTransactions] = useState(false);
     const [showMoreDetails, setShowMoreDetails] = useState(false);
@@ -48,28 +50,31 @@ const BlockDisplay: React.FC<BlockDisplayProps> = React.memo(
       const diffSeconds = Math.floor(Math.abs(diffMs) / 1000);
 
       if (diffSeconds < 5) {
-        return diffMs >= 0 ? "just now" : "in a few seconds";
+        return diffMs >= 0 ? t("time.justNow") : t("time.inFewSeconds");
       }
 
       const units = [
-        { label: "day", seconds: 60 * 60 * 24 },
-        { label: "hour", seconds: 60 * 60 },
-        { label: "minute", seconds: 60 },
-      ];
+        { key: "day", seconds: 60 * 60 * 24 },
+        { key: "hour", seconds: 60 * 60 },
+        { key: "minute", seconds: 60 },
+      ] as const;
 
       for (const unit of units) {
         if (diffSeconds >= unit.seconds) {
           const value = Math.floor(diffSeconds / unit.seconds);
-          const plural = value === 1 ? "" : "s";
+          const unitLabel = t(`time.${unit.key}`, { count: value });
+
           return diffMs >= 0
-            ? `${value} ${unit.label}${plural} ago`
-            : `in ${value} ${unit.label}${plural}`;
+            ? t("time.ago", { count: value, unit: unitLabel })
+            : t("time.in", { count: value, unit: unitLabel });
         }
       }
 
+      const unitLabel = t("time.second", { count: diffSeconds });
+
       return diffMs >= 0
-        ? `${diffSeconds} second${diffSeconds === 1 ? "" : "s"} ago`
-        : `in ${diffSeconds} second${diffSeconds === 1 ? "" : "s"}`;
+        ? t("time.ago", { count: diffSeconds, unit: unitLabel })
+        : t("time.in", { count: diffSeconds, unit: unitLabel });
     };
 
     const formatGwei = (value: string) => {
@@ -108,20 +113,20 @@ const BlockDisplay: React.FC<BlockDisplayProps> = React.memo(
               <Link
                 to={`/${networkId}/block/${blockNumber - 1}`}
                 className="block-nav-btn"
-                title="Previous block"
+                title={t("previousBlock")}
               >
                 ←
               </Link>
             )}
             <div className="block-header-info">
-              <span className="block-label">Block</span>
+              <span className="block-label">{t("block")}</span>
               <span className="block-number">#{blockNumber.toLocaleString()}</span>
             </div>
             {networkId && (
               <Link
                 to={`/${networkId}/block/${blockNumber + 1}`}
                 className="block-nav-btn"
-                title="Next block"
+                title={t("nextBlock")}
               >
                 →
               </Link>
@@ -132,7 +137,7 @@ const BlockDisplay: React.FC<BlockDisplayProps> = React.memo(
               <span className="block-timestamp-full">({timestampFormatted})</span>
             </span>
             <span className="block-header-divider">•</span>
-            <span className="block-status-badge block-status-finalized">Finalized</span>
+            <span className="block-status-badge block-status-finalized">{t("finalized")}</span>
           </div>
           {metadata && selectedProvider !== undefined && onProviderSelect && (
             <RPCIndicator
@@ -146,29 +151,30 @@ const BlockDisplay: React.FC<BlockDisplayProps> = React.memo(
         <div className="tx-details">
           {/* Transactions */}
           <div className="tx-row">
-            <span className="tx-label">Transactions:</span>
+            <span className="tx-label">{t("transactions")}</span>
             <span className="tx-value">
               <span className="tx-value-highlight">
-                {block.transactions ? block.transactions.length : 0} transactions
+                {block.transactions ? block.transactions.length : 0} {t("transactions")}
               </span>{" "}
-              in this block
+              {t("inThisBlock")}
             </span>
           </div>
 
           {/* Withdrawals count */}
           {block.withdrawals && block.withdrawals.length > 0 && (
             <div className="tx-row">
-              <span className="tx-label">Withdrawals:</span>
+              <span className="tx-label">{t("withdrawals")}</span>
               <span className="tx-value">
-                {block.withdrawals.length} withdrawal
-                {block.withdrawals.length !== 1 ? "s" : ""} in this block
+                {block.withdrawals.length}{" "}
+                {block.withdrawals.length !== 1 ? t("withdrawalsPlural") : t("withdrawal")}{" "}
+                {t("inThisBlock")}
               </span>
             </div>
           )}
 
           {/* Fee Recipient (Miner) */}
           <div className="tx-row">
-            <span className="tx-label">Fee Recipient:</span>
+            <span className="tx-label">{t("feeRecipient")}</span>
             <span className="tx-value tx-mono">
               {networkId ? (
                 <Link to={`/${networkId}/address/${block.miner}`} className="link-accent">
@@ -182,7 +188,7 @@ const BlockDisplay: React.FC<BlockDisplayProps> = React.memo(
 
           {/* Gas Used */}
           <div className="tx-row">
-            <span className="tx-label">Gas Used:</span>
+            <span className="tx-label">{t("gasUsed")}</span>
             <span className="tx-value">
               {Number(block.gasUsed).toLocaleString()}
               <span className="tx-gas-pct"> ({gasUsedPct}%)</span>
@@ -191,14 +197,14 @@ const BlockDisplay: React.FC<BlockDisplayProps> = React.memo(
 
           {/* Gas Limit */}
           <div className="tx-row">
-            <span className="tx-label">Gas Limit:</span>
+            <span className="tx-label">{t("gasLimit")}</span>
             <span className="tx-value">{Number(block.gasLimit).toLocaleString()}</span>
           </div>
 
           {/* Base Fee Per Gas */}
           {block.baseFeePerGas && (
             <div className="tx-row">
-              <span className="tx-label">Base Fee Per Gas:</span>
+              <span className="tx-label">{t("baseFeePerGas")}</span>
               <span className="tx-value">{formatGwei(block.baseFeePerGas)}</span>
             </div>
           )}
@@ -206,7 +212,7 @@ const BlockDisplay: React.FC<BlockDisplayProps> = React.memo(
           {/* Burnt Fees */}
           {burntFees && (
             <div className="tx-row">
-              <span className="tx-label">Burnt Fees:</span>
+              <span className="tx-label">{t("burntFees")}:</span>
               <span className="tx-value">
                 <span className="burnt-fees">🔥 {formatEth(burntFees)}</span>
               </span>
@@ -216,7 +222,7 @@ const BlockDisplay: React.FC<BlockDisplayProps> = React.memo(
           {/* Extra Data */}
           {block.extraData && block.extraData !== "0x" && (
             <div className="tx-row">
-              <span className="tx-label">Extra Data:</span>
+              <span className="tx-label">{t("extraData")}:</span>
               <span className="tx-value">
                 <ExtraDataDisplay hexData={block.extraData} />
               </span>
@@ -226,7 +232,7 @@ const BlockDisplay: React.FC<BlockDisplayProps> = React.memo(
           {/* Difficulty */}
           {Number(block.difficulty) > 0 && (
             <div className="tx-row">
-              <span className="tx-label">Difficulty:</span>
+              <span className="tx-label">{t("difficulty")}:</span>
               <span className="tx-value">{Number(block.difficulty).toLocaleString()}</span>
             </div>
           )}
@@ -234,14 +240,14 @@ const BlockDisplay: React.FC<BlockDisplayProps> = React.memo(
           {/* Total Difficulty */}
           {Number(block.totalDifficulty) > 0 && (
             <div className="tx-row">
-              <span className="tx-label">Total Difficulty:</span>
+              <span className="tx-label">{t("totalDifficulty")}:</span>
               <span className="tx-value">{Number(block.totalDifficulty).toLocaleString()}</span>
             </div>
           )}
 
           {/* Size */}
           <div className="tx-row">
-            <span className="tx-label">Size:</span>
+            <span className="tx-label">{t("size")}:</span>
             <span className="tx-value">{Number(block.size).toLocaleString()} bytes</span>
           </div>
 
@@ -249,15 +255,15 @@ const BlockDisplay: React.FC<BlockDisplayProps> = React.memo(
           {isArbitrumBlock(block) && (
             <>
               <div className="tx-row tx-row-arbitrum">
-                <span className="tx-label">L1 Block Number:</span>
+                <span className="tx-label">{t("l1BlockNumber")}:</span>
                 <span className="tx-value">{Number(block.l1BlockNumber).toLocaleString()}</span>
               </div>
               <div className="tx-row tx-row-arbitrum">
-                <span className="tx-label">Send Count:</span>
+                <span className="tx-label">{t("sendCount")}:</span>
                 <span className="tx-value">{block.sendCount}</span>
               </div>
               <div className="tx-row tx-row-arbitrum">
-                <span className="tx-label">Send Root:</span>
+                <span className="tx-label">{t("sendRoot")}:</span>
                 <span className="tx-value tx-mono">{block.sendRoot}</span>
               </div>
             </>
@@ -270,7 +276,7 @@ const BlockDisplay: React.FC<BlockDisplayProps> = React.memo(
               className="more-details-toggle"
               onClick={() => setShowMoreDetails(!showMoreDetails)}
             >
-              {showMoreDetails ? "− Hide" : "+ Show"} More Details
+              {showMoreDetails ? "− Hide" : "+ Show"} {t("moreDetails")}
             </button>
 
             {showMoreDetails && (
@@ -343,7 +349,9 @@ const BlockDisplay: React.FC<BlockDisplayProps> = React.memo(
                 className="tx-section-toggle"
                 onClick={() => setShowTransactions(!showTransactions)}
               >
-                <span className="tx-section-title">Transactions ({block.transactions.length})</span>
+                <span className="tx-section-title">
+                  {t("transactions")} ({block.transactions.length})
+                </span>
                 <span className="tx-section-arrow">{showTransactions ? "▼" : "▶"}</span>
               </button>
             </div>
@@ -389,19 +397,19 @@ const BlockDisplay: React.FC<BlockDisplayProps> = React.memo(
                     <div className="tx-log-index">{index}</div>
                     <div className="tx-log-content">
                       <div className="tx-log-row">
-                        <span className="tx-log-label">Index</span>
+                        <span className="tx-log-label">{t("index")}</span>
                         <span className="tx-log-value">
                           {Number(withdrawal.index).toLocaleString()}
                         </span>
                       </div>
                       <div className="tx-log-row">
-                        <span className="tx-log-label">Validator</span>
+                        <span className="tx-log-label">{t("validator")}</span>
                         <span className="tx-log-value">
                           {Number(withdrawal.validatorIndex).toLocaleString()}
                         </span>
                       </div>
                       <div className="tx-log-row">
-                        <span className="tx-log-label">Address</span>
+                        <span className="tx-log-label">{t("address")}</span>
                         <span className="tx-log-value tx-mono">
                           {networkId ? (
                             <Link
@@ -416,7 +424,7 @@ const BlockDisplay: React.FC<BlockDisplayProps> = React.memo(
                         </span>
                       </div>
                       <div className="tx-log-row">
-                        <span className="tx-log-label">Amount</span>
+                        <span className="tx-log-label">{t("amount")}</span>
                         <span className="tx-log-value tx-value-highlight">
                           {(Number(withdrawal.amount) / 1e9).toFixed(9)} ETH
                         </span>

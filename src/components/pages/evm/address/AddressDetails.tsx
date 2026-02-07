@@ -20,6 +20,7 @@ import type {
 } from "../../../../types";
 import { RPCIndicator } from "../../../common/RPCIndicator";
 import ENSRecordsDisplay from "./shared/ENSRecordsDisplay";
+import { useTranslation } from "react-i18next";
 
 interface AddressDisplayProps {
   address: Address;
@@ -73,6 +74,8 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
     const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
       hash,
     });
+
+    const { t } = useTranslation("address");
 
     const isContract = useMemo(() => address.code && address.code !== "0x", [address.code]);
 
@@ -372,20 +375,22 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
 
             {/* Transaction Count (Nonce) */}
             <div className="tx-row">
-              <span className="tx-label">Transactions:</span>
+              <span className="tx-label">{t("details.txs")}:</span>
               <span className="tx-value">{Number(address.txCount).toLocaleString()} txns</span>
             </div>
 
             {/* Verification Status (only for contracts) */}
             {isContract && (
               <div className="tx-row">
-                <span className="tx-label">Contract Verified:</span>
+                <span className="tx-label">{t("details.verfing")}:</span>
                 <span className="tx-value">
                   {sourcifyLoading ? (
-                    <span className="verification-checking">Checking Sourcify...</span>
+                    <span className="verification-checking">
+                      {t("details.checkingSourcify")}...
+                    </span>
                   ) : isVerified || parsedLocalData ? (
                     <span className="flex-align-center-gap-8">
-                      <span className="tx-value-highlight">✓ Verified</span>
+                      <span className="tx-value-highlight">✓ {t("details.verified")}</span>
                       {contractData?.match && (
                         <span className="match-badge match-badge-full">
                           {contractData.match === "perfect"
@@ -397,7 +402,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
                       )}
                     </span>
                   ) : (
-                    <span className="verification-not-verified">Not Verified</span>
+                    <span className="verification-not-verified">{t("details.notVerified")}</span>
                   )}
                 </span>
               </div>
@@ -406,7 +411,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
             {/* Contract Name (if verified) */}
             {isContract && contractData?.name && (
               <div className="tx-row">
-                <span className="tx-label">Contract Name:</span>
+                <span className="tx-label">{t("details.contractName")}:</span>
                 <span className="tx-value">{contractData.name}</span>
               </div>
             )}
@@ -414,7 +419,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
             {/* Compiler Version (if verified) */}
             {isContract && contractData?.compilerVersion && (
               <div className="tx-row">
-                <span className="tx-label">Compiler:</span>
+                <span className="tx-label">{t("details.compiler")}:</span>
                 <span className="tx-value tx-mono">{contractData.compilerVersion}</span>
               </div>
             )}
@@ -440,7 +445,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
                 className="tx-section btn-toggle-section"
                 onClick={() => setShowContractDetails(!showContractDetails)}
               >
-                <span className="tx-section-title">Contract Details</span>
+                <span className="tx-section-title">{t("details.contractDetail")}</span>
                 <span className="contract-section-toggle">{showContractDetails ? " ▼" : " ▶"}</span>
               </button>
 
@@ -448,21 +453,21 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
                 <>
                   {contractData.name && (
                     <div className="tx-row">
-                      <span className="tx-label">Contract Name</span>
+                      <span className="tx-label">{t("details.contractName")}</span>
                       <span className="tx-value tx-value-success">{contractData.name}</span>
                     </div>
                   )}
 
                   {contractData.compilerVersion && (
                     <div className="tx-row">
-                      <span className="tx-label">Compiler Version</span>
+                      <span className="tx-label">{t("details.compiler")}</span>
                       <span className="tx-value tx-mono">{contractData.compilerVersion}</span>
                     </div>
                   )}
 
                   {contractData.evmVersion && (
                     <div className="tx-row">
-                      <span className="tx-label">EVM Version</span>
+                      <span className="tx-label">{t("details.evmVersion")}</span>
                       <span className="tx-value">{contractData.evmVersion}</span>
                     </div>
                   )}
@@ -476,7 +481,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
 
                   {contractData.verifiedAt && (
                     <div className="tx-row">
-                      <span className="tx-label">Verified At</span>
+                      <span className="tx-label">{t("details.verifiedAt")}</span>
                       <span className="tx-value">
                         {new Date(contractData.verifiedAt).toLocaleString()}
                       </span>
@@ -485,7 +490,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
 
                   {contractData.match && (
                     <div className="tx-row">
-                      <span className="tx-label">Match Type</span>
+                      <span className="tx-label">{t("details.matchType")}</span>
                       <span
                         className={`tx-value font-weight-600 ${contractData.match === "perfect" ? "text-success" : "text-warning"}`}
                       >
@@ -496,7 +501,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
 
                   {contractData.metadata?.compiler && (
                     <div className="tx-row">
-                      <span className="tx-label">Compiler</span>
+                      <span className="tx-label">{t("details.compiler")}</span>
                       <span className="tx-value tx-mono">
                         {contractData.metadata.compiler.version}
                       </span>
@@ -505,7 +510,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
 
                   {contractData.creation_match && (
                     <div className="tx-row">
-                      <span className="tx-label">Creation Match</span>
+                      <span className="tx-label">{t("details.creationMatch")}</span>
                       <span
                         className={`tx-value font-weight-600 ${contractData.creation_match === "perfect" ? "text-success" : "text-warning"}`}
                       >
@@ -516,7 +521,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
 
                   {contractData.runtime_match && (
                     <div className="tx-row">
-                      <span className="tx-label">Runtime Match</span>
+                      <span className="tx-label">{t("details.runtimeMatch")}</span>
                       <span
                         className={`tx-value font-weight-600 ${contractData.runtime_match === "perfect" ? "text-success" : "text-warning"}`}
                       >
@@ -540,7 +545,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
                         }
                       }}
                     >
-                      <span className="tx-label">Contract Bytecode</span>
+                      <span className="tx-label">{t("details.contractBytecode")}</span>
                       <span id="bytecode-icon" className="source-toggle-icon">
                         ▶
                       </span>
@@ -582,7 +587,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
                               }
                             }}
                           >
-                            <span className="tx-label">Source Code</span>
+                            <span className="tx-label">{t("details.sourceCode")}</span>
                             <span id="source-code-icon" className="source-toggle-icon">
                               ▶
                             </span>
@@ -632,7 +637,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
                   {contractData.abi && contractData.abi.length > 0 && (
                     <div className="tx-row-vertical">
                       <div className="contract-functions-header">
-                        <span className="tx-label">Functions</span>
+                        <span className="tx-label">{t("details.functions")}</span>
                         <ConnectButton.Custom>
                           {({
                             account,
@@ -667,7 +672,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
                                         type="button"
                                         className="btn-connect-wallet"
                                       >
-                                        Connect Wallet
+                                        {t("details.connectWallet")}
                                       </button>
                                     );
                                   }
@@ -679,7 +684,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
                                         type="button"
                                         className="btn-wrong-network"
                                       >
-                                        Wrong Network
+                                        {t("details.wrongNetwork")}
                                       </button>
                                     );
                                   }
@@ -728,7 +733,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
                             readFunctions.length > 0 && (
                               <div className="functions-section">
                                 <div className="functions-section-title functions-section-title-read">
-                                  Read Functions ({readFunctions.length})
+                                  {t("details.readFunctions")} ({readFunctions.length})
                                 </div>
                                 <div className="functions-list">
                                   {readFunctions.map((func: FunctionABI) => (
@@ -765,7 +770,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
                             writeFunctions.length > 0 && (
                               <div className="functions-section">
                                 <div className="functions-section-title functions-section-title-write">
-                                  Write Functions ({writeFunctions.length})
+                                  {t("details.writeFunctions")} ({writeFunctions.length})
                                 </div>
                                 <div className="functions-list">
                                   {writeFunctions.map((func: FunctionABI) => (
@@ -794,7 +799,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
                           0 && (
                           <div className="functions-section">
                             <div className="functions-section-title functions-section-title-events">
-                              Events (
+                              {t("details.events")} (
                               {contractData.abi.filter((item: ABI) => item.type === "event").length}
                               )
                             </div>
@@ -813,7 +818,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
                                   +
                                   {contractData.abi.filter((item: ABI) => item.type === "event")
                                     .length - 10}{" "}
-                                  more
+                                  {t("details.more")}
                                 </span>
                               )}
                             </div>
@@ -856,7 +861,9 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
                                 )}
                               </div>
                             ) : (
-                              <div className="function-no-params">No parameters required</div>
+                              <div className="function-no-params">
+                                {t("details.noParametersRequired")}
+                              </div>
                             )}
 
                             {/* Read Result */}
@@ -890,7 +897,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
                                 }}
                                 className="btn-cancel"
                               >
-                                Cancel
+                                {t("details.cancel")}
                               </button>
                             </div>
                           </div>
@@ -902,7 +909,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
                             <div className="function-form-title function-form-title-write">
                               {selectedWriteFunction.name}
                               {selectedWriteFunction.stateMutability === "payable" && (
-                                <span className="payable-badge">payable</span>
+                                <span className="payable-badge">{t("details.payable")}</span>
                               )}
                             </div>
 
@@ -935,7 +942,9 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
                                 )}
                               </div>
                             ) : (
-                              <div className="function-no-params">No parameters required</div>
+                              <div className="function-no-params">
+                                {t("details.noParametersRequired")}
+                              </div>
                             )}
 
                             {selectedWriteFunction.stateMutability === "payable" && (
@@ -966,11 +975,11 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
                                 {isConfirming && "⏳ Waiting for transaction confirmation..."}
                                 {isConfirmed && (
                                   <div>
-                                    ✅ Transaction confirmed!
+                                    {t("details.confirmed")}
                                     {hash && (
                                       <div className="tx-hash-link">
                                         <Link to={`/${networkId}/tx/${hash}`}>
-                                          View transaction
+                                          {t("details.viewTx")}
                                         </Link>
                                       </div>
                                     )}
@@ -990,10 +999,10 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
                                 className="btn-function-action btn-write-action"
                               >
                                 {isPending
-                                  ? "Confirming in Wallet..."
+                                  ? t("details.confirmingWallet")
                                   : isConfirming
-                                    ? "Processing..."
-                                    : "Write"}
+                                    ? t("details.processing")
+                                    : t("details.write")}
                               </button>
                               <button
                                 type="button"
@@ -1018,7 +1027,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
                         rel="noopener noreferrer"
                         className="sourcify-link"
                       >
-                        View Full Contract on Sourcify ↗
+                        {t("details.viewOnSourcify")} ↗
                       </a>
                     </div>
                   )}
@@ -1030,7 +1039,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
           {/* Last Transactions Section */}
           <div className="tx-details">
             <div className="tx-section tx-history-header">
-              <span className="tx-section-title">Last Transactions</span>
+              <span className="tx-section-title"> {t("details.lastTransactions")}</span>
               {transactionsResult && (
                 <span
                   className={`tx-history-status ${transactionsResult.source === "trace_filter" ? "tx-history-status-complete" : transactionsResult.source === "logs" ? "tx-history-status-partial" : "tx-history-status-none"}`}
@@ -1038,19 +1047,23 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
                   {transactionsResult.source === "trace_filter" && (
                     <>
                       <span className="tx-history-dot">●</span>
-                      Complete history ({transactionDetails.length} transactions)
+                      {t("details.completeHistory", {
+                        count: transactionDetails.length,
+                      })}
                     </>
                   )}
                   {transactionsResult.source === "logs" && (
                     <>
                       <span className="tx-history-dot">●</span>
-                      Partial (logs only) - {transactionDetails.length} transactions
+                      {t("details.partialHistory", {
+                        count: transactionDetails.length,
+                      })}
                     </>
                   )}
                   {transactionsResult.source === "none" && (
                     <>
                       <span className="tx-history-dot">●</span>
-                      No data available
+                      {t("details.noHistory")}
                     </>
                   )}
                 </span>
@@ -1071,7 +1084,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
 
             {/* Loading state */}
             {loadingTxDetails && (
-              <div className="tx-history-empty">Loading transaction details...</div>
+              <div className="tx-history-empty">{t("details.loadingTxData")}</div>
             )}
 
             {/* Transaction table */}
@@ -1081,11 +1094,11 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
                   <thead>
                     <tr>
                       <th>TX Hash</th>
-                      {contractData && <th>Method</th>}
-                      <th>From</th>
-                      <th>To</th>
-                      <th>Value</th>
-                      <th>Status</th>
+                      {contractData && <th>{t("details.method")}</th>}
+                      <th>{t("details.from")}</th>
+                      <th>{t("details.to")}</th>
+                      <th>{t("details.value")}</th>
+                      <th>{t("details.status")}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -1115,7 +1128,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
                                   </span>
                                 ) : (
                                   <span className="method-badge method-badge-transfer">
-                                    Transfer
+                                    {t("details.transfer")}
                                   </span>
                                 );
                               })()
@@ -1137,7 +1150,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
                             className="address-table-link"
                           >
                             {tx.from?.toLowerCase() === addressHash.toLowerCase()
-                              ? "This Address"
+                              ? t("details.thisAddress")
                               : truncate(tx.from || "", 6, 4)}
                           </Link>
                         </td>
@@ -1148,11 +1161,13 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
                               className={`tx-table-to-link ${tx.to?.toLowerCase() === addressHash.toLowerCase() ? "tx-table-to-link-self" : "tx-table-to-link-other"}`}
                             >
                               {tx.to?.toLowerCase() === addressHash.toLowerCase()
-                                ? "This Address"
+                                ? t("details.thisAddress")
                                 : truncate(tx.to, 6, 4)}
                             </Link>
                           ) : (
-                            <span className="contract-creation-badge">Contract Creation</span>
+                            <span className="contract-creation-badge">
+                              {t("details.contractCreation")}
+                            </span>
                           )}
                         </td>
                         <td>
@@ -1161,13 +1176,15 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
                         <td>
                           {tx.receipt?.status === "0x1" || tx.receipt?.status === "1" ? (
                             <span className="table-status-badge table-status-success">
-                              ✓ Success
+                              ✓ {t("details.success")}
                             </span>
                           ) : tx.receipt?.status === "0x0" || tx.receipt?.status === "0" ? (
-                            <span className="table-status-badge table-status-failed">✗ Failed</span>
+                            <span className="table-status-badge table-status-failed">
+                              ✗ {t("details.failed")}
+                            </span>
                           ) : (
                             <span className="table-status-badge table-status-pending">
-                              ⏳ Pending
+                              ⏳ {t("details.pending")}
                             </span>
                           )}
                         </td>
@@ -1182,7 +1199,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
             {!loadingTxDetails &&
               transactionDetails.length === 0 &&
               !transactionsResult?.message && (
-                <div className="tx-history-empty">No transactions found for this address</div>
+                <div className="tx-history-empty">{t("details.noTxsFound")}</div>
               )}
           </div>
 
@@ -1190,11 +1207,11 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
           {isContract && (
             <div className="block-display-card">
               <div className="block-display-header">
-                <span className="block-label">Contract Storage</span>
+                <span className="block-label">{t("details.contractStorage")}:</span>
               </div>
               <div className="tx-details">
                 <div className="tx-row">
-                  <span className="tx-label">Storage Slot:</span>
+                  <span className="tx-label">{t("details.storageSlot")}:</span>
                   <span className="tx-value">
                     <div className="storage-input-row">
                       <input
@@ -1205,14 +1222,14 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
                         className="storage-input"
                       />
                       <button type="button" onClick={handleGetStorage} className="storage-button">
-                        Get
+                        {t("details.get")}
                       </button>
                     </div>
                   </span>
                 </div>
                 {storageValue && (
                   <div className="tx-row">
-                    <span className="tx-label">Value:</span>
+                    <span className="tx-label">{t("details.value")}:</span>
                     <span className="tx-value">
                       <div className="storage-value-display">{storageValue}</div>
                     </span>

@@ -5,6 +5,7 @@ import { useDataService } from "../../../../hooks/useDataService";
 import { useProviderSelection } from "../../../../hooks/useProviderSelection";
 import type { DataWithMetadata, Transaction } from "../../../../types";
 import Loader from "../../../common/Loader";
+import { useTranslation } from "react-i18next";
 
 const BLOCKS_PER_PAGE = 10;
 
@@ -27,6 +28,8 @@ export default function Txs() {
 
   // Provider selection state
   const [selectedProvider, setSelectedProvider] = useProviderSelection(`txs_${numericNetworkId}`);
+
+  const { t } = useTranslation("transaction");
 
   // Extract actual transactions data based on selected provider
   const transactions = useMemo(() => {
@@ -93,14 +96,14 @@ export default function Txs() {
         // biome-ignore lint/suspicious/noExplicitAny: <TODO>
       } catch (err: any) {
         console.error("Error fetching transactions:", err);
-        setError(err.message || "Failed to fetch transactions");
+        setError(err.message || t("txs.failedToFetch"));
       } finally {
         setLoading(false);
       }
     };
 
     fetchTransactions();
-  }, [dataService, fromBlock]);
+  }, [dataService, fromBlock, t]);
 
   const truncate = (str: string, start = 10, end = 8) => {
     if (!str) return "";
@@ -164,10 +167,10 @@ export default function Txs() {
       <div className="container-wide">
         <div className="block-display-card">
           <div className="blocks-header">
-            <span className="block-label">Latest Transactions</span>
+            <span className="block-label">{t("txs.latests")}</span>
           </div>
           <div className="card-content-loading">
-            <Loader text="Loading transactions..." />
+            <Loader text={t("txs.loading")} />
           </div>
         </div>
       </div>
@@ -179,7 +182,7 @@ export default function Txs() {
       <div className="container-wide">
         <div className="block-display-card">
           <div className="blocks-header">
-            <span className="block-label">Latest Transactions</span>
+            <span className="block-label">{t("txs.latests")}</span>
           </div>
           <div className="card-content">
             <p className="text-error margin-0">Error: {error}</p>
@@ -198,27 +201,32 @@ export default function Txs() {
           onClick={goToLatest}
           disabled={isAtLatest}
           className="pagination-btn"
-          title="Go to latest transactions"
+          title={t("txs.pagination.latestTitle")}
+          aria-label={t("txs.pagination.latestTitle")}
         >
-          Latest
+          {t("txs.pagination.latest")}
         </button>
+
         {/** biome-ignore lint/a11y/useButtonType: <TODO> */}
         <button
           onClick={goToNewerBlocks}
           disabled={!canGoNewer}
           className="pagination-btn"
-          title="View newer transactions"
+          title={t("txs.pagination.newerTitle")}
+          aria-label={t("txs.pagination.newerTitle")}
         >
-          ← Newer
+          {t("txs.pagination.newer")}
         </button>
+
         {/** biome-ignore lint/a11y/useButtonType: <TODO> */}
         <button
           onClick={goToOlderBlocks}
           disabled={!canGoOlder}
           className="pagination-btn"
-          title="View older transactions"
+          title={t("txs.pagination.olderTitle")}
+          aria-label={t("txs.pagination.olderTitle")}
         >
-          Older →
+          {t("txs.pagination.older")}
         </button>
       </div>
     );
@@ -226,21 +234,29 @@ export default function Txs() {
 
   // Get metadata from first transaction result if available
   const metadata = transactionsResult?.metadata;
+  const message = isAtLatest
+    ? t("txs.latest", {
+        count: transactions.length,
+        blocks: BLOCKS_PER_PAGE,
+      })
+    : blockRange
+      ? t("txs.range", {
+          count: transactions.length,
+          from: blockRange.from.toLocaleString(),
+          to: blockRange.to.toLocaleString(),
+        })
+      : t("txs.default", {
+          count: transactions.length,
+        });
 
   return (
     <div className="container-wide">
       <div className="block-display-card">
         <div className="blocks-header">
           <div className="blocks-header-main">
-            <span className="block-label">Latest Transactions</span>
+            <span className="block-label">{t("txs.latests")}</span>
             <span className="block-header-divider">•</span>
-            <span className="blocks-header-info">
-              {isAtLatest
-                ? `Showing ${transactions.length} transactions from the last ${BLOCKS_PER_PAGE} blocks`
-                : blockRange
-                  ? `Showing ${transactions.length} transactions from blocks ${blockRange.from.toLocaleString()} - ${blockRange.to.toLocaleString()}`
-                  : `Showing ${transactions.length} transactions`}
-            </span>
+            <span className="blocks-header-info">{message}</span>
           </div>
           {metadata && selectedProvider !== undefined && (
             <RPCIndicator
@@ -254,19 +270,19 @@ export default function Txs() {
         <Pagination />
 
         {transactions.length === 0 ? (
-          <p className="table-cell-muted">No transactions found in the selected block range</p>
+          <p className="table-cell-muted">{t("txs.notFound")}</p>
         ) : (
           <div className="table-wrapper">
             <table className="dash-table">
               <thead>
                 <tr>
                   <th>Tx Hash</th>
-                  <th>Block</th>
-                  <th>From</th>
-                  <th>To</th>
-                  <th>Value</th>
-                  <th className="hide-mobile">Gas Price</th>
-                  <th className="hide-mobile">Gas</th>
+                  <th>{t("txs.block")}</th>
+                  <th>{t("txs.from")}</th>
+                  <th>{t("txs.to")}</th>
+                  <th>{t("txs.value")}</th>
+                  <th className="hide-mobile">{t("txs.gasPrice")}</th>
+                  <th className="hide-mobile">{t("txs.gas")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -306,7 +322,7 @@ export default function Txs() {
                           {truncate(transaction.to)}
                         </Link>
                       ) : (
-                        <span className="table-cell-italic">Contract Creation</span>
+                        <span className="table-cell-italic">{t("txs.contractCreation")}</span>
                       )}
                     </td>
                     <td className="table-cell-value">{formatValue(transaction.value)}</td>
