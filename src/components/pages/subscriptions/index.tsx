@@ -1,5 +1,6 @@
 import type React from "react";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { OPENSCAN_DAO_ADDRESS } from "../../../config/index";
 import "../../../styles/subscriptions.css";
 
@@ -7,6 +8,7 @@ type SubscriptionCategory = "tokens" | "networks" | "apps" | "companies";
 
 interface TierBenefit {
   tier: string;
+  tierKey: string;
   benefits: string[];
 }
 
@@ -17,118 +19,6 @@ interface SubscriptionType {
   description: string;
   tiers: TierBenefit[];
 }
-
-const subscriptionTypes: SubscriptionType[] = [
-  {
-    id: "tokens",
-    name: "Tokens",
-    basePrice: 500,
-    description:
-      "Verified contracts tags, metadata integration, logo display, official links and token balance fetcher integration.",
-    tiers: [
-      {
-        tier: "Backer",
-        benefits: [
-          "Token page with token info: ERC20 details, project name, custom URLs",
-          "Verified contracts and tagged important contracts",
-        ],
-      },
-      {
-        tier: "Partner",
-        benefits: [
-          "Token balance shown on the main explorer",
-          "Simple profile page",
-          "Multiple network listing",
-        ],
-      },
-      {
-        tier: "Ally",
-        benefits: [
-          "Complete profile page with markdown description",
-          "OpenScan subdomain",
-          "Direct communication line with the technical team",
-        ],
-      },
-    ],
-  },
-  {
-    id: "networks",
-    name: "Networks",
-    basePrice: 2000,
-    description:
-      "Full RPC methods support, dedicated technical maintenance, subdomain availability, and prominent branding.",
-    tiers: [
-      {
-        tier: "Backer",
-        benefits: ["Markdown profile on the network page", "Priority placement on the home page"],
-      },
-      {
-        tier: "Partner",
-        benefits: [
-          "Dedicated subdomain network explorer",
-          "Direct communication line with the technical team",
-        ],
-      },
-      {
-        tier: "Ally",
-        benefits: [
-          "Roadmap voting power",
-          "Network-specific features in the dedicated network explorer",
-        ],
-      },
-    ],
-  },
-  {
-    id: "apps",
-    name: "Crypto Apps",
-    basePrice: 1000,
-    description:
-      "Dedicated listing and verified branding for wallets, dApps, supplementary explorer tools, and exchanges, promoting integration and visibility.",
-    tiers: [
-      {
-        tier: "Backer",
-        benefits: [
-          "Simple profile page",
-          "Important contracts verified and tagged",
-          "Contract events listing",
-        ],
-      },
-      {
-        tier: "Partner",
-        benefits: ["OpenScan subdomain", "Complete profile page with markdown description"],
-      },
-      {
-        tier: "Ally",
-        benefits: ["Roadmap voting power", "Direct communication line with the technical team"],
-      },
-    ],
-  },
-  {
-    id: "companies",
-    name: "Companies & Orgs",
-    basePrice: 500,
-    description:
-      "Formal recognition and visibility for infrastructure providers, venture funds, and other supporting entities who contribute to the project's continuity.",
-    tiers: [
-      {
-        tier: "Backer",
-        benefits: [
-          "Simple profile page",
-          "Important contracts verified and tagged",
-          "Contract events listing",
-        ],
-      },
-      {
-        tier: "Partner",
-        benefits: ["Complete profile page with markdown description", "OpenScan subdomain"],
-      },
-      {
-        tier: "Ally",
-        benefits: ["Direct communication line with the technical team", "Roadmap voting power"],
-      },
-    ],
-  },
-];
 
 const tierMultipliers: Record<string, number> = {
   Backer: 1,
@@ -173,7 +63,127 @@ const isEarlyAdopterPeriod = (): boolean => {
 };
 
 const Subscriptions: React.FC = () => {
+  const { t } = useTranslation();
   const [selectedCategory, setSelectedCategory] = useState<SubscriptionCategory>("tokens");
+
+  const subscriptionTypes: SubscriptionType[] = [
+    {
+      id: "tokens",
+      name: t("subscriptions.categories.tokens.name"),
+      basePrice: 500,
+      description: t("subscriptions.categories.tokens.description"),
+      tiers: [
+        {
+          tier: t("subscriptions.tierNames.backer"),
+          tierKey: "backer",
+          benefits: t("subscriptions.tierBenefits.tokens.backer", {
+            returnObjects: true,
+          }) as string[],
+        },
+        {
+          tier: t("subscriptions.tierNames.partner"),
+          tierKey: "partner",
+          benefits: t("subscriptions.tierBenefits.tokens.partner", {
+            returnObjects: true,
+          }) as string[],
+        },
+        {
+          tier: t("subscriptions.tierNames.ally"),
+          tierKey: "ally",
+          benefits: t("subscriptions.tierBenefits.tokens.ally", {
+            returnObjects: true,
+          }) as string[],
+        },
+      ],
+    },
+    {
+      id: "networks",
+      name: t("subscriptions.categories.networks.name"),
+      basePrice: 2000,
+      description: t("subscriptions.categories.networks.description"),
+      tiers: [
+        {
+          tier: t("subscriptions.tierNames.backer"),
+          tierKey: "backer",
+          benefits: t("subscriptions.tierBenefits.networks.backer", {
+            returnObjects: true,
+          }) as string[],
+        },
+        {
+          tier: t("subscriptions.tierNames.partner"),
+          tierKey: "partner",
+          benefits: t("subscriptions.tierBenefits.networks.partner", {
+            returnObjects: true,
+          }) as string[],
+        },
+        {
+          tier: t("subscriptions.tierNames.ally"),
+          tierKey: "ally",
+          benefits: t("subscriptions.tierBenefits.networks.ally", {
+            returnObjects: true,
+          }) as string[],
+        },
+      ],
+    },
+    {
+      id: "apps",
+      name: t("subscriptions.categories.apps.name"),
+      basePrice: 1000,
+      description: t("subscriptions.categories.apps.description"),
+      tiers: [
+        {
+          tier: t("subscriptions.tierNames.backer"),
+          tierKey: "backer",
+          benefits: t("subscriptions.tierBenefits.apps.backer", {
+            returnObjects: true,
+          }) as string[],
+        },
+        {
+          tier: t("subscriptions.tierNames.partner"),
+          tierKey: "partner",
+          benefits: t("subscriptions.tierBenefits.apps.partner", {
+            returnObjects: true,
+          }) as string[],
+        },
+        {
+          tier: t("subscriptions.tierNames.ally"),
+          tierKey: "ally",
+          benefits: t("subscriptions.tierBenefits.apps.ally", {
+            returnObjects: true,
+          }) as string[],
+        },
+      ],
+    },
+    {
+      id: "companies",
+      name: t("subscriptions.categories.companies.name"),
+      basePrice: 500,
+      description: t("subscriptions.categories.companies.description"),
+      tiers: [
+        {
+          tier: t("subscriptions.tierNames.backer"),
+          tierKey: "backer",
+          benefits: t("subscriptions.tierBenefits.companies.backer", {
+            returnObjects: true,
+          }) as string[],
+        },
+        {
+          tier: t("subscriptions.tierNames.partner"),
+          tierKey: "partner",
+          benefits: t("subscriptions.tierBenefits.companies.partner", {
+            returnObjects: true,
+          }) as string[],
+        },
+        {
+          tier: t("subscriptions.tierNames.ally"),
+          tierKey: "ally",
+          benefits: t("subscriptions.tierBenefits.companies.ally", {
+            returnObjects: true,
+          }) as string[],
+        },
+      ],
+    },
+  ];
 
   const selectedSubscription = subscriptionTypes.find((s) => s.id === selectedCategory);
 
@@ -184,18 +194,16 @@ const Subscriptions: React.FC = () => {
       <div className="page-card">
         {/* Header */}
         <div className="text-center mb-large">
-          <h1 className="page-heading">Support OpenScan</h1>
-          <p className="page-subtitle">
-            Sustainable, ethical funding for open-source blockchain infrastructure
-          </p>
+          <h1 className="page-heading">{t("subscriptions.title")}</h1>
+          <p className="page-subtitle">{t("subscriptions.subtitle")}</p>
         </div>
 
         {/* Value Proposition */}
         <div className="subscriptions-intro">
           <p>
-            OpenScan remains <strong>entirely free for all end-users</strong>. Revenue is sourced
-            from projects, applications, tokens, and networks that recognize the value of the
-            platform and wish to formally appear as verified supporters of the open ecosystem.
+            {t("subscriptions.valueProposition").split(t("subscriptions.freeForAllUsers"))[0]}
+            <strong>{t("subscriptions.freeForAllUsers")}</strong>
+            {t("subscriptions.valueProposition").split(t("subscriptions.freeForAllUsers"))[1]}
           </p>
         </div>
 
@@ -227,21 +235,30 @@ const Subscriptions: React.FC = () => {
               const multiplier = tierMultipliers[tier.tier] ?? 1;
               const price = selectedSubscription.basePrice * multiplier;
               return (
-                <div key={tier.tier} className="subscriptions-tier-card">
+                <div key={tier.tierKey} className="subscriptions-tier-card">
                   <div className="subscriptions-tier-header">
                     <h3 className="subscriptions-tier-name">
-                      Tier {Object.keys(tierMultipliers).indexOf(tier.tier) + 1} - {tier.tier}
+                      {t("subscriptions.tierLabel", {
+                        number: Object.keys(tierMultipliers).indexOf(tier.tier) + 1,
+                        name: tier.tier,
+                      })}
                     </h3>
                     <div className="subscriptions-tier-price">
                       <span className="subscriptions-price-amount">${price.toLocaleString()}</span>
-                      <span className="subscriptions-price-period">/ month</span>
+                      <span className="subscriptions-price-period">
+                        {t("subscriptions.perMonth")}
+                      </span>
                     </div>
                     <div className="subscriptions-tier-price-annual">
                       <span className="subscriptions-price-annual-amount">
                         ${(price * 12 * 0.8).toLocaleString()}
                       </span>
-                      <span className="subscriptions-price-annual-period">/ year</span>
-                      <span className="subscriptions-price-annual-discount">Save 20%</span>
+                      <span className="subscriptions-price-annual-period">
+                        {t("subscriptions.perYear")}
+                      </span>
+                      <span className="subscriptions-price-annual-discount">
+                        {t("subscriptions.save20")}
+                      </span>
                     </div>
                   </div>
                   <div className="subscriptions-tier-benefits">
@@ -252,9 +269,14 @@ const Subscriptions: React.FC = () => {
                       ))}
                     </ul>
                   </div>
-                  {tier.tier !== "Backer" && (
+                  {tier.tierKey !== "backer" && (
                     <div className="subscriptions-tier-note">
-                      Includes all {tier.tier === "Ally" ? "Partner" : "Backer"} benefits
+                      {t("subscriptions.includesAllBenefits", {
+                        tier:
+                          tier.tierKey === "ally"
+                            ? t("subscriptions.tierNames.partner")
+                            : t("subscriptions.tierNames.backer"),
+                      })}
                     </div>
                   )}
                 </div>
@@ -265,14 +287,16 @@ const Subscriptions: React.FC = () => {
 
         {/* Pricing Summary Table */}
         <div className="subscriptions-summary">
-          <h2 className="page-heading-large text-center">Pricing Overview</h2>
+          <h2 className="page-heading-large text-center">{t("subscriptions.pricingOverview")}</h2>
 
           {/* Early Adopter Discount Banner */}
           <div className="subscriptions-early-adopter">
-            <div className="subscriptions-early-adopter-badge">Early Adopter Discount</div>
+            <div className="subscriptions-early-adopter-badge">
+              {t("subscriptions.earlyAdopterDiscount")}
+            </div>
             <div className="subscriptions-early-adopter-content">
               <p className="subscriptions-early-adopter-title">
-                Limited time discounts on all subscriptions
+                {t("subscriptions.limitedTimeDiscounts")}
               </p>
               <div className="subscriptions-early-adopter-tiers">
                 {EARLY_ADOPTER_PERIODS.map((period, idx) => {
@@ -286,7 +310,7 @@ const Subscriptions: React.FC = () => {
                       className={`subscriptions-early-adopter-tier ${isActive ? "active" : ""} ${isPast ? "past" : ""}`}
                     >
                       <span className="subscriptions-early-adopter-tier-discount">
-                        {period.discount * 100}% off
+                        {t("subscriptions.percentOff", { percent: period.discount * 100 })}
                       </span>
                       <span className="subscriptions-early-adopter-tier-month">{period.label}</span>
                     </div>
@@ -295,9 +319,14 @@ const Subscriptions: React.FC = () => {
               </div>
               {earlyAdopterActive && (
                 <p className="subscriptions-early-adopter-status">
-                  <span className="subscriptions-early-adopter-active">Active now</span> -{" "}
-                  {/* biome-ignore lint/style/noNonNullAssertion: earlyAdopterActive guarantees non-null */}
-                  {getCurrentEarlyAdopterDiscount()! * 100}% discount available
+                  <span className="subscriptions-early-adopter-active">
+                    {t("subscriptions.activeNow")}
+                  </span>{" "}
+                  -{" "}
+                  {t("subscriptions.discountAvailable", {
+                    // biome-ignore lint/style/noNonNullAssertion: earlyAdopterActive guarantees non-null
+                    percent: getCurrentEarlyAdopterDiscount()! * 100,
+                  })}
                 </p>
               )}
             </div>
@@ -307,10 +336,10 @@ const Subscriptions: React.FC = () => {
             <table className="subscriptions-table">
               <thead>
                 <tr>
-                  <th>Subscription Type</th>
-                  <th>Backer</th>
-                  <th>Partner (3x)</th>
-                  <th>Ally (6x)</th>
+                  <th>{t("subscriptions.subscriptionType")}</th>
+                  <th>{t("subscriptions.tierNames.backer")}</th>
+                  <th>{t("subscriptions.tierNames.partner")} (3x)</th>
+                  <th>{t("subscriptions.tierNames.ally")} (6x)</th>
                 </tr>
               </thead>
               <tbody>
@@ -364,93 +393,80 @@ const Subscriptions: React.FC = () => {
 
         {/* Shared Roadmap Planning */}
         <div className="subscriptions-governance">
-          <h2 className="page-heading-large text-center">Shared Roadmap Planning</h2>
-          <p>
-            Ally-tier subscribers gain voting power in our bi-annual roadmap planning sessions,
-            where the OpenScan team and Allies collaborate to shape the future of the platform.
-          </p>
+          <h2 className="page-heading-large text-center">
+            {t("subscriptions.sharedRoadmapPlanning")}
+          </h2>
+          <p>{t("subscriptions.roadmapDescription")}</p>
           <div className="subscriptions-roadmap-features">
             <div className="subscriptions-roadmap-item">
-              <h4>Feature Prioritization</h4>
-              <p>
-                Vote on which features and improvements get developed next based on community needs.
-              </p>
+              <h4>{t("subscriptions.featurePrioritization")}</h4>
+              <p>{t("subscriptions.featurePrioritizationDescription")}</p>
             </div>
             <div className="subscriptions-roadmap-item">
-              <h4>Network Expansion</h4>
-              <p>Help decide which blockchain networks OpenScan should support and integrate.</p>
+              <h4>{t("subscriptions.networkExpansion")}</h4>
+              <p>{t("subscriptions.networkExpansionDescription")}</p>
             </div>
             <div className="subscriptions-roadmap-item">
-              <h4>Strategic Direction</h4>
-              <p>
-                Participate in discussions about OpenScan's long-term vision and technical
-                direction.
-              </p>
+              <h4>{t("subscriptions.strategicDirection")}</h4>
+              <p>{t("subscriptions.strategicDirectionDescription")}</p>
             </div>
           </div>
         </div>
 
         {/* How to Subscribe */}
         <div className="subscriptions-how-to">
-          <h2 className="page-heading-large text-center">How to Subscribe</h2>
+          <h2 className="page-heading-large text-center">{t("subscriptions.howToSubscribe")}</h2>
           <div className="subscriptions-steps">
             <div className="subscriptions-step">
               <div className="subscriptions-step-number">1</div>
               <div className="subscriptions-step-content">
-                <h4>Submit Pull Request</h4>
+                <h4>{t("subscriptions.step1Title")}</h4>
                 <p>
-                  Create a pull request to the{" "}
+                  {t("subscriptions.step1Description").split("explorer-metadata")[0]}
                   <a
                     href="https://github.com/openscan-explorer/explorer-metadata"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
                     explorer-metadata
-                  </a>{" "}
-                  repository with your project information and subscription details.
+                  </a>
+                  {t("subscriptions.step1Description").split("explorer-metadata")[1]}
                 </p>
               </div>
             </div>
             <div className="subscriptions-step">
               <div className="subscriptions-step-number">2</div>
               <div className="subscriptions-step-content">
-                <h4>PR Review & Approval</h4>
-                <p>
-                  The OpenScan team will review your pull request to verify eligibility and ensure
-                  all required information is provided.
-                </p>
+                <h4>{t("subscriptions.step2Title")}</h4>
+                <p>{t("subscriptions.step2Description")}</p>
               </div>
             </div>
             <div className="subscriptions-step">
               <div className="subscriptions-step-number">3</div>
               <div className="subscriptions-step-content">
-                <h4>Make Payment & Prove Ownership</h4>
+                <h4>{t("subscriptions.step3Title")}</h4>
                 <p>
-                  Once your PR is approved, send the subscription payment to{" "}
-                  <strong>{OPENSCAN_DAO_ADDRESS}</strong> on Ethereum Mainnet. Then use the{" "}
+                  {t("subscriptions.step3Description").split("OpenScan Devtools")[0]}
                   <a href="/devtools" target="_blank" rel="noopener noreferrer">
                     OpenScan Devtools
-                  </a>{" "}
-                  to sign the payment transaction hash and share it on your PR to prove ownership.
+                  </a>
+                  {t("subscriptions.step3Description").split("OpenScan Devtools")[1]}
                 </p>
               </div>
             </div>
             <div className="subscriptions-step">
               <div className="subscriptions-step-number">4</div>
               <div className="subscriptions-step-content">
-                <h4>Subscription Activated</h4>
-                <p>
-                  After payment and signature verification, your PR will be merged and your
-                  subscription benefits will be activated immediately.
-                </p>
+                <h4>{t("subscriptions.step4Title")}</h4>
+                <p>{t("subscriptions.step4Description")}</p>
               </div>
             </div>
           </div>
 
           <div className="subscriptions-payment-info">
-            <h4>Payment Address</h4>
+            <h4>{t("subscriptions.paymentAddress")}</h4>
             <p>
-              All subscription payments are sent directly to the OpenScan DAO address:{" "}
+              {t("subscriptions.paymentAddressDescription")}{" "}
               <a
                 href={`/1/address/${OPENSCAN_DAO_ADDRESS}`}
                 className="subscriptions-payment-address"
@@ -467,20 +483,17 @@ const Subscriptions: React.FC = () => {
               rel="noopener noreferrer"
               className="button-primary-inline"
             >
-              Submit Subscription PR
+              {t("subscriptions.submitSubscriptionPR")}
             </a>
             <a href={`/1/address/${OPENSCAN_DAO_ADDRESS}`} className="button-secondary-inline">
-              View DAO Address
+              {t("subscriptions.viewDaoAddress")}
             </a>
           </div>
         </div>
 
         {/* Footer Note */}
         <div className="text-center license-footer">
-          <p>
-            All revenue is reinvested solely for the platform's continuous development, growth, and
-            infrastructural improvement.
-          </p>
+          <p>{t("subscriptions.footerNote")}</p>
         </div>
       </div>
     </div>

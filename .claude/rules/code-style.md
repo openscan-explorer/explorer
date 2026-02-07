@@ -20,6 +20,16 @@
 - **React 19** with functional components and hooks
 - No class components
 
+## Internationalization (i18n)
+
+- **NEVER hardcode user-facing strings** - All text visible to users must use the i18n system
+- Use `useTranslation()` hook from react-i18next in all components with user-facing text
+- See @.claude/rules/i18n.md for complete guidelines on:
+  - Choosing the right namespace
+  - Adding new translation keys
+  - Variable interpolation and pluralization
+  - Supporting new languages
+
 ## CSS
 
 - All styles should be in `src/styles` folder
@@ -49,7 +59,11 @@ npm run lint:fix
 # 3. Verify type safety
 npm run typecheck
 
-# 4. Run tests (if applicable)
+# 4. Verify i18n compliance
+# - Ensure no hardcoded user-facing strings
+# - Test in both English and Spanish if you added translations
+
+# 5. Run tests (if applicable)
 npm run test:run
 ```
 

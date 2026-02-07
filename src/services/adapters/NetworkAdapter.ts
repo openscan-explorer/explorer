@@ -105,6 +105,8 @@ export abstract class NetworkAdapter {
    * @param toBlock - Ending block (optional)
    * @param limit - Maximum number of transactions to return
    * @param onTransactionsFound - Callback for streaming results
+   * @param signal - AbortSignal for cancellation
+   * @param onProgress - Callback for search progress updates
    * @returns List of transactions
    */
   async getAddressTransactions(
@@ -113,6 +115,11 @@ export abstract class NetworkAdapter {
     toBlock?: number | "latest",
     limit = 100,
     onTransactionsFound?: (txs: Transaction[]) => void,
+    signal?: AbortSignal,
+    onProgress?: (progress: {
+      message?: string;
+      blockRange?: { from: number; to: number };
+    }) => void,
   ): Promise<AddressTransactionsResult> {
     if (!this.txSearch) {
       return {
@@ -134,6 +141,12 @@ export abstract class NetworkAdapter {
               onTransactionsFound(cleanTxs);
             }
           : undefined,
+        onProgress: onProgress
+          ? (progress) => {
+              onProgress({ message: progress.message, blockRange: progress.blockRange });
+            }
+          : undefined,
+        signal,
       });
 
       if (result.transactions.length === 0) {
@@ -154,10 +167,7 @@ export abstract class NetworkAdapter {
         transactionDetails: txDetails,
         source: "binary_search",
         isComplete: result.stats.totalTxs < limit || limit === 0,
-        message:
-          limit > 0 && result.stats.totalTxs >= limit
-            ? `Showing ${limit} transactions (more may exist)`
-            : undefined,
+        message: undefined,
       };
     } catch (error) {
       console.error("Error searching address transactions:", error);
@@ -173,6 +183,20 @@ export abstract class NetworkAdapter {
             : "Address transaction lookup failed",
       };
     }
+  }
+
+  /**
+   * Find the smallest recent block range with address activity.
+   * Uses exponential search from the chain tip.
+   * Used for fast initial search on address page load.
+   */
+  async findRecentActivityRange(
+    address: string,
+    initialRange?: number,
+    signal?: AbortSignal,
+  ): Promise<{ fromBlock: number; toBlock: number } | null> {
+    if (!this.txSearch) return null;
+    return this.txSearch.findRecentActivityRange(address, initialRange, signal);
   }
 
   /**

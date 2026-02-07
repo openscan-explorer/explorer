@@ -1,38 +1,48 @@
 import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { Link, useSearchParams } from "react-router-dom";
 import { getEnabledNetworks, getNetworkLogoUrlById } from "../../../config/networks";
 import { ENSService } from "../../../services/ENS/ENSService";
 import type { NetworkConfig } from "../../../types";
+import { getChainIdFromNetwork } from "../../../utils/networkResolver";
 
 type SearchType = "address" | "transaction" | "block" | "ens" | "unknown";
 
 interface SearchTypeConfig {
   badge: string;
-  getRoute: (networkId: number, query: string) => string;
+  getRoute: (chainId: number, query: string) => string;
 }
 
 const SEARCH_TYPE_CONFIG: Record<SearchType, SearchTypeConfig> = {
   address: {
     badge: "Address",
-    getRoute: (networkId, query) => `/${networkId}/address/${query}`,
+    getRoute: (chainId, query) => `/${chainId}/address/${query}`,
   },
   transaction: {
     badge: "TX Hash",
-    getRoute: (networkId, query) => `/${networkId}/tx/${query}`,
+    getRoute: (chainId, query) => `/${chainId}/tx/${query}`,
   },
   block: {
     badge: "Block",
-    getRoute: (networkId, query) => `/${networkId}/block/${query}`,
+    getRoute: (chainId, query) => `/${chainId}/block/${query}`,
   },
   ens: {
     badge: "ENS",
-    getRoute: (networkId, query) => `/${networkId}/address/${query}`,
+    getRoute: (chainId, query) => `/${chainId}/address/${query}`,
   },
   unknown: {
     badge: "Unknown",
-    getRoute: (networkId, query) => `/${networkId}/address/${query}`,
+    getRoute: (chainId, query) => `/${chainId}/address/${query}`,
   },
 };
+
+const SEARCH_TYPE_BADGE_KEYS = {
+  address: "search.badgeAddress",
+  transaction: "search.badgeTxHash",
+  block: "search.badgeBlock",
+  ens: "search.badgeEns",
+  unknown: "search.badgeUnknown",
+} as const satisfies Record<SearchType, string>;
 
 function detectSearchType(query: string): SearchType {
   if (!query) return "unknown";
@@ -75,8 +85,10 @@ interface NetworkListItemProps {
 
 function NetworkListItem({ network, query, searchType }: NetworkListItemProps) {
   const config = SEARCH_TYPE_CONFIG[searchType];
-  const route = config.getRoute(network.networkId, query);
-  const logoUrl = getNetworkLogoUrlById(network.networkId);
+  const chainId = getChainIdFromNetwork(network);
+  const route = chainId ? config.getRoute(chainId, query) : "#";
+  const logoUrl = chainId ? getNetworkLogoUrlById(chainId) : undefined;
+  const { t } = useTranslation();
 
   return (
     <Link
@@ -86,7 +98,7 @@ function NetworkListItem({ network, query, searchType }: NetworkListItemProps) {
     >
       <div className="search-result-item-content">
         <span className="search-result-query">{truncateQuery(query, 12)}</span>
-        <span className="search-result-in">in</span>
+        <span className="search-result-in">{t("search.in")}</span>
         <div className="search-result-network">
           {logoUrl && (
             <img
@@ -108,18 +120,19 @@ function NetworkListItem({ network, query, searchType }: NetworkListItemProps) {
 }
 
 export default function Search() {
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const query = searchParams.get("q") || "";
   const searchType = useMemo(() => detectSearchType(query), [query]);
-  const config = SEARCH_TYPE_CONFIG[searchType];
+  const badgeKey = SEARCH_TYPE_BADGE_KEYS[searchType];
 
-  // Get networks to display
+  // Get networks to display (only EVM networks with chainId)
   const networks = useMemo(() => {
-    const allNetworks = getEnabledNetworks();
+    const allNetworks = getEnabledNetworks().filter((n) => getChainIdFromNetwork(n) !== undefined);
 
     // For ENS names, only show Ethereum mainnet
     if (searchType === "ens") {
-      return allNetworks.filter((n) => n.networkId === 1);
+      return allNetworks.filter((n) => getChainIdFromNetwork(n) === 1);
     }
 
     // For unknown types, don't show any networks
@@ -139,9 +152,9 @@ export default function Search() {
         <div className="block-display-card search-results-card">
           <div className="search-results-container">
             <div className="search-results-header">
-              <h1 className="search-results-title">Search</h1>
+              <h1 className="search-results-title">{t("search.title")}</h1>
             </div>
-            <p className="text-muted margin-0">No search query provided</p>
+            <p className="text-muted margin-0">{t("search.noQuery")}</p>
           </div>
         </div>
       </div>
@@ -154,16 +167,15 @@ export default function Search() {
         <div className="block-display-card search-results-card">
           <div className="search-results-container">
             <div className="search-results-header">
-              <h1 className="search-results-title">Search Results</h1>
+              <h1 className="search-results-title">{t("search.resultsTitle")}</h1>
               <div className="search-results-query-display">
                 <span className="search-results-query-text">{query}</span>
-                <span className="search-type-badge search-type-badge-error">Invalid</span>
+                <span className="search-type-badge search-type-badge-error">
+                  {t("search.invalidBadge")}
+                </span>
               </div>
             </div>
-            <p className="text-error margin-0">
-              Invalid search query. Enter an address (0x...), transaction hash, block number, or ENS
-              name.
-            </p>
+            <p className="text-error margin-0">{t("search.invalidQuery")}</p>
           </div>
         </div>
       </div>
@@ -175,16 +187,16 @@ export default function Search() {
       <div className="block-display-card search-results-card">
         <div className="search-results-container">
           <div className="search-results-header">
-            <h1 className="search-results-title">Search Results</h1>
+            <h1 className="search-results-title">{t("search.resultsTitle")}</h1>
             <div className="search-results-query-display">
               <span className="search-results-query-text">{query}</span>
-              <span className="search-type-badge">{config.badge}</span>
+              <span className="search-type-badge">{t(badgeKey)}</span>
             </div>
           </div>
 
           {searchType === "ens" && (
             <div className="search-info-message search-info-message-centered">
-              ENS names resolve to addresses on Ethereum mainnet.
+              {t("search.ensInfo")}
             </div>
           )}
 

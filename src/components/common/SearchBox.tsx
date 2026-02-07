@@ -1,6 +1,8 @@
+import { useTranslation } from "react-i18next";
 import { useSearch } from "../../hooks/useSearch";
 
 const SearchBox = () => {
+  const { t } = useTranslation();
   const { searchTerm, setSearchTerm, isResolving, error, clearError, handleSearch } = useSearch();
 
   return (
@@ -10,7 +12,7 @@ const SearchBox = () => {
           <input
             type="text"
             className="home-search-input"
-            placeholder="Search by Address / Txn Hash / Block / ENS Name"
+            placeholder={t("searchBox.placeholder")}
             value={searchTerm}
             onChange={(e) => {
               setSearchTerm(e.target.value);
@@ -22,8 +24,8 @@ const SearchBox = () => {
             type="submit"
             className="home-search-button"
             disabled={isResolving}
-            aria-label="Search"
-            title="Search"
+            aria-label={t("searchBox.ariaLabel")}
+            title={t("searchBox.title")}
           >
             {isResolving ? (
               "..."

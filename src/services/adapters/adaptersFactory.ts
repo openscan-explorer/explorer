@@ -5,10 +5,12 @@ import { BaseAdapter } from "./BaseAdapter/BaseAdapter";
 import { BNBAdapter } from "./BNBAdapter/BNBAdapter";
 import { PolygonAdapter } from "./PolygonAdapter/PolygonAdapter";
 import { ArbitrumAdapter } from "./ArbitrumAdapter/ArbitrumAdapter";
+import { BitcoinAdapter } from "./BitcoinAdapter/BitcoinAdapter";
 import type {
   ArbitrumClient,
   AztecClient,
   BaseClient,
+  BitcoinClient,
   BNBClient,
   EthereumClient,
   OptimismClient,
@@ -18,6 +20,9 @@ import type {
 
 // biome-ignore lint/complexity/noStaticOnlyClass: <TODO>
 export class AdapterFactory {
+  /**
+   * Create an EVM network adapter
+   */
   static createAdapter(
     networkId: SupportedChainId | 11155111 | 97 | 31337,
     client:
@@ -48,5 +53,12 @@ export class AdapterFactory {
       default:
         throw new Error(`Unknown adapter for networkId: ${networkId}`);
     }
+  }
+
+  /**
+   * Create a Bitcoin network adapter
+   */
+  static createBitcoinAdapter(networkId: string, client: BitcoinClient): BitcoinAdapter {
+    return new BitcoinAdapter(networkId, client);
   }
 }

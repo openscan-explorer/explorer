@@ -1,5 +1,6 @@
 import type React from "react";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate } from "react-router-dom";
 import ContractsSection from "./ContractsSection";
 import DevelopmentSection from "./DevelopmentSection";
@@ -11,6 +12,7 @@ import "../../../styles/devtools.css";
 const validSections = ["transactions", "signatures", "utils", "contracts", "development"];
 
 const DevTools: React.FC = () => {
+  const { t } = useTranslation("devtools");
   const location = useLocation();
   const navigate = useNavigate();
   const searchParams = new URLSearchParams(location.search);
@@ -24,11 +26,11 @@ const DevTools: React.FC = () => {
   }, [location.search]);
 
   const tabs = [
-    { name: "transactions", label: "Transactions" },
-    { name: "signatures", label: "Signatures" },
-    { name: "utils", label: "Utils" },
-    { name: "contracts", label: "Contracts" },
-    { name: "development", label: "Development" },
+    { name: "transactions", label: t("transactions") },
+    { name: "signatures", label: t("signatures") },
+    { name: "utils", label: t("utils") },
+    { name: "contracts", label: t("contracts") },
+    { name: "development", label: t("development") },
   ];
 
   const handleTabClick = (tabName: string) => {
@@ -39,7 +41,7 @@ const DevTools: React.FC = () => {
   return (
     <div className="container-wide">
       <div className="page-card devtools-content-wrapper">
-        <h1 className="page-title-small text-center">Dev Tools</h1>
+        <h1 className="page-title-small text-center">{t("title")}</h1>
 
         {/* Mobile dropdown */}
         <div className="devtools-mobile-select">

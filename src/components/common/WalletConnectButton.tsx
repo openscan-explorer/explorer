@@ -1,5 +1,6 @@
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import type React from "react";
+import { useTranslation } from "react-i18next";
 
 interface WalletConnectButtonProps {
   showChainSelector?: boolean;
@@ -10,6 +11,7 @@ interface WalletConnectButtonProps {
  * Shows connect button when disconnected, chain selector and account when connected.
  */
 const WalletConnectButton: React.FC<WalletConnectButtonProps> = ({ showChainSelector = true }) => {
+  const { t } = useTranslation();
   return (
     <ConnectButton.Custom>
       {({
@@ -39,7 +41,7 @@ const WalletConnectButton: React.FC<WalletConnectButtonProps> = ({ showChainSele
               if (!connected) {
                 return (
                   <button onClick={openConnectModal} type="button" className="btn-connect-wallet">
-                    Connect Wallet
+                    {t("wallet.connectWallet")}
                   </button>
                 );
               }
@@ -47,7 +49,7 @@ const WalletConnectButton: React.FC<WalletConnectButtonProps> = ({ showChainSele
               if (chain.unsupported) {
                 return (
                   <button onClick={openChainModal} type="button" className="btn-wrong-network">
-                    Wrong Network
+                    {t("wallet.wrongNetwork")}
                   </button>
                 );
               }
@@ -58,7 +60,7 @@ const WalletConnectButton: React.FC<WalletConnectButtonProps> = ({ showChainSele
                     <button onClick={openChainModal} type="button" className="btn-chain-selector">
                       {chain.hasIcon && chain.iconUrl && (
                         <img
-                          alt={chain.name ?? "Chain icon"}
+                          alt={chain.name ?? t("wallet.chainIcon")}
                           src={chain.iconUrl}
                           className="chain-icon"
                         />

@@ -6,7 +6,7 @@
 
 ![Production IPFS Hash](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/openscan-explorer/explorer/meta/ipfs-hash.json)
 
-A trustless, open-source blockchain explorer for Ethereum and Layer 2 networks. OpenScan connects directly to blockchain nodes via RPC, giving you unfettered access to on-chain data without intermediaries or centralized services.
+A trustless, open-source blockchain explorer for Bitcoin, Ethereum, and Layer 2 networks. OpenScan connects directly to blockchain nodes via RPC, giving you unfettered access to on-chain data without intermediaries or centralized services.
 
 > *We choose to build trustless systems even when it is harder.*
 > *We pay the cost of openness over the convenience of control.*
@@ -18,6 +18,11 @@ A trustless, open-source blockchain explorer for Ethereum and Layer 2 networks. 
 
 ### 🌐 Multi-Chain Support
 
+#### Bitcoin Networks
+- **Bitcoin Mainnet** (`/btc`) - The main Bitcoin network
+- **Bitcoin Testnet4** (`/tbtc`) - Bitcoin test network for development
+
+#### EVM Networks
 - **Ethereum Mainnet** - The main Ethereum network
 - **Sepolia Testnet** - Ethereum test network for development
 - **Arbitrum One** - Ethereum Layer 2 scaling solution
@@ -225,7 +230,16 @@ Default RPC endpoints:
 - **Polygon**: `https://polygon-rpc.com`, `https://polygon.llamarpc.com`, `https://polygon-bor.publicnode.com`
 - **Localhost**: `http://localhost:8545`
 
-### Supported Chain IDs
+### Supported Networks
+
+#### Bitcoin Networks
+
+| Network | Slug | Network ID (CAIP-2) |
+|---------|------|---------------------|
+| Bitcoin Mainnet | `btc` | `bip122:000000000019d6689c085ae165831e93` |
+| Bitcoin Testnet4 | `tbtc` | `bip122:00000000da84f2bafbbc53dee25a72ae` |
+
+#### EVM Networks
 
 | Network | Chain ID |
 |---------|----------|
@@ -262,7 +276,8 @@ src/
 ├── context/          # React context providers
 ├── hooks/            # Custom React hooks
 ├── services/         # Blockchain data services
-│   ├── adapters      # General reusable adapters
+│   ├── adapters/     # General reusable adapters
+│   │   └── BitcoinAdapter/ # Bitcoin network adapter
 │   └── EVM/          # EVM-compatible chain adapters
 │       ├── Arbitrum/ # Arbitrum-specific adapters
 │       ├── common/   # EVM common resources

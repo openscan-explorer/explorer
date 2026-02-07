@@ -1,9 +1,10 @@
 {
-  "updatedAt": "2025-12-11T12:01:22.402Z",
-  "count": 9,
+  "updatedAt": "2026-01-30",
   "networks": [
     {
-      "chainId": 1,
+      "type": "evm",
+      "networkId": "eip155:1",
+      "slug": "eth",
       "name": "Ethereum Mainnet",
       "shortName": "Ethereum",
       "description": "The main Ethereum network - the original smart contract platform",
@@ -19,11 +20,10 @@
       "rpc": {
         "public": [
           "https://ethereum.publicnode.com",
-          "https://eth.llamarpc.com",
-          "https://0xrpc.io/eth",
+          "https://eth.merkle.io",
           "https://eth.blockrazor.xyz",
-          "https://rpc.mevblocker.io",
-          "https://rpc.flashbots.net"
+          "https://eth.llamarpc.com",
+          "https://rpc.ankr.com/eth"
         ]
       },
       "links": [
@@ -45,7 +45,9 @@
       ]
     },
     {
-      "chainId": 8453,
+      "type": "evm",
+      "networkId": "eip155:8453",
+      "slug": "base",
       "name": "Base",
       "shortName": "Base",
       "description": "Ethereum Layer 2 built on the OP Stack by Coinbase",
@@ -79,7 +81,9 @@
       ]
     },
     {
-      "chainId": 42161,
+      "type": "evm",
+      "networkId": "eip155:42161",
+      "slug": "arb",
       "name": "Arbitrum One",
       "shortName": "Arbitrum",
       "description": "Ethereum Layer 2 scaling solution using optimistic rollups",
@@ -118,7 +122,9 @@
       ]
     },
     {
-      "chainId": 10,
+      "type": "evm",
+      "networkId": "eip155:10",
+      "slug": "op",
       "name": "Optimism",
       "shortName": "Optimism",
       "description": "Ethereum Layer 2 scaling solution using optimistic rollups",
@@ -152,7 +158,9 @@
       ]
     },
     {
-      "chainId": 56,
+      "type": "evm",
+      "networkId": "eip155:56",
+      "slug": "bsc",
       "name": "BNB Smart Chain",
       "shortName": "BSC",
       "description": "EVM-compatible blockchain by Binance",
@@ -186,7 +194,9 @@
       ]
     },
     {
-      "chainId": 137,
+      "type": "evm",
+      "networkId": "eip155:137",
+      "slug": "polygon",
       "name": "Polygon",
       "shortName": "Polygon",
       "description": "Ethereum sidechain with fast and low-cost transactions",
@@ -220,7 +230,9 @@
       ]
     },
     {
-      "chainId": 11155111,
+      "type": "evm",
+      "networkId": "eip155:11155111",
+      "slug": "sepolia",
       "name": "Ethereum Sepolia",
       "shortName": "Sepolia",
       "description": "Ethereum testnet for developers",
@@ -249,7 +261,9 @@
       ]
     },
     {
-      "chainId": 97,
+      "type": "evm",
+      "networkId": "eip155:97",
+      "slug": "bsc-testnet",
       "name": "BNB Smart Chain Testnet",
       "shortName": "BSC Testnet",
       "description": "BNB Smart Chain testnet for developers",
@@ -278,27 +292,61 @@
       ]
     },
     {
-      "chainId": 31337,
-      "name": "Localhost",
-      "shortName": "Localhost",
-      "description": "Local development network (Hardhat, Anvil)",
-      "currency": "ETH",
-      "color": "#4A5568",
-      "isTestnet": true,
-      "logo": "assets/networks/31337.svg",
+      "type": "bitcoin",
+      "networkId": "bip122:000000000019d6689c085ae165831e93",
+      "slug": "btc",
+      "name": "Bitcoin Mainnet",
+      "shortName": "Bitcoin",
+      "description": "The original decentralized cryptocurrency network",
+      "currency": "BTC",
+      "color": "#F7931A",
+      "isTestnet": false,
+      "logo": "assets/networks/bitcoin-mainnet.svg",
       "rpc": {
-        "public": ["http://127.0.0.1:8545"]
+        "public": [
+          "https://bitcoin-rpc.publicnode.com",
+          "https://bitcoin.api.onfinality.io/public",
+          "https://public-btc.nownodes.io/",
+          "https://bitcoin-mainnet.gateway.tatum.io/"
+        ]
       },
       "links": [
         {
-          "name": "Hardhat",
-          "url": "https://hardhat.org",
-          "description": "Hardhat documentation"
+          "name": "Website",
+          "url": "https://bitcoin.org",
+          "description": "Official Bitcoin website"
         },
         {
-          "name": "Foundry",
-          "url": "https://book.getfoundry.sh",
-          "description": "Foundry documentation"
+          "name": "Whitepaper",
+          "url": "https://bitcoin.org/bitcoin.pdf",
+          "description": "Bitcoin whitepaper"
+        },
+        {
+          "name": "GitHub",
+          "url": "https://github.com/bitcoin/bitcoin",
+          "description": "Bitcoin Core repository"
+        }
+      ]
+    },
+    {
+      "type": "bitcoin",
+      "networkId": "bip122:00000000da84f2bafbbc53dee25a72ae",
+      "slug": "tbtc",
+      "name": "Bitcoin Testnet4",
+      "shortName": "BTC Testnet4",
+      "description": "Bitcoin testnet for developers - Testnet4",
+      "currency": "tBTC",
+      "color": "#F7931A",
+      "isTestnet": true,
+      "logo": "assets/networks/bitcoin-mainnet.svg",
+      "rpc": {
+        "public": ["https://bitcoin-testnet-rpc.publicnode.com"]
+      },
+      "links": [
+        {
+          "name": "Faucet",
+          "url": "https://mempool.space/testnet4/faucet",
+          "description": "Get testnet BTC"
         }
       ]
     }

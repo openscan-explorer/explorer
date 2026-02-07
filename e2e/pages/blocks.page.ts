@@ -41,11 +41,11 @@ export class BlocksPage {
   }
 
   async goto(chainId = "1") {
-    await this.page.goto(`/${chainId}/blocks`);
+    await this.page.goto(`/#/${chainId}/blocks`);
   }
 
   async gotoWithFromBlock(fromBlock: number, chainId = "1") {
-    await this.page.goto(`/${chainId}/blocks?fromBlock=${fromBlock}`);
+    await this.page.goto(`/#/${chainId}/blocks?fromBlock=${fromBlock}`);
   }
 
   async waitForLoad() {

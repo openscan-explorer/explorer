@@ -2,7 +2,9 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { NetworkConfig } from "../../../config/networks";
 import { ENSService } from "../../../services/ENS/ENSService";
+import { getChainIdFromNetwork } from "../../../utils/networkResolver";
 import NetworkIcon from "../../common/NetworkIcon";
+import { useTranslation } from "react-i18next";
 
 type SearchType = "address" | "transaction" | "block" | "ens" | null;
 
@@ -47,6 +49,7 @@ export default function HomeSearchBar({ networks }: HomeSearchBarProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
+  const { t } = useTranslation("home");
   const searchType = detectSearchType(searchTerm);
   const showDropdown = isDropdownOpen && searchType !== null;
 
@@ -79,14 +82,12 @@ export default function HomeSearchBar({ networks }: HomeSearchBarProps) {
     if (!term) return;
 
     if (searchType === null) {
-      setError(
-        "Invalid search. Enter an address (0x...), transaction hash, block number, or ENS name.",
-      );
+      setError(t("invalidSearchTerm"));
       setIsDropdownOpen(false);
     } else {
       setIsDropdownOpen(true);
     }
-  }, [searchTerm, searchType]);
+  }, [searchTerm, searchType, t]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -105,17 +106,17 @@ export default function HomeSearchBar({ networks }: HomeSearchBarProps) {
       const term = searchTerm.trim();
       if (!term || !searchType) return;
 
-      const networkId = network.networkId;
+      const chainId = getChainIdFromNetwork(network);
 
       switch (searchType) {
         case "transaction":
-          navigate(`/${networkId}/tx/${term}`);
+          navigate(`/${chainId}/tx/${term}`);
           break;
         case "address":
-          navigate(`/${networkId}/address/${term}`);
+          navigate(`/${chainId}/address/${term}`);
           break;
         case "block":
-          navigate(`/${networkId}/block/${term}`);
+          navigate(`/${chainId}/block/${term}`);
           break;
         case "ens":
           // Navigate directly to the ENS URL - the address page will resolve it
@@ -131,7 +132,7 @@ export default function HomeSearchBar({ networks }: HomeSearchBarProps) {
 
   // For ENS, only show Mainnet in dropdown
   const displayNetworks =
-    searchType === "ens" ? networks.filter((n) => n.networkId === 1) : networks;
+    searchType === "ens" ? networks.filter((n) => getChainIdFromNetwork(n) === 1) : networks;
 
   return (
     <div className="home-search-container" ref={containerRef}>
@@ -139,7 +140,7 @@ export default function HomeSearchBar({ networks }: HomeSearchBarProps) {
         <input
           type="text"
           className="home-search-input"
-          placeholder="Search by Address / Tx Hash / Block / ENS Name"
+          placeholder={t("searchBy")}
           value={searchTerm}
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
@@ -148,8 +149,8 @@ export default function HomeSearchBar({ networks }: HomeSearchBarProps) {
           type="button"
           className="home-search-button"
           onClick={handleSearchClick}
-          aria-label="Search"
-          title="Search"
+          aria-label={t("search")}
+          title={t("search")}
         >
           {/* biome-ignore lint/a11y/noSvgWithoutTitle: button has aria-label */}
           <svg

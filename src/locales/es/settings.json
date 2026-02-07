@@ -1,0 +1,104 @@
+{
+  "pageTitle": "Configuración",
+  "appearance": {
+    "title": "Apariencia",
+    "description": "Personalizá la apariencia visual de la aplicación.",
+    "backgroundBlocks": {
+      "label": "Bloques de Fondo Divertidos",
+      "description": "Mostrar bloques isométricos animados en el fondo"
+    }
+  },
+  "language": {
+    "title": "Idioma",
+    "description": "Seleccioná el idioma de la aplicación.",
+    "label": "Idioma de Visualización",
+    "selectDescription": "Elegí el idioma para la interfaz de usuario."
+  },
+  "cacheData": {
+    "title": "Cache y Datos",
+    "description": "Administrá los datos en cache y el almacenamiento de la aplicación.",
+    "clearCache": {
+      "label": "Limpiar Cache",
+      "description": "Borrar metadata cacheada sin perder tu configuración.",
+      "button": "Limpiar Cache"
+    },
+    "clearSiteData": {
+      "label": "Limpiar Datos del Sitio",
+      "description": "Borrar todos los datos, incluyendo configuración, RPCs y API keys.",
+      "button": "Limpiar Datos del Sitio",
+      "confirmMessage": "Esto va a borrar toda la configuración, RPCs, API keys y datos cacheados. La página se va a recargar. ¿Continuar?"
+    }
+  },
+  "rpcStrategy": {
+    "title": "Estrategia de RPC",
+    "description": "Elegí cómo se envían las requests a múltiples endpoints RPC.",
+    "requestStrategy": {
+      "label": "Estrategia de Requests",
+      "fallbackDesc": "Probar los endpoints uno por uno hasta que alguno responda.",
+      "parallelDesc": "Consultar todos los endpoints en paralelo.",
+      "raceDesc": "Consultar todos los endpoints y devolver la respuesta más rápida.",
+      "fallback": "Fallback (Default)",
+      "parallel": "Paralelo",
+      "race": "Race (Más rápido)"
+    },
+    "maxParallelRequests": {
+      "label": "Máximo de Requests en Paralelo",
+      "description": "Limitá cuántos endpoints RPC se consultan al mismo tiempo. Valores más bajos reducen el uso de ancho de banda. Usa los primeros N endpoints de tu lista de RPCs (podés reordenarlos arrastrando).",
+      "option1": "1 endpoint",
+      "option2": "2 endpoints",
+      "option3": "3 endpoints (Default)",
+      "option5": "5 endpoints",
+      "option10": "10 endpoints",
+      "optionUnlimited": "Ilimitado"
+    }
+  },
+  "apiKeys": {
+    "title": "API Keys",
+    "description": "Ingresá tus API keys para los proveedores RPC.",
+    "infura": {
+      "name": "Infura",
+      "getKey": "Obtener Key",
+      "placeholder": "Ingresá tu API key de Infura"
+    },
+    "alchemy": {
+      "name": "Alchemy",
+      "getKey": "Obtener Key",
+      "placeholder": "Ingresá tu API key de Alchemy"
+    },
+    "toggleHide": "Ocultar API key",
+    "toggleShow": "Mostrar API key"
+  },
+  "saveConfiguration": "Guardar Configuración",
+  "toasts": {
+    "settingsSaved": "¡Configuración guardada correctamente!",
+    "cacheCleared": "¡Cache limpiada!"
+  },
+  "rpcEndpoints": {
+    "title": "Endpoints RPC",
+    "description": "Configurá las URLs RPC para cada red. Hacé click en una red para desplegar y configurar sus endpoints.",
+    "fetchButton": "Obtener desde Chainlist",
+    "fetchingButton": "Obteniendo...",
+    "placeholder": "https://eth-mainnet.g.alchemy.com/v2/TU-API-KEY",
+    "currentRPCs": "RPCs actuales:",
+    "chainId": "Chain ID: {{chainId}}",
+    "rpcCount_one": "{{count}} RPC",
+    "rpcCount_other": "{{count}} RPCs",
+    "removeRpc": "Eliminar RPC",
+    "localhostHelp": "¿Necesitás acceder a tu red local de forma remota?",
+    "localhostHelpLink": "Aprendé cómo configurar un túnel con ngrok",
+    "metamask": {
+      "notSupported": "No soportado para esta chain",
+      "configured": "¡OpenScan configurado!",
+      "setDefault": "Configurar OpenScan como explorador por defecto en MetaMask",
+      "configuring": "Configurando...",
+      "configuredText": "¡Configurado!",
+      "useAsDefault": "Usar como explorador por defecto"
+    }
+  },
+  "errors": {
+    "failedToFetch": "No se pudo obtener la información desde Chainlist",
+    "noRPCsFound": "No se encontraron RPCs para la chain {{chainId}}",
+    "noPrivacyFriendlyRPCs": "No se encontraron RPCs amigables con la privacidad para la chain {{chainId}}",
+    "errorFetchingChainlist": "Error al obtener datos desde Chainlist:"
+  }
+}

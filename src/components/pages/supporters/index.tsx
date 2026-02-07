@@ -1,11 +1,13 @@
 import type React from "react";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { fetchSupporters, type Supporter } from "../../../services/MetadataService";
 import Loader from "../../common/Loader";
 import TierBadge from "../../common/TierBadge";
 
 const Supporters: React.FC = () => {
+  const { t } = useTranslation();
   const [supporters, setSupporters] = useState<Supporter[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -17,10 +19,10 @@ const Supporters: React.FC = () => {
         setLoading(false);
       })
       .catch((err) => {
-        setError(err.message || "Failed to fetch supporters");
+        setError(err.message || t("supporters.error", { error: "Unknown" }));
         setLoading(false);
       });
-  }, []);
+  }, [t]);
 
   // Group supporters by tier
   const allies = supporters.filter((s) => s.currentTier === 3);
@@ -31,21 +33,19 @@ const Supporters: React.FC = () => {
     <div className="container-medium page-container-padded">
       <div className="page-card">
         <div className="text-center mb-large">
-          <h1 className="page-heading">Openscan Supporters</h1>
-          <p className="page-subtitle">
-            Thanks to everyone who supports Openscan and helps keep it online, free and ad-free!
-          </p>
+          <h1 className="page-heading">{t("supporters.title")}</h1>
+          <p className="page-subtitle">{t("supporters.subtitle")}</p>
         </div>
 
-        {loading && <Loader text="Loading supporters..." />}
+        {loading && <Loader text={t("supporters.loading")} />}
 
-        {error && <p className="error-text-center">Error: {error}</p>}
+        {error && <p className="error-text-center">{t("supporters.error", { error })}</p>}
 
         {!loading && !error && supporters.length === 0 && (
           <div className="text-center">
-            <p className="supporters-empty">No supporters yet. Be the first to support Openscan!</p>
+            <p className="supporters-empty">{t("supporters.noSupporters")}</p>
             <Link to="/subscriptions" className="button-primary-inline">
-              Become a Supporter
+              {t("supporters.becomeSupporterTitle")}
             </Link>
           </div>
         )}
@@ -55,7 +55,7 @@ const Supporters: React.FC = () => {
             {allies.length > 0 && (
               <div className="supporters-tier-section">
                 <h2 className="supporters-tier-title">
-                  <span className="tier-icon">🏆</span> Allies
+                  <span className="tier-icon">🏆</span> {t("supporters.allies")}
                 </h2>
                 <div className="supporters-grid supporters-grid-allies">
                   {allies.map((supporter) => (
@@ -68,7 +68,7 @@ const Supporters: React.FC = () => {
             {partners.length > 0 && (
               <div className="supporters-tier-section">
                 <h2 className="supporters-tier-title">
-                  <span className="tier-icon">🤝</span> Partners
+                  <span className="tier-icon">🤝</span> {t("supporters.partners")}
                 </h2>
                 <div className="supporters-grid supporters-grid-partners">
                   {partners.map((supporter) => (
@@ -81,7 +81,7 @@ const Supporters: React.FC = () => {
             {backers.length > 0 && (
               <div className="supporters-tier-section">
                 <h2 className="supporters-tier-title">
-                  <span className="tier-icon">💪</span> Backers
+                  <span className="tier-icon">💪</span> {t("supporters.backers")}
                 </h2>
                 <div className="supporters-grid supporters-grid-backers">
                   {backers.map((supporter) => (
@@ -94,9 +94,9 @@ const Supporters: React.FC = () => {
         )}
 
         <div className="text-center supporters-cta">
-          <p>Want to support OpenScan and get your network featured?</p>
+          <p>{t("supporters.becomeSupporterDescription")}</p>
           <Link to="/subscriptions" className="button-primary-inline">
-            View Subscription Plans
+            {t("supporters.viewPlans")}
           </Link>
         </div>
       </div>

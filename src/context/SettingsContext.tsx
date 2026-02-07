@@ -8,6 +8,9 @@ interface SettingsContextType {
   // Theme-specific methods for backward compatibility
   isDarkMode: boolean;
   toggleTheme: () => void;
+  // Super user mode
+  isSuperUser: boolean;
+  toggleSuperUserMode: () => void;
 }
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
@@ -79,6 +82,13 @@ export const SettingsProvider = React.memo<SettingsProviderProps>(({ children })
     updateSettings({ theme: newTheme });
   }, [isDarkMode, updateSettings]);
 
+  // Super user mode
+  const isSuperUser = settings.superUserMode ?? false;
+
+  const toggleSuperUserMode = React.useCallback(() => {
+    updateSettings({ superUserMode: !settings.superUserMode });
+  }, [settings.superUserMode, updateSettings]);
+
   const value = React.useMemo(
     () => ({
       settings,
@@ -86,8 +96,18 @@ export const SettingsProvider = React.memo<SettingsProviderProps>(({ children })
       resetSettings,
       isDarkMode,
       toggleTheme,
+      isSuperUser,
+      toggleSuperUserMode,
     }),
-    [settings, updateSettings, resetSettings, isDarkMode, toggleTheme],
+    [
+      settings,
+      updateSettings,
+      resetSettings,
+      isDarkMode,
+      toggleTheme,
+      isSuperUser,
+      toggleSuperUserMode,
+    ],
   );
 
   return <SettingsContext.Provider value={value}>{children}</SettingsContext.Provider>;

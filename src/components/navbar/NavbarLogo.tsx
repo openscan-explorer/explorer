@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import type { NetworkConfig } from "../../config/networks";
-import { getSubdomainForNetwork, subdomainConfig } from "../../config/subdomains";
+import { useTranslation } from "react-i18next";
 import { useNetworks } from "../../context/AppContext";
 import { getBaseDomainUrl, getSubdomain, getSubdomainRedirect } from "../../utils/subdomainUtils";
+import { getNetworkUrlPath, isBitcoinNetwork, resolveNetwork } from "../../utils/networkResolver";
 import NetworkIcon from "../common/NetworkIcon";
 
 // OpenScan cube SVG component
@@ -57,54 +57,27 @@ export default function NavbarLogo() {
 
   // Extract network ID from URL path (e.g., "/1/blocks" -> 1)
   const pathSegments = location.pathname.split("/").filter(Boolean);
-  const networkIdFromPath =
-    pathSegments[0] && /^\d+$/.test(pathSegments[0]) ? Number(pathSegments[0]) : null;
+  const networkIdFromPath = pathSegments[0] || null;
 
-  // Check if the network from path has a configured subdomain
-  const networkFromPathHasSubdomain = networkIdFromPath
-    ? getSubdomainForNetwork(networkIdFromPath)
-    : null;
+  // Get network config from enabled networks
+  const { networks } = useNetworks();
 
-  // Determine which network to show:
-  // 1. If on a subdomain, use that network
-  // 2. If on a network page (from path) that has a subdomain configured, use that
-  const activeNetworkId =
-    networkIdFromSubdomain ?? (networkFromPathHasSubdomain ? networkIdFromPath : null);
-
-  // Get network config from enabled networks only
-  const { enabledNetworks } = useNetworks();
-  const network = useMemo(() => {
-    if (!activeNetworkId) return undefined;
-    return enabledNetworks.find((n) => n.networkId === activeNetworkId);
-  }, [activeNetworkId, enabledNetworks]);
-
-  // Get all networks that have subdomain support (enabled networks with subdomain config)
-  const networksWithSubdomain = useMemo(() => {
-    const networkSubdomains = subdomainConfig.filter(
-      (config) => config.enabled && /^\/\d+$/.test(config.redirect),
-    );
-
-    const networks: NetworkConfig[] = [];
-    for (const config of networkSubdomains) {
-      const networkId = Number(config.redirect.slice(1));
-      const networkConfig = enabledNetworks.find((n) => n.networkId === networkId);
-      if (networkConfig) {
-        networks.push(networkConfig);
-      }
+  const { t } = useTranslation();
+  // Resolve the current network from path or subdomain
+  const currentNetwork = useMemo(() => {
+    // First try subdomain
+    if (networkIdFromSubdomain) {
+      return resolveNetwork(String(networkIdFromSubdomain), networks);
     }
-    return networks;
-  }, [enabledNetworks]);
-
-  // Other networks (not the current one) for the dropdown
-  const otherNetworks = useMemo(() => {
-    return networksWithSubdomain.filter((n) => n.networkId !== activeNetworkId);
-  }, [networksWithSubdomain, activeNetworkId]);
+    // Then try path
+    if (networkIdFromPath) {
+      return resolveNetwork(networkIdFromPath, networks);
+    }
+    return null;
+  }, [networkIdFromSubdomain, networkIdFromPath, networks]);
 
   // Determine if we're currently on the subdomain for this network
   const isOnSubdomain = Boolean(subdomain && networkIdFromSubdomain);
-
-  // Only show network logo if we have a valid enabled network with subdomain support
-  const showNetworkLogo = activeNetworkId && network;
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -132,20 +105,15 @@ export default function NavbarLogo() {
     setIsDropdownOpen(false);
   }, [isOnSubdomain]);
 
-  const handleGoToNetwork = useCallback(
-    (networkId?: number) => {
-      const targetNetworkId = networkId ?? activeNetworkId;
-      if (!targetNetworkId) return;
+  const handleGoToNetwork = useCallback(() => {
+    if (!currentNetwork) return;
+    const networkId = getNetworkUrlPath(currentNetwork);
+    navigate(`/${networkId}`);
+    setIsDropdownOpen(false);
+  }, [currentNetwork, navigate]);
 
-      // Navigate to network page path using React Router
-      navigate(`/${targetNetworkId}`);
-      setIsDropdownOpen(false);
-    },
-    [activeNetworkId, navigate],
-  );
-
-  // If not on a network subdomain, show the regular OpenScan cube
-  if (!showNetworkLogo) {
+  // If not on a network page, show the regular OpenScan cube
+  if (!currentNetwork) {
     return (
       <Link to="/" className="home-cube-link" title="Home">
         <OpenScanCube />
@@ -153,9 +121,15 @@ export default function NavbarLogo() {
     );
   }
 
-  // On a network subdomain - show network icon with dropdown
+  // On a network page - show network icon with dropdown
   return (
-    <div className="navbar-logo-container" ref={dropdownRef}>
+    // biome-ignore lint/a11y/noStaticElementInteractions: container for hover dropdown
+    <div
+      className="navbar-logo-container"
+      ref={dropdownRef}
+      onMouseEnter={() => setIsDropdownOpen(true)}
+      onMouseLeave={() => setIsDropdownOpen(false)}
+    >
       <div className="navbar-logo-group">
         <button
           type="button"
@@ -170,37 +144,56 @@ export default function NavbarLogo() {
         <button
           type="button"
           className="navbar-logo-network"
-          onClick={() => handleGoToNetwork()}
-          title={`Go to ${network.name}`}
+          onClick={handleGoToNetwork}
+          title={`Go to ${currentNetwork.name}`}
         >
-          <NetworkIcon network={network} size={28} />
+          <NetworkIcon network={currentNetwork} size={28} />
         </button>
       </div>
 
       {isDropdownOpen && (
         <div className="navbar-logo-dropdown">
-          {/* Current network first */}
+          {/* Current network home */}
           <button
             type="button"
             className="navbar-logo-dropdown-item active"
-            onClick={() => handleGoToNetwork()}
+            onClick={handleGoToNetwork}
           >
-            <NetworkIcon network={network} size={24} />
-            <span>{network.name}</span>
+            <NetworkIcon network={currentNetwork} size={24} />
+            <span>{currentNetwork.name}</span>
           </button>
 
-          {/* Other networks with subdomain support */}
-          {otherNetworks.map((otherNetwork) => (
-            <button
-              key={otherNetwork.networkId}
-              type="button"
+          {/* Divider */}
+          <div className="navbar-logo-dropdown-divider" />
+
+          {/* Blocks link */}
+          <Link
+            to={`/${getNetworkUrlPath(currentNetwork)}/blocks`}
+            className="navbar-logo-dropdown-item"
+            onClick={() => setIsDropdownOpen(false)}
+          >
+            <span>{t("nav.blocksMobile")}</span>
+          </Link>
+
+          {/* Transactions link */}
+          <Link
+            to={`/${getNetworkUrlPath(currentNetwork)}/txs`}
+            className="navbar-logo-dropdown-item"
+            onClick={() => setIsDropdownOpen(false)}
+          >
+            <span>{t("nav.txs")}</span>
+          </Link>
+
+          {/* Mempool link (Bitcoin networks only) */}
+          {isBitcoinNetwork(currentNetwork) && (
+            <Link
+              to={`/${getNetworkUrlPath(currentNetwork)}/mempool`}
               className="navbar-logo-dropdown-item"
-              onClick={() => handleGoToNetwork(otherNetwork.networkId)}
+              onClick={() => setIsDropdownOpen(false)}
             >
-              <NetworkIcon network={otherNetwork} size={24} />
-              <span>{otherNetwork.name}</span>
-            </button>
-          ))}
+              <span>{t("nav.mempool")}</span>
+            </Link>
+          )}
 
           {/* Divider */}
           <div className="navbar-logo-dropdown-divider" />

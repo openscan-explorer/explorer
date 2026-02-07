@@ -23,7 +23,7 @@ export class TransactionPage {
   }
 
   async goto(txHash: string, chainId = "1") {
-    await this.page.goto(`/${chainId}/tx/${txHash}`);
+    await this.page.goto(`/#/${chainId}/tx/${txHash}`);
   }
 
   async waitForLoad() {

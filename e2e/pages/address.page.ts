@@ -37,11 +37,11 @@ export class AddressPage {
   }
 
   async goto(chainId = "1", address: string) {
-    await this.page.goto(`/${chainId}/address/${address}`);
+    await this.page.goto(`/#/${chainId}/address/${address}`);
   }
 
   async gotoWithENS(chainId = "1", ensName: string) {
-    await this.page.goto(`/${chainId}/address/${ensName}`);
+    await this.page.goto(`/#/${chainId}/address/${ensName}`);
   }
 
   async waitForLoad() {

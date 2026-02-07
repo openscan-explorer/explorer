@@ -104,6 +104,32 @@ export async function waitForAddressContent(page: Page, testInfo: TestInfo): Pro
 }
 
 /**
+ * Wait for transactions page content to load or error to appear.
+ * Returns true if content loaded successfully, false if error or timeout.
+ */
+export async function waitForTxsContent(page: Page, testInfo: TestInfo): Promise<boolean> {
+  const timeout = getTimeout(testInfo);
+  try {
+    await expect(
+      page
+        .locator(".blocks-header-main")
+        .or(page.locator("text=Error:"))
+        .or(page.locator("text=Something went wrong"))
+        .or(page.locator("text=Failed to fetch"))
+        .first()
+    ).toBeVisible({ timeout });
+
+    return (
+      !(await page.locator("text=Error:").isVisible()) &&
+      !(await page.locator("text=Something went wrong").isVisible()) &&
+      !(await page.locator("text=Failed to fetch").isVisible())
+    );
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Wait for token page content to load or error to appear.
  * Returns true if content loaded successfully, false if error or timeout.
  */
@@ -122,6 +148,87 @@ export async function waitForTokenContent(page: Page, testInfo: TestInfo): Promi
     return (
       !(await page.locator("text=Error:").isVisible()) &&
       !(await page.locator("text=Something went wrong").isVisible())
+    );
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Wait for Bitcoin block page content to load or error to appear.
+ * Returns true if content loaded successfully, false if error or timeout.
+ */
+export async function waitForBitcoinBlockContent(page: Page, testInfo: TestInfo): Promise<boolean> {
+  const timeout = getTimeout(testInfo);
+  try {
+    await expect(
+      page
+        .locator("text=Block Hash:")
+        .or(page.locator("text=Error:"))
+        .or(page.locator("text=Something went wrong"))
+        .or(page.locator("text=Block not found"))
+        .first()
+    ).toBeVisible({ timeout });
+
+    return (
+      !(await page.locator("text=Error:").isVisible()) &&
+      !(await page.locator("text=Something went wrong").isVisible()) &&
+      !(await page.locator("text=Block not found").isVisible())
+    );
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Wait for Bitcoin transaction page content to load or error to appear.
+ * Returns true if content loaded successfully, false if error or timeout.
+ */
+export async function waitForBitcoinTxContent(page: Page, testInfo: TestInfo): Promise<boolean> {
+  const timeout = getTimeout(testInfo);
+  try {
+    await expect(
+      page
+        .locator("text=Transaction ID:")
+        .or(page.locator("text=Error:"))
+        .or(page.locator("text=Something went wrong"))
+        .or(page.locator("text=Transaction not found"))
+        .first()
+    ).toBeVisible({ timeout });
+
+    return (
+      !(await page.locator("text=Error:").isVisible()) &&
+      !(await page.locator("text=Something went wrong").isVisible()) &&
+      !(await page.locator("text=Transaction not found").isVisible())
+    );
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Wait for Bitcoin address page content to load or error to appear.
+ * Returns true if content loaded successfully, false if error or timeout.
+ */
+export async function waitForBitcoinAddressContent(
+  page: Page,
+  testInfo: TestInfo
+): Promise<boolean> {
+  const timeout = getTimeout(testInfo);
+  try {
+    await expect(
+      page
+        .locator("text=Balance:")
+        .or(page.locator("text=Error:"))
+        .or(page.locator("text=Something went wrong"))
+        .or(page.locator("text=Address not found"))
+        .first()
+    ).toBeVisible({ timeout });
+
+    return (
+      !(await page.locator("text=Error:").isVisible()) &&
+      !(await page.locator("text=Something went wrong").isVisible()) &&
+      !(await page.locator("text=Address not found").isVisible())
     );
   } catch {
     return false;

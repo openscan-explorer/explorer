@@ -1,4 +1,5 @@
 import type React from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 import { ENVIRONMENT } from "../../utils/constants";
 
@@ -7,6 +8,7 @@ interface FooterProps {
 }
 
 const Footer: React.FC<FooterProps> = ({ className = "" }) => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   // Get commit hash from environment variable, fallback to 'development'
@@ -45,11 +47,11 @@ const Footer: React.FC<FooterProps> = ({ className = "" }) => {
             onClick={() => navigate("/about")}
             className="footer-link btn-reset"
           >
-            About
+            {t("footer.about")}
           </button>
           <span className="footer-separator hide-mobile">|</span>
           <button type="button" onClick={goToSubscriptions} className="footer-link btn-reset">
-            Subscribe
+            {t("footer.subscribe")}
           </button>
           <span className="footer-separator hide-mobile">|</span>
           <button
@@ -57,11 +59,11 @@ const Footer: React.FC<FooterProps> = ({ className = "" }) => {
             onClick={() => navigate("/contact")}
             className="footer-link btn-reset"
           >
-            Contact
+            {t("footer.contact")}
           </button>
           <span className="footer-separator hide-mobile">|</span>
           <button type="button" onClick={goToSupporters} className="footer-link btn-reset">
-            Supporters ❤️
+            {t("footer.supporters")} ❤️
           </button>
         </div>
         <div className={`footer-right ${getVersionClass()}`}>
@@ -70,18 +72,18 @@ const Footer: React.FC<FooterProps> = ({ className = "" }) => {
             target="_blank"
             rel="noopener noreferrer"
             className="footer-link"
-            title="Report a bug"
+            title={t("footer.reportBugTitle")}
           >
-            Report a Bug
+            {t("footer.reportBug")}
           </a>
           <a
             href={`${repoUrl}/commit/${commitHash}`}
             target="_blank"
             rel="noopener noreferrer"
             className="commit-link"
-            title={`View commit ${formattedCommitHash} on GitHub`}
+            title={t("footer.viewCommitTitle", { hash: formattedCommitHash })}
           >
-            v{appVersion} {formattedCommitHash}
+            {t("footer.versionLabel", { version: appVersion, hash: formattedCommitHash })}
           </a>
           {ENVIRONMENT !== "production" && (
             <span className="commit-link environment-tag">{ENVIRONMENT}</span>
@@ -91,7 +93,7 @@ const Footer: React.FC<FooterProps> = ({ className = "" }) => {
             target="_blank"
             rel="noopener noreferrer"
             className="github-btn-footer"
-            title="View on GitHub"
+            title={t("footer.githubTitle")}
           >
             {/** biome-ignore lint/a11y/noSvgWithoutTitle: <TODO> */}
             <svg
@@ -109,7 +111,7 @@ const Footer: React.FC<FooterProps> = ({ className = "" }) => {
             target="_blank"
             rel="noopener noreferrer"
             className="github-btn-footer"
-            title="Follow on X"
+            title={t("footer.xTitle")}
           >
             {/** biome-ignore lint/a11y/noSvgWithoutTitle: <TODO> */}
             <svg

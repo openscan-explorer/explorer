@@ -4,7 +4,7 @@
  * For ETH L2s (Arbitrum, Optimism, Base), fetches ETH price from mainnet
  */
 
-import { getPricePoolsForNetwork, type PricePoolConfig } from "../config/priceFeeds";
+import { getPricePoolsForNetwork, getWBTCPools, type PricePoolConfig } from "../config/priceFeeds";
 
 // Chain IDs that use ETH as their native token (L2s)
 const ETH_NATIVE_CHAINS = new Set([
@@ -172,6 +172,32 @@ export async function getNativeTokenPrice(
 
   // Fetch prices from all pools in parallel
   const pricePromises = pools.map((pool) => fetchPriceFromPool(targetRpcUrl, pool));
+  const prices = await Promise.all(pricePromises);
+
+  // Filter out null values
+  const validPrices = prices.filter((p): p is number => p !== null && p > 0);
+
+  if (validPrices.length === 0) {
+    return null;
+  }
+
+  // Return median price for manipulation resistance
+  return median(validPrices);
+}
+
+/**
+ * Fetch BTC price from WBTC/stablecoin pools on Ethereum mainnet
+ * Returns median price from all configured pools
+ */
+export async function getBTCPrice(mainnetRpcUrl: string): Promise<number | null> {
+  const pools = getWBTCPools();
+
+  if (pools.length === 0) {
+    return null;
+  }
+
+  // Fetch prices from all pools in parallel
+  const pricePromises = pools.map((pool) => fetchPriceFromPool(mainnetRpcUrl, pool));
   const prices = await Promise.all(pricePromises);
 
   // Filter out null values

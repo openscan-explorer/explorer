@@ -237,12 +237,15 @@ Any other details that might be helpful.
 
 ## Creating PRs with Claude
 
+**IMPORTANT: Always use the PR template when creating pull requests.**
+
 When asked to create a PR:
-1. Always use the PR template structure above
-2. Fill in all sections appropriately
+1. **MUST** use the PR template structure from `.github/PULL_REQUEST_TEMPLATE.md`
+2. Fill in ALL sections appropriately (Description, Related Issue, Type of Change, Changes Made, etc.)
 3. Check the applicable boxes in "Type of Change"
-4. Mark completed items in the checklist
+4. Mark completed items in the checklist (format, lint, typecheck, etc.)
 5. Link related issues with "Closes #XXX" or "Fixes #XXX"
+6. Never create PRs with custom formats - always follow the template exactly
 
 ## Creating Issues with Claude
 

@@ -11,6 +11,7 @@ import {
 } from "ethers";
 import type React from "react";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useAccount } from "wagmi";
 import WalletConnectButton from "../../common/WalletConnectButton";
 
@@ -23,6 +24,7 @@ const NETWORKS: Record<number, { name: string; rpc: string }> = {
 };
 
 const TransactionsSection: React.FC = () => {
+  const { t } = useTranslation("devtools");
   const { address: walletAddress, isConnected } = useAccount();
   const [showTransactionBuilder, setShowTransactionBuilder] = useState(true);
   const [txFrom, setTxFrom] = useState("");
@@ -91,7 +93,7 @@ const TransactionsSection: React.FC = () => {
     try {
       const chainId = txChainId || 1;
       const net = NETWORKS[chainId];
-      if (!net) throw new Error("Unknown network - select a supported chainId");
+      if (!net) throw new Error(t("txBuilder.unknownNetwork"));
       const provider = new JsonRpcProvider(net.rpc);
 
       const to = txTo || undefined;
@@ -301,7 +303,7 @@ const TransactionsSection: React.FC = () => {
             className="devtools-tool-header cursor-pointer"
             onClick={() => setShowTransactionBuilder(!showTransactionBuilder)}
           >
-            <h3 className="devtools-tool-title">🧾 Transaction Builder</h3>
+            <h3 className="devtools-tool-title">🧾 {t("txBuilder.title")}</h3>
             <span className="devtools-section-toggle">{showTransactionBuilder ? "▼" : "▶"}</span>
           </div>
           <WalletConnectButton />
@@ -310,7 +312,7 @@ const TransactionsSection: React.FC = () => {
           <div className="devtools-flex-column devtools-gap-10">
             <div className="tx-builder-network-row">
               {/** biome-ignore lint/a11y/noLabelWithoutControl: <TODO> */}
-              <label className="input-label">Network</label>
+              <label className="input-label">{t("txBuilder.network")}</label>
               <select
                 value={txChainId ?? 1}
                 onChange={(e) => setTxChainId(parseInt(e.target.value, 10))}
@@ -327,18 +329,18 @@ const TransactionsSection: React.FC = () => {
             <div className="tx-builder-address-row">
               <div className="devtools-flex-1">
                 {/** biome-ignore lint/a11y/noLabelWithoutControl: <TODO> */}
-                <label className="input-label">From (address, optional)</label>
+                <label className="input-label">{t("txBuilder.fromLabel")}</label>
                 <input
                   type="text"
                   className="devtools-input"
                   value={txFrom}
                   onChange={(e) => setTxFrom(e.target.value)}
-                  placeholder="0x... (for building unsigned tx)"
+                  placeholder={t("txBuilder.fromPlaceholder")}
                 />
               </div>
               <div className="devtools-flex-1">
                 {/** biome-ignore lint/a11y/noLabelWithoutControl: <TODO> */}
-                <label className="input-label">To (address)</label>
+                <label className="input-label">{t("txBuilder.toLabel")}</label>
                 <input
                   type="text"
                   className="devtools-input"
@@ -352,7 +354,7 @@ const TransactionsSection: React.FC = () => {
             <div className="tx-builder-value-row">
               <div className="devtools-flex-1">
                 {/** biome-ignore lint/a11y/noLabelWithoutControl: <TODO> */}
-                <label className="input-label">Value (ETH)</label>
+                <label className="input-label">{t("txBuilder.valueLabel")}</label>
                 <input
                   type="text"
                   className="devtools-input"
@@ -363,7 +365,7 @@ const TransactionsSection: React.FC = () => {
               </div>
               <div className="devtools-width-220">
                 {/** biome-ignore lint/a11y/noLabelWithoutControl: <TODO> */}
-                <label className="input-label">Nonce (optional)</label>
+                <label className="input-label">{t("txBuilder.nonceLabel")}</label>
                 <input
                   type="number"
                   className="devtools-input"
@@ -380,7 +382,7 @@ const TransactionsSection: React.FC = () => {
 
             <div className="devtools-flex-column">
               {/** biome-ignore lint/a11y/noLabelWithoutControl: <TODO> */}
-              <label className="input-label">Data (hex, optional)</label>
+              <label className="input-label">{t("txBuilder.dataLabel")}</label>
               <textarea
                 className="devtools-input mono tx-builder-data-textarea"
                 value={txData}
@@ -392,19 +394,19 @@ const TransactionsSection: React.FC = () => {
             <div className="tx-builder-gas-row">
               <div>
                 {/** biome-ignore lint/a11y/noLabelWithoutControl: <TODO> */}
-                <label className="input-label">Tx Type</label>
+                <label className="input-label">{t("txBuilder.txTypeLabel")}</label>
                 <select
                   className="devtools-input"
                   value={txType}
                   onChange={(e) => setTxType(Number(e.target.value) as 0 | 2)}
                 >
-                  <option value={2}>EIP-1559 (type 2)</option>
-                  <option value={0}>Legacy (type 0)</option>
+                  <option value={2}>{t("txBuilder.eip1559Type")}</option>
+                  <option value={0}>{t("txBuilder.legacyType")}</option>
                 </select>
               </div>
               <div className="devtools-flex-1">
                 {/** biome-ignore lint/a11y/noLabelWithoutControl: <TODO> */}
-                <label className="input-label">Gas Limit (optional)</label>
+                <label className="input-label">{t("txBuilder.gasLimitLabel")}</label>
                 <input
                   className="devtools-input"
                   value={txGasLimit ?? ""}
@@ -420,7 +422,7 @@ const TransactionsSection: React.FC = () => {
               <div className="tx-builder-fee-row">
                 <div className="devtools-flex-1">
                   {/** biome-ignore lint/a11y/noLabelWithoutControl: <TODO> */}
-                  <label className="input-label">Gas Price (gwei)</label>
+                  <label className="input-label">{t("txBuilder.gasPriceGwei")}</label>
                   <input
                     className="devtools-input"
                     value={txGasPrice ?? ""}
@@ -435,7 +437,7 @@ const TransactionsSection: React.FC = () => {
               <div className="tx-builder-fee-row">
                 <div className="devtools-flex-1">
                   {/** biome-ignore lint/a11y/noLabelWithoutControl: <TODO> */}
-                  <label className="input-label">Max Fee Per Gas (gwei)</label>
+                  <label className="input-label">{t("txBuilder.maxFeeLabel")}</label>
                   <input
                     className="devtools-input"
                     value={txMaxFeePerGas ?? ""}
@@ -447,7 +449,7 @@ const TransactionsSection: React.FC = () => {
                 </div>
                 <div className="devtools-width-220">
                   {/** biome-ignore lint/a11y/noLabelWithoutControl: <TODO> */}
-                  <label className="input-label">Max Priority Fee (gwei)</label>
+                  <label className="input-label">{t("txBuilder.maxPriorityLabel")}</label>
                   <input
                     className="devtools-input"
                     value={txMaxPriorityFeePerGas ?? ""}
@@ -462,14 +464,16 @@ const TransactionsSection: React.FC = () => {
 
             <div className="tx-builder-signing-row">
               {/** biome-ignore lint/a11y/noLabelWithoutControl: <TODO> */}
-              <label className="input-label devtools-margin-right-8">Signing</label>
+              <label className="input-label devtools-margin-right-8">
+                {t("txBuilder.signingLabel")}
+              </label>
               <select
                 className="devtools-input devtools-width-220"
                 value={useMetaMask ? "metamask" : "local"}
                 onChange={(e) => setUseMetaMask(e.target.value === "metamask")}
               >
-                <option value="metamask">MetaMask / Injected</option>
-                <option value="local">Local Private Key</option>
+                <option value="metamask">{t("txBuilder.metamaskInjected")}</option>
+                <option value="local">{t("txBuilder.localPrivateKey")}</option>
               </select>
               {!useMetaMask && (
                 <input
@@ -484,20 +488,20 @@ const TransactionsSection: React.FC = () => {
             <div className="tx-builder-buttons">
               {/** biome-ignore lint/a11y/useButtonType: <TODO> */}
               <button className="devtools-button" onClick={estimateGasAndFees}>
-                Estimate Gas & Fees
+                {t("txBuilder.estimateGasFees")}
               </button>
               {/** biome-ignore lint/a11y/useButtonType: <TODO> */}
               <button
                 className="devtools-button"
                 disabled={fetchingNonce || !isConnected}
                 onClick={() => fetchNonceForAddress(walletAddress)}
-                title={!isConnected ? "Connect your wallet first" : undefined}
+                title={!isConnected ? t("txBuilder.connectWalletFirst") : undefined}
               >
-                {fetchingNonce ? "Fetching..." : "Fetch Nonce"}
+                {fetchingNonce ? t("txBuilder.fetching") : t("txBuilder.fetchNonce")}
               </button>
               {/** biome-ignore lint/a11y/useButtonType: <TODO> */}
               <button className="devtools-button" onClick={buildTransaction}>
-                Build Transaction
+                {t("txBuilder.buildTransaction")}
               </button>
               {/** biome-ignore lint/a11y/useButtonType: <TODO> */}
               <button
@@ -505,21 +509,21 @@ const TransactionsSection: React.FC = () => {
                 onClick={sendTransaction}
                 disabled={txSending}
               >
-                {txSending ? "Sending..." : "Sign & Send"}
+                {txSending ? t("txBuilder.sending") : t("txBuilder.signAndSend")}
               </button>
             </div>
 
             {estimatedGas && (
               <div className="devtools-results">
                 <div>
-                  Estimated Gas: <span className="mono">{estimatedGas}</span>
+                  {t("txBuilder.estimatedGas")} <span className="mono">{estimatedGas}</span>
                   {txWillRevert && (
-                    <span className="tx-fallback-estimate">(fallback estimate)</span>
+                    <span className="tx-fallback-estimate">{t("txBuilder.fallbackEstimate")}</span>
                   )}
                 </div>
                 {suggestedFees && (
                   <div>
-                    Suggested:{" "}
+                    {t("txBuilder.suggested")}{" "}
                     <span className="mono">
                       {txType === 0
                         ? `${suggestedFees.gasPrice ? formatUnits(suggestedFees.gasPrice, "gwei") : "N/A"} gwei`
@@ -529,7 +533,8 @@ const TransactionsSection: React.FC = () => {
                 )}
                 {estimatedCostEth && (
                   <div>
-                    Estimated Cost: <span className="mono">{estimatedCostEth} ETH</span>{" "}
+                    {t("txBuilder.estimatedCost")}{" "}
+                    <span className="mono">{estimatedCostEth} ETH</span>{" "}
                     {estimatedCostUsd && <span> (~${estimatedCostUsd} USD)</span>}
                   </div>
                 )}
@@ -538,7 +543,7 @@ const TransactionsSection: React.FC = () => {
 
             {builtTx && (
               <div className="devtools-results">
-                <div className="tx-built-header">Unsigned Transaction:</div>
+                <div className="tx-built-header">{t("txBuilder.unsignedTransaction")}</div>
                 <textarea
                   className="devtools-input mono tx-builder-built-tx-textarea"
                   value={builtTx}
@@ -549,21 +554,21 @@ const TransactionsSection: React.FC = () => {
                   className="devtools-button devtools-margin-top-8"
                   onClick={() => navigator.clipboard.writeText(builtTx)}
                 >
-                  Copy to Clipboard
+                  {t("txBuilder.copyToClipboard")}
                 </button>
               </div>
             )}
 
             {txWillRevert && (
               <div className="devtools-error tx-revert-warning">
-                ⚠️ Transaction will likely revert!
+                ⚠️ {t("txBuilder.revertWarning")}
                 {revertReason && <div className="tx-revert-warning-text">{revertReason}</div>}
               </div>
             )}
 
             {txHashResult && (
               <div className="devtools-results">
-                Transaction sent:{" "}
+                {t("txBuilder.transactionSent")}{" "}
                 <a
                   className="mono devtools-results-link"
                   href={`https://etherscan.io/tx/${txHashResult}`}
@@ -588,14 +593,14 @@ const TransactionsSection: React.FC = () => {
           className="devtools-tool-header cursor-pointer"
           onClick={() => setShowAdvancedRaw(!showAdvancedRaw)}
         >
-          <h3 className="devtools-tool-title">📦 Raw RLP Transaction</h3>
+          <h3 className="devtools-tool-title">📦 {t("rawRlp.title")}</h3>
           <span className="devtools-section-toggle">{showAdvancedRaw ? "▼" : "▶"}</span>
         </div>
         {showAdvancedRaw && (
           <div className="raw-rlp-container">
             <div className="devtools-flex-column devtools-gap-4">
               {/** biome-ignore lint/a11y/noLabelWithoutControl: <TODO> */}
-              <label className="input-label">Signed Transaction (RLP hex)</label>
+              <label className="input-label">{t("rawRlp.signedTransactionLabel")}</label>
               <textarea
                 className="devtools-input mono tx-builder-raw-rlp-textarea"
                 value={rawRlp}
@@ -606,7 +611,7 @@ const TransactionsSection: React.FC = () => {
             <div className="raw-rlp-buttons">
               {/** biome-ignore lint/a11y/useButtonType: <TODO> */}
               <button className="devtools-button" onClick={sendRawRlpTx} disabled={txSending}>
-                {txSending ? "Sending..." : "Send Raw Transaction"}
+                {txSending ? t("txBuilder.sending") : t("rawRlp.sendRawTransaction")}
               </button>
             </div>
           </div>

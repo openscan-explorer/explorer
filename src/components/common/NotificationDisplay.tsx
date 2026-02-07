@@ -1,7 +1,9 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { useNotifications } from "../../context/NotificationContext";
 
 const NotificationDisplay: React.FC = React.memo(() => {
+  const { t } = useTranslation();
   const { notifications, removeNotification } = useNotifications();
 
   if (notifications.length === 0) {
@@ -18,7 +20,7 @@ const NotificationDisplay: React.FC = React.memo(() => {
             <button
               className="notification__close"
               onClick={() => removeNotification(notification.id)}
-              aria-label="Close notification"
+              aria-label={t("notifications.closeAriaLabel")}
             >
               ×
             </button>

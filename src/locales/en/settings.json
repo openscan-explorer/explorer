@@ -1,0 +1,104 @@
+{
+  "pageTitle": "Settings",
+  "appearance": {
+    "title": "Appearance",
+    "description": "Customize the visual appearance of the application.",
+    "backgroundBlocks": {
+      "label": "Funny Background Blocks",
+      "description": "Show animated isometric blocks in the background"
+    }
+  },
+  "language": {
+    "title": "Language",
+    "description": "Select the application language.",
+    "label": "Display Language",
+    "selectDescription": "Choose the language for the user interface."
+  },
+  "cacheData": {
+    "title": "Cache & Data",
+    "description": "Manage cached data and application storage.",
+    "clearCache": {
+      "label": "Clear Cache",
+      "description": "Clear cached metadata without losing your settings.",
+      "button": "Clear Cache"
+    },
+    "clearSiteData": {
+      "label": "Clear Site Data",
+      "description": "Clear all data including settings, RPC configs, and API keys.",
+      "button": "Clear Site Data",
+      "confirmMessage": "This will clear all settings, RPC configurations, API keys, and cached data. The page will reload. Continue?"
+    }
+  },
+  "rpcStrategy": {
+    "title": "RPC Strategy",
+    "description": "Choose how requests are sent to multiple RPC endpoints.",
+    "requestStrategy": {
+      "label": "Request Strategy",
+      "fallbackDesc": "Try endpoints one by one until one succeeds.",
+      "parallelDesc": "Query all endpoints simultaneously.",
+      "raceDesc": "Query all endpoints and return the fastest response.",
+      "fallback": "Fallback (Default)",
+      "parallel": "Parallel",
+      "race": "Race (Fastest)"
+    },
+    "maxParallelRequests": {
+      "label": "Max Parallel Requests",
+      "description": "Limit how many RPC endpoints are queried simultaneously. Lower values reduce bandwidth usage. Uses the first N endpoints from your RPC list (reorder by dragging).",
+      "option1": "1 endpoint",
+      "option2": "2 endpoints",
+      "option3": "3 endpoints (Default)",
+      "option5": "5 endpoints",
+      "option10": "10 endpoints",
+      "optionUnlimited": "Unlimited"
+    }
+  },
+  "apiKeys": {
+    "title": "API Keys",
+    "description": "Enter your API keys for RPC providers.",
+    "infura": {
+      "name": "Infura",
+      "getKey": "Get Key",
+      "placeholder": "Enter your Infura API key"
+    },
+    "alchemy": {
+      "name": "Alchemy",
+      "getKey": "Get Key",
+      "placeholder": "Enter your Alchemy API key"
+    },
+    "toggleHide": "Hide API key",
+    "toggleShow": "Show API key"
+  },
+  "saveConfiguration": "Save Configuration",
+  "toasts": {
+    "settingsSaved": "Settings saved successfully!",
+    "cacheCleared": "Cache cleared!"
+  },
+  "rpcEndpoints": {
+    "title": "RPC Endpoints",
+    "description": "Configure RPC URLs for each network. Click on a network to expand and configure its endpoints.",
+    "fetchButton": "Fetch from Chainlist",
+    "fetchingButton": "Fetching...",
+    "placeholder": "https://eth-mainnet.g.alchemy.com/v2/YOUR-API-KEY",
+    "currentRPCs": "Current RPCs:",
+    "chainId": "Chain ID: {{chainId}}",
+    "rpcCount_one": "{{count}} RPC",
+    "rpcCount_other": "{{count}} RPCs",
+    "removeRpc": "Remove RPC",
+    "localhostHelp": "Need to access your local network remotely?",
+    "localhostHelpLink": "Learn how to set up a tunnel with ngrok",
+    "metamask": {
+      "notSupported": "Not supported for this chain",
+      "configured": "OpenScan configured!",
+      "setDefault": "Set OpenScan as the default block explorer in MetaMask",
+      "configuring": "Configuring...",
+      "configuredText": "Configured!",
+      "useAsDefault": "Use as default explorer"
+    }
+  },
+  "errors": {
+    "failedToFetch": "Failed to fetch from Chainlist",
+    "noRPCsFound": "No RPCs found for chain {{chainId}}",
+    "noPrivacyFriendlyRPCs": "No privacy-friendly RPCs found for chain {{chainId}}",
+    "errorFetchingChainlist": "Error fetching from Chainlist:"
+  }
+}
