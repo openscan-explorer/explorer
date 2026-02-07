@@ -29,9 +29,7 @@
   "checkBalance": "Consultar Balance",
   "balance": "Balance",
   "detectingTokenType": "Detectando tipo de token...",
-  "unknown": "desconocido",
   "errors": {
-    "missingValues": "Falta la dirección del contrato, el token ID o la URL RPC",
     "error": "Error"
   }
 }

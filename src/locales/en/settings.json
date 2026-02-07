@@ -78,11 +78,7 @@
     "description": "Configure RPC URLs for each network. Click on a network to expand and configure its endpoints.",
     "fetchButton": "Fetch from Chainlist",
     "fetchingButton": "Fetching...",
-    "placeholder": "https://eth-mainnet.g.alchemy.com/v2/YOUR-API-KEY",
     "currentRPCs": "Current RPCs:",
-    "chainId": "Chain ID: {{chainId}}",
-    "rpcCount_one": "{{count}} RPC",
-    "rpcCount_other": "{{count}} RPCs",
     "removeRpc": "Remove RPC",
     "localhostHelp": "Need to access your local network remotely?",
     "localhostHelpLink": "Learn how to set up a tunnel with ngrok",
@@ -94,11 +90,5 @@
       "configuredText": "Configured!",
       "useAsDefault": "Use as default explorer"
     }
-  },
-  "errors": {
-    "failedToFetch": "Failed to fetch from Chainlist",
-    "noRPCsFound": "No RPCs found for chain {{chainId}}",
-    "noPrivacyFriendlyRPCs": "No privacy-friendly RPCs found for chain {{chainId}}",
-    "errorFetchingChainlist": "Error fetching from Chainlist:"
   }
 }

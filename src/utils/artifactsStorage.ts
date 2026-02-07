@@ -1,3 +1,5 @@
+import { logger } from "./logger";
+
 const STORAGE_KEY = "OPENSCAN_ARTIFACTS_JSON_V1";
 
 // biome-ignore lint/suspicious/noExplicitAny: <TODO>
@@ -28,7 +30,7 @@ export function loadJsonFilesFromStorage(): JsonFilesMap {
     if (!isValidJsonFilesMap(parsed)) return {};
     return parsed;
   } catch (err) {
-    console.warn("Failed to parse JSON files from storage", err);
+    logger.warn("Failed to parse JSON files from storage", err);
     return {};
   }
 }
@@ -40,10 +42,10 @@ export function saveJsonFilesToStorage(jsonFiles: JsonFilesMap): void {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(jsonFiles));
   } catch (err) {
-    console.warn("Failed to save JSON files to storage", err);
+    logger.warn("Failed to save JSON files to storage", err);
     // Handle quota exceeded errors
     if (err instanceof Error && err.name === "QuotaExceededError") {
-      console.error("LocalStorage quota exceeded. Consider clearing old artifacts.");
+      logger.error("LocalStorage quota exceeded. Consider clearing old artifacts.");
     }
   }
 }
@@ -55,7 +57,7 @@ export function clearJsonFilesFromStorage(): void {
   try {
     localStorage.removeItem(STORAGE_KEY);
   } catch (err) {
-    console.warn("Failed to clear JSON files from storage", err);
+    logger.warn("Failed to clear JSON files from storage", err);
   }
 }
 

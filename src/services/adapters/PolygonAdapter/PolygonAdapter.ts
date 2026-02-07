@@ -1,6 +1,7 @@
 import { type BlockNumberOrTag, NetworkAdapter } from "../NetworkAdapter";
 import type { Block, Transaction, Address, NetworkStats, DataWithMetadata } from "../../../types";
 import type { TraceResult } from "../NetworkAdapter";
+import { logger } from "../../../utils/logger";
 import {
   transformPolygonBlockToBlock,
   transformPolygonTransactionToTransaction,
@@ -99,7 +100,7 @@ export class PolygonAdapter extends NetworkAdapter {
           transaction.blockBaseFeePerGas = blockResult.data.baseFeePerGas;
         }
       } catch (error) {
-        console.warn("Failed to fetch block for transaction timestamp:", error);
+        logger.warn("Failed to fetch block for transaction timestamp:", error);
       }
     }
 
@@ -215,7 +216,7 @@ export class PolygonAdapter extends NetworkAdapter {
           });
         }
       } catch (error) {
-        console.error(`Error fetching block ${blockNum}:`, error);
+        logger.error(`Error fetching block ${blockNum}:`, error);
       }
     }
 
@@ -239,7 +240,7 @@ export class PolygonAdapter extends NetworkAdapter {
 
   async getTransactionTrace(txHash: string): Promise<TraceResult | null> {
     if (!this.isLocalHost) {
-      console.warn("Trace methods are only available on localhost networks");
+      logger.warn("Trace methods are only available on localhost networks");
       return null;
     }
 
@@ -247,7 +248,7 @@ export class PolygonAdapter extends NetworkAdapter {
       const result = await this.client.debugTraceTransaction(txHash, {});
       return extractData<TraceResult | null>(result.data);
     } catch (error) {
-      console.error("Error getting transaction trace:", error);
+      logger.error("Error getting transaction trace:", error);
       return null;
     }
   }
@@ -255,7 +256,7 @@ export class PolygonAdapter extends NetworkAdapter {
   // biome-ignore lint/suspicious/noExplicitAny: Generic trace result
   async getCallTrace(txHash: string): Promise<any> {
     if (!this.isLocalHost) {
-      console.warn("Trace methods are only available on localhost networks");
+      logger.warn("Trace methods are only available on localhost networks");
       return null;
     }
 
@@ -264,14 +265,14 @@ export class PolygonAdapter extends NetworkAdapter {
       // biome-ignore lint/suspicious/noExplicitAny: Generic trace result type
       return extractData<any>(result.data);
     } catch (error) {
-      console.error("Error getting call trace:", error);
+      logger.error("Error getting call trace:", error);
       return null;
     }
   }
 
   async getBlockTrace(blockHash: string): Promise<TraceResult[] | null> {
     if (!this.isLocalHost) {
-      console.warn("Trace methods are only available on localhost networks");
+      logger.warn("Trace methods are only available on localhost networks");
       return null;
     }
 
@@ -285,7 +286,7 @@ export class PolygonAdapter extends NetworkAdapter {
       const result = await this.client.traceBlock(blockNumber);
       return extractData<TraceResult[] | null>(result.data);
     } catch (error) {
-      console.error("Error getting block trace:", error);
+      logger.error("Error getting block trace:", error);
       return null;
     }
   }

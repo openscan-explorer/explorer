@@ -1,8 +1,9 @@
 import type React from "react";
 import { useCallback, useContext, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { AppContext } from "../../../../../context";
 import { fetchToken, getAssetUrl } from "../../../../../services/MetadataService";
-import { useTranslation } from "react-i18next";
+import { logger } from "../../../../../utils/logger";
 import {
   fetchERC20TokenInfo,
   formatTokenBalance,
@@ -86,7 +87,7 @@ const CustomTokenModal: React.FC<CustomTokenModalProps> = ({
           setTokenInfo(info);
         }
       } catch (err) {
-        console.error("Error fetching token info:", err);
+        logger.error("Error fetching token info:", err);
         setError("Failed to fetch token information");
         setTokenInfo(null);
       } finally {

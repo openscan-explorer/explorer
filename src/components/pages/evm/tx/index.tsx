@@ -5,6 +5,7 @@ import { useDataService } from "../../../../hooks/useDataService";
 import { useProviderSelection } from "../../../../hooks/useProviderSelection";
 import { useSelectedData } from "../../../../hooks/useSelectedData";
 import type { DataWithMetadata, Transaction } from "../../../../types";
+import { logger } from "../../../../utils/logger";
 import Loader from "../../../common/Loader";
 import TransactionDisplay from "./TransactionDisplay";
 
@@ -40,7 +41,7 @@ export default function Tx() {
       return;
     }
 
-    console.log("Fetching transaction:", txHash, "for chain:", numericNetworkId);
+    logger.debug("Fetching transaction:", txHash, "for chain:", numericNetworkId);
     setLoading(true);
     setError(null);
 
@@ -49,13 +50,13 @@ export default function Tx() {
       dataService.networkAdapter.getLatestBlockNumber(),
     ])
       .then(([result, latestBlock]) => {
-        console.log("Fetched transaction:", result);
-        console.log("Latest block number:", latestBlock);
+        logger.debug("Fetched transaction:", result);
+        logger.debug("Latest block number:", latestBlock);
         setTransactionResult(result);
         setCurrentBlockNumber(latestBlock);
       })
       .catch((err) => {
-        console.error("Error fetching transaction:", err);
+        logger.error("Error fetching transaction:", err);
         setError(err.message || "Failed to fetch transaction");
       })
       .finally(() => setLoading(false));

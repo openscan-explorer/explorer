@@ -2,6 +2,7 @@
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { AppContext } from "../context";
 import { ENSService } from "../services/ENS/ENSService";
+import { logger } from "../utils/logger";
 import type { DecodedContenthash, ENSRecords, ENSReverseResult } from "../types";
 
 interface UseENSResult {
@@ -103,7 +104,7 @@ export function useENS(
           }
         }
       } catch (err) {
-        console.error("Error fetching ENS data:", err);
+        logger.error("Error fetching ENS data:", err);
         setError(err instanceof Error ? err.message : "Unknown error");
       } finally {
         setLoading(false);

@@ -5,6 +5,7 @@ import { RPCIndicator } from "../../../common/RPCIndicator";
 import { useDataService } from "../../../../hooks/useDataService";
 import { useProviderSelection } from "../../../../hooks/useProviderSelection";
 import type { Block, DataWithMetadata } from "../../../../types";
+import { logger } from "../../../../utils/logger";
 import Loader from "../../../common/Loader";
 
 const BLOCKS_PER_PAGE = 10;
@@ -89,12 +90,12 @@ export default function Blocks() {
           blockNumbers.map((num) => dataService.networkAdapter.getBlock(num)),
         );
 
-        console.log("Fetched blocks:", blockResults);
+        logger.debug("Fetched blocks:", blockResults);
         // Store complete results with metadata
         setBlocksResult(blockResults);
         // biome-ignore lint/suspicious/noExplicitAny: <TODO>
       } catch (err: any) {
-        console.error("Error fetching blocks:", err);
+        logger.error("Error fetching blocks:", err);
         setError(err.message || t("errors.failedToFetchBlocks"));
       } finally {
         setLoading(false);
