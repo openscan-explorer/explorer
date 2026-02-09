@@ -1,0 +1,10 @@
+{
+  "title": "OPENSCAN",
+  "loading": "Cargando redes...",
+  "showTestnets": "Mostrar testnets",
+  "hideTestnets": "Ocultar testnets",
+  "invalidSearchTerm": "Búsqueda inválida. Ingresá una dirección (0x...), hash de transacción, número de bloque o nombre ENS.",
+  "searchBy": "Buscar por Dirección / Hash de Tx / Bloque / Nombre ENS",
+  "search": "Buscar",
+  "chainID": "Chain ID"
+}

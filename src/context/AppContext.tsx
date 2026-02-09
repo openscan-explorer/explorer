@@ -17,6 +17,8 @@ import {
 import { useWagmiConnection } from "../hooks/useWagmiConnection";
 import type { IAppContext, NetworkConfig, RpcUrlsContextType } from "../types";
 import { loadJsonFilesFromStorage, saveJsonFilesToStorage } from "../utils/artifactsStorage";
+import { logger } from "../utils/logger";
+import { getChainIdFromNetwork } from "../utils/networkResolver";
 import { getEffectiveRpcUrls, saveRpcUrlsToStorage } from "../utils/rpcStorage";
 
 // Alias exported for use across the app where a shorter/consistent name is preferred
@@ -43,7 +45,7 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
   const [appReady, setAppReady] = useState<boolean>(false);
   const [resourcesLoaded, setResourcesLoaded] = useState<boolean>(false);
   const [isHydrated, setIsHydrated] = useState<boolean>(false);
-  const [rpcUrls, setRpcUrlsState] = useState<RpcUrlsContextType>({} as RpcUrlsContextType);
+  const [rpcUrls, setRpcUrlsState] = useState<RpcUrlsContextType>(() => getEffectiveRpcUrls());
   // biome-ignore lint/suspicious/noExplicitAny: <TODO>
   const [jsonFiles, setJsonFilesState] = useState<Record<string, any>>(() =>
     loadJsonFilesFromStorage(),
@@ -62,7 +64,7 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
     try {
       saveRpcUrlsToStorage(next);
     } catch (err) {
-      console.warn("Failed to persist rpc urls", err);
+      logger.warn("Failed to persist rpc urls", err);
     }
   }, []);
 
@@ -72,14 +74,17 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
     try {
       saveJsonFilesToStorage(next);
     } catch (err) {
-      console.warn("Failed to persist json files", err);
+      logger.warn("Failed to persist json files", err);
     }
   }, []);
 
   // Hardhat network config for local development
   const hardhatNetwork: NetworkConfig = useMemo(
     () => ({
-      networkId: 31337,
+      type: "evm" as const,
+      networkId: "eip155:31337",
+      chainId: 31337,
+      slug: "localhost",
       name: "Hardhat",
       shortName: "hardhat",
       description: "Local development network",
@@ -107,7 +112,11 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
       const hardhatInEnv = envNetworks?.split(",").some((id) => id.trim() === "31337");
 
       // Add Hardhat network if in development AND explicitly enabled
-      if (isDevelopment && hardhatInEnv && !loadedNetworks.some((n) => n.networkId === 31337)) {
+      if (
+        isDevelopment &&
+        hardhatInEnv &&
+        !loadedNetworks.some((n) => getChainIdFromNetwork(n) === 31337)
+      ) {
         loadedNetworks.push(hardhatNetwork);
       }
 
@@ -185,7 +194,7 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
         // Mark app as ready
         setAppReady(true);
       } catch (error) {
-        console.error("Error initializing app:", error);
+        logger.error("Error initializing app:", error);
         setAppReady(true); // Still mark as ready even if there's an error
       }
     };
@@ -242,7 +251,7 @@ export function useNetworks() {
   };
 }
 
-export function useNetwork(networkId: number): NetworkConfig | undefined {
+export function useNetwork(networkId: string | number): NetworkConfig | undefined {
   const { getNetwork } = useNetworks();
   return getNetwork(networkId);
 }

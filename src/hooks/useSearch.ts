@@ -1,7 +1,8 @@
 import { useCallback, useContext, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { AppContext } from "../context";
+import { AppContext, useNetworks } from "../context";
 import { ENSService } from "../services/ENS/ENSService";
+import { resolveNetwork } from "../utils/networkResolver";
 
 interface UseSearchResult {
   searchTerm: string;
@@ -18,13 +19,22 @@ export function useSearch(): UseSearchResult {
   const [isResolving, setIsResolving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { rpcUrls } = useContext(AppContext);
+  const { networks } = useNetworks();
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Extract networkId from the pathname (e.g., /1/blocks -> 1)
+  // Extract network slug from the pathname (e.g., /1/blocks -> "1", /btc/block/123 -> "btc")
   const pathSegments = location.pathname.split("/").filter(Boolean);
-  const networkId =
-    pathSegments[0] && !Number.isNaN(Number(pathSegments[0])) ? pathSegments[0] : undefined;
+  const networkSlug = pathSegments[0] || undefined;
+
+  // Resolve network from slug (works for "1", "btc", etc.)
+  const resolvedNetwork = useMemo(() => {
+    if (!networkSlug) return undefined;
+    return resolveNetwork(networkSlug, networks);
+  }, [networkSlug, networks]);
+
+  // Return the slug as networkId for backward compatibility
+  const networkId = resolvedNetwork ? networkSlug : undefined;
 
   const mainnetRpcUrls = rpcUrls[1];
 
@@ -75,15 +85,18 @@ export function useSearch(): UseSearchResult {
       }
 
       // Determine what type of search this is
-      const isTransactionHash = /^0x[a-fA-F0-9]{64}$/.test(term);
-      const isAddress = /^0x[a-fA-F0-9]{40}$/.test(term);
+      const isEvmTransactionHash = /^0x[a-fA-F0-9]{64}$/.test(term);
+      const isEvmAddress = /^0x[a-fA-F0-9]{40}$/.test(term);
+      const isBitcoinTxid = /^[a-fA-F0-9]{64}$/.test(term);
+      const isBitcoinAddress = /^(1|3|bc1)[a-zA-Z0-9]{25,62}$/.test(term);
       const isBlockNumber = /^\d+$/.test(term);
+
+      const isTransactionHash = isEvmTransactionHash || isBitcoinTxid;
+      const isAddress = isEvmAddress || isBitcoinAddress;
 
       // If pattern doesn't match any valid type, show error immediately
       if (!isTransactionHash && !isAddress && !isBlockNumber) {
-        setError(
-          "Invalid search. Enter an address (0x...), transaction hash, block number, or ENS name.",
-        );
+        setError("Invalid search. Enter an address, transaction hash, block number, or ENS name.");
         return;
       }
 

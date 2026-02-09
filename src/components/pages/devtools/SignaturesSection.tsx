@@ -8,9 +8,11 @@ import {
 } from "ethers";
 import type React from "react";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import MessageSigner from "./MessageSigner";
 
 const SignaturesSection: React.FC = () => {
+  const { t } = useTranslation("devtools");
   const [showSignatureInspector, setShowSignatureInspector] = useState(false);
   const [showEIP712Tool, setShowEIP712Tool] = useState(false);
 
@@ -182,7 +184,7 @@ const SignaturesSection: React.FC = () => {
       });
       // biome-ignore lint/suspicious/noExplicitAny: <TODO>
     } catch (err: any) {
-      setSigResults({ error: err.message || "Failed to verify signature" });
+      setSigResults({ error: err.message || t("sigInspector.failedToVerify") });
     }
   };
 
@@ -192,7 +194,7 @@ const SignaturesSection: React.FC = () => {
       const { domain, types, message } = parsed;
 
       if (!domain || !types || !message) {
-        setEip712Results({ error: "JSON must contain domain, types, and message fields" });
+        setEip712Results({ error: t("eip712Tool.missingFields") });
         return;
       }
 
@@ -223,7 +225,7 @@ const SignaturesSection: React.FC = () => {
       });
       // biome-ignore lint/suspicious/noExplicitAny: <TODO>
     } catch (err: any) {
-      setEip712Results({ error: err.message || "Failed to encode EIP-712 data" });
+      setEip712Results({ error: err.message || t("eip712Tool.failedToEncode") });
     }
   };
 
@@ -233,14 +235,14 @@ const SignaturesSection: React.FC = () => {
       const data = eip712DecodeData.trim();
 
       if (!data.startsWith("0x")) {
-        setEip712Results({ error: "Encoded data must be a hex string starting with 0x" });
+        setEip712Results({ error: t("eip712Tool.stringWith0x") });
         return;
       }
 
       // Get the primary type
       const primaryType = Object.keys(types).find((t) => t !== "EIP712Domain");
       if (!primaryType) {
-        setEip712Results({ error: "No primary type found in types" });
+        setEip712Results({ error: t("eip712Tool.noPrimaryType") });
         return;
       }
 
@@ -289,7 +291,7 @@ const SignaturesSection: React.FC = () => {
       });
       // biome-ignore lint/suspicious/noExplicitAny: <TODO>
     } catch (err: any) {
-      setEip712Results({ error: err.message || "Failed to decode EIP-712 data" });
+      setEip712Results({ error: err.message || t("eip712Tool.failedToDecode") });
     }
   };
 
@@ -306,7 +308,7 @@ const SignaturesSection: React.FC = () => {
           className="devtools-tool-header cursor-pointer"
           onClick={() => setShowSignatureInspector(!showSignatureInspector)}
         >
-          <h3 className="devtools-tool-title">🔍 Signature Inspector</h3>
+          <h3 className="devtools-tool-title">🔍 {t("sigInspector.title")}</h3>
           <span className="devtools-section-toggle">{showSignatureInspector ? "▼" : "▶"}</span>
         </div>
         {showSignatureInspector && (
@@ -318,22 +320,22 @@ const SignaturesSection: React.FC = () => {
                 className={`keccak-mode-btn ${sigMessageType === "message" ? "active" : ""}`}
                 onClick={() => setSigMessageType("message")}
               >
-                EIP-191 Personal Signature
+                {t("sigInspector.eip191Mode")}
               </button>
               {/** biome-ignore lint/a11y/useButtonType: mode toggle */}
               <button
                 className={`keccak-mode-btn ${sigMessageType === "hash" ? "active" : ""}`}
                 onClick={() => setSigMessageType("hash")}
               >
-                Raw Message Signature
+                {t("sigInspector.rawMessageMode")}
               </button>
             </div>
             <div className="devtools-flex-column devtools-gap-4">
               {/** biome-ignore lint/a11y/noLabelWithoutControl: <TODO> */}
               <label className="input-label">
                 {sigMessageType === "message"
-                  ? "Message (string or EIP-712 JSON)"
-                  : "Pre-hashed value (32-byte hex)"}
+                  ? t("sigInspector.messageLabel")
+                  : t("sigInspector.preHashedLabel")}
               </label>
               <textarea
                 placeholder={
@@ -348,7 +350,7 @@ const SignaturesSection: React.FC = () => {
             </div>
             <div className="devtools-flex-column devtools-gap-4">
               {/** biome-ignore lint/a11y/noLabelWithoutControl: <TODO> */}
-              <label className="input-label">Signature (65 or 64 bytes hex)</label>
+              <label className="input-label">{t("sigInspector.signatureLabel")}</label>
               <input
                 type="text"
                 placeholder="0x..."
@@ -359,7 +361,7 @@ const SignaturesSection: React.FC = () => {
             </div>
             {/** biome-ignore lint/a11y/useButtonType: <TODO> */}
             <button onClick={verifySignature} className="devtools-button">
-              Verify Signature
+              {t("sigInspector.verify")}
             </button>
 
             {sigResults && (
@@ -369,23 +371,25 @@ const SignaturesSection: React.FC = () => {
                 ) : (
                   <div className="signature-results">
                     <div className="sig-result-row">
-                      <span className="sig-result-label">Signature Format:</span>
+                      <span className="sig-result-label">{t("sigInspector.signatureFormat")}</span>
                       <span className="sig-result-value">{sigResults.format}</span>
                     </div>
                     <div className="sig-result-row">
-                      <span className="sig-result-label">Message Format:</span>
+                      <span className="sig-result-label">{t("sigInspector.messageFormat")}</span>
                       <span className="sig-result-value">{sigResults.messageFormat}</span>
                     </div>
                     <div className="sig-result-row">
-                      <span className="sig-result-label">Message Hash:</span>
+                      <span className="sig-result-label">{t("sigInspector.messageHash")}</span>
                       <span className="sig-result-value mono">{sigResults.messageHash}</span>
                     </div>
                     <div className="sig-result-row">
-                      <span className="sig-result-label">Recovered Address:</span>
+                      <span className="sig-result-label">{t("sigInspector.recoveredAddress")}</span>
                       <span className="sig-result-value mono">{sigResults.recoveredAddress}</span>
                     </div>
                     <div className="sig-components">
-                      <div className="sig-component-title">Signature Components</div>
+                      <div className="sig-component-title">
+                        {t("sigInspector.signatureComponents")}
+                      </div>
                       <div className="sig-result-row">
                         <span className="sig-result-label">r:</span>
                         <span className="sig-result-value mono">{sigResults.r}</span>
@@ -421,7 +425,7 @@ const SignaturesSection: React.FC = () => {
           className="devtools-tool-header cursor-pointer"
           onClick={() => setShowEIP712Tool(!showEIP712Tool)}
         >
-          <h3 className="devtools-tool-title">📋 EIP-712 Encoder/Decoder</h3>
+          <h3 className="devtools-tool-title">📋 {t("eip712Tool.title")}</h3>
           <span className="devtools-section-toggle">{showEIP712Tool ? "▼" : "▶"}</span>
         </div>
         {showEIP712Tool && (
@@ -436,7 +440,7 @@ const SignaturesSection: React.FC = () => {
                   setEip712Results(null);
                 }}
               >
-                Encode
+                {t("eip712Tool.encode")}
               </button>
               {/** biome-ignore lint/a11y/useButtonType: <TODO> */}
               <button
@@ -446,7 +450,7 @@ const SignaturesSection: React.FC = () => {
                   setEip712Results(null);
                 }}
               >
-                Decode
+                {t("eip712Tool.decode")}
               </button>
             </div>
 
@@ -454,7 +458,7 @@ const SignaturesSection: React.FC = () => {
               <>
                 <div className="devtools-flex-column devtools-gap-4">
                   {/** biome-ignore lint/a11y/noLabelWithoutControl: <TODO> */}
-                  <label className="input-label">EIP-712 JSON (domain, types, message)</label>
+                  <label className="input-label">{t("eip712Tool.eip712JsonLabel")}</label>
                   <textarea
                     placeholder='{"domain": {...}, "types": {...}, "message": {...}}'
                     value={eip712Input}
@@ -464,14 +468,14 @@ const SignaturesSection: React.FC = () => {
                 </div>
                 {/** biome-ignore lint/a11y/useButtonType: <TODO> */}
                 <button onClick={encodeEIP712} className="devtools-button">
-                  Encode EIP-712
+                  {t("eip712Tool.encodeEip712")}
                 </button>
               </>
             ) : (
               <>
                 <div className="devtools-flex-column devtools-gap-4">
                   {/** biome-ignore lint/a11y/noLabelWithoutControl: <TODO> */}
-                  <label className="input-label">Types Definition</label>
+                  <label className="input-label">{t("eip712Tool.typesDefinition")}</label>
                   <textarea
                     placeholder='{"Person": [{"name": "name", "type": "string"}]}'
                     value={eip712DecodeTypes}
@@ -481,7 +485,7 @@ const SignaturesSection: React.FC = () => {
                 </div>
                 <div className="devtools-flex-column devtools-gap-4">
                   {/** biome-ignore lint/a11y/noLabelWithoutControl: <TODO> */}
-                  <label className="input-label">Encoded Data (hex)</label>
+                  <label className="input-label">{t("eip712Tool.encodedDataLabel")}</label>
                   <textarea
                     placeholder="0x..."
                     value={eip712DecodeData}
@@ -491,7 +495,7 @@ const SignaturesSection: React.FC = () => {
                 </div>
                 {/** biome-ignore lint/a11y/useButtonType: <TODO> */}
                 <button onClick={decodeEIP712} className="devtools-button">
-                  Decode EIP-712
+                  {t("eip712Tool.decodeEip712")}
                 </button>
               </>
             )}
@@ -503,19 +507,21 @@ const SignaturesSection: React.FC = () => {
                 ) : eip712Mode === "encode" ? (
                   <div className="eip712-results">
                     <div className="sig-result-row">
-                      <span className="sig-result-label">Domain Separator:</span>
+                      <span className="sig-result-label">{t("eip712Tool.domainSeparator")}</span>
                       <span className="sig-result-value mono">{eip712Results.domainSeparator}</span>
                     </div>
                     <div className="sig-result-row">
-                      <span className="sig-result-label">Struct Hash:</span>
+                      <span className="sig-result-label">{t("eip712Tool.structHash")}</span>
                       <span className="sig-result-value mono">{eip712Results.structHash}</span>
                     </div>
                     <div className="sig-result-row">
-                      <span className="sig-result-label">Message Hash (signable):</span>
+                      <span className="sig-result-label">
+                        {t("eip712Tool.messageHashSignable")}
+                      </span>
                       <span className="sig-result-value mono">{eip712Results.messageHash}</span>
                     </div>
                     <div className="sig-result-row">
-                      <span className="sig-result-label">Encoded Data:</span>
+                      <span className="sig-result-label">{t("eip712Tool.encodedData")}</span>
                       <span className="sig-result-value mono eip712-encoded-data">
                         {eip712Results.encodedData}
                       </span>
@@ -524,7 +530,7 @@ const SignaturesSection: React.FC = () => {
                 ) : (
                   <div className="eip712-results">
                     <div className="eip712-decoded-row">
-                      <span className="sig-result-label">Decoded Message:</span>
+                      <span className="sig-result-label">{t("eip712Tool.decodedMessage")}</span>
                       <pre className="eip712-decoded-pre">{eip712Results.decodedMessage}</pre>
                     </div>
                   </div>

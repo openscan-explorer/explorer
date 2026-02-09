@@ -1,6 +1,13 @@
 import type { EthLog } from "@openscan/network-connectors";
 import type React from "react";
 
+// ==================== NETWORK TYPES ====================
+
+/**
+ * Network type - EVM or Bitcoin
+ */
+export type NetworkType = "evm" | "bitcoin";
+
 // ==================== CORE DOMAIN TYPES ====================
 
 export interface NetworkStats {
@@ -116,6 +123,144 @@ export interface TransactionReceiptOptimism extends TransactionReceipt {
   l1FeeScalar: string;
 }
 
+// ==================== BITCOIN TYPES ====================
+
+/**
+ * Bitcoin network statistics from getblockchaininfo + getmempoolinfo
+ */
+export interface BitcoinNetworkStats {
+  blockHeight: number;
+  difficulty: number;
+  mempoolSize: number;
+  mempoolBytes: number;
+  chain: string;
+  bestBlockHash: string;
+  connections?: number;
+}
+
+/**
+ * Bitcoin fee estimates in sat/vB for different confirmation targets
+ */
+export interface BitcoinFeeEstimates {
+  fast: number | null; // ~1 block (10 min)
+  medium: number | null; // ~6 blocks (1 hour)
+  slow: number | null; // ~144 blocks (24 hours)
+}
+
+/**
+ * Bitcoin block data
+ */
+export interface BitcoinBlock {
+  hash: string;
+  height: number;
+  time: number;
+  nTx: number;
+  size: number;
+  weight: number;
+  merkleRoot: string;
+  previousBlockHash?: string;
+  nextBlockHash?: string;
+  version: number;
+  bits: string;
+  nonce: number;
+  // Transaction hashes (when fetched with verbosity 1)
+  txids?: string[];
+  // Extended stats (calculated from full block data)
+  confirmations?: number;
+  difficulty?: number;
+  totalFees?: number;
+  totalOutputValue?: number;
+  inputCount?: number;
+  outputCount?: number;
+  blockReward?: number;
+  miner?: string; // Extracted from coinbase tx
+  coinbaseMessage?: string; // ASCII message from coinbase
+  coinbaseHex?: string; // Raw hex of coinbase scriptSig
+  feeRateAvg?: number; // sat/vB average
+  feeRateMedian?: number; // sat/vB median
+}
+
+/**
+ * Bitcoin transaction input (spending a previous UTXO)
+ */
+export interface BitcoinTransactionInput {
+  txid: string;
+  vout: number;
+  scriptSig?: { asm: string; hex: string };
+  txinwitness?: string[];
+  sequence: number;
+  // Populated when verbosity=2 is used
+  prevout?: {
+    value: number;
+    scriptPubKey: { address?: string; type: string; asm: string; hex: string };
+  };
+}
+
+/**
+ * Bitcoin transaction output (creating a new UTXO)
+ */
+export interface BitcoinTransactionOutput {
+  value: number;
+  n: number;
+  scriptPubKey: {
+    address?: string;
+    type: string;
+    asm: string;
+    hex: string;
+  };
+}
+
+/**
+ * Bitcoin transaction data from getRawTransaction
+ */
+export interface BitcoinTransaction {
+  txid: string;
+  hash: string;
+  version: number;
+  size: number;
+  vsize: number;
+  weight: number;
+  locktime: number;
+  vin: BitcoinTransactionInput[];
+  vout: BitcoinTransactionOutput[];
+  blockhash?: string;
+  confirmations?: number;
+  blocktime?: number;
+  time?: number;
+  fee?: number;
+}
+
+/**
+ * Bitcoin UTXO (Unspent Transaction Output)
+ */
+export interface BitcoinUTXO {
+  txid: string;
+  vout: number;
+  address: string;
+  scriptPubKey: string;
+  amount: number;
+  confirmations: number;
+}
+
+/**
+ * Bitcoin address types
+ */
+export type BitcoinAddressType = "legacy" | "p2sh" | "segwit" | "taproot" | "unknown";
+
+/**
+ * Bitcoin address data
+ */
+export interface BitcoinAddress {
+  address: string;
+  type: BitcoinAddressType;
+  balance: number;
+  utxoCount: number;
+  utxos: BitcoinUTXO[];
+  totalReceived?: number;
+  txCount?: number;
+  txids?: string[];
+}
+
 export interface Address {
   address: string;
   balance: string;
@@ -209,7 +354,7 @@ export interface IAppContext {
   enabledNetworks: NetworkConfig[];
   networksLoading: boolean;
   networksError: string | null;
-  getNetwork: (networkId: number) => NetworkConfig | undefined;
+  getNetwork: (networkId: string | number) => NetworkConfig | undefined;
   reloadNetworks: () => Promise<void>;
 }
 
@@ -243,7 +388,9 @@ export interface NetworkLink {
  * Network configuration interface
  */
 export interface NetworkConfig {
-  networkId: number;
+  type: NetworkType;
+  networkId: string; // CAIP-2 format (e.g., "eip155:1", "bip122:000...")
+  slug?: string; // URL routing (e.g., "btc", "eth", "1")
   name: string;
   shortName: string;
   description?: string;
@@ -266,8 +413,8 @@ export interface NetworkConfig {
 
 export type RPCUrls = string[];
 
-// RPC URLs are now dynamically loaded from metadata, so we use a flexible Record type
-export type RpcUrlsContextType = Record<number, RPCUrls>;
+// RPC URLs are keyed by networkId (CAIP-2 format, e.g., "eip155:1", "bip122:000...")
+export type RpcUrlsContextType = Record<string, RPCUrls>;
 
 // ==================== SETTINGS TYPES ====================
 
@@ -285,9 +432,10 @@ export interface ApiKeys {
 export interface UserSettings {
   theme?: "light" | "dark" | "auto";
   showBackgroundBlocks?: boolean;
-  rpcStrategy?: "fallback" | "parallel";
+  rpcStrategy?: "fallback" | "parallel" | "race";
   maxParallelRequests?: number;
   apiKeys?: ApiKeys;
+  superUserMode?: boolean;
 }
 
 /**
@@ -299,18 +447,19 @@ export const DEFAULT_SETTINGS: UserSettings = {
   rpcStrategy: "fallback",
   maxParallelRequests: 3,
   apiKeys: {},
+  superUserMode: false,
 };
 
 /**
  * RPC strategy type - re-exported from RPCClient
  */
-export type RPCStrategy = "fallback" | "parallel";
+export type RPCStrategy = "fallback" | "parallel" | "race";
 
 /**
  * Metadata about RPC request when using parallel or fallback strategy
  */
 export interface RPCMetadata {
-  strategy: "parallel" | "fallback";
+  strategy: "parallel" | "fallback" | "race";
   timestamp: number;
   responses: RPCProviderResponse[];
   hasInconsistencies: boolean;

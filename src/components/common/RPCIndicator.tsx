@@ -1,4 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useParams } from "react-router-dom";
+import { AppContext } from "../../context/AppContext";
+import { useSettings } from "../../context/SettingsContext";
 import type { RPCMetadata } from "../../types";
 
 interface RPCIndicatorProps {
@@ -20,10 +24,28 @@ export function RPCIndicator({
 }: RPCIndicatorProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const { networkId } = useParams<{ networkId?: string }>();
+  const { rpcUrls } = useContext(AppContext);
+  const { settings } = useSettings();
+  const { t } = useTranslation();
 
   const successCount = metadata.responses.filter((r) => r.status === "success").length;
   const totalCount = metadata.responses.length;
   const isFallbackMode = metadata.strategy === "fallback";
+  const isRaceMode = metadata.strategy === "race";
+
+  // For race mode, get the actual total number of providers queried
+  const networkRpcUrls = rpcUrls[Number(networkId) || 1] || [];
+  const totalProviders = isRaceMode
+    ? settings.maxParallelRequests && settings.maxParallelRequests > 0
+      ? Math.min(networkRpcUrls.length, settings.maxParallelRequests)
+      : networkRpcUrls.length
+    : totalCount;
+
+  // In race mode, find the fastest successful response (winner)
+  const raceWinnerUrl = isRaceMode
+    ? metadata.responses.find((r) => r.status === "success")?.url
+    : null;
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -44,10 +66,10 @@ export function RPCIndicator({
       <div
         className="rpc-indicator-badge"
         onClick={() => setIsExpanded(!isExpanded)}
-        title="Click to see RPC provider details"
+        title={t("rpcIndicator.clickToSeeDetails")}
       >
         {metadata.hasInconsistencies && (
-          <span className="rpc-indicator-warning" title="Inconsistent responses">
+          <span className="rpc-indicator-warning" title={t("rpcIndicator.inconsistentResponses")}>
             !!!
           </span>
         )}
@@ -55,6 +77,11 @@ export function RPCIndicator({
           {isFallbackMode ? (
             // Fallback: show attempt ratio (1/N means succeeded on Nth attempt)
             `✓ 1/${totalCount}`
+          ) : isRaceMode ? (
+            // Race: show lightning bolt — 1 winner out of N total providers
+            <>
+              {"⚡"} 1/{totalProviders}
+            </>
           ) : (
             // Parallel: show success count
             <>
@@ -68,30 +95,42 @@ export function RPCIndicator({
       {isExpanded && (
         <div className="rpc-indicator-dropdown">
           <div className="rpc-indicator-header">
-            <strong>RPC Providers</strong>
-            <span className="rpc-indicator-strategy">Strategy: {metadata.strategy}</span>
+            <strong>{t("rpcIndicator.rpcProviders")}</strong>
+            <span className="rpc-indicator-strategy">
+              {t("rpcIndicator.strategy", { strategy: metadata.strategy })}
+            </span>
           </div>
 
           {isFallbackMode && totalCount > 1 && (
-            <div className="rpc-indicator-fallback-info">Succeeded on attempt #{totalCount}</div>
+            <div className="rpc-indicator-fallback-info">
+              {t("rpcIndicator.succeededOnAttempt", { count: totalCount })}
+            </div>
+          )}
+
+          {isRaceMode && (
+            <div className="rpc-indicator-race-info">{t("rpcIndicator.fastestResponseWins")}</div>
           )}
 
           {metadata.hasInconsistencies && (
-            <div className="rpc-indicator-warning-banner">Responses differ between providers</div>
+            <div className="rpc-indicator-warning-banner">{t("rpcIndicator.responsesDiffer")}</div>
           )}
 
           <div className="rpc-indicator-list">
-            {metadata.responses.map((response, idx) => {
+            {(isRaceMode
+              ? [...metadata.responses].sort((a, b) => a.responseTime - b.responseTime)
+              : metadata.responses
+            ).map((response, idx) => {
               const isSelected = selectedProvider === response.url;
               const urlDisplay = truncateUrl(response.url);
-              const isClickable = !isFallbackMode && response.status === "success";
+              const isClickable = !isFallbackMode && !isRaceMode && response.status === "success";
+              const isRaceWinner = isRaceMode && response.url === raceWinnerUrl;
 
               return (
                 // biome-ignore lint/a11y/noStaticElementInteractions: <TODO>
                 // biome-ignore lint/a11y/useKeyWithClickEvents: <TODO>
                 <div
                   key={response.url}
-                  className={`rpc-indicator-item ${isSelected ? "selected" : ""} ${response.status} ${isFallbackMode ? "fallback-mode" : ""}`}
+                  className={`rpc-indicator-item ${isSelected ? "selected" : ""} ${response.status} ${isFallbackMode ? "fallback-mode" : ""} ${isRaceWinner ? "race-winner" : ""}`}
                   onClick={() => {
                     if (isClickable) {
                       onProviderSelect(response.url);
@@ -118,8 +157,12 @@ export function RPCIndicator({
                     <div className="rpc-indicator-item-time">{response.responseTime}ms</div>
                   )}
 
-                  {!isFallbackMode && isSelected && (
-                    <div className="rpc-indicator-item-badge">Selected</div>
+                  {!isFallbackMode && !isRaceMode && isSelected && (
+                    <div className="rpc-indicator-item-badge">{t("rpcIndicator.selected")}</div>
+                  )}
+
+                  {isRaceWinner && (
+                    <div className="rpc-indicator-item-badge">{t("rpcIndicator.winner")}</div>
                   )}
                 </div>
               );
@@ -128,9 +171,13 @@ export function RPCIndicator({
 
           {isFallbackMode && (
             <div className="rpc-indicator-footer">
-              <span className="rpc-indicator-footer-note">
-                Fallback mode: providers tried sequentially
-              </span>
+              <span className="rpc-indicator-footer-note">{t("rpcIndicator.fallbackNote")}</span>
+            </div>
+          )}
+
+          {isRaceMode && (
+            <div className="rpc-indicator-footer">
+              <span className="rpc-indicator-footer-note">{t("rpcIndicator.raceNote")}</span>
             </div>
           )}
         </div>

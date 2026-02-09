@@ -22,6 +22,13 @@ import Loading from "./components/common/Loading";
 import {
   LazyAbout,
   LazyAddress,
+  LazyBitcoinAddress,
+  LazyBitcoinBlock,
+  LazyBitcoinBlocks,
+  LazyBitcoinMempool,
+  LazyBitcoinNetwork,
+  LazyBitcoinTx,
+  LazyBitcoinTxs,
   LazyBlock,
   LazyBlocks,
   LazyChain,
@@ -122,6 +129,25 @@ function AppContent() {
               <Route path="subscriptions" element={<LazySubscriptions />} />
               <Route path="profile/:profileType/:profileId" element={<LazyProfile />} />
               <Route path="supporters" element={<LazySupporters />} />
+              {/* Bitcoin Mainnet routes (must come before :networkId catch-all) */}
+              <Route path="btc" element={<LazyBitcoinNetwork />} />
+              <Route path="btc/blocks" element={<LazyBitcoinBlocks />} />
+              <Route path="btc/block/:filter" element={<LazyBitcoinBlock />} />
+              <Route path="btc/txs" element={<LazyBitcoinTxs />} />
+              <Route path="btc/tx/:filter" element={<LazyBitcoinTx />} />
+              <Route path="btc/address/:address" element={<LazyBitcoinAddress />} />
+              <Route path="btc/mempool" element={<LazyBitcoinMempool />} />
+              <Route path="btc/mempool/:filter" element={<LazyBitcoinTx />} />
+              {/* Bitcoin Testnet4 routes */}
+              <Route path="tbtc" element={<LazyBitcoinNetwork />} />
+              <Route path="tbtc/blocks" element={<LazyBitcoinBlocks />} />
+              <Route path="tbtc/block/:filter" element={<LazyBitcoinBlock />} />
+              <Route path="tbtc/txs" element={<LazyBitcoinTxs />} />
+              <Route path="tbtc/tx/:filter" element={<LazyBitcoinTx />} />
+              <Route path="tbtc/address/:address" element={<LazyBitcoinAddress />} />
+              <Route path="tbtc/mempool" element={<LazyBitcoinMempool />} />
+              <Route path="tbtc/mempool/:filter" element={<LazyBitcoinTx />} />
+              {/* EVM network routes */}
               <Route path=":networkId" element={<LazyChain />} />
               <Route path=":networkId/gastracker" element={<LazyGasTracker />} />
               <Route path=":networkId/blocks" element={<LazyBlocks />} />

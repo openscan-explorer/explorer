@@ -1,10 +1,12 @@
 import type React from "react";
 import { useCallback, useContext, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { AppContext } from "../../../context/AppContext";
 import { useZipJsonReader } from "../../../hooks/useZipJsonReader";
 
 const DevelopmentSection: React.FC = () => {
+  const { t } = useTranslation("devtools");
   const [files, setFiles] = useState<File[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const { jsonFiles, setJsonFiles } = useContext(AppContext);
@@ -95,11 +97,8 @@ const DevelopmentSection: React.FC = () => {
   return (
     <div className="devtools-section">
       <div className="info-box dev-section-container">
-        <h3 className="dev-section-title">Hardhat Ignition</h3>
-        <p className="dev-section-description">
-          Provide a .zip file with the project's <b>contracts/</b> and <b>ignition/</b> directories
-          inside. This will be used as local verification method
-        </p>
+        <h3 className="dev-section-title">{t("hardhat.title")}</h3>
+        <p className="dev-section-description">{t("hardhat.description")}</p>
 
         {/* biome-ignore lint/a11y/noStaticElementInteractions: drag and drop zone */}
         <div
@@ -111,11 +110,11 @@ const DevelopmentSection: React.FC = () => {
         >
           <div className="dev-dropzone-icon">📁</div>
           <h4 className="dev-dropzone-title">
-            {isDragging ? "Drop files here" : "Drag and drop ZIP files here"}
+            {isDragging ? t("hardhat.dropFilesHere") : t("hardhat.dragAndDrop")}
           </h4>
-          <p className="dev-dropzone-separator">or</p>
+          <p className="dev-dropzone-separator">{t("hardhat.or")}</p>
           <label htmlFor="file-input" className="dev-browse-btn">
-            Browse Files
+            {t("hardhat.browseFiles")}
           </label>
           <input
             id="file-input"
@@ -129,9 +128,11 @@ const DevelopmentSection: React.FC = () => {
         {files.length > 0 && (
           <div>
             <div className="flex-between mb-medium">
-              <h4 className="dev-section-subtitle">Uploaded Files ({files.length})</h4>
+              <h4 className="dev-section-subtitle">
+                {t("hardhat.uploadedFiles", { count: files.length })}
+              </h4>
               <button type="button" onClick={handleClearAll} className="dev-clear-btn">
-                Clear All
+                {t("hardhat.clearAll")}
               </button>
             </div>
 
@@ -141,8 +142,8 @@ const DevelopmentSection: React.FC = () => {
                   <div className="dev-file-item-content">
                     <div className="dev-file-name">{file.name}</div>
                     <div className="dev-file-meta">
-                      <span>Size: {formatFileSize(file.size)}</span>
-                      <span>Type: {file.type || "Unknown"}</span>
+                      <span>{t("hardhat.size", { size: formatFileSize(file.size) })}</span>
+                      <span>{t("hardhat.type", { type: file.type || t("hardhat.unknown") })}</span>
                     </div>
                   </div>
                   <button
@@ -150,7 +151,7 @@ const DevelopmentSection: React.FC = () => {
                     onClick={() => handleRemoveFile(index)}
                     className="dev-remove-btn"
                   >
-                    Remove
+                    {t("hardhat.remove")}
                   </button>
                 </div>
               ))}
@@ -159,15 +160,13 @@ const DevelopmentSection: React.FC = () => {
         )}
 
         {files.length === 0 && !loading && Object.keys(jsonFiles).length === 0 && (
-          <div className="dev-empty-state">
-            No files uploaded yet. Drag and drop or browse to add files.
-          </div>
+          <div className="dev-empty-state">{t("hardhat.noFilesUploaded")}</div>
         )}
 
         {loading && (
           <div className="dev-loading-state">
             <div className="dev-loading-icon">⏳</div>
-            <div className="dev-loading-text">Processing ZIP file...</div>
+            <div className="dev-loading-text">{t("hardhat.processingZip")}</div>
           </div>
         )}
 
@@ -182,10 +181,10 @@ const DevelopmentSection: React.FC = () => {
           <div className="mt-large">
             <div className="flex-between mb-medium">
               <h4 className="dev-section-subtitle">
-                Extracted JSON Files ({Object.keys(jsonFiles).length})
+                {t("hardhat.extractedJsonFiles", { count: Object.keys(jsonFiles).length })}
               </h4>
               <button type="button" onClick={handleClearArtifacts} className="dev-clear-btn">
-                Clear Artifacts
+                {t("hardhat.clearArtifacts")}
               </button>
             </div>
             <div className="dev-json-list">
@@ -197,7 +196,7 @@ const DevelopmentSection: React.FC = () => {
                     {path}
                   </div>
                   <details>
-                    <summary className="dev-json-summary">View JSON content</summary>
+                    <summary className="dev-json-summary">{t("hardhat.viewJsonContent")}</summary>
                     <pre className="dev-json-content">{JSON.stringify(data, null, 2)}</pre>
                   </details>
                 </div>
