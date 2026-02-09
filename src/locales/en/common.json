@@ -1,0 +1,283 @@
+{
+  "nav": {
+    "searchPlaceholderDesktop": "Search by Address / Tx Hash / Block / ENS",
+    "searchPlaceholderMobile": "Search address, tx, block, ENS...",
+    "searchAriaLabel": "Search",
+    "searchTitle": "Search",
+    "switchToLightMode": "Switch to light mode",
+    "switchToDarkMode": "Switch to dark mode",
+    "lightModeTitle": "Light mode",
+    "darkModeTitle": "Dark mode",
+    "settingsAriaLabel": "Settings",
+    "settingsTitle": "Settings",
+    "openMenuAriaLabel": "Open menu",
+    "closeMenuAriaLabel": "Close menu",
+    "blocksMobile": "Blocks",
+    "transactionsMobile": "Transactions",
+    "home": "Home",
+    "lightMode": "Light Mode",
+    "darkMode": "Dark Mode",
+    "githubTitle": "View on GitHub",
+    "xTwitterTitle": "Follow on X",
+    "xTwitterLabel": "X (Twitter)",
+    "githubLabel": "GitHub",
+    "close": "Close",
+    "dismissError": "Dismiss error",
+    "disableSuperUser": "Disable Super User Mode",
+    "enableSuperUser": "Enable Super User Mode",
+    "mempool": "Mempool",
+    "txs": "Transactions"
+  },
+  "footer": {
+    "about": "About",
+    "subscribe": "Subscribe",
+    "contact": "Contact",
+    "supporters": "Supporters",
+    "reportBug": "Report a Bug",
+    "reportBugTitle": "Report a bug",
+    "viewCommitTitle": "View commit {{hash}} on GitHub",
+    "versionLabel": "v{{version}} {{hash}}",
+    "githubTitle": "View on GitHub",
+    "xTitle": "Follow on X"
+  },
+  "errors": {
+    "somethingWentWrong": "Something went wrong",
+    "errorMessage": "We're sorry, but something unexpected happened. The application encountered an error.",
+    "reloadPage": "Reload Page",
+    "goHome": "Go Home",
+    "errorDetailsSummary": "Error Details (Development Mode)",
+    "errorLabel": "Error:",
+    "componentStackLabel": "Component Stack:"
+  },
+  "notifications": {
+    "closeAriaLabel": "Close notification"
+  },
+  "about": {
+    "heading": "OPENSCAN",
+    "subtitle": "Trustless Blockchain Exploration",
+    "missionStatement": "OpenScan is an open-source, lightweight blockchain explorer built to provide transparency and true openness. We connect directly to blockchain nodes, giving you unfettered access to on-chain data without intermediaries or centralized services.",
+    "principles": "Principles",
+    "freeOpenSource": "Free & Open Source",
+    "freeOpenSourceDescription": "100% open source, publicly auditable, and free for all users. No vendor lock-in.",
+    "privacyFirst": "Privacy First",
+    "privacyFirstDescription": "No advertising, no trackers, no user data harvesting. Your data stays yours.",
+    "trustlessByDesign": "Trustless by Design",
+    "trustlessByDesignDescription": "Direct RPC connections to blockchain nodes. Verify data independently, no intermediaries.",
+    "publicInfrastructure": "Public Infrastructure",
+    "publicInfrastructureDescription": "Built as a public good for the decentralized ecosystem, sustained by ethical funding.",
+    "features": "Features",
+    "multiChainExplorer": "Multi-Chain Explorer",
+    "multiChainExplorerDescription": "Explore blocks, transactions, and addresses across multiple EVM networks.",
+    "contractInteraction": "Contract Interaction",
+    "contractInteractionDescription": "Read and write to verified smart contracts directly from the explorer.",
+    "localDevelopment": "Local Development",
+    "localDevelopmentDescription": "Full support for Hardhat and Anvil local networks with trace capabilities.",
+    "rpcTransparency": "RPC Transparency",
+    "rpcTransparencyDescription": "Compare responses across multiple RPC providers. Detect inconsistencies.",
+    "supportedNetworks": "Supported Networks",
+    "openSource": "Open Source",
+    "openSourceDescription": "The entire codebase is publicly available and welcomes community contributions.",
+    "viewOnGithub": "View on GitHub",
+    "version": "Version",
+    "commit": "Commit",
+    "totalCommits": "Total Commits",
+    "contributors": "Contributors",
+    "licensedUnderMIT": "Licensed under MIT"
+  },
+  "contact": {
+    "title": "Contact Us",
+    "subtitle": "Get in touch with the OpenScan team",
+    "xmtpTitle": "Message via XMTP",
+    "xmtpDescription": "We use XMTP for decentralized, wallet-to-wallet messaging. Send us a direct message using your Ethereum wallet - no email required, fully encrypted, and censorship resistant.",
+    "sendMessage": "Send a Message",
+    "whatIsXmtp": "What is XMTP?",
+    "walletMessaging": "Wallet-Based Messaging",
+    "walletMessagingDescription": "XMTP enables messaging between Ethereum wallets. No account creation needed - just connect your wallet.",
+    "endToEnd": "End-to-End Encrypted",
+    "endToEndDescription": "All messages are encrypted. Only you and the recipient can read the conversation.",
+    "decentralized": "Decentralized",
+    "decentralizedDescription": "No central server controls your messages. The protocol is open and permissionless.",
+    "interoperable": "Interoperable",
+    "interoperableDescription": "Works across any app that supports XMTP - Converse, Coinbase Wallet, and more.",
+    "alsoReachUs": "You can also reach us on",
+    "orOpenIssue": "or open an issue on",
+    "xTwitter": "X (Twitter)",
+    "github": "GitHub"
+  },
+  "subscriptions": {
+    "title": "Support OpenScan",
+    "subtitle": "Sustainable, ethical funding for open-source blockchain infrastructure",
+    "valueProposition": "OpenScan remains entirely free for all end-users. Revenue is sourced from projects, applications, tokens, and networks that recognize the value of the platform and wish to formally appear as verified supporters of the open ecosystem.",
+    "freeForAllUsers": "entirely free for all end-users",
+    "pricingOverview": "Pricing Overview",
+    "earlyAdopterDiscount": "Early Adopter Discount",
+    "limitedTimeDiscounts": "Limited time discounts on all subscriptions",
+    "activeNow": "Active now",
+    "discountAvailable": "{{percent}}% discount available",
+    "percentOff": "{{percent}}% off",
+    "subscriptionType": "Subscription Type",
+    "perMonth": "/ month",
+    "perYear": "/ year",
+    "save20": "Save 20%",
+    "includesAllBenefits": "Includes all {{tier}} benefits",
+    "tierLabel": "Tier {{number}} - {{name}}",
+    "sharedRoadmapPlanning": "Shared Roadmap Planning",
+    "roadmapDescription": "Ally-tier subscribers gain voting power in our bi-annual roadmap planning sessions, where the OpenScan team and Allies collaborate to shape the future of the platform.",
+    "featurePrioritization": "Feature Prioritization",
+    "featurePrioritizationDescription": "Vote on which features and improvements get developed next based on community needs.",
+    "networkExpansion": "Network Expansion",
+    "networkExpansionDescription": "Help decide which blockchain networks OpenScan should support and integrate.",
+    "strategicDirection": "Strategic Direction",
+    "strategicDirectionDescription": "Participate in discussions about OpenScan's long-term vision and technical direction.",
+    "howToSubscribe": "How to Subscribe",
+    "step1Title": "Submit Pull Request",
+    "step1Description": "Create a pull request to the explorer-metadata repository with your project information and subscription details.",
+    "step2Title": "PR Review & Approval",
+    "step2Description": "The OpenScan team will review your pull request to verify eligibility and ensure all required information is provided.",
+    "step3Title": "Make Payment & Prove Ownership",
+    "step3Description": "Once your PR is approved, send the subscription payment on Ethereum Mainnet. Then use the OpenScan Devtools to sign the payment transaction hash and share it on your PR to prove ownership.",
+    "step4Title": "Subscription Activated",
+    "step4Description": "After payment and signature verification, your PR will be merged and your subscription benefits will be activated immediately.",
+    "paymentAddress": "Payment Address",
+    "paymentAddressDescription": "All subscription payments are sent directly to the OpenScan DAO address:",
+    "submitSubscriptionPR": "Submit Subscription PR",
+    "viewDaoAddress": "View DAO Address",
+    "footerNote": "All revenue is reinvested solely for the platform's continuous development, growth, and infrastructural improvement.",
+    "categories": {
+      "tokens": {
+        "name": "Tokens",
+        "description": "Verified contracts tags, metadata integration, logo display, official links and token balance fetcher integration."
+      },
+      "networks": {
+        "name": "Networks",
+        "description": "Full RPC methods support, dedicated technical maintenance, subdomain availability, and prominent branding."
+      },
+      "apps": {
+        "name": "Crypto Apps",
+        "description": "Dedicated listing and verified branding for wallets, dApps, supplementary explorer tools, and exchanges, promoting integration and visibility."
+      },
+      "companies": {
+        "name": "Companies & Orgs",
+        "description": "Formal recognition and visibility for infrastructure providers, venture funds, and other supporting entities who contribute to the project's continuity."
+      }
+    },
+    "tierNames": {
+      "backer": "Backer",
+      "partner": "Partner",
+      "ally": "Ally"
+    },
+    "tierBenefits": {
+      "tokens": {
+        "backer": [
+          "Token page with token info: ERC20 details, project name, custom URLs",
+          "Verified contracts and tagged important contracts"
+        ],
+        "partner": [
+          "Token balance shown on the main explorer",
+          "Simple profile page",
+          "Multiple network listing"
+        ],
+        "ally": [
+          "Complete profile page with markdown description",
+          "OpenScan subdomain",
+          "Direct communication line with the technical team"
+        ]
+      },
+      "networks": {
+        "backer": ["Markdown profile on the network page", "Priority placement on the home page"],
+        "partner": [
+          "Dedicated subdomain network explorer",
+          "Direct communication line with the technical team"
+        ],
+        "ally": [
+          "Roadmap voting power",
+          "Network-specific features in the dedicated network explorer"
+        ]
+      },
+      "apps": {
+        "backer": [
+          "Simple profile page",
+          "Important contracts verified and tagged",
+          "Contract events listing"
+        ],
+        "partner": ["OpenScan subdomain", "Complete profile page with markdown description"],
+        "ally": ["Roadmap voting power", "Direct communication line with the technical team"]
+      },
+      "companies": {
+        "backer": [
+          "Simple profile page",
+          "Important contracts verified and tagged",
+          "Contract events listing"
+        ],
+        "partner": ["Complete profile page with markdown description", "OpenScan subdomain"],
+        "ally": ["Direct communication line with the technical team", "Roadmap voting power"]
+      }
+    }
+  },
+  "supporters": {
+    "title": "Supporters",
+    "subtitle": "Thank you to our supporters",
+    "loading": "Loading supporters...",
+    "error": "Error: {{error}}",
+    "noSupporters": "No supporters yet. Be the first!",
+    "becomeSupporterTitle": "Become a Supporter",
+    "becomeSupporterDescription": "Support OpenScan's development by subscribing a network.",
+    "viewPlans": "View Subscription Plans",
+    "allies": "Allies",
+    "partners": "Partners",
+    "backers": "Backers"
+  },
+  "profile": {
+    "notFound": "Profile Not Found",
+    "loading": "Loading profile...",
+    "invalidUrl": "Invalid profile URL. Please provide both profile type and ID.",
+    "invalidType": "Invalid profile type: {{type}}. Must be one of: network, app, organization.",
+    "notFoundMessage": "Profile not found: {{type}}/{{id}}",
+    "fetchError": "Failed to fetch profile",
+    "unknownType": "Unknown profile type"
+  },
+  "extraData": {
+    "showDecoded": "Show decoded",
+    "showRawHex": "Show raw hex"
+  },
+  "searchBox": {
+    "placeholder": "Search by Address / Txn Hash / Block / ENS Name",
+    "ariaLabel": "Search",
+    "title": "Search"
+  },
+  "wallet": {
+    "connectWallet": "Connect Wallet",
+    "wrongNetwork": "Wrong Network",
+    "chainIcon": "Chain icon"
+  },
+  "rpcIndicator": {
+    "clickToSeeDetails": "Click to see RPC provider details",
+    "inconsistentResponses": "Inconsistent responses",
+    "rpcProviders": "RPC Providers",
+    "strategy": "Strategy: {{strategy}}",
+    "succeededOnAttempt": "Succeeded on attempt #{{count}}",
+    "fastestResponseWins": "Fastest response wins • All times shown",
+    "responsesDiffer": "Responses differ between providers",
+    "selected": "Selected",
+    "winner": "Winner",
+    "fallbackNote": "Fallback mode: providers tried sequentially",
+    "raceNote": "Race mode: first successful response returned. Pending are discarded"
+  },
+  "buildWarning": {
+    "notProductionBuild": "This is not a production verified build"
+  },
+  "search": {
+    "title": "Search",
+    "resultsTitle": "Search Results",
+    "noQuery": "No search query provided",
+    "invalidQuery": "Invalid search query. Enter an address (0x...), transaction hash, block number, or ENS name.",
+    "invalidBadge": "Invalid",
+    "ensInfo": "ENS names resolve to addresses on Ethereum mainnet.",
+    "in": "in",
+    "badgeAddress": "Address",
+    "badgeTxHash": "TX Hash",
+    "badgeBlock": "Block",
+    "badgeEns": "ENS",
+    "badgeUnknown": "Unknown"
+  }
+}

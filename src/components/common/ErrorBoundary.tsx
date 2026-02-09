@@ -1,4 +1,6 @@
+import i18next from "i18next";
 import React, { Component, type ErrorInfo, type ReactNode } from "react";
+import { logger } from "../../utils/logger";
 
 interface Props {
   children: ReactNode;
@@ -24,7 +26,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     // Log error details
-    console.error("ErrorBoundary caught an error:", error, errorInfo);
+    logger.error("ErrorBoundary caught an error:", error, errorInfo);
 
     this.setState({
       error,
@@ -57,33 +59,30 @@ export class ErrorBoundary extends Component<Props, State> {
         <div className="error-boundary">
           <div className="error-boundary-container">
             <div className="error-boundary-content">
-              <h2>⚠️ Something went wrong</h2>
-              <p>
-                We're sorry, but something unexpected happened. The application encountered an
-                error.
-              </p>
+              <h2>{`⚠️ ${i18next.t("errors.somethingWentWrong")}`}</h2>
+              <p>{i18next.t("errors.errorMessage")}</p>
 
               <div className="error-boundary-actions">
                 {/** biome-ignore lint/a11y/useButtonType: <TODO> */}
                 <button className="btn-md primary" onClick={this.handleReload}>
-                  Reload Page
+                  {i18next.t("errors.reloadPage")}
                 </button>
                 {/** biome-ignore lint/a11y/useButtonType: <TODO> */}
                 <button className="btn-md outline" onClick={this.handleGoHome}>
-                  Go Home
+                  {i18next.t("errors.goHome")}
                 </button>
               </div>
 
               {process.env.NODE_ENV === "development" && this.state.error && (
                 <details className="error-boundary-details">
-                  <summary>Error Details (Development Mode)</summary>
+                  <summary>{i18next.t("errors.errorDetailsSummary")}</summary>
                   <div className="error-boundary-debug">
-                    <h4>Error:</h4>
+                    <h4>{i18next.t("errors.errorLabel")}</h4>
                     <pre>{this.state.error.toString()}</pre>
 
                     {this.state.errorInfo && (
                       <>
-                        <h4>Component Stack:</h4>
+                        <h4>{i18next.t("errors.componentStackLabel")}</h4>
                         <pre>{this.state.errorInfo.componentStack}</pre>
                       </>
                     )}
@@ -109,7 +108,7 @@ export const useErrorHandler = () => {
   }, []);
 
   const captureError = React.useCallback((error: Error) => {
-    console.error("Error captured:", error);
+    logger.error("Error captured:", error);
     setError(error);
   }, []);
 

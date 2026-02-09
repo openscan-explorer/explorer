@@ -1,5 +1,6 @@
 import type React from "react";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import {
   fetchProfile,
@@ -12,6 +13,7 @@ import ProfileNetworkDisplay from "./ProfileNetworkDisplay";
 import ProfileOrgDisplay from "./ProfileOrgDisplay";
 
 const Profile: React.FC = () => {
+  const { t } = useTranslation();
   const { profileType, profileId } = useParams<{
     profileType?: string;
     profileId?: string;
@@ -23,7 +25,7 @@ const Profile: React.FC = () => {
 
   useEffect(() => {
     if (!profileType || !profileId) {
-      setError("Invalid profile URL. Please provide both profile type and ID.");
+      setError(t("profile.invalidUrl"));
       setLoading(false);
       return;
     }
@@ -31,7 +33,7 @@ const Profile: React.FC = () => {
     // Validate profile type
     const validTypes: ProfileType[] = ["network", "app", "organization"];
     if (!validTypes.includes(profileType as ProfileType)) {
-      setError(`Invalid profile type: ${profileType}. Must be one of: network, app, organization.`);
+      setError(t("profile.invalidType", { type: profileType }));
       setLoading(false);
       return;
     }
@@ -44,15 +46,15 @@ const Profile: React.FC = () => {
         if (data) {
           setProfile(data);
         } else {
-          setError(`Profile not found: ${profileType}/${profileId}`);
+          setError(t("profile.notFoundMessage", { type: profileType, id: profileId }));
         }
         setLoading(false);
       })
       .catch((err) => {
-        setError(err.message || "Failed to fetch profile");
+        setError(err.message || t("profile.fetchError"));
         setLoading(false);
       });
-  }, [profileType, profileId]);
+  }, [profileType, profileId, t]);
 
   // Render the appropriate display component based on profile type
   const renderProfileDisplay = () => {
@@ -66,18 +68,18 @@ const Profile: React.FC = () => {
       case "organization":
         return <ProfileOrgDisplay profile={profile} />;
       default:
-        return <p>Unknown profile type</p>;
+        return <p>{t("profile.unknownType")}</p>;
     }
   };
 
   return (
     <div className="container-medium page-container-padded">
       <div className="page-card">
-        {loading && <Loader text="Loading profile..." />}
+        {loading && <Loader text={t("profile.loading")} />}
 
         {error && (
           <div className="text-center">
-            <h1 className="page-heading">Profile Not Found</h1>
+            <h1 className="page-heading">{t("profile.notFound")}</h1>
             <p className="error-text-center">{error}</p>
           </div>
         )}

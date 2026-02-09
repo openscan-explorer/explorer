@@ -1,5 +1,6 @@
 import React, { createContext, type ReactNode, useContext, useEffect, useState } from "react";
 import { DEFAULT_SETTINGS, type UserSettings } from "../types";
+import { logger } from "../utils/logger";
 
 interface SettingsContextType {
   settings: UserSettings;
@@ -8,6 +9,9 @@ interface SettingsContextType {
   // Theme-specific methods for backward compatibility
   isDarkMode: boolean;
   toggleTheme: () => void;
+  // Super user mode
+  isSuperUser: boolean;
+  toggleSuperUserMode: () => void;
 }
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
@@ -29,7 +33,7 @@ export const SettingsProvider = React.memo<SettingsProviderProps>(({ children })
         return { ...DEFAULT_SETTINGS, ...parsed };
       }
     } catch (error) {
-      console.warn("Failed to load settings from localStorage:", error);
+      logger.warn("Failed to load settings from localStorage:", error);
     }
     return DEFAULT_SETTINGS;
   });
@@ -61,7 +65,7 @@ export const SettingsProvider = React.memo<SettingsProviderProps>(({ children })
     try {
       localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(settings));
     } catch (error) {
-      console.warn("Failed to save settings to localStorage:", error);
+      logger.warn("Failed to save settings to localStorage:", error);
     }
   }, [settings]);
 
@@ -79,6 +83,13 @@ export const SettingsProvider = React.memo<SettingsProviderProps>(({ children })
     updateSettings({ theme: newTheme });
   }, [isDarkMode, updateSettings]);
 
+  // Super user mode
+  const isSuperUser = settings.superUserMode ?? false;
+
+  const toggleSuperUserMode = React.useCallback(() => {
+    updateSettings({ superUserMode: !settings.superUserMode });
+  }, [settings.superUserMode, updateSettings]);
+
   const value = React.useMemo(
     () => ({
       settings,
@@ -86,8 +97,18 @@ export const SettingsProvider = React.memo<SettingsProviderProps>(({ children })
       resetSettings,
       isDarkMode,
       toggleTheme,
+      isSuperUser,
+      toggleSuperUserMode,
     }),
-    [settings, updateSettings, resetSettings, isDarkMode, toggleTheme],
+    [
+      settings,
+      updateSettings,
+      resetSettings,
+      isDarkMode,
+      toggleTheme,
+      isSuperUser,
+      toggleSuperUserMode,
+    ],
   );
 
   return <SettingsContext.Provider value={value}>{children}</SettingsContext.Provider>;

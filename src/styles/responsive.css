@@ -545,6 +545,11 @@
   color: var(--color-primary);
 }
 
+.navbar-mobile-menu-item-active {
+  background: var(--color-primary-alpha-15, rgba(99, 102, 241, 0.15));
+  border-color: var(--color-primary-alpha-25, rgba(99, 102, 241, 0.25));
+}
+
 .navbar-mobile-menu-divider {
   height: 1px;
   background: var(--border-primary);
@@ -557,13 +562,13 @@
 }
 
 .navbar-mobile-search .search-form {
+  position: relative;
   display: flex;
-  gap: 8px;
 }
 
 .navbar-mobile-search .search-input {
   flex: 1;
-  padding: 12px 16px;
+  padding: 12px 48px 12px 16px;
   font-size: 16px; /* Prevent iOS zoom */
   border-radius: 10px;
   border: 2px solid var(--border-primary);
@@ -577,16 +582,24 @@
 }
 
 .navbar-mobile-search .search-button {
-  width: var(--touch-target-min);
-  height: var(--touch-target-min);
-  border-radius: 10px;
-  background: var(--color-primary);
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
   border: none;
-  color: white;
+  color: var(--text-muted);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.navbar-mobile-search .search-button:hover {
+  color: var(--color-primary);
+  background: var(--color-primary-alpha-10);
 }
 
 /* Social links in mobile menu */
@@ -1341,15 +1354,27 @@
     margin-top: 4px;
   }
 
+  /* Hide metamask button and RPC count on mobile to save space */
+  .settings-metamask-button {
+    display: none;
+  }
+
+  .settings-chain-rpc-count {
+    display: none;
+  }
+
   /* RPC tags - more compact on mobile */
   .settings-rpc-tags {
     gap: 6px;
+    width: 100%;
+    overflow-x: hidden;
   }
 
   .settings-rpc-tag {
     padding: 4px 8px;
     font-size: 0.7rem;
-    max-width: calc(100vw - 80px);
+    max-width: 100%;
+    min-width: 0;
   }
 
   .settings-rpc-tag-index {
@@ -1388,7 +1413,7 @@
   }
 
   .settings-rpc-tag-url {
-    max-width: 150px;
+    max-width: 120px;
   }
 
   .settings-chain-name {

@@ -4,13 +4,21 @@
  */
 
 import { getNetworkLogoUrl } from "../services/MetadataService";
-import type { NetworkConfig } from "../types";
+import type { NetworkConfig, NetworkType } from "../types";
+import { logger } from "../utils/logger";
+import {
+  resolveNetwork,
+  extractChainIdFromNetworkId,
+  getChainIdFromNetwork,
+} from "../utils/networkResolver";
 import networksData from "./networks.json";
 
 export type { NetworkConfig };
 
 interface NetworkMetadata {
-  chainId: number;
+  type: NetworkType;
+  networkId: string; // CAIP-2 format
+  slug?: string;
   name: string;
   shortName: string;
   description?: string;
@@ -40,11 +48,12 @@ interface NetworkMetadata {
 
 /**
  * Convert metadata network to NetworkConfig
- * Maps chainId from metadata to networkId internally
  */
 function metadataToNetworkConfig(network: NetworkMetadata): NetworkConfig {
   return {
-    networkId: network.chainId,
+    type: network.type,
+    networkId: network.networkId,
+    slug: network.slug,
     name: network.name,
     shortName: network.shortName,
     description: network.description,
@@ -66,7 +75,7 @@ const loadedNetworks: NetworkConfig[] = (networksData.networks as NetworkMetadat
 );
 const networksUpdatedAt: string = networksData.updatedAt;
 
-console.log(
+logger.debug(
   `Loaded ${loadedNetworks.length} networks from local config (updated: ${networksUpdatedAt})`,
 );
 
@@ -87,13 +96,13 @@ export function getAllNetworks(): NetworkConfig[] {
 
 /**
  * Get the list of enabled networks based on environment variable
- * REACT_APP_OPENSCAN_NETWORKS can be a comma-separated list of network IDs
+ * REACT_APP_OPENSCAN_NETWORKS can be a comma-separated list of chain IDs, slugs, or network IDs
  * If not set, all networks are enabled
  */
 export function getEnabledNetworks(): NetworkConfig[] {
   const allNetworks = getAllNetworks();
   const envNetworks = process.env.REACT_APP_OPENSCAN_NETWORKS;
-  const localhostNetworkId = 31337;
+  const localhostChainId = 31337;
 
   // REACT_APP_ENVIRONMENT is set by webpack DefinePlugin based on NODE_ENV
   const isDevelopment = process.env.REACT_APP_ENVIRONMENT === "development";
@@ -101,36 +110,33 @@ export function getEnabledNetworks(): NetworkConfig[] {
   // Check if localhost is explicitly enabled in REACT_APP_OPENSCAN_NETWORKS
   const isLocalhostExplicitlyEnabled = envNetworks
     ?.split(",")
-    .map((id) => parseInt(id.trim(), 10))
-    .includes(localhostNetworkId);
+    .map((id) => id.trim())
+    .some((id) => id === "31337" || id === "localhost");
 
   // Filter out localhost in production/staging (only show in development or if explicitly enabled)
   const filterLocalhost = (networks: NetworkConfig[]) => {
     if (isDevelopment || isLocalhostExplicitlyEnabled) {
       return networks;
     }
-    return networks.filter((n) => n.networkId !== localhostNetworkId);
+    return networks.filter((n) => getChainIdFromNetwork(n) !== localhostChainId);
   };
 
   if (!envNetworks || envNetworks.trim() === "") {
     return filterLocalhost(allNetworks);
   }
 
-  // Parse comma-separated network IDs
-  const enabledNetworkIds = envNetworks
-    .split(",")
-    .map((id) => parseInt(id.trim(), 10))
-    .filter((id) => !Number.isNaN(id));
+  // Parse comma-separated identifiers (can be chainId, slug, or networkId)
+  const enabledIdentifiers = envNetworks.split(",").map((id) => id.trim());
 
-  if (enabledNetworkIds.length === 0) {
+  if (enabledIdentifiers.length === 0) {
     return filterLocalhost(allNetworks);
   }
 
-  // Filter networks by enabled network IDs, maintaining order from env var
+  // Filter networks by enabled identifiers, maintaining order from env var
   const enabledNetworks: NetworkConfig[] = [];
-  for (const networkId of enabledNetworkIds) {
-    const network = allNetworks.find((n) => n.networkId === networkId);
-    if (network) {
+  for (const identifier of enabledIdentifiers) {
+    const network = resolveNetwork(identifier, allNetworks);
+    if (network && !enabledNetworks.some((n) => n.networkId === network.networkId)) {
       enabledNetworks.push(network);
     }
   }
@@ -139,31 +145,56 @@ export function getEnabledNetworks(): NetworkConfig[] {
 }
 
 /**
- * Get enabled network IDs as an array
+ * Get enabled network IDs as an array (CAIP-2 format strings)
  */
-export function getEnabledNetworkIds(): number[] {
+export function getEnabledNetworkIds(): string[] {
   return getEnabledNetworks().map((n) => n.networkId);
 }
 
 /**
- * Check if a network ID is enabled
+ * Get enabled chain IDs for EVM networks only
  */
-export function isNetworkEnabled(networkId: number): boolean {
-  return getEnabledNetworkIds().includes(networkId);
+export function getEnabledChainIds(): number[] {
+  return getEnabledNetworks()
+    .map((n) => getChainIdFromNetwork(n))
+    .filter((chainId): chainId is number => chainId !== undefined);
 }
 
 /**
- * Get network config by network ID
+ * Check if a network is enabled (accepts chainId, slug, or networkId)
  */
-export function getNetworkById(networkId: number): NetworkConfig | undefined {
-  return getAllNetworks().find((n) => n.networkId === networkId);
+export function isNetworkEnabled(identifier: string | number): boolean {
+  const network = resolveNetwork(String(identifier), getAllNetworks());
+  if (!network) return false;
+  return getEnabledNetworkIds().includes(network.networkId);
 }
 
 /**
- * Get the full URL for a network logo
+ * Get network config by identifier (chainId, slug, or networkId)
  */
-export function getNetworkLogoUrlById(networkId: number): string | undefined {
-  const network = getNetworkById(networkId);
+export function getNetworkById(identifier: string | number): NetworkConfig | undefined {
+  return resolveNetwork(String(identifier), getAllNetworks());
+}
+
+/**
+ * Get network config by slug
+ */
+export function getNetworkBySlug(slug: string): NetworkConfig | undefined {
+  return getAllNetworks().find((n) => n.slug?.toLowerCase() === slug.toLowerCase());
+}
+
+/**
+ * Get network config by chainId (EVM networks only)
+ */
+export function getNetworkByChainId(chainId: number): NetworkConfig | undefined {
+  return getAllNetworks().find((n) => extractChainIdFromNetworkId(n.networkId) === chainId);
+}
+
+/**
+ * Get the full URL for a network logo (accepts chainId, slug, or networkId)
+ */
+export function getNetworkLogoUrlById(identifier: string | number): string | undefined {
+  const network = getNetworkById(identifier);
   if (!network?.logo) return undefined;
   return getNetworkLogoUrl(network.logo);
 }

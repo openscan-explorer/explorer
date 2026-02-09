@@ -1,7 +1,9 @@
 import { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import type { NetworkConfig } from "../../../config/networks";
 import { useNetworks } from "../../../context/AppContext";
+import { getChainIdFromNetwork } from "../../../utils/networkResolver";
 import NetworkIcon from "../../common/NetworkIcon";
 import TierBadge from "../../common/TierBadge";
 import HomeSearchBar from "./HomeSearchBar";
@@ -11,9 +13,11 @@ interface NetworkCardProps {
 }
 
 const NetworkCard: React.FC<NetworkCardProps> = ({ network }) => {
+  const chainId = getChainIdFromNetwork(network);
+  const { t } = useTranslation("home");
   return (
     <Link
-      to={`/${network.networkId}`}
+      to={`/${chainId ?? network.slug}`}
       className="network-card-link"
       style={{ "--network-color": network.color } as React.CSSProperties}
     >
@@ -25,11 +29,15 @@ const NetworkCard: React.FC<NetworkCardProps> = ({ network }) => {
           <div className="network-card-info">
             <div className="network-card-title-row">
               <h3 className="network-card-title">{network.name}</h3>
-              {network.networkId !== 1 && (
+              {network.networkId !== "eip155:1" && (
                 <TierBadge subscription={network.subscription} size="small" />
               )}
             </div>
-            <div className="network-card-chain-id">Network ID: {network.networkId}</div>
+            {chainId !== undefined && (
+              <div className="network-card-chain-id">
+                {t("chainID")}: {chainId}
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -38,16 +46,17 @@ const NetworkCard: React.FC<NetworkCardProps> = ({ network }) => {
 };
 
 export default function Home() {
+  const { t } = useTranslation("home");
   const { enabledNetworks, isLoading } = useNetworks();
   const [showTestnets, setShowTestnets] = useState(false);
 
   const { productionNetworks, testnetNetworks } = useMemo(() => {
     const isDevelopment = process.env.REACT_APP_ENVIRONMENT === "development";
-    const localhostNetworkId = 31337;
+    const localhostChainId = 31337;
 
     // In development, treat localhost as a production network (show with other networks)
     const isProductionNetwork = (n: (typeof enabledNetworks)[0]) => {
-      if (isDevelopment && n.networkId === localhostNetworkId) {
+      if (isDevelopment && getChainIdFromNetwork(n) === localhostChainId) {
         return true;
       }
       return !n.isTestnet;
@@ -62,13 +71,13 @@ export default function Home() {
   return (
     <div className="home-container">
       <div className="home-content page-card">
-        <h1 className="home-title">OPENSCAN</h1>
+        <h1 className="home-title">{t("title")}</h1>
 
         <HomeSearchBar networks={enabledNetworks} />
 
         <div className="network-grid">
           {isLoading && productionNetworks.length === 0 ? (
-            <p className="loading-text">Loading networks...</p>
+            <p className="loading-text">{t("loading")}</p>
           ) : (
             productionNetworks.map((network) => (
               <NetworkCard key={network.networkId} network={network} />
@@ -91,7 +100,7 @@ export default function Home() {
                 className="testnet-toggle-btn"
                 onClick={() => setShowTestnets(!showTestnets)}
               >
-                {showTestnets ? "Hide testnets" : "Show testnets"}
+                {showTestnets ? t("hideTestnets") : t("showTestnets")}
               </button>
             </div>
           </>

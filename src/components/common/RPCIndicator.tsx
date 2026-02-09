@@ -1,4 +1,5 @@
 import { useContext, useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import { AppContext } from "../../context/AppContext";
 import { useSettings } from "../../context/SettingsContext";
@@ -26,6 +27,7 @@ export function RPCIndicator({
   const { networkId } = useParams<{ networkId?: string }>();
   const { rpcUrls } = useContext(AppContext);
   const { settings } = useSettings();
+  const { t } = useTranslation();
 
   const successCount = metadata.responses.filter((r) => r.status === "success").length;
   const totalCount = metadata.responses.length;
@@ -64,10 +66,10 @@ export function RPCIndicator({
       <div
         className="rpc-indicator-badge"
         onClick={() => setIsExpanded(!isExpanded)}
-        title="Click to see RPC provider details"
+        title={t("rpcIndicator.clickToSeeDetails")}
       >
         {metadata.hasInconsistencies && (
-          <span className="rpc-indicator-warning" title="Inconsistent responses">
+          <span className="rpc-indicator-warning" title={t("rpcIndicator.inconsistentResponses")}>
             !!!
           </span>
         )}
@@ -93,20 +95,24 @@ export function RPCIndicator({
       {isExpanded && (
         <div className="rpc-indicator-dropdown">
           <div className="rpc-indicator-header">
-            <strong>RPC Providers</strong>
-            <span className="rpc-indicator-strategy">Strategy: {metadata.strategy}</span>
+            <strong>{t("rpcIndicator.rpcProviders")}</strong>
+            <span className="rpc-indicator-strategy">
+              {t("rpcIndicator.strategy", { strategy: metadata.strategy })}
+            </span>
           </div>
 
           {isFallbackMode && totalCount > 1 && (
-            <div className="rpc-indicator-fallback-info">Succeeded on attempt #{totalCount}</div>
+            <div className="rpc-indicator-fallback-info">
+              {t("rpcIndicator.succeededOnAttempt", { count: totalCount })}
+            </div>
           )}
 
           {isRaceMode && (
-            <div className="rpc-indicator-race-info">Fastest response wins • All times shown</div>
+            <div className="rpc-indicator-race-info">{t("rpcIndicator.fastestResponseWins")}</div>
           )}
 
           {metadata.hasInconsistencies && (
-            <div className="rpc-indicator-warning-banner">Responses differ between providers</div>
+            <div className="rpc-indicator-warning-banner">{t("rpcIndicator.responsesDiffer")}</div>
           )}
 
           <div className="rpc-indicator-list">
@@ -152,10 +158,12 @@ export function RPCIndicator({
                   )}
 
                   {!isFallbackMode && !isRaceMode && isSelected && (
-                    <div className="rpc-indicator-item-badge">Selected</div>
+                    <div className="rpc-indicator-item-badge">{t("rpcIndicator.selected")}</div>
                   )}
 
-                  {isRaceWinner && <div className="rpc-indicator-item-badge">Winner</div>}
+                  {isRaceWinner && (
+                    <div className="rpc-indicator-item-badge">{t("rpcIndicator.winner")}</div>
+                  )}
                 </div>
               );
             })}
@@ -163,17 +171,13 @@ export function RPCIndicator({
 
           {isFallbackMode && (
             <div className="rpc-indicator-footer">
-              <span className="rpc-indicator-footer-note">
-                Fallback mode: providers tried sequentially
-              </span>
+              <span className="rpc-indicator-footer-note">{t("rpcIndicator.fallbackNote")}</span>
             </div>
           )}
 
           {isRaceMode && (
             <div className="rpc-indicator-footer">
-              <span className="rpc-indicator-footer-note">
-                Race mode: first successful response returned. Pending are discarded
-              </span>
+              <span className="rpc-indicator-footer-note">{t("rpcIndicator.raceNote")}</span>
             </div>
           )}
         </div>

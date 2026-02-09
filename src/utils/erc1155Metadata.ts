@@ -4,6 +4,7 @@
  */
 
 import { decodeAbiString, hexToString } from "./hexUtils";
+import { logger } from "./logger";
 
 export interface ERC1155TokenMetadata {
   name?: string;
@@ -62,7 +63,7 @@ function parseDataUri(uri: string): ERC1155TokenMetadata | null {
     }
     return null;
   } catch (error) {
-    console.error("Failed to parse data URI:", error);
+    logger.error("Failed to parse data URI:", error);
     return null;
   }
 }
@@ -113,7 +114,7 @@ export async function fetchTokenUri(
 
     return uri;
   } catch (error) {
-    console.error("Failed to fetch token URI:", error);
+    logger.error("Failed to fetch token URI:", error);
     return null;
   }
 }
@@ -155,7 +156,7 @@ export async function fetchTokenBalance(
     const balance = BigInt(result.result).toString();
     return balance;
   } catch (error) {
-    console.error("Failed to fetch token balance:", error);
+    logger.error("Failed to fetch token balance:", error);
     return null;
   }
 }
@@ -207,14 +208,14 @@ export async function fetchERC1155MetadataWithUri(
   try {
     const response = await fetch(httpUri);
     if (!response.ok) {
-      console.error("Failed to fetch metadata:", response.status);
+      logger.error("Failed to fetch metadata:", response.status);
       return { metadata: null, tokenUri: uri };
     }
 
     const metadata = await response.json();
     return { metadata: metadata as ERC1155TokenMetadata, tokenUri: uri };
   } catch (error) {
-    console.error("Failed to fetch/parse metadata:", error);
+    logger.error("Failed to fetch/parse metadata:", error);
     return { metadata: null, tokenUri: uri };
   }
 }

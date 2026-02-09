@@ -4,6 +4,8 @@
  */
 
 import networksData from "../config/networks.json";
+import { logger } from "../utils/logger";
+import { extractChainIdFromNetworkId } from "../utils/networkResolver";
 
 const METADATA_BASE_URL = "https://cdn.jsdelivr.net/npm/@openscan/metadata/dist";
 
@@ -25,7 +27,10 @@ export interface NetworkExplorer {
 }
 
 export interface NetworkMetadata {
-  chainId: number;
+  type: string;
+  networkId: string;
+  chainId?: number;
+  slug?: string;
   name: string;
   shortName: string;
   description?: string;
@@ -85,13 +90,13 @@ export async function fetchNetworkProfile(profilePath: string): Promise<string |
     const response = await fetch(url);
 
     if (!response.ok) {
-      console.warn(`Failed to fetch network profile: ${response.statusText}`);
+      logger.warn(`Failed to fetch network profile: ${response.statusText}`);
       return null;
     }
 
     return await response.text();
   } catch (error) {
-    console.error("Error fetching network profile:", error);
+    logger.error("Error fetching network profile:", error);
     return null;
   }
 }
@@ -202,7 +207,7 @@ export async function fetchSupporters(): Promise<Supporter[]> {
 
     return processSupporters(data);
   } catch (error) {
-    console.error("Error fetching supporters:", error);
+    logger.error("Error fetching supporters:", error);
 
     // Return cached data if available, even if stale
     if (supportersCache) {
@@ -224,7 +229,14 @@ async function processSupporters(data: SupportersResponse): Promise<Supporter[]>
 
   try {
     const { networks } = await fetchNetworks();
-    networksMap = new Map(networks.map((n) => [n.chainId, n]));
+    networksMap = new Map(
+      networks
+        .map((n) => {
+          const chainId = n.chainId ?? extractChainIdFromNetworkId(n.networkId);
+          return chainId !== undefined ? ([chainId, n] as [number, NetworkMetadata]) : null;
+        })
+        .filter((entry): entry is [number, NetworkMetadata] => entry !== null),
+    );
   } catch {
     // Continue without network data
   }
@@ -488,7 +500,7 @@ export async function fetchApps(): Promise<AppsResponse> {
     appsCacheTime = now;
     return data;
   } catch (error) {
-    console.error("Error fetching apps:", error);
+    logger.error("Error fetching apps:", error);
     if (appsCache) {
       return appsCache;
     }
@@ -518,7 +530,7 @@ export async function fetchOrganizations(): Promise<OrganizationsResponse> {
     orgsCacheTime = now;
     return data;
   } catch (error) {
-    console.error("Error fetching organizations:", error);
+    logger.error("Error fetching organizations:", error);
     if (orgsCache) {
       return orgsCache;
     }
@@ -541,13 +553,13 @@ export async function fetchProfileMarkdown(profilePath: string): Promise<string 
     const response = await fetch(url);
 
     if (!response.ok) {
-      console.warn(`Failed to fetch profile markdown: ${response.statusText}`);
+      logger.warn(`Failed to fetch profile markdown: ${response.statusText}`);
       return null;
     }
 
     return await response.text();
   } catch (error) {
-    console.error("Error fetching profile markdown:", error);
+    logger.error("Error fetching profile markdown:", error);
     return null;
   }
 }
@@ -577,7 +589,7 @@ export async function fetchToken(chainId: number, address: string): Promise<Toke
 
     return await response.json();
   } catch (error) {
-    console.error("Error fetching token:", error);
+    logger.error("Error fetching token:", error);
     return null;
   }
 }
@@ -634,7 +646,7 @@ export async function fetchTokenList(chainId: number): Promise<TokenListResponse
 
     return data;
   } catch (error) {
-    console.error("Error fetching token list:", error);
+    logger.error("Error fetching token list:", error);
 
     // Return cached data if available, even if stale
     if (cached) {
@@ -658,22 +670,26 @@ export async function fetchProfile(
     switch (profileType) {
       case "network": {
         const { networks } = await fetchNetworks();
-        const network = networks.find(
-          (n) =>
-            n.chainId.toString() === profileId ||
-            n.shortName.toLowerCase() === profileId.toLowerCase(),
-        );
+        const network = networks.find((n) => {
+          const chainId = n.chainId ?? extractChainIdFromNetworkId(n.networkId);
+          return (
+            (chainId !== undefined && chainId.toString() === profileId) ||
+            n.shortName.toLowerCase() === profileId.toLowerCase() ||
+            n.slug?.toLowerCase() === profileId.toLowerCase()
+          );
+        });
         if (network) {
+          const chainId = network.chainId ?? extractChainIdFromNetworkId(network.networkId);
           profileData = {
             type: "network",
-            id: network.chainId.toString(),
+            id: chainId?.toString() ?? network.networkId,
             name: network.name,
             description: network.description,
             subscription: network.subscription,
             logo: network.logo,
             logoUrl: network.logo ? getAssetUrl(network.logo) : undefined,
             links: network.links,
-            chainId: network.chainId,
+            chainId: chainId,
             currency: network.currency,
             color: network.color,
             isTestnet: network.isTestnet,
@@ -775,7 +791,7 @@ export async function fetchProfile(
 
     return profileData;
   } catch (error) {
-    console.error(`Error fetching ${profileType} profile:`, error);
+    logger.error(`Error fetching ${profileType} profile:`, error);
     return null;
   }
 }
