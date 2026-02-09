@@ -1,4 +1,5 @@
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import { AppContext, useNetwork } from "../../../../context/AppContext";
 import { useDataService } from "../../../../hooks/useDataService";
@@ -11,14 +12,42 @@ const REFRESH_INTERVAL = 15000; // 15 seconds
 
 // Common transaction gas estimates
 const TX_GAS_ESTIMATES = [
-  { name: "ETH Transfer", gas: 21000, description: "Native token transfer" },
-  { name: "ERC20 Transfer", gas: 65000, description: "Token transfer" },
-  { name: "ERC20 Approve", gas: 46000, description: "Token approval" },
-  { name: "NFT Transfer", gas: 85000, description: "ERC721 transfer" },
-  { name: "Swap", gas: 150000, description: "DEX swap" },
-  { name: "NFT Mint", gas: 120000, description: "Mint an NFT" },
-  { name: "Contract Deploy (Simple)", gas: 300000, description: "Deploy basic contract" },
-];
+  {
+    nameKey: "gasTracker.ethTransfer",
+    descriptionKey: "gasTracker.ethTransferDesc",
+    gas: 21000,
+  },
+  {
+    nameKey: "gasTracker.erc20Transfer",
+    descriptionKey: "gasTracker.erc20TransferDesc",
+    gas: 65000,
+  },
+  {
+    nameKey: "gasTracker.erc20Approve",
+    descriptionKey: "gasTracker.erc20ApproveDesc",
+    gas: 46000,
+  },
+  {
+    nameKey: "gasTracker.nftTransfer",
+    descriptionKey: "gasTracker.nftTransferDesc",
+    gas: 85000,
+  },
+  {
+    nameKey: "gasTracker.swap",
+    descriptionKey: "gasTracker.swapDesc",
+    gas: 150000,
+  },
+  {
+    nameKey: "gasTracker.nftMint",
+    descriptionKey: "gasTracker.nftMintDesc",
+    gas: 120000,
+  },
+  {
+    nameKey: "gasTracker.contractDeploy",
+    descriptionKey: "gasTracker.contractDeployDesc",
+    gas: 300000,
+  },
+] as const;
 
 interface GasTrackerData {
   gasPrices: GasPrices | null;
@@ -65,6 +94,7 @@ function calculateTxCost(
 }
 
 export default function GasTracker() {
+  const { t } = useTranslation("network");
   const { networkId } = useParams<{ networkId?: string }>();
   const numericNetworkId = Number(networkId) || 1;
   const networkConfig = useNetwork(numericNetworkId);
@@ -129,19 +159,17 @@ export default function GasTracker() {
     <div className="container-wide">
       <div className="block-display-card">
         <div className="gas-tracker-header">
-          <h1 className="page-title-small">Gas Tracker</h1>
+          <h1 className="page-title-small">{t("gasTracker.title")}</h1>
         </div>
 
-        {loading && !gasPrices && <Loader text="Loading gas prices..." />}
+        {loading && !gasPrices && <Loader text={t("gasTracker.loadingGasPrices")} />}
 
-        {error && <p className="error-text-center">Error: {error}</p>}
+        {error && <p className="error-text-center">{t("gasTracker.errorLoadingGas", { error })}</p>}
 
         {gasPrices && (
           <>
             <section className="gas-tracker-section">
-              <p className="gas-tracker-section-subtitle">
-                Based on the last 20 blocks. Prices include base fee + priority fee.
-              </p>
+              <p className="gas-tracker-section-subtitle">{t("gasTracker.basedOnLastBlocks")}</p>
 
               {(() => {
                 const lowPrice = formatGasPrice(gasPrices.low);
@@ -153,32 +181,38 @@ export default function GasTracker() {
                   <>
                     <div className="gas-price-cards">
                       <div className="gas-price-card gas-price-low">
-                        <div className="gas-price-tier-label">Low</div>
+                        <div className="gas-price-tier-label">{t("gasTracker.low")}</div>
                         <div className="gas-price-tier-value">
                           {lowPrice.value} {lowPrice.unit}
                         </div>
-                        <div className="gas-price-tier-time">~5+ min</div>
+                        <div className="gas-price-tier-time">
+                          {t("gasTracker.estimatedTimeLow")}
+                        </div>
                       </div>
 
                       <div className="gas-price-card gas-price-avg">
-                        <div className="gas-price-tier-label">Average</div>
+                        <div className="gas-price-tier-label">{t("gasTracker.average")}</div>
                         <div className="gas-price-tier-value">
                           {avgPrice.value} {avgPrice.unit}
                         </div>
-                        <div className="gas-price-tier-time">~1-3 min</div>
+                        <div className="gas-price-tier-time">
+                          {t("gasTracker.estimatedTimeAvg")}
+                        </div>
                       </div>
 
                       <div className="gas-price-card gas-price-high">
-                        <div className="gas-price-tier-label">High</div>
+                        <div className="gas-price-tier-label">{t("gasTracker.high")}</div>
                         <div className="gas-price-tier-value">
                           {highPrice.value} {highPrice.unit}
                         </div>
-                        <div className="gas-price-tier-time">~30 sec</div>
+                        <div className="gas-price-tier-time">
+                          {t("gasTracker.estimatedTimeHigh")}
+                        </div>
                       </div>
                     </div>
 
                     <div className="gas-base-fee">
-                      <span className="gas-base-fee-label">Base Fee:</span>
+                      <span className="gas-base-fee-label">{t("gasTracker.baseFee")}</span>
                       <span className="gas-base-fee-value">
                         {baseFee.value} {baseFee.unit}
                       </span>
@@ -189,19 +223,21 @@ export default function GasTracker() {
             </section>
 
             <section className="gas-tracker-section">
-              <h2 className="gas-tracker-section-title">Transaction Cost Estimates</h2>
+              <h2 className="gas-tracker-section-title">
+                {t("gasTracker.transactionCostEstimates")}
+              </h2>
               <p className="gas-tracker-section-subtitle">
-                Estimated costs at current gas prices
+                {t("gasTracker.estimatedCostsAtCurrent")}
                 {price && ` (${currency} @ $${price.toFixed(2)})`}
               </p>
 
               <div className="tx-cost-table">
                 <div className="tx-cost-header">
-                  <div className="tx-cost-col-name">Transaction Type</div>
-                  <div className="tx-cost-col-gas">Gas</div>
-                  <div className="tx-cost-col-low">Low</div>
-                  <div className="tx-cost-col-avg">Avg</div>
-                  <div className="tx-cost-col-high">High</div>
+                  <div className="tx-cost-col-name">{t("gasTracker.transactionType")}</div>
+                  <div className="tx-cost-col-gas">{t("gasTracker.gas")}</div>
+                  <div className="tx-cost-col-low">{t("gasTracker.low")}</div>
+                  <div className="tx-cost-col-avg">{t("gasTracker.average")}</div>
+                  <div className="tx-cost-col-high">{t("gasTracker.high")}</div>
                 </div>
 
                 {TX_GAS_ESTIMATES.map((tx) => {
@@ -210,10 +246,10 @@ export default function GasTracker() {
                   const highCost = calculateTxCost(gasPrices.high, tx.gas, price);
 
                   return (
-                    <div key={tx.name} className="tx-cost-row">
+                    <div key={tx.nameKey} className="tx-cost-row">
                       <div className="tx-cost-col-name">
-                        <span className="tx-cost-name">{tx.name}</span>
-                        <span className="tx-cost-desc">{tx.description}</span>
+                        <span className="tx-cost-name">{t(tx.nameKey)}</span>
+                        <span className="tx-cost-desc">{t(tx.descriptionKey)}</span>
                       </div>
                       <div className="tx-cost-col-gas">{tx.gas.toLocaleString()}</div>
                       <div className="tx-cost-col-low">
@@ -244,7 +280,9 @@ export default function GasTracker() {
 
         {data.lastUpdated && (
           <div className="gas-tracker-updated">
-            Last updated: {new Date(data.lastUpdated).toLocaleTimeString()}
+            {t("gasTracker.lastUpdated", {
+              time: new Date(data.lastUpdated).toLocaleTimeString(),
+            })}
           </div>
         )}
       </div>

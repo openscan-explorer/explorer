@@ -1,13 +1,9 @@
 {
   "nav": {
-    "blocks": "BLOQUES",
-    "transactions": "TRANSACCIONES",
     "searchPlaceholderDesktop": "Buscar por dirección / hash de tx / bloque / ENS",
     "searchPlaceholderMobile": "Buscar dirección, tx, bloque, ENS...",
     "searchAriaLabel": "Buscar",
     "searchTitle": "Buscar",
-    "devToolsAriaLabel": "Herramientas dev",
-    "devToolsTitle": "Herramientas dev",
     "switchToLightMode": "Cambiar a modo claro",
     "switchToDarkMode": "Cambiar a modo oscuro",
     "lightModeTitle": "Modo claro",
@@ -18,7 +14,6 @@
     "closeMenuAriaLabel": "Cerrar menú",
     "blocksMobile": "Bloques",
     "transactionsMobile": "Transacciones",
-    "gasTracker": "Tracker de gas",
     "home": "Inicio",
     "lightMode": "Modo claro",
     "darkMode": "Modo oscuro",
@@ -37,7 +32,7 @@
     "about": "Acerca de",
     "subscribe": "Suscribirse",
     "contact": "Contacto",
-    "supporters": "Soportes",
+    "supporters": "Sponsors",
     "reportBug": "Reportar bug",
     "reportBugTitle": "Reportar un bug",
     "viewCommitTitle": "Ver commit {{hash}} en GitHub",
@@ -147,9 +142,157 @@
     "paymentAddressDescription": "Todos los pagos se envían directamente a la dirección del DAO de OpenScan:",
     "submitSubscriptionPR": "Enviar PR de suscripción",
     "viewDaoAddress": "Ver dirección del DAO",
-    "footerNote": "Todos los ingresos se reinvierten exclusivamente en el desarrollo y mejora continua de la plataforma."
+    "footerNote": "Todos los ingresos se reinvierten exclusivamente en el desarrollo y mejora continua de la plataforma.",
+    "categories": {
+      "tokens": {
+        "name": "Tokens",
+        "description": "Tags de contratos verificados, integración de metadatos, logo, links oficiales e integración con el fetcher de balances."
+      },
+      "networks": {
+        "name": "Redes",
+        "description": "Soporte completo de métodos RPC, mantenimiento técnico dedicado, disponibilidad de subdominio y branding destacado."
+      },
+      "apps": {
+        "name": "Apps cripto",
+        "description": "Listado dedicado y branding verificado para wallets, dApps, herramientas complementarias del explorador y exchanges, promoviendo integración y visibilidad."
+      },
+      "companies": {
+        "name": "Empresas y orgs",
+        "description": "Reconocimiento formal y visibilidad para proveedores de infraestructura, fondos de venture y otras entidades que contribuyen a la continuidad del proyecto."
+      }
+    },
+    "tierNames": {
+      "backer": "Backer",
+      "partner": "Partner",
+      "ally": "Ally"
+    },
+    "tierBenefits": {
+      "tokens": {
+        "backer": [
+          "Página de token con info del token: detalles ERC20, nombre del proyecto y URLs personalizadas",
+          "Contratos verificados y contratos importantes etiquetados"
+        ],
+        "partner": [
+          "Saldo de token mostrado en el explorador principal",
+          "Página de perfil simple",
+          "Listado en múltiples redes"
+        ],
+        "ally": [
+          "Página de perfil completa con descripción en markdown",
+          "Subdominio de OpenScan",
+          "Línea directa de comunicación con el equipo técnico"
+        ]
+      },
+      "networks": {
+        "backer": [
+          "Perfil en markdown en la página de la red",
+          "Ubicación prioritaria en la página principal"
+        ],
+        "partner": [
+          "Explorador de red en subdominio dedicado",
+          "Línea directa de comunicación con el equipo técnico"
+        ],
+        "ally": [
+          "Poder de voto en el roadmap",
+          "Features específicas de la red en el explorador dedicado"
+        ]
+      },
+      "apps": {
+        "backer": [
+          "Página de perfil simple",
+          "Contratos importantes verificados y etiquetados",
+          "Listado de eventos de contratos"
+        ],
+        "partner": [
+          "Subdominio de OpenScan",
+          "Página de perfil completa con descripción en markdown"
+        ],
+        "ally": [
+          "Poder de voto en el roadmap",
+          "Línea directa de comunicación con el equipo técnico"
+        ]
+      },
+      "companies": {
+        "backer": [
+          "Página de perfil simple",
+          "Contratos importantes verificados y etiquetados",
+          "Listado de eventos de contratos"
+        ],
+        "partner": [
+          "Página de perfil completa con descripción en markdown",
+          "Subdominio de OpenScan"
+        ],
+        "ally": [
+          "Línea directa de comunicación con el equipo técnico",
+          "Poder de voto en el roadmap"
+        ]
+      }
+    }
   },
   "buildWarning": {
     "notProductionBuild": "Esta no es una versión verificada de producción"
+  },
+  "extraData": {
+    "showDecoded": "Mostrar decodificado",
+    "showRawHex": "Mostrar hex crudo"
+  },
+  "profile": {
+    "notFound": "Perfil no encontrado",
+    "loading": "Cargando perfil...",
+    "invalidUrl": "URL de perfil inválida. Por favor proporcioná el tipo y el ID del perfil.",
+    "invalidType": "Tipo de perfil inválido: {{type}}. Debe ser uno de: network, app, organization.",
+    "notFoundMessage": "Perfil no encontrado: {{type}}/{{id}}",
+    "fetchError": "No se pudo obtener el perfil",
+    "unknownType": "Tipo de perfil desconocido"
+  },
+  "rpcIndicator": {
+    "clickToSeeDetails": "Hacé clic para ver los detalles del proveedor RPC",
+    "inconsistentResponses": "Respuestas inconsistentes",
+    "rpcProviders": "Proveedores RPC",
+    "strategy": "Estrategia: {{strategy}}",
+    "succeededOnAttempt": "Éxito en el intento #{{count}}",
+    "fastestResponseWins": "Gana la respuesta más rápida • Se muestran todos los tiempos",
+    "responsesDiffer": "Las respuestas difieren entre proveedores",
+    "selected": "Seleccionado",
+    "winner": "Ganador",
+    "fallbackNote": "Modo fallback: los proveedores se prueban en secuencia",
+    "raceNote": "Modo carrera: se devuelve la primera respuesta exitosa. Las pendientes se descartan"
+  },
+  "search": {
+    "title": "Buscar",
+    "resultsTitle": "Resultados de búsqueda",
+    "noQuery": "No se proporcionó ninguna búsqueda",
+    "invalidQuery": "Consulta inválida. Ingresá una dirección (0x...), hash de transacción, número de bloque o nombre ENS.",
+    "invalidBadge": "Inválido",
+    "ensInfo": "Los nombres ENS se resuelven a direcciones en Ethereum mainnet.",
+    "in": "en",
+    "badgeAddress": "Dirección",
+    "badgeTxHash": "Hash de TX",
+    "badgeBlock": "Bloque",
+    "badgeEns": "ENS",
+    "badgeUnknown": "Desconocido"
+  },
+  "searchBox": {
+    "placeholder": "Buscar por dirección / hash de tx / bloque / nombre ENS",
+    "ariaLabel": "Buscar",
+    "title": "Buscar"
+  },
+  "supporters": {
+    "title": "Supporters",
+    "subtitle": "Gracias a nuestros supporters",
+    "loading": "Cargando supporters...",
+    "error": "Error: {{error}}",
+    "noSupporters": "Aún no hay supporters. ¡Sé el primero!",
+    "becomeSupporterTitle": "Convertite en Supporter",
+    "becomeSupporterDescription": "Apoyá el desarrollo de OpenScan suscribiendo una red.",
+    "viewPlans": "Ver planes de suscripción",
+    "allies": "Allies",
+    "partners": "Partners",
+    "backers": "Backers"
+  },
+  "wallet": {
+    "connectWallet": "Conectar wallet",
+    "wrongNetwork": "Red incorrecta",
+    "chainIcon": "Ícono de red"
   }
 }

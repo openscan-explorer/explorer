@@ -6,7 +6,6 @@
   "failed": "Failed",
   "block": "Block:",
   "blockConfirmations": "Block Confirmations",
-  "confirmations": "Confirmations",
   "timestamp": "Timestamp:",
   "from": "From:",
   "to": "To:",
@@ -25,7 +24,6 @@
   "inputData": "Input Data:",
   "decodedInput": "Decoded Input:",
   "eventLogs": "Event Logs:",
-  "debugTrace": "Debug Trace",
   "showDebugTrace": "Show Debug Trace",
   "hideDebugTrace": "Hide Debug Trace",
   "loadingTrace": "Loading trace data...",
@@ -54,19 +52,6 @@
   "logsData": "Data",
   "logsIndexed": "indexed",
   "logsAbi": "ABI",
-  "latestTransactions": "Latest Transactions",
-  "loadingTransactions": "Loading transactions...",
-  "showingFromLastBlocks": "Showing {{count}} transactions from the last {{blocks}} blocks",
-  "showingFromRange": "Showing {{count}} transactions from blocks {{from}} - {{to}}",
-  "noTransactionsFound": "No transactions found in the selected block range",
-  "tableHash": "Tx Hash",
-  "tableBlock": "Block",
-  "tableFrom": "From",
-  "tableTo": "To",
-  "tableValue": "Value",
-  "tableGasPrice": "Gas Price",
-  "tableGas": "Gas",
-  "mempool": "Mempool",
   "transaction": "Transaction",
   "loadingTransaction": "Loading transaction...",
   "transactionNotFound": "Transaction not found",
@@ -99,10 +84,8 @@
     "pagination": {
       "latest": "Latest",
       "latestTitle": "Go to latest transactions",
-
       "newer": "← Newer",
       "newerTitle": "View newer transactions",
-
       "older": "Older →",
       "olderTitle": "View older transactions"
     }
