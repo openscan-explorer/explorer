@@ -1,7 +1,8 @@
 import React from "react";
-import type { NetworkStats, RPCMetadata } from "../../../../types";
-import { RPCIndicator } from "../../../common/RPCIndicator";
 import { useTranslation } from "react-i18next";
+import type { NetworkStats, RPCMetadata } from "../../../../types";
+import { logger } from "../../../../utils/logger";
+import { RPCIndicator } from "../../../common/RPCIndicator";
 
 interface NetworkStatsDisplayProps {
   networkStats: NetworkStats | null;
@@ -79,7 +80,7 @@ const NetworkStatsDisplay: React.FC<NetworkStatsDisplayProps> = React.memo(
       try {
         return networkStats.metadata.clientVersion || null;
       } catch (err) {
-        console.error("Failed to parse metadata:", err);
+        logger.error("Failed to parse metadata:", err);
         return null;
       }
     };
@@ -102,7 +103,7 @@ const NetworkStatsDisplay: React.FC<NetworkStatsDisplayProps> = React.memo(
           blockHash: forked.forkBlockHash,
         };
       } catch (err) {
-        console.error("Failed to parse forked network info:", err);
+        logger.error("Failed to parse forked network info:", err);
         return null;
       }
     };

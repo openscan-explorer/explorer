@@ -1,5 +1,6 @@
 import type React from "react";
 import { useContext, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Link, useParams } from "react-router-dom";
 import { AppContext } from "../../../../context";
 import {
@@ -11,8 +12,8 @@ import {
   fetchTokenOwner,
   getImageUrl,
 } from "../../../../utils/erc721Metadata";
+import { logger } from "../../../../utils/logger";
 import Loader from "../../../common/Loader";
-import { useTranslation } from "react-i18next";
 
 const ERC721TokenDisplay: React.FC = () => {
   const {
@@ -74,7 +75,7 @@ const ERC721TokenDisplay: React.FC = () => {
         }
       })
       .catch((err) => {
-        console.error("Error fetching token data:", err);
+        logger.error("Error fetching token data:", err);
         setError(err.message || t("tokenDataFetchFail")); // "Failed to fetch token data"
       })
       .finally(() => setLoading(false));

@@ -10,6 +10,7 @@ import {
   truncateHash,
 } from "../../../utils/bitcoinFormatters";
 import { calculateTotalOutput } from "../../../utils/bitcoinUtils";
+import { logger } from "../../../utils/logger";
 import Loader from "../../common/Loader";
 
 export default function BitcoinTransactionsPage() {
@@ -40,7 +41,7 @@ export default function BitcoinTransactionsPage() {
         const txs = await adapter.getLatestTransactions(TXS_PER_PAGE);
         setTransactions(txs);
       } catch (err) {
-        console.error("Error fetching Bitcoin transactions:", err);
+        logger.error("Error fetching Bitcoin transactions:", err);
         setError(err instanceof Error ? err.message : "Failed to fetch transactions");
       } finally {
         setLoading(false);

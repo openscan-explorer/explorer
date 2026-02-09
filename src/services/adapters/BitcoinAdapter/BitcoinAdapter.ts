@@ -8,6 +8,7 @@ import type {
   BitcoinUTXO,
   DataWithMetadata,
 } from "../../../types";
+import { logger } from "../../../utils/logger";
 import { extractData } from "../shared/extractData";
 
 /**
@@ -246,7 +247,7 @@ export class BitcoinAdapter {
         currentHeight--;
         blocksToFetch++;
       } catch (error) {
-        console.error(`Error fetching Bitcoin block ${currentHeight}:`, error);
+        logger.error(`Error fetching Bitcoin block ${currentHeight}:`, error);
         currentHeight--;
         blocksToFetch++;
       }
@@ -890,7 +891,7 @@ export class BitcoinAdapter {
 
       return { total: entries.length, entries };
     } catch (error) {
-      console.error("Error fetching mempool summary:", error);
+      logger.error("Error fetching mempool summary:", error);
       return { total: 0, entries: [] };
     }
   }
@@ -961,7 +962,7 @@ export class BitcoinAdapter {
 
       return { transactions, total };
     } catch (error) {
-      console.error("Error fetching mempool transactions:", error);
+      logger.error("Error fetching mempool transactions:", error);
       return { transactions: [], total: 0 };
     }
   }

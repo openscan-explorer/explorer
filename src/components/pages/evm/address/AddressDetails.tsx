@@ -5,6 +5,7 @@ import { encodeFunctionData, parseEther, toFunctionSelector } from "viem";
 import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import { AppContext } from "../../../../context";
 import { useSourcify } from "../../../../hooks/useSourcify";
+import { logger } from "../../../../utils/logger";
 import type {
   ABI,
   ABIParameter,
@@ -242,7 +243,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
           value: txValue,
         });
       } catch (err) {
-        console.error("Error writing to contract:", err);
+        logger.error("Error writing to contract:", err);
         alert(`Error: ${err instanceof Error ? err.message : "Unknown error"}`);
       }
     }, [selectedWriteFunction, functionInputs, addressHash, contractData?.abi, writeContract]);
@@ -320,7 +321,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
 
         setReadFunctionResult(data.result);
       } catch (err) {
-        console.error("Error reading from contract:", err);
+        logger.error("Error reading from contract:", err);
         setReadFunctionResult(`Error: ${err instanceof Error ? err.message : "Unknown error"}`);
       } finally {
         setIsReadingFunction(false);

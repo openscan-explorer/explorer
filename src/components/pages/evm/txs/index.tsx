@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { RPCIndicator } from "../../../../components/common/RPCIndicator";
 import { useDataService } from "../../../../hooks/useDataService";
 import { useProviderSelection } from "../../../../hooks/useProviderSelection";
 import type { DataWithMetadata, Transaction } from "../../../../types";
+import { logger } from "../../../../utils/logger";
 import Loader from "../../../common/Loader";
-import { useTranslation } from "react-i18next";
 
 const BLOCKS_PER_PAGE = 10;
 
@@ -91,11 +92,11 @@ export default function Txs() {
           BLOCKS_PER_PAGE,
         );
 
-        console.log("Fetched transactions:", fetchedTransactions);
+        logger.debug("Fetched transactions:", fetchedTransactions);
         setTransactionsResult(fetchedTransactions);
         // biome-ignore lint/suspicious/noExplicitAny: <TODO>
       } catch (err: any) {
-        console.error("Error fetching transactions:", err);
+        logger.error("Error fetching transactions:", err);
         setError(err.message || t("txs.failedToFetch"));
       } finally {
         setLoading(false);

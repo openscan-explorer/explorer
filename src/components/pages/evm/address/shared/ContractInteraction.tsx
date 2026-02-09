@@ -1,12 +1,13 @@
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import type React from "react";
 import { useCallback, useContext, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { encodeFunctionData, parseEther } from "viem";
 import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import { AppContext } from "../../../../../context";
 import type { ABI, ABIParameter, EventABI, FunctionABI } from "../../../../../types";
-import { useTranslation } from "react-i18next";
+import { logger } from "../../../../../utils/logger";
 
 /**
  * Generate a unique key for a function based on its name and input types
@@ -153,7 +154,7 @@ const ContractInteraction: React.FC<ContractInteractionProps> = ({
         value: txValue,
       });
     } catch (err) {
-      console.error("Error writing to contract:", err);
+      logger.error("Error writing to contract:", err);
       alert(`Error: ${err instanceof Error ? err.message : "Unknown error"}`);
     }
   }, [selectedWriteFunction, functionInputs, addressHash, abi, writeContract]);
@@ -224,7 +225,7 @@ const ContractInteraction: React.FC<ContractInteractionProps> = ({
 
       setReadFunctionResult(data.result);
     } catch (err) {
-      console.error("Error reading from contract:", err);
+      logger.error("Error reading from contract:", err);
       setReadFunctionResult(`Error: ${err instanceof Error ? err.message : "Unknown error"}`);
     } finally {
       setIsReadingFunction(false);

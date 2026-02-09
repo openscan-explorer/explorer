@@ -2,6 +2,7 @@ import type React from "react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { getEnabledNetworks } from "../../../config/networks";
+import { logger } from "../../../utils/logger";
 import NetworkIcon from "../../common/NetworkIcon";
 
 interface GitHubStats {
@@ -54,7 +55,7 @@ const About: React.FC = () => {
           }
         }
       } catch (error) {
-        console.error("Failed to fetch GitHub stats:", error);
+        logger.error("Failed to fetch GitHub stats:", error);
       }
     };
 

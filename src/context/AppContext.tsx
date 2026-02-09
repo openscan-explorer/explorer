@@ -16,8 +16,9 @@ import {
 } from "../config/networks";
 import { useWagmiConnection } from "../hooks/useWagmiConnection";
 import type { IAppContext, NetworkConfig, RpcUrlsContextType } from "../types";
-import { getChainIdFromNetwork } from "../utils/networkResolver";
 import { loadJsonFilesFromStorage, saveJsonFilesToStorage } from "../utils/artifactsStorage";
+import { logger } from "../utils/logger";
+import { getChainIdFromNetwork } from "../utils/networkResolver";
 import { getEffectiveRpcUrls, saveRpcUrlsToStorage } from "../utils/rpcStorage";
 
 // Alias exported for use across the app where a shorter/consistent name is preferred
@@ -63,7 +64,7 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
     try {
       saveRpcUrlsToStorage(next);
     } catch (err) {
-      console.warn("Failed to persist rpc urls", err);
+      logger.warn("Failed to persist rpc urls", err);
     }
   }, []);
 
@@ -73,7 +74,7 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
     try {
       saveJsonFilesToStorage(next);
     } catch (err) {
-      console.warn("Failed to persist json files", err);
+      logger.warn("Failed to persist json files", err);
     }
   }, []);
 
@@ -193,7 +194,7 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
         // Mark app as ready
         setAppReady(true);
       } catch (error) {
-        console.error("Error initializing app:", error);
+        logger.error("Error initializing app:", error);
         setAppReady(true); // Still mark as ready even if there's an error
       }
     };
