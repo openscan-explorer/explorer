@@ -29,6 +29,7 @@ export interface AIAnalysisRequest {
   context: Record<string, unknown>;
   networkName: string;
   networkCurrency: string;
+  language?: string;
 }
 
 /**
@@ -48,6 +49,7 @@ export class AIService {
     const { system, user } = buildPrompt(request.type, request.context, {
       networkName: request.networkName,
       networkCurrency: request.networkCurrency,
+      language: request.language,
     });
 
     try {

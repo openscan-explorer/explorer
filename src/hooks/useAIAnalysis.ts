@@ -26,6 +26,7 @@ export function useAIAnalysis(
   networkName: string,
   networkCurrency: string,
   cacheKey: string,
+  language?: string,
 ): UseAIAnalysisReturn {
   const { settings } = useSettings();
   const [result, setResult] = useState<AIAnalysisResult | null>(null);
@@ -81,6 +82,7 @@ export function useAIAnalysis(
           context,
           networkName,
           networkCurrency,
+          language,
         });
 
         setCachedAnalysis(cacheKey, contextHash, analysisResult);
@@ -98,7 +100,7 @@ export function useAIAnalysis(
         setLoading(false);
       }
     },
-    [resolveProvider, context, cacheKey, analysisType, networkName, networkCurrency],
+    [resolveProvider, context, cacheKey, analysisType, networkName, networkCurrency, language],
   );
 
   const analyze = useCallback(() => performAnalysis(false), [performAnalysis]);

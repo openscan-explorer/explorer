@@ -20,13 +20,14 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({
   networkCurrency,
   cacheKey,
 }) => {
-  const { t } = useTranslation("common");
+  const { t, i18n } = useTranslation("common");
   const { result, loading, error, errorType, analyze, refresh } = useAIAnalysis(
     analysisType,
     context,
     networkName,
     networkCurrency,
     cacheKey,
+    i18n.language,
   );
 
   return (
