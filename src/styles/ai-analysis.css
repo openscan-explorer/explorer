@@ -1,0 +1,201 @@
+/* AI Analysis - 2-column layout and panel styles */
+
+.page-with-analysis {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+@media (min-width: 1200px) {
+  .page-with-analysis {
+    grid-template-columns: 2fr 1fr;
+  }
+}
+
+.page-analysis-panel {
+  position: sticky;
+  top: 16px;
+  align-self: start;
+}
+
+/* AI Analysis Panel Card */
+.ai-analysis-panel {
+  background: var(--color-surface);
+  border: 1px solid var(--color-primary-alpha-10);
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.ai-analysis-title {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+/* Analyze Button */
+.ai-analysis-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 16px;
+  border: 1px solid var(--color-primary-alpha-20);
+  border-radius: 6px;
+  background: var(--color-primary-alpha-8);
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.ai-analysis-button:hover:not(:disabled) {
+  background: var(--color-primary-alpha-20);
+  border-color: var(--color-primary-alpha-30);
+}
+
+.ai-analysis-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Loading Spinner */
+.ai-analysis-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--text-secondary);
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: ai-spin 0.8s linear infinite;
+}
+
+@keyframes ai-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Result Content */
+.ai-analysis-result {
+  margin-top: 12px;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--text-primary);
+}
+
+.ai-analysis-result p {
+  margin: 8px 0;
+}
+
+.ai-analysis-result p:first-child {
+  margin-top: 0;
+}
+
+.ai-analysis-result strong {
+  font-weight: 600;
+}
+
+.ai-analysis-result ul,
+.ai-analysis-result ol {
+  padding-left: 20px;
+  margin: 8px 0;
+}
+
+.ai-analysis-result li {
+  margin: 4px 0;
+}
+
+.ai-analysis-result code {
+  background: var(--color-primary-alpha-8);
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-size: 0.8rem;
+}
+
+/* Footer */
+.ai-analysis-footer {
+  margin-top: 12px;
+  padding-top: 8px;
+  border-top: 1px solid var(--color-primary-alpha-8);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ai-analysis-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+}
+
+.ai-analysis-disclaimer {
+  font-size: 0.7rem;
+  color: var(--text-tertiary);
+  font-style: italic;
+}
+
+.ai-analysis-refresh {
+  font-size: 0.75rem;
+  color: var(--color-primary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+}
+
+.ai-analysis-refresh:hover {
+  opacity: 0.8;
+}
+
+/* Cached badge */
+.ai-analysis-cached {
+  font-size: 0.7rem;
+  color: var(--text-tertiary);
+  background: var(--color-primary-alpha-8);
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+/* Error State */
+.ai-analysis-error {
+  margin-top: 12px;
+  padding: 10px;
+  background: var(--color-error-alpha-10, rgba(220, 38, 38, 0.1));
+  border: 1px solid var(--color-error-alpha-20, rgba(220, 38, 38, 0.2));
+  border-radius: 6px;
+  font-size: 0.825rem;
+  color: var(--text-primary);
+}
+
+.ai-analysis-error-message {
+  margin-bottom: 8px;
+}
+
+.ai-analysis-error-action {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.ai-analysis-retry {
+  font-size: 0.8rem;
+  color: var(--color-primary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+}
+
+.ai-analysis-settings-link {
+  font-size: 0.8rem;
+  color: var(--color-primary);
+}
