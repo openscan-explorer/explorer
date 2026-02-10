@@ -5113,6 +5113,33 @@ code {
   opacity: 1;
 }
 
+/* Collapsible section toggle */
+.settings-section-collapse-button {
+  font-size: 0.75rem;
+  font-weight: 500;
+  font-family: "Outfit", sans-serif;
+  color: var(--color-primary);
+  background: var(--color-primary-alpha-10);
+  border: 1px solid var(--color-primary-alpha-20);
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin: 16px auto 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.settings-section-collapse-button:hover {
+  background: var(--color-primary-alpha-20);
+  border-color: var(--color-primary-alpha-40);
+}
+
+.settings-ai-other-providers {
+  margin-top: 12px;
+}
+
 /* Toast Notifications */
 .settings-toast-container {
   position: fixed;

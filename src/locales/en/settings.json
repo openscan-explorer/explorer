@@ -69,6 +69,8 @@
     "toggleShow": "Show API key",
     "aiTitle": "AI Analysis Keys",
     "aiDescription": "Enter API keys for AI-powered blockchain analysis. At least one key is required to use the AI analyzer.",
+    "aiProvidersShow": "Show other providers",
+    "aiProvidersHide": "Hide other providers",
     "groq": {
       "name": "Groq",
       "getKey": "Get Free Key",
