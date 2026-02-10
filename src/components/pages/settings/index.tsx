@@ -9,6 +9,8 @@ import { useMetaMaskExplorer } from "../../../hooks/useMetaMaskExplorer";
 import { SUPPORTED_LANGUAGES } from "../../../i18n";
 import { clearSupportersCache } from "../../../services/MetadataService";
 import type { RPCUrls, RpcUrlsContextType } from "../../../types";
+import { AI_PROVIDERS, AI_PROVIDER_ORDER } from "../../../config/aiProviders";
+import { clearAICache } from "../../../utils/aiCache";
 import { logger } from "../../../utils/logger";
 import { getChainIdFromNetwork } from "../../../utils/networkResolver";
 
@@ -71,10 +73,18 @@ const Settings: React.FC = () => {
   const [localApiKeys, setLocalApiKeys] = useState({
     infura: settings.apiKeys?.infura || "",
     alchemy: settings.apiKeys?.alchemy || "",
+    groq: settings.apiKeys?.groq || "",
+    openai: settings.apiKeys?.openai || "",
+    anthropic: settings.apiKeys?.anthropic || "",
+    togetherai: settings.apiKeys?.togetherai || "",
   });
   const [showApiKeys, setShowApiKeys] = useState({
     infura: false,
     alchemy: false,
+    groq: false,
+    openai: false,
+    anthropic: false,
+    togetherai: false,
   });
   const [metamaskStatus, setMetamaskStatus] = useState<
     Record<string, "idle" | "loading" | "success" | "error">
@@ -108,6 +118,8 @@ const Settings: React.FC = () => {
     clearSupportersCache();
     // Clear localStorage caches if any
     localStorage.removeItem("openscan_cache");
+    // Clear AI analysis cache
+    clearAICache();
     setCacheCleared(true);
     setTimeout(() => setCacheCleared(false), 3000);
   }, []);
@@ -408,6 +420,10 @@ const Settings: React.FC = () => {
       apiKeys: {
         infura: localApiKeys.infura || undefined,
         alchemy: localApiKeys.alchemy || undefined,
+        groq: localApiKeys.groq || undefined,
+        openai: localApiKeys.openai || undefined,
+        anthropic: localApiKeys.anthropic || undefined,
+        togetherai: localApiKeys.togetherai || undefined,
       },
     });
 
@@ -683,6 +699,60 @@ const Settings: React.FC = () => {
                   </button>
                 </div>
               </div>
+            </div>
+          </div>
+
+          {/* AI Provider API Keys */}
+          <div className="settings-card">
+            <div className="settings-section no-margin">
+              <h2 className="settings-section-title">🤖 {t("apiKeys.aiTitle")}</h2>
+              <p className="settings-section-description">{t("apiKeys.aiDescription")}</p>
+
+              {AI_PROVIDER_ORDER.map((providerId) => {
+                const provider = AI_PROVIDERS[providerId];
+                return (
+                  <div key={providerId} className="settings-api-key-item">
+                    <div className="settings-api-key-header">
+                      <span className="settings-api-key-name">
+                        {t(`apiKeys.${providerId}.name`)}
+                      </span>
+                      <a
+                        href={provider.keyUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="settings-api-key-link"
+                      >
+                        {t(`apiKeys.${providerId}.getKey`)} →
+                      </a>
+                    </div>
+                    <div className="settings-api-key-input-wrapper">
+                      <input
+                        type={showApiKeys[providerId] ? "text" : "password"}
+                        className="settings-rpc-input"
+                        value={localApiKeys[providerId]}
+                        onChange={(e) =>
+                          setLocalApiKeys((prev) => ({ ...prev, [providerId]: e.target.value }))
+                        }
+                        placeholder={t(`apiKeys.${providerId}.placeholder`)}
+                      />
+                      <button
+                        type="button"
+                        className="settings-api-key-toggle"
+                        onClick={() =>
+                          setShowApiKeys((prev) => ({ ...prev, [providerId]: !prev[providerId] }))
+                        }
+                        title={
+                          showApiKeys[providerId]
+                            ? t("apiKeys.toggleHide")
+                            : t("apiKeys.toggleShow")
+                        }
+                      >
+                        {showApiKeys[providerId] ? "👁️" : "👁️‍🗨️"}
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
 
