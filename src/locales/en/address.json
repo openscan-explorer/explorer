@@ -183,5 +183,8 @@
   "errorResolvingENS": "Error resolving ENS",
   "unknownError": "Unknown error",
   "failedToFetchAddressData": "Failed to fetch address data",
-  "nonce": "Nonce (Transactions Sent)"
+  "nonce": "Nonce (Transactions Sent)",
+  "aiAnalysis": {
+    "sectionTitle": "AI Analysis"
+  }
 }
