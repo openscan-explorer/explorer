@@ -258,6 +258,26 @@
     "fallbackNote": "Modo fallback: los proveedores se prueban en secuencia",
     "raceNote": "Modo carrera: se devuelve la primera respuesta exitosa. Las pendientes se descartan"
   },
+  "aiAnalysis": {
+    "title": "Análisis IA",
+    "analyzeButton": "Analizar",
+    "analyzing": "Analizando...",
+    "refreshButton": "Actualizar",
+    "disclaimer": "Análisis generado por IA. Puede contener errores.",
+    "generatedBy": "por {{model}} ",
+    "cachedResult": "en caché",
+    "errors": {
+      "rateLimited": "Límite de solicitudes alcanzado. Intentá de nuevo en un momento.",
+      "invalidKey": "API key inválida. Verificá tu clave en Configuración.",
+      "no_api_key": "No hay API key configurada. Agregá una clave de proveedor IA en Configuración.",
+      "networkError": "Error de red. Verificá tu conexión e intentá de nuevo.",
+      "serviceUnavailable": "Servicio de IA temporalmente no disponible. Intentá más tarde.",
+      "parseError": "No se pudo procesar la respuesta de IA. Intentá de nuevo.",
+      "generic": "El análisis falló. Intentá de nuevo.",
+      "tryAgain": "Intentar de nuevo",
+      "goToSettings": "Ir a Configuración"
+    }
+  },
   "search": {
     "title": "Buscar",
     "resultsTitle": "Resultados de búsqueda",

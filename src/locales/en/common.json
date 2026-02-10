@@ -266,6 +266,26 @@
   "buildWarning": {
     "notProductionBuild": "This is not a production verified build"
   },
+  "aiAnalysis": {
+    "title": "AI Analysis",
+    "analyzeButton": "Analyze",
+    "analyzing": "Analyzing...",
+    "refreshButton": "Refresh",
+    "disclaimer": "AI-generated analysis. May contain errors.",
+    "generatedBy": "by {{model}} ",
+    "cachedResult": "cached",
+    "errors": {
+      "rateLimited": "Rate limited. Please try again in a moment.",
+      "invalidKey": "Invalid API key. Check your key in Settings.",
+      "no_api_key": "No API key configured. Add an AI provider key in Settings.",
+      "networkError": "Network error. Check your connection and try again.",
+      "serviceUnavailable": "AI service temporarily unavailable. Try again later.",
+      "parseError": "Failed to parse AI response. Try again.",
+      "generic": "Analysis failed. Please try again.",
+      "tryAgain": "Try Again",
+      "goToSettings": "Go to Settings"
+    }
+  },
   "search": {
     "title": "Search",
     "resultsTitle": "Search Results",

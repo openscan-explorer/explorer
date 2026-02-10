@@ -66,7 +66,29 @@
       "placeholder": "Ingresá tu API key de Alchemy"
     },
     "toggleHide": "Ocultar API key",
-    "toggleShow": "Mostrar API key"
+    "toggleShow": "Mostrar API key",
+    "aiTitle": "Claves de Análisis IA",
+    "aiDescription": "Ingresá las API keys para el análisis de blockchain con IA. Se necesita al menos una clave para usar el analizador IA.",
+    "groq": {
+      "name": "Groq",
+      "getKey": "Obtener Key Gratis",
+      "placeholder": "Ingresá tu API key de Groq"
+    },
+    "openai": {
+      "name": "OpenAI",
+      "getKey": "Obtener Key",
+      "placeholder": "Ingresá tu API key de OpenAI"
+    },
+    "anthropic": {
+      "name": "Anthropic",
+      "getKey": "Obtener Key",
+      "placeholder": "Ingresá tu API key de Anthropic"
+    },
+    "togetherai": {
+      "name": "Together AI",
+      "getKey": "Obtener Key",
+      "placeholder": "Ingresá tu API key de Together AI"
+    }
   },
   "saveConfiguration": "Guardar Configuración",
   "toasts": {
