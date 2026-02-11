@@ -1,38 +1,52 @@
-/* AI Analysis - 2-column layout and panel styles */
+/* AI Analysis - inline expandable panel styles */
 
 .page-with-analysis {
-  display: grid;
-  grid-template-columns: 1fr;
+  display: flex;
+  flex-direction: column;
   gap: 16px;
 }
 
-@media (min-width: 1200px) {
-  .page-with-analysis {
-    grid-template-columns: 2fr 1fr;
-  }
-}
-
-.page-analysis-panel {
-  position: sticky;
-  top: 16px;
-  align-self: start;
-}
-
-/* AI Analysis Panel Card */
+/* AI Analysis Panel */
 .ai-analysis-panel {
-  background: var(--color-surface);
-  border: 1px solid var(--color-primary-alpha-10);
-  border-radius: 8px;
-  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ai-analysis-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
 .ai-analysis-title {
   font-size: 0.75rem;
   text-transform: uppercase;
   color: var(--text-secondary);
-  margin-bottom: 12px;
+  margin: 0;
   letter-spacing: 0.05em;
   font-weight: 600;
+}
+
+.ai-analysis-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.ai-analysis-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ai-analysis-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 /* Analyze Button */
@@ -41,26 +55,29 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  width: 100%;
-  padding: 10px 16px;
-  border: 1px solid var(--color-primary-alpha-20);
-  border-radius: 6px;
-  background: var(--color-primary-alpha-8);
-  color: var(--text-primary);
-  font-size: 0.875rem;
-  font-weight: 500;
+  width: auto;
+  min-width: 140px;
   cursor: pointer;
-  transition: background 0.15s ease, border-color 0.15s ease;
-}
-
-.ai-analysis-button:hover:not(:disabled) {
-  background: var(--color-primary-alpha-20);
-  border-color: var(--color-primary-alpha-30);
 }
 
 .ai-analysis-button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.ai-analysis-preview {
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+.ai-analysis-preview-text {
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  white-space: pre-line;
 }
 
 /* Loading Spinner */
@@ -82,7 +99,7 @@
 
 /* Result Content */
 .ai-analysis-result {
-  margin-top: 12px;
+  margin-top: 0;
   font-size: 0.875rem;
   line-height: 1.6;
   color: var(--text-primary);
@@ -119,7 +136,7 @@
 
 /* Footer */
 .ai-analysis-footer {
-  margin-top: 12px;
+  margin-top: 0;
   padding-top: 8px;
   border-top: 1px solid var(--color-primary-alpha-8);
   display: flex;
@@ -166,7 +183,7 @@
 
 /* Error State */
 .ai-analysis-error {
-  margin-top: 12px;
+  margin-top: 0;
   padding: 10px;
   background: var(--color-error-alpha-10, rgba(220, 38, 38, 0.1));
   border: 1px solid var(--color-error-alpha-20, rgba(220, 38, 38, 0.2));
