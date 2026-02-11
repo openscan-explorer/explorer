@@ -183,5 +183,7 @@
   "errorResolvingENS": "Error al resolver ENS",
   "unknownError": "Error desconocido",
   "failedToFetchAddressData": "No se pudieron obtener los datos de la dirección",
-  "nonce": "Nonce (transacciones enviadas)"
+  "nonce": "Nonce (transacciones enviadas)",
+  "fetchingSentTxsByNonce": "Obteniendo transacciones enviadas ({{current}}/{{total}})...",
+  "searchingReceivedTxs": "Buscando transacciones recibidas..."
 }
