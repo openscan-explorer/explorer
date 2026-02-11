@@ -260,8 +260,10 @@
   },
   "aiAnalysis": {
     "title": "Análisis IA",
-    "analyzeButton": "Analizar",
+    "analyzeButton": "Analizar con IA",
     "analyzing": "Analizando...",
+    "expand": "Expandir análisis",
+    "collapse": "Contraer análisis",
     "refreshButton": "Actualizar",
     "disclaimer": "Análisis generado por IA. Puede contener errores.",
     "generatedBy": "por {{model}} ",

@@ -268,8 +268,10 @@
   },
   "aiAnalysis": {
     "title": "AI Analysis",
-    "analyzeButton": "Analyze",
+    "analyzeButton": "Analyze with AI",
     "analyzing": "Analyzing...",
+    "expand": "Expand analysis",
+    "collapse": "Collapse analysis",
     "refreshButton": "Refresh",
     "disclaimer": "AI-generated analysis. May contain errors.",
     "generatedBy": "by {{model}} ",
