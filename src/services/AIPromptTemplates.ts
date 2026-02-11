@@ -39,8 +39,13 @@ function buildTransactionPrompt(
   context: Record<string, unknown>,
   { networkName, networkCurrency, language }: PromptContext,
 ): PromptPair {
+  const hasPreAnalysis = "erc7730Intent" in context;
+  const preAnalysisHint = hasPreAnalysis
+    ? " ERC-7730 pre-analysis data is included (erc7730Intent, erc7730Fields, erc7730Warnings, erc7730Protocol). Use it as authoritative context for understanding the transaction purpose and parameters. Highlight any security warnings if present."
+    : "";
+
   return {
-    system: `You are a blockchain analyst for the ${networkName} network (native currency: ${networkCurrency}). Explain this transaction in plain English. Be concise (3-5 sentences). Use markdown formatting. Focus on: what happened, who was involved, how much was transferred, and any notable aspects. If the transaction failed, explain why it might have failed.${languageInstruction(language)}`,
+    system: `You are a blockchain analyst for the ${networkName} network (native currency: ${networkCurrency}). Explain this transaction in plain English. Be concise (3-5 sentences). Use markdown formatting. Focus on: what happened, who was involved, how much was transferred, and any notable aspects. If the transaction failed, explain why it might have failed.${preAnalysisHint}${languageInstruction(language)}`,
     user: formatContext(context),
   };
 }
