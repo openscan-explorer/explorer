@@ -11,7 +11,7 @@ import {
 import type { Address, ENSReverseResult, RPCMetadata } from "../../../../../types";
 import { hexToUtf8 } from "../../../../../utils/erc20Utils";
 import { logger } from "../../../../../utils/logger";
-import AIAnalysis from "../../../../common/AIAnalysis";
+import AIAnalysisPanel from "../../../../common/AIAnalysisPanel";
 import { AddressHeader } from "../shared";
 import ContractInfoCard from "../shared/ContractInfoCard";
 import ContractInfoCards from "../shared/ContractInfoCards";
@@ -279,15 +279,13 @@ const ERC20Display: React.FC<ERC20DisplayProps> = ({
           />
         </div>
       </div>
-      <div className="page-analysis-panel">
-        <AIAnalysis
-          analysisType="contract"
-          context={aiContext}
-          networkName={networkName}
-          networkCurrency={networkCurrency}
-          cacheKey={`account_${networkId}_${addressHash}`}
-        />
-      </div>
+      <AIAnalysisPanel
+        analysisType="contract"
+        context={aiContext}
+        networkName={networkName}
+        networkCurrency={networkCurrency}
+        cacheKey={`account_${networkId}_${addressHash}`}
+      />
     </div>
   );
 };

@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { getNetworkById } from "../../../../config/networks";
 import type { Block, BlockArbitrum, RPCMetadata } from "../../../../types";
-import AIAnalysis from "../../../common/AIAnalysis";
+import AIAnalysisPanel from "../../../common/AIAnalysisPanel";
 import ExtraDataDisplay from "../../../common/ExtraDataDisplay";
 import { RPCIndicator } from "../../../common/RPCIndicator";
 
@@ -466,15 +466,13 @@ const BlockDisplay: React.FC<BlockDisplayProps> = React.memo(
             </div>
           )}
         </div>
-        <div className="page-analysis-panel">
-          <AIAnalysis
-            analysisType="block"
-            context={aiContext}
-            networkName={networkName}
-            networkCurrency={networkCurrency}
-            cacheKey={`openscan_ai_block_${networkId}_${block.number}`}
-          />
-        </div>
+        <AIAnalysisPanel
+          analysisType="block"
+          context={aiContext}
+          networkName={networkName}
+          networkCurrency={networkCurrency}
+          cacheKey={`openscan_ai_block_${networkId}_${block.number}`}
+        />
       </div>
     );
   },

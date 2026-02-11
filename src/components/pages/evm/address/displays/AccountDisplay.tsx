@@ -2,7 +2,7 @@ import type React from "react";
 import { useCallback, useMemo, useState } from "react";
 import { getNetworkById } from "../../../../../config/networks";
 import type { Address, ENSReverseResult, RPCMetadata, Transaction } from "../../../../../types";
-import AIAnalysis from "../../../../common/AIAnalysis";
+import AIAnalysisPanel from "../../../../common/AIAnalysisPanel";
 import { AddressHeader, TransactionHistory } from "../shared";
 import AccountInfoCards from "../shared/AccountInfoCards";
 
@@ -95,15 +95,13 @@ const AccountDisplay: React.FC<AccountDisplayProps> = ({
           />
         </div>
       </div>
-      <div className="page-analysis-panel">
-        <AIAnalysis
-          analysisType="account"
-          context={aiContext}
-          networkName={networkName}
-          networkCurrency={networkCurrency}
-          cacheKey={`account_${networkId}_${addressHash}`}
-        />
-      </div>
+      <AIAnalysisPanel
+        analysisType="account"
+        context={aiContext}
+        networkName={networkName}
+        networkCurrency={networkCurrency}
+        cacheKey={`account_${networkId}_${addressHash}`}
+      />
     </div>
   );
 };

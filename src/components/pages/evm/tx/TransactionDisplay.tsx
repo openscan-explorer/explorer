@@ -1,7 +1,7 @@
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
-import AIAnalysis from "../../../../components/common/AIAnalysis";
+import AIAnalysisPanel from "../../../../components/common/AIAnalysisPanel";
 import LongString from "../../../../components/common/LongString";
 import { RPCIndicator } from "../../../../components/common/RPCIndicator";
 import { getNetworkById } from "../../../../config/networks";
@@ -964,15 +964,13 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
             </div>
           )}
         </div>
-        <div className="page-analysis-panel">
-          <AIAnalysis
-            analysisType="transaction"
-            context={aiContext}
-            networkName={networkName}
-            networkCurrency={networkCurrency}
-            cacheKey={`openscan_ai_transaction_${networkId}_${transaction.hash}`}
-          />
-        </div>
+        <AIAnalysisPanel
+          analysisType="transaction"
+          context={aiContext}
+          networkName={networkName}
+          networkCurrency={networkCurrency}
+          cacheKey={`openscan_ai_transaction_${networkId}_${transaction.hash}`}
+        />
       </div>
     );
   },
