@@ -183,5 +183,7 @@
   "errorResolvingENS": "Error resolving ENS",
   "unknownError": "Unknown error",
   "failedToFetchAddressData": "Failed to fetch address data",
-  "nonce": "Nonce (Transactions Sent)"
+  "nonce": "Nonce (Transactions Sent)",
+  "fetchingSentTxsByNonce": "Fetching sent transactions ({{current}}/{{total}})...",
+  "searchingReceivedTxs": "Searching for received transactions..."
 }

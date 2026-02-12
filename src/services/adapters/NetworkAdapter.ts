@@ -11,6 +11,7 @@ import type {
 import { logger } from "../../utils/logger";
 import { extractData } from "./shared/extractData";
 import { AddressTransactionSearch } from "../AddressTransactionSearch";
+import type { NonceLookupService } from "../NonceLookupService";
 
 export type BlockTag = "latest" | "earliest" | "pending" | "finalized" | "safe";
 export type BlockNumberOrTag = number | string | BlockTag;
@@ -65,8 +66,8 @@ export abstract class NetworkAdapter {
    * Initialize the transaction search service
    * Call this in subclass constructors to enable binary search tx discovery
    */
-  protected initTxSearch(client: EthereumClient): void {
-    this.txSearch = new AddressTransactionSearch(client);
+  protected initTxSearch(client: EthereumClient, nonceLookup?: NonceLookupService): void {
+    this.txSearch = new AddressTransactionSearch(client, nonceLookup);
   }
 
   /**
