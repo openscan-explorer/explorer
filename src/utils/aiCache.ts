@@ -17,7 +17,9 @@ interface CachedAnalysis {
  * Used to hash serialized context objects for cache invalidation.
  */
 export function hashContext(context: Record<string, unknown>): string {
-  const str = JSON.stringify(context);
+  const str = JSON.stringify(context, (_key, value) =>
+    typeof value === "bigint" ? value.toString() : value,
+  );
   let hash = 5381;
   for (let i = 0; i < str.length; i++) {
     hash = ((hash << 5) + hash + str.charCodeAt(i)) | 0;

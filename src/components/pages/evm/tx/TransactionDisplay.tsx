@@ -9,8 +9,19 @@ import { AppContext } from "../../../../context";
 import { useSourcify } from "../../../../hooks/useSourcify";
 import { useTransactionPreAnalysis } from "../../../../hooks/useTransactionPreAnalysis";
 import type { DataService } from "../../../../services/DataService";
+import {
+  fetchToken,
+  fetchTokenList,
+  type TokenListItem,
+  type TokenMetadata,
+} from "../../../../services/MetadataService";
 import type { TraceResult } from "../../../../services/adapters/NetworkAdapter";
 import { logger } from "../../../../utils/logger";
+import {
+  formatGweiFromWei,
+  formatNativeFromWei,
+  formatTokenAmount,
+} from "../../../../utils/aiUnits";
 import type {
   RPCMetadata,
   Transaction,
@@ -57,6 +68,10 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
 
     const [_showRawData, _setShowRawData] = useState(false);
     const [_showLogs, _setShowLogs] = useState(false);
+    const [callTargetToken, setCallTargetToken] = useState<TokenMetadata | null>(null);
+    const [callTargetTokenListMatch, setCallTargetTokenListMatch] = useState<TokenListItem | null>(
+      null,
+    );
     const [showTrace, setShowTrace] = useState(false);
     const [traceData, setTraceData] = useState<TraceResult | null>(null);
     // biome-ignore lint/suspicious/noExplicitAny: <TODO>
@@ -112,6 +127,51 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
       true,
     );
 
+    useEffect(() => {
+      if (!networkId || !transaction.to) {
+        setCallTargetToken(null);
+        setCallTargetTokenListMatch(null);
+        return;
+      }
+      let cancelled = false;
+      const chainId = Number(networkId);
+      const target = transaction.to.toLowerCase();
+
+      fetchToken(chainId, target)
+        .then((token) => {
+          if (cancelled) return;
+          if (token) {
+            setCallTargetToken(token);
+            setCallTargetTokenListMatch(null);
+            return;
+          }
+          setCallTargetToken(null);
+          return fetchTokenList(chainId)
+            .then((list) => {
+              if (cancelled) return;
+              const match = list?.tokens.find((t) => t.address.toLowerCase() === target) ?? null;
+              setCallTargetTokenListMatch(match);
+            })
+            .catch((err) => {
+              if (!cancelled) {
+                logger.warn("Failed to fetch token list for transaction target:", err);
+                setCallTargetTokenListMatch(null);
+              }
+            });
+        })
+        .catch((err) => {
+          if (!cancelled) {
+            logger.warn("Failed to fetch token metadata for transaction target:", err);
+            setCallTargetToken(null);
+            setCallTargetTokenListMatch(null);
+          }
+        });
+
+      return () => {
+        cancelled = true;
+      };
+    }, [networkId, transaction.to]);
+
     // Use local artifact data if available and sourcify is not verified, otherwise use sourcify
     const contractData = useMemo(
       () => (isVerified && sourcifyData ? sourcifyData : parsedLocalData),
@@ -136,22 +196,47 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
             BigInt(transaction.receipt.gasUsed) * BigInt(transaction.receipt.effectiveGasPrice)
           ).toString()
         : undefined;
+      const valueNative = formatNativeFromWei(transaction.value, networkCurrency, 6);
+      const gasPriceGwei = formatGweiFromWei(transaction.gasPrice, 2);
+      const maxFeePerGasGwei = transaction.maxFeePerGas
+        ? formatGweiFromWei(transaction.maxFeePerGas, 2)
+        : undefined;
+      const maxPriorityFeePerGasGwei = transaction.maxPriorityFeePerGas
+        ? formatGweiFromWei(transaction.maxPriorityFeePerGas, 2)
+        : undefined;
+      const transactionFeeNative = fee ? formatNativeFromWei(fee, networkCurrency, 6) : undefined;
+
+      const tokenInfo = callTargetToken ?? callTargetTokenListMatch;
+      const tokenDecimals =
+        tokenInfo && typeof tokenInfo.decimals === "number" ? tokenInfo.decimals : undefined;
+      const tokenSymbol = tokenInfo?.symbol;
 
       const ctx: Record<string, unknown> = {
         hash: transaction.hash,
         from: transaction.from,
         to: transaction.to ?? "contract creation",
-        value: transaction.value,
+        valueNative,
         status: status ? (isSuccess ? "success" : "failed") : "pending",
         gasUsed: transaction.receipt?.gasUsed,
-        gasPrice: transaction.gasPrice,
-        transactionFee: fee,
+        gasPriceGwei,
+        maxFeePerGasGwei,
+        maxPriorityFeePerGasGwei,
+        transactionFeeNative,
         blockNumber: transaction.blockNumber,
         timestamp: transaction.timestamp,
         nonce: transaction.nonce,
         type: transaction.type,
         isContractCreation: !transaction.to,
       };
+      if (tokenInfo) {
+        ctx.callTargetToken = {
+          name: tokenInfo.name,
+          symbol: tokenInfo.symbol,
+          decimals: tokenInfo.decimals,
+          type: "type" in tokenInfo ? tokenInfo.type : undefined,
+          source: callTargetToken ? "metadata" : "tokenList",
+        };
+      }
 
       if (transaction.receipt?.contractAddress) {
         ctx.contractAddress = transaction.receipt.contractAddress;
@@ -211,8 +296,8 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
       }
       if (receipt && "l1Fee" in receipt) {
         const opReceipt = receipt as TransactionReceiptOptimism;
-        ctx.l1Fee = opReceipt.l1Fee;
-        ctx.l1GasPrice = opReceipt.l1GasPrice;
+        ctx.l1FeeNative = formatNativeFromWei(opReceipt.l1Fee, networkCurrency, 6);
+        ctx.l1GasPriceGwei = formatGweiFromWei(opReceipt.l1GasPrice, 2);
         ctx.l1GasUsed = opReceipt.l1GasUsed;
       }
 
@@ -221,10 +306,33 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
         ctx.erc7730Intent = preAnalysis.intent;
         ctx.erc7730Confidence = preAnalysis.confidence;
         if (preAnalysis.fields.length > 0) {
-          ctx.erc7730Fields = preAnalysis.fields.map((f) => ({
-            label: f.label,
-            value: f.value,
-          }));
+          ctx.erc7730Fields = preAnalysis.fields.map((f) => {
+            const base = {
+              label: f.label,
+              value: f.value,
+              format: f.format,
+              rawValue: f.rawValue,
+              path: f.path,
+            };
+            if (f.format === "tokenAmount" && tokenDecimals !== undefined && tokenSymbol) {
+              const raw =
+                typeof f.rawValue === "string" || typeof f.rawValue === "number"
+                  ? String(f.rawValue)
+                  : typeof f.rawValue === "bigint"
+                    ? f.rawValue.toString()
+                    : undefined;
+              const formatted = raw
+                ? formatTokenAmount(raw, tokenDecimals, 6, tokenSymbol)
+                : undefined;
+              return {
+                ...base,
+                tokenSymbol,
+                tokenDecimals,
+                formattedValue: formatted,
+              };
+            }
+            return base;
+          });
         }
         if (preAnalysis.warnings.length > 0) {
           ctx.erc7730Warnings = preAnalysis.warnings.map((w) => ({
@@ -236,10 +344,20 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
         if (preAnalysis.metadata.protocol) {
           ctx.erc7730Protocol = preAnalysis.metadata.protocol;
         }
+        ctx.erc7730Function = preAnalysis.functionName;
+        ctx.erc7730Signature = preAnalysis.signature;
       }
 
       return ctx;
-    }, [transaction, decodedInput, contractData?.abi, preAnalysis]);
+    }, [
+      transaction,
+      decodedInput,
+      contractData?.abi,
+      preAnalysis,
+      networkCurrency,
+      callTargetToken,
+      callTargetTokenListMatch,
+    ]);
 
     // Check if trace is available (localhost only)
     const isTraceAvailable = dataService?.networkAdapter.isTraceAvailable() || false;
@@ -295,23 +413,12 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
       return `${str.slice(0, start)}...${str.slice(-end)}`;
     }, []);
 
-    const formatValue = useCallback((value: string) => {
-      try {
-        const eth = Number(value) / 1e18;
-        return `${eth.toFixed(6)} ETH`;
-      } catch (_e) {
-        return value;
-      }
-    }, []);
+    const formatValue = useCallback(
+      (value: string) => formatNativeFromWei(value, networkCurrency, 6) ?? value,
+      [networkCurrency],
+    );
 
-    const formatGwei = useCallback((value: string) => {
-      try {
-        const gwei = Number(value) / 1e9;
-        return `${gwei.toFixed(2)} Gwei`;
-      } catch (_e) {
-        return value;
-      }
-    }, []);
+    const formatGwei = useCallback((value: string) => formatGweiFromWei(value, 2) ?? value, []);
 
     const parseTimestampToMs = useCallback((timestamp?: string) => {
       if (!timestamp) return null;

@@ -11,6 +11,7 @@ import {
 import type { Address, ENSReverseResult, RPCMetadata } from "../../../../../types";
 import { decodeAbiString } from "../../../../../utils/hexUtils";
 import { logger } from "../../../../../utils/logger";
+import { formatNativeFromWei } from "../../../../../utils/aiUnits";
 import AIAnalysisPanel from "../../../../common/AIAnalysisPanel";
 import { AddressHeader } from "../shared";
 import ContractInfoCard from "../shared/ContractInfoCard";
@@ -178,7 +179,7 @@ const ERC721Display: React.FC<ERC721DisplayProps> = ({
   const aiContext = useMemo(
     () => ({
       address: addressHash,
-      balance: address.balance,
+      balanceNative: formatNativeFromWei(address.balance, networkCurrency, 6),
       txCount: address.txCount,
       accountType: "erc721",
       hasCode: true,
@@ -199,6 +200,7 @@ const ERC721Display: React.FC<ERC721DisplayProps> = ({
       totalSupply,
       hasVerifiedContract,
       contractData?.name,
+      networkCurrency,
     ],
   );
 
@@ -260,7 +262,7 @@ const ERC721Display: React.FC<ERC721DisplayProps> = ({
         context={aiContext}
         networkName={networkName}
         networkCurrency={networkCurrency}
-        cacheKey={`account_${networkId}_${addressHash}`}
+        cacheKey={`openscan_ai_contract_${networkId}_${addressHash}`}
       />
     </div>
   );

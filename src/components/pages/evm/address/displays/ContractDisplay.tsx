@@ -1,11 +1,16 @@
 import type React from "react";
 import { useContext, useMemo } from "react";
+import { getNetworkById } from "../../../../../config/networks";
 import { AppContext } from "../../../../../context";
 import { useSourcify } from "../../../../../hooks/useSourcify";
 import type { Address, ENSReverseResult, RPCMetadata } from "../../../../../types";
+import AIAnalysisPanel from "../../../../common/AIAnalysisPanel";
 import { AddressHeader } from "../shared";
 import ContractInfoCard from "../shared/ContractInfoCard";
 import ContractInfoCards from "../shared/ContractInfoCards";
+import { logger } from "../../../../../utils";
+import { compactContractDataForAI } from "../../../../../utils/aiContext";
+import { formatNativeFromWei } from "../../../../../utils/aiUnits";
 
 interface ContractDisplayProps {
   address: Address;
@@ -32,6 +37,9 @@ const ContractDisplay: React.FC<ContractDisplayProps> = ({
   isMainnet = true,
 }) => {
   const { jsonFiles } = useContext(AppContext);
+  const network = getNetworkById(networkId);
+  const networkName = network?.name ?? "Unknown Network";
+  const networkCurrency = network?.currency ?? "ETH";
 
   // Fetch Sourcify data
   const {
@@ -83,43 +91,79 @@ const ContractDisplay: React.FC<ContractDisplayProps> = ({
 
   const hasVerifiedContract = isVerified || !!parsedLocalData;
 
+  const aiContractData = useMemo(() => compactContractDataForAI(contractData), [contractData]);
+
+  const aiContext = useMemo(
+    () => ({
+      address: addressHash,
+      balanceNative: formatNativeFromWei(address.balance, networkCurrency, 6),
+      txCount: address.txCount,
+      accountType: "contract",
+      hasCode: true,
+      ensName: ensName ?? undefined,
+      isVerified: hasVerifiedContract,
+      contractName: aiContractData?.name ?? undefined,
+      contractData: aiContractData,
+    }),
+    [
+      addressHash,
+      address.balance,
+      address.txCount,
+      ensName,
+      hasVerifiedContract,
+      aiContractData,
+      networkCurrency,
+    ],
+  );
+
+  logger.debug(contractData);
   return (
-    <div className="block-display-card">
-      <AddressHeader
-        addressHash={addressHash}
-        addressType="contract"
-        metadata={metadata}
-        selectedProvider={selectedProvider}
-        onProviderSelect={onProviderSelect}
-      />
-
-      <div className="address-section-content">
-        {/* Overview + More Info Cards */}
-        <ContractInfoCards
-          address={address}
+    <div className="page-with-analysis">
+      <div className="block-display-card">
+        <AddressHeader
           addressHash={addressHash}
-          networkId={Number(networkId)}
-          ensName={ensName}
-          reverseResult={reverseResult}
-          isMainnet={isMainnet}
+          addressType="contract"
+          metadata={metadata}
+          selectedProvider={selectedProvider}
+          onProviderSelect={onProviderSelect}
         />
 
-        {/* Contract Info Card (includes Contract Details) */}
-        <ContractInfoCard
-          address={address}
-          addressHash={addressHash}
-          networkId={networkId}
-          contractData={contractData}
-          hasVerifiedContract={hasVerifiedContract}
-          sourcifyLoading={sourcifyLoading}
-          isLocalArtifact={!!parsedLocalData && !isVerified}
-          sourcifyUrl={
-            sourcifyData
-              ? `https://repo.sourcify.dev/contracts/full_match/${networkId}/${addressHash}/`
-              : undefined
-          }
-        />
+        <div className="address-section-content">
+          {/* Overview + More Info Cards */}
+          <ContractInfoCards
+            address={address}
+            addressHash={addressHash}
+            networkId={Number(networkId)}
+            ensName={ensName}
+            reverseResult={reverseResult}
+            isMainnet={isMainnet}
+          />
+
+          {/* Contract Info Card (includes Contract Details) */}
+          <ContractInfoCard
+            address={address}
+            addressHash={addressHash}
+            networkId={networkId}
+            contractData={contractData}
+            hasVerifiedContract={hasVerifiedContract}
+            sourcifyLoading={sourcifyLoading}
+            isLocalArtifact={!!parsedLocalData && !isVerified}
+            sourcifyUrl={
+              sourcifyData
+                ? `https://repo.sourcify.dev/contracts/full_match/${networkId}/${addressHash}/`
+                : undefined
+            }
+          />
+        </div>
       </div>
+
+      <AIAnalysisPanel
+        analysisType="contract"
+        context={aiContext}
+        networkName={networkName}
+        networkCurrency={networkCurrency}
+        cacheKey={`openscan_ai_contract_${networkId}_${addressHash}`}
+      />
     </div>
   );
 };

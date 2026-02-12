@@ -6,6 +6,7 @@ import type { Block, BlockArbitrum, RPCMetadata } from "../../../../types";
 import AIAnalysisPanel from "../../../common/AIAnalysisPanel";
 import ExtraDataDisplay from "../../../common/ExtraDataDisplay";
 import { RPCIndicator } from "../../../common/RPCIndicator";
+import { formatGweiFromWei, formatNativeFromWei } from "../../../../utils/aiUnits";
 
 interface BlockDisplayProps {
   block: Block | BlockArbitrum;
@@ -82,23 +83,9 @@ const BlockDisplay: React.FC<BlockDisplayProps> = React.memo(
         : t("time.in", { count: diffSeconds, unit: unitLabel });
     };
 
-    const formatGwei = (value: string) => {
-      try {
-        const gwei = Number(value) / 1e9;
-        return `${gwei.toFixed(9)} Gwei`;
-      } catch (_e) {
-        return value;
-      }
-    };
-
-    const formatEth = (value: string) => {
-      try {
-        const eth = Number(value) / 1e18;
-        return `${eth.toFixed(12)} ETH`;
-      } catch (_e) {
-        return value;
-      }
-    };
+    const formatGwei = (value: string) => formatGweiFromWei(value, 9) ?? value;
+    const formatNative = (value: string) =>
+      formatNativeFromWei(value, networkCurrency, 12) ?? value;
 
     const blockNumber = Number(block.number);
     const timestampFormatted = formatTimestamp(block.timestamp);
@@ -109,6 +96,8 @@ const BlockDisplay: React.FC<BlockDisplayProps> = React.memo(
     const burntFees = block.baseFeePerGas
       ? (BigInt(block.gasUsed) * BigInt(block.baseFeePerGas)).toString()
       : null;
+    const baseFeePerGasGwei = block.baseFeePerGas ? formatGwei(block.baseFeePerGas) : undefined;
+    const burntFeesNative = burntFees ? formatNative(burntFees) : undefined;
 
     const aiContext = useMemo(() => {
       const ctx: Record<string, unknown> = {
@@ -121,8 +110,8 @@ const BlockDisplay: React.FC<BlockDisplayProps> = React.memo(
         gasUsed: block.gasUsed,
         gasLimit: block.gasLimit,
         gasUsedPercentage: gasUsedPct,
-        baseFeePerGas: block.baseFeePerGas ?? undefined,
-        burntFees: burntFees ?? undefined,
+        baseFeePerGasGwei,
+        burntFeesNative,
         size: block.size,
         extraData: block.extraData !== "0x" ? block.extraData : undefined,
       };
@@ -131,7 +120,7 @@ const BlockDisplay: React.FC<BlockDisplayProps> = React.memo(
         ctx.sendCount = (block as BlockArbitrum).sendCount;
       }
       return ctx;
-    }, [block, gasUsedPct, burntFees]);
+    }, [block, gasUsedPct, baseFeePerGasGwei, burntFeesNative]);
 
     return (
       <div className="page-with-analysis">
@@ -243,7 +232,7 @@ const BlockDisplay: React.FC<BlockDisplayProps> = React.memo(
               <div className="tx-row">
                 <span className="tx-label">{t("burntFees")}:</span>
                 <span className="tx-value">
-                  <span className="burnt-fees">🔥 {formatEth(burntFees)}</span>
+                  <span className="burnt-fees">🔥 {formatNative(burntFees)}</span>
                 </span>
               </div>
             )}

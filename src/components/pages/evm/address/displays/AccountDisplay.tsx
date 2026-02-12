@@ -5,6 +5,7 @@ import type { Address, ENSReverseResult, RPCMetadata, Transaction } from "../../
 import AIAnalysisPanel from "../../../../common/AIAnalysisPanel";
 import { AddressHeader, TransactionHistory } from "../shared";
 import AccountInfoCards from "../shared/AccountInfoCards";
+import { formatNativeFromWei } from "../../../../../utils/aiUnits";
 
 interface AccountDisplayProps {
   address: Address;
@@ -46,22 +47,30 @@ const AccountDisplay: React.FC<AccountDisplayProps> = ({
       hash: tx.hash,
       from: tx.from,
       to: tx.to ?? "contract creation",
-      value: tx.value,
+      valueNative: formatNativeFromWei(tx.value, networkCurrency, 6),
       status: tx.receipt?.status === "0x1" || tx.receipt?.status === "1" ? "success" : "failed",
     }));
-  }, [transactions]);
+  }, [transactions, networkCurrency]);
 
   const aiContext = useMemo(
     () => ({
       address: addressHash,
-      balance: address.balance,
+      balanceNative: formatNativeFromWei(address.balance, networkCurrency, 6),
       txCount: address.txCount,
       accountType: "account",
       hasCode: address.code !== "0x",
       ensName: ensName ?? undefined,
       recentTransactions: recentTxSummary,
     }),
-    [addressHash, address.balance, address.txCount, address.code, ensName, recentTxSummary],
+    [
+      addressHash,
+      address.balance,
+      address.txCount,
+      address.code,
+      ensName,
+      recentTxSummary,
+      networkCurrency,
+    ],
   );
 
   return (
@@ -100,7 +109,7 @@ const AccountDisplay: React.FC<AccountDisplayProps> = ({
         context={aiContext}
         networkName={networkName}
         networkCurrency={networkCurrency}
-        cacheKey={`account_${networkId}_${addressHash}`}
+        cacheKey={`openscan_ai_account_${networkId}_${addressHash}`}
       />
     </div>
   );

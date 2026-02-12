@@ -11,6 +11,7 @@ import {
 import type { Address, ENSReverseResult, RPCMetadata } from "../../../../../types";
 import { decodeAbiString } from "../../../../../utils/hexUtils";
 import { logger } from "../../../../../utils/logger";
+import { formatNativeFromWei } from "../../../../../utils/aiUnits";
 import AIAnalysisPanel from "../../../../common/AIAnalysisPanel";
 import { AddressHeader } from "../shared";
 import ContractInfoCard from "../shared/ContractInfoCard";
@@ -196,7 +197,7 @@ const ERC1155Display: React.FC<ERC1155DisplayProps> = ({
   const aiContext = useMemo(
     () => ({
       address: addressHash,
-      balance: address.balance,
+      balanceNative: formatNativeFromWei(address.balance, networkCurrency, 6),
       txCount: address.txCount,
       accountType: "erc1155",
       hasCode: true,
@@ -217,6 +218,7 @@ const ERC1155Display: React.FC<ERC1155DisplayProps> = ({
       onChainData?.uri,
       hasVerifiedContract,
       contractData?.name,
+      networkCurrency,
     ],
   );
 
@@ -278,7 +280,7 @@ const ERC1155Display: React.FC<ERC1155DisplayProps> = ({
         context={aiContext}
         networkName={networkName}
         networkCurrency={networkCurrency}
-        cacheKey={`account_${networkId}_${addressHash}`}
+        cacheKey={`openscan_ai_contract_${networkId}_${addressHash}`}
       />
     </div>
   );
