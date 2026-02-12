@@ -7,7 +7,8 @@
     "url": "git+https://github.com/openscan-explorer/explorer.git"
   },
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "tag": "alpha"
   },
   "files": ["*"]
 }
