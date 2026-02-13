@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { getNetworkById } from "../../../../config/networks";
 import type { Block, BlockArbitrum, RPCMetadata } from "../../../../types";
-import AIAnalysisPanel from "../../../common/AIAnalysisPanel";
+import AIAnalysisPanel from "../../../common/AIAnalysis/AIAnalysisPanel";
 import ExtraDataDisplay from "../../../common/ExtraDataDisplay";
 import { RPCIndicator } from "../../../common/RPCIndicator";
 import { formatGweiFromWei, formatNativeFromWei } from "../../../../utils/unitFormatters";

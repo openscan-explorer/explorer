@@ -10,7 +10,7 @@ import { SUPPORTED_LANGUAGES } from "../../../i18n";
 import { clearSupportersCache } from "../../../services/MetadataService";
 import type { AIProvider, RPCUrls, RpcUrlsContextType } from "../../../types";
 import { AI_PROVIDERS, AI_PROVIDER_ORDER } from "../../../config/aiProviders";
-import { clearAICache } from "../../../utils/aiCache";
+import { clearAICache } from "../../common/AIAnalysis/aiCache";
 import { logger } from "../../../utils/logger";
 import { getChainIdFromNetwork } from "../../../utils/networkResolver";
 

@@ -3,8 +3,8 @@ import { useEffect, useId, useState } from "react";
 import { useTranslation } from "react-i18next";
 import Markdown from "react-markdown";
 import { Link } from "react-router-dom";
-import { useAIAnalysis } from "../../hooks/useAIAnalysis";
-import type { AIAnalysisType } from "../../types";
+import { useAIAnalysis } from "../../../hooks/useAIAnalysis";
+import type { AIAnalysisType } from "../../../types";
 
 interface AIAnalysisProps {
   analysisType: AIAnalysisType;

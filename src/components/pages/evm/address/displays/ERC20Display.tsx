@@ -12,7 +12,7 @@ import type { Address, ENSReverseResult, RPCMetadata } from "../../../../../type
 import { hexToUtf8 } from "../../../../../utils/erc20Utils";
 import { logger } from "../../../../../utils/logger";
 import { formatNativeFromWei, formatTokenAmount } from "../../../../../utils/unitFormatters";
-import AIAnalysisPanel from "../../../../common/AIAnalysisPanel";
+import AIAnalysisPanel from "../../../../common/AIAnalysis/AIAnalysisPanel";
 import { AddressHeader } from "../shared";
 import ContractInfoCard from "../shared/ContractInfoCard";
 import ContractInfoCards from "../shared/ContractInfoCards";

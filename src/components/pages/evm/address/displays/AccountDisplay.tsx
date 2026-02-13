@@ -2,7 +2,7 @@ import type React from "react";
 import { useCallback, useMemo, useState } from "react";
 import { getNetworkById } from "../../../../../config/networks";
 import type { Address, ENSReverseResult, RPCMetadata, Transaction } from "../../../../../types";
-import AIAnalysisPanel from "../../../../common/AIAnalysisPanel";
+import AIAnalysisPanel from "../../../../common/AIAnalysis/AIAnalysisPanel";
 import { AddressHeader, TransactionHistory } from "../shared";
 import AccountInfoCards from "../shared/AccountInfoCards";
 import { formatNativeFromWei } from "../../../../../utils/unitFormatters";

@@ -1,4 +1,4 @@
-import type { ABI, ABIParameter } from "../types";
+import type { ABI, ABIParameter } from "../../../types";
 
 const MAX_ABI_FUNCTIONS = 30;
 const MAX_ABI_EVENTS = 30;

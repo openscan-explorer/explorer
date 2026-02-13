@@ -1,7 +1,7 @@
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
-import AIAnalysisPanel from "../../../../components/common/AIAnalysisPanel";
+import AIAnalysisPanel from "../../../common/AIAnalysis/AIAnalysisPanel";
 import LongString from "../../../../components/common/LongString";
 import { RPCIndicator } from "../../../../components/common/RPCIndicator";
 import { getNetworkById } from "../../../../config/networks";

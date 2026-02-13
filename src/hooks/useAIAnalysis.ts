@@ -3,7 +3,11 @@ import { AI_PROVIDERS, AI_PROVIDER_ORDER } from "../config/aiProviders";
 import { useSettings } from "../context/SettingsContext";
 import { AIService, AIServiceError } from "../services/AIService";
 import type { AIAnalysisResult, AIAnalysisType, AIProvider } from "../types";
-import { getCachedAnalysis, hashContext, setCachedAnalysis } from "../utils/aiCache";
+import {
+  getCachedAnalysis,
+  hashContext,
+  setCachedAnalysis,
+} from "../components/common/AIAnalysis/aiCache";
 import { logger } from "../utils/logger";
 
 interface UseAIAnalysisReturn {

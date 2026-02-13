@@ -1,5 +1,5 @@
-import type { AIAnalysisResult } from "../types";
-import { logger } from "./logger";
+import type { AIAnalysisResult } from "../../../types";
+import { logger } from "../../../utils/logger";
 
 const CACHE_PREFIX = "openscan_ai_";
 const CACHE_VERSION = 1;

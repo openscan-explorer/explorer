@@ -4,12 +4,12 @@ import { getNetworkById } from "../../../../../config/networks";
 import { AppContext } from "../../../../../context";
 import { useSourcify } from "../../../../../hooks/useSourcify";
 import type { Address, ENSReverseResult, RPCMetadata } from "../../../../../types";
-import AIAnalysisPanel from "../../../../common/AIAnalysisPanel";
+import AIAnalysisPanel from "../../../../common/AIAnalysis/AIAnalysisPanel";
 import { AddressHeader } from "../shared";
 import ContractInfoCard from "../shared/ContractInfoCard";
 import ContractInfoCards from "../shared/ContractInfoCards";
 import { logger } from "../../../../../utils";
-import { compactContractDataForAI } from "../../../../../utils/aiContext";
+import { compactContractDataForAI } from "../../../../common/AIAnalysis/aiContext";
 import { formatNativeFromWei } from "../../../../../utils/unitFormatters";
 
 interface ContractDisplayProps {
