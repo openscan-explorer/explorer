@@ -6,6 +6,7 @@ import type {
 import type { Transaction } from "../types";
 import { logger } from "../utils/logger";
 import { hexToNumber } from "./adapters/EVMAdapter/utils";
+import type { NonceLookupService } from "./NonceLookupService";
 
 interface Semaphore {
   acquire(): Promise<() => void>;
@@ -90,6 +91,7 @@ function extractData<T>(data: T | T[] | null | undefined): T | null {
 
 export class AddressTransactionSearch {
   private client: EthereumClient;
+  private nonceLookup: NonceLookupService | null;
   private nonceCache: Map<string, number> = new Map();
   private balanceCache: Map<string, bigint> = new Map();
   private rpcSemaphore: Semaphore = createSemaphore(4);
@@ -98,9 +100,11 @@ export class AddressTransactionSearch {
   // Can be increased later when RPC type detection is added (e.g., for localhost/private RPCs)
   private static readonly MAX_SEGMENTS = 8; // Max segments per split (safe for public RPCs)
   private static readonly BATCH_SIZE = 8; // Max parallel state fetches (8 blocks = 16 RPC calls)
+  private static readonly RECEIPT_BATCH_SIZE = 20;
 
-  constructor(client: EthereumClient) {
+  constructor(client: EthereumClient, nonceLookup?: NonceLookupService) {
     this.client = client;
+    this.nonceLookup = nonceLookup ?? null;
   }
 
   private rpcLimited<T>(fn: () => Promise<T>): Promise<T> {
@@ -544,6 +548,394 @@ export class AddressTransactionSearch {
     return transactions;
   }
 
+  /**
+   * Optimized search using eth_getTransactionBySenderAndNonce for sent transactions,
+   * with gap-based binary search for received/internal transactions.
+   *
+   * Phase 1: Nonce lookups (reth) + receipt fetches (user RPC) in parallel
+   * Phase 2: Gap searches for received/internal txs in intervals between sent tx blocks
+   * Phase 3: Combine, sort, deliver as one batch
+   *
+   * Returns null if it should fall back to binary search.
+   */
+  private async searchWithNonceLookup(
+    normalizedAddress: string,
+    endBlock: number,
+    initialState: AddressState,
+    finalState: AddressState,
+    options: {
+      limit: number;
+      onProgress?: ProgressCallback;
+      onTransactionsFound?: TransactionFoundCallback;
+      signal?: AbortSignal;
+    },
+  ): Promise<SearchResult | null> {
+    const { limit, onProgress, onTransactionsFound, signal } = options;
+    const nonceLookup = this.nonceLookup;
+    if (!nonceLookup) return null;
+
+    const searchStartTime = performance.now();
+    const nonceDelta = finalState.nonce - initialState.nonce;
+
+    // Determine nonce range to fetch
+    const totalNoncesToFetch = limit > 0 ? Math.min(limit, nonceDelta) : nonceDelta;
+    const startNonce = finalState.nonce - totalNoncesToFetch;
+    const endNonce = finalState.nonce;
+
+    // Probe availability with the first nonce in range
+    const available = await nonceLookup.isAvailable(normalizedAddress, startNonce);
+    if (!available) return null;
+
+    // Phase 1: Fetch sent transactions via nonce lookup + receipts in parallel
+    const sentTxs: Array<Transaction & { type: "sent" | "received" | "internal" }> = [];
+    const sentBlockNumbers = new Set<number>();
+    let completedNonces = 0;
+
+    onProgress?.({
+      phase: "fetching",
+      current: 0,
+      total: totalNoncesToFetch,
+      message: `Fetching sent transactions (0/${totalNoncesToFetch})...`,
+    });
+
+    const nonceResults = await nonceLookup.fetchSentTransactions(
+      normalizedAddress,
+      startNonce,
+      endNonce,
+      signal,
+      (completed, total) => {
+        completedNonces = completed;
+        onProgress?.({
+          phase: "fetching",
+          current: completed,
+          total,
+          message: `Fetching sent transactions (${completed}/${total})...`,
+        });
+      },
+    );
+
+    if (signal?.aborted) return null;
+
+    // Fetch receipts and full tx data for nonce lookup results
+    // These go to the user's RPC (not reth), so they can run concurrently
+    for (let i = 0; i < nonceResults.length; i += AddressTransactionSearch.RECEIPT_BATCH_SIZE) {
+      if (signal?.aborted) break;
+      const batch = nonceResults.slice(i, i + AddressTransactionSearch.RECEIPT_BATCH_SIZE);
+
+      const txPromises = batch.map(async (nr) => {
+        try {
+          const [txResult, receiptResult] = await Promise.all([
+            this.rpcLimited(() => this.client.getTransactionByHash(nr.txHash)),
+            this.rpcLimited(() => this.client.getTransactionReceipt(nr.txHash)),
+          ]);
+
+          const tx = extractData(txResult.data);
+          const receipt = extractData(receiptResult.data);
+          if (!tx) return null;
+
+          // Also get block timestamp
+          let timestamp = "";
+          try {
+            const blockResult = await this.rpcLimited(() =>
+              this.client.getBlockByNumber(`0x${nr.blockNumber.toString(16)}`, false),
+            );
+            const block = extractData(blockResult.data);
+            if (block) timestamp = block.timestamp;
+          } catch {
+            // timestamp remains empty
+          }
+
+          return {
+            hash: tx.hash,
+            blockNumber: tx.blockNumber || "",
+            blockHash: tx.blockHash || "",
+            from: tx.from,
+            to: tx.to || "",
+            value: tx.value,
+            gas: tx.gas,
+            gasPrice: tx.gasPrice || "0x0",
+            maxFeePerGas: tx.maxFeePerGas,
+            maxPriorityFeePerGas: tx.maxPriorityFeePerGas,
+            data: tx.input,
+            input: tx.input,
+            nonce: tx.nonce,
+            transactionIndex: tx.transactionIndex || "0x0",
+            timestamp,
+            type: "sent" as const,
+            v: tx.v || "0x0",
+            r: tx.r || "0x0",
+            s: tx.s || "0x0",
+            receipt: receipt || undefined,
+          } as Transaction & { type: "sent" | "received" | "internal" };
+        } catch (err) {
+          logger.warn(`Failed to fetch tx details for ${nr.txHash}:`, err);
+          return null;
+        }
+      });
+
+      const results = await Promise.all(txPromises);
+      for (const tx of results) {
+        if (tx) {
+          sentTxs.push(tx);
+          const blockNum = hexToNumber(tx.blockNumber || "0x0");
+          if (blockNum > 0) sentBlockNumbers.add(blockNum);
+        }
+      }
+    }
+
+    if (signal?.aborted) return null;
+
+    // Phase 2: Interleaved progressive delivery — walk from newest to oldest,
+    // alternating gap searches and sent tx delivery so the UI appends in order.
+    onProgress?.({
+      phase: "searching",
+      current: completedNonces,
+      total: totalNoncesToFetch,
+      message: "Searching for received transactions...",
+    });
+
+    const allTransactions: Array<Transaction & { type: "sent" | "received" | "internal" }> = [];
+
+    if (sentBlockNumbers.size === 0) {
+      // No sent txs found — fall back to binary search (return null)
+      return null;
+    }
+
+    // Sort sent txs by block number descending (newest first) and index by block
+    sentTxs.sort((a, b) => {
+      const blockA = hexToNumber(a.blockNumber || "0x0");
+      const blockB = hexToNumber(b.blockNumber || "0x0");
+      return blockB - blockA;
+    });
+    const sentTxsByBlock = new Map<
+      number,
+      Array<Transaction & { type: "sent" | "received" | "internal" }>
+    >();
+    for (const tx of sentTxs) {
+      const blockNum = hexToNumber(tx.blockNumber || "0x0");
+      const existing = sentTxsByBlock.get(blockNum);
+      if (existing) {
+        existing.push(tx);
+      } else {
+        sentTxsByBlock.set(blockNum, [tx]);
+      }
+    }
+
+    // Build ordered segments: [gap, sentTx, gap, sentTx, ...] newest to oldest
+    // Each segment is either a gap to search or a sent tx block to deliver
+    type Segment = { kind: "gap"; from: number; to: number } | { kind: "sent"; blockNum: number };
+
+    const segments: Segment[] = [];
+    const sortedDesc = Array.from(sentBlockNumbers).sort((a, b) => b - a);
+    const newestSent = sortedDesc[0] as number;
+
+    // Gap after newest sent tx (contains the most recent possible received txs)
+    if (newestSent < endBlock) {
+      segments.push({ kind: "gap", from: newestSent + 1, to: endBlock });
+    }
+
+    // Interleave sent txs and gaps between them, newest to oldest
+    for (let i = 0; i < sortedDesc.length; i++) {
+      const current = sortedDesc[i] as number;
+      segments.push({ kind: "sent", blockNum: current });
+
+      if (i < sortedDesc.length - 1) {
+        const older = sortedDesc[i + 1] as number;
+        if (current - older > 1) {
+          segments.push({ kind: "gap", from: older + 1, to: current - 1 });
+        }
+      }
+    }
+
+    const processedBlocks = new Set<number>();
+
+    // Process segments in order — each delivery is chronologically after the previous
+    for (const segment of segments) {
+      if (signal?.aborted) break;
+      if (limit > 0 && allTransactions.length >= limit) break;
+
+      if (segment.kind === "sent") {
+        // Deliver sent tx(s) at this block
+        const txsAtBlock = sentTxsByBlock.get(segment.blockNum);
+        if (txsAtBlock && txsAtBlock.length > 0) {
+          allTransactions.push(...txsAtBlock);
+          onTransactionsFound?.(txsAtBlock);
+        }
+        continue;
+      }
+
+      // Gap search
+      const gap = segment;
+      try {
+        const gapEndState = await this.getState(normalizedAddress, gap.to);
+        const gapStartState = await this.getState(normalizedAddress, gap.from);
+
+        if (
+          gapStartState.balance === gapEndState.balance &&
+          gapStartState.nonce === gapEndState.nonce
+        ) {
+          continue; // No activity in this gap
+        }
+
+        // Exponential narrowing for large gaps
+        let narrowedFrom = gap.from;
+        let narrowedTo = gap.to;
+        const gapSize = gap.to - gap.from;
+
+        if (gapSize > 100_000) {
+          let range = 100_000;
+          let prevBoundary = gap.to;
+
+          while (range < gapSize) {
+            if (signal?.aborted) break;
+            const probe = Math.max(gap.to - range, gap.from);
+            const probeState = await this.getState(normalizedAddress, probe);
+
+            if (
+              probeState.nonce !== gapEndState.nonce ||
+              probeState.balance !== gapEndState.balance
+            ) {
+              narrowedFrom = probe;
+              narrowedTo = prevBoundary;
+              break;
+            }
+
+            if (probe === gap.from) break;
+            prevBoundary = probe;
+            range *= 2;
+          }
+
+          const narrowedStartState = await this.getState(normalizedAddress, narrowedFrom);
+          const narrowedEndState = await this.getState(normalizedAddress, narrowedTo);
+          if (
+            narrowedStartState.balance === narrowedEndState.balance &&
+            narrowedStartState.nonce === narrowedEndState.nonce
+          ) {
+            continue;
+          }
+        }
+
+        // Adaptive segmented search — delivers txs progressively via onTransactionsFound
+        const searchGap = async (
+          searchStart: number,
+          searchEnd: number,
+          sState: AddressState,
+          eState: AddressState,
+          depth = 0,
+        ): Promise<void> => {
+          if (signal?.aborted) return;
+
+          if (searchEnd - searchStart <= 1) {
+            const nonceChanged = sState.nonce !== eState.nonce;
+            const balanceChanged = sState.balance !== eState.balance;
+
+            if ((nonceChanged || balanceChanged) && !processedBlocks.has(searchEnd)) {
+              processedBlocks.add(searchEnd);
+              const searchForInternal = balanceChanged && !nonceChanged;
+              const blockTxs = await this.fetchBlockTransactions(
+                searchEnd,
+                normalizedAddress,
+                searchForInternal,
+                signal,
+              );
+              if (blockTxs.length > 0) {
+                allTransactions.push(...blockTxs);
+                onTransactionsFound?.(blockTxs);
+              }
+            }
+            return;
+          }
+
+          const blockRange = searchEnd - searchStart;
+          const segmentCount = this.getOptimalSegmentCount(sState, eState, blockRange);
+          if (segmentCount === 0) return;
+
+          if (segmentCount <= 2) {
+            const midBlock = Math.floor((searchStart + searchEnd) / 2);
+            const midState = await this.getState(normalizedAddress, midBlock);
+
+            const rightChanged =
+              midState.nonce !== eState.nonce || midState.balance !== eState.balance;
+            const leftChanged =
+              sState.nonce !== midState.nonce || sState.balance !== midState.balance;
+
+            if (rightChanged) {
+              await searchGap(midBlock, searchEnd, midState, eState, depth + 1);
+            }
+            if (leftChanged) {
+              await searchGap(searchStart, midBlock, sState, midState, depth + 1);
+            }
+            return;
+          }
+
+          const boundaries = this.calculateBoundaries(searchStart, searchEnd, segmentCount);
+          const internalBlocks = boundaries.slice(1, -1);
+          const stateMap = await this.getStatesInBatches(normalizedAddress, internalBlocks);
+          stateMap.set(searchStart, sState);
+          stateMap.set(searchEnd, eState);
+
+          for (let i = segmentCount - 1; i >= 0; i--) {
+            if (signal?.aborted) break;
+            const segStart = boundaries[i];
+            const segEnd = boundaries[i + 1];
+            if (segStart === undefined || segEnd === undefined) continue;
+
+            const segStartState = stateMap.get(segStart);
+            const segEndState = stateMap.get(segEnd);
+            if (!segStartState || !segEndState) continue;
+
+            const hasChanges =
+              segStartState.nonce !== segEndState.nonce ||
+              segStartState.balance !== segEndState.balance;
+
+            if (hasChanges) {
+              await searchGap(segStart, segEnd, segStartState, segEndState, depth + 1);
+            }
+          }
+        };
+
+        const narrowedStartState = await this.getState(normalizedAddress, narrowedFrom);
+        const narrowedEndState = await this.getState(normalizedAddress, narrowedTo);
+        await searchGap(narrowedFrom, narrowedTo, narrowedStartState, narrowedEndState);
+      } catch (err) {
+        logger.warn(`Gap search failed for blocks ${gap.from}-${gap.to}:`, err);
+      }
+    }
+
+    // Sort all collected transactions by block number descending (newest first)
+    allTransactions.sort((a, b) => {
+      const blockA = hexToNumber(a.blockNumber || "0x0");
+      const blockB = hexToNumber(b.blockNumber || "0x0");
+      return blockB - blockA;
+    });
+
+    // Apply limit
+    const limitedTxs = limit > 0 ? allTransactions.slice(0, limit) : allTransactions;
+
+    const sentCount = limitedTxs.filter((t) => t.type === "sent").length;
+    const receivedCount = limitedTxs.filter((t) => t.type === "received").length;
+    const internalCount = limitedTxs.filter((t) => t.type === "internal").length;
+    const elapsedMs = Math.round(performance.now() - searchStartTime);
+
+    const foundBlocks = new Set(
+      limitedTxs.map((tx) => hexToNumber(tx.blockNumber || "0x0")).filter((b) => b > 0),
+    );
+
+    return {
+      blocks: Array.from(foundBlocks).sort((a, b) => b - a),
+      transactions: limitedTxs,
+      stats: {
+        totalBlocks: foundBlocks.size,
+        totalTxs: limitedTxs.length,
+        sentCount,
+        receivedCount,
+        internalCount,
+        rpcCalls: this.nonceCache.size + this.balanceCache.size,
+        elapsedMs,
+      },
+    };
+  }
+
   async searchAddressActivity(
     address: string,
     options: {
@@ -576,8 +968,24 @@ export class AddressTransactionSearch {
     // Get initial and final states
     // If fromBlock is provided, use it as the lower bound instead of block 0
     const startBlock = fromBlock !== undefined ? fromBlock : 0;
-    const initialState = await this.getState(address, startBlock);
-    const finalState = await this.getState(address, endBlock);
+    const initialState = await this.getState(normalizedAddress, startBlock);
+    const finalState = await this.getState(normalizedAddress, endBlock);
+
+    // Try nonce-based lookup for sent transactions (Ethereum mainnet only)
+    if (this.nonceLookup && finalState.nonce > initialState.nonce) {
+      try {
+        const result = await this.searchWithNonceLookup(
+          normalizedAddress,
+          endBlock,
+          initialState,
+          finalState,
+          { limit, onProgress, onTransactionsFound, signal },
+        );
+        if (result) return result;
+      } catch (err) {
+        logger.warn("Nonce lookup failed, falling back to binary search:", err);
+      }
+    }
 
     // No activity if states are identical and nonce is 0
     if (
@@ -687,7 +1095,7 @@ export class AddressTransactionSearch {
       // For binary (2 segments), use optimized path
       if (segmentCount <= 2) {
         const midBlock = Math.floor((searchStartBlock + searchEndBlock) / 2);
-        const midState = await this.getState(address, midBlock);
+        const midState = await this.getState(normalizedAddress, midBlock);
 
         const leftChanged =
           searchStartState.nonce !== midState.nonce ||
@@ -711,7 +1119,7 @@ export class AddressTransactionSearch {
       // Calculate boundaries and fetch internal boundary states in batches
       const boundaries = this.calculateBoundaries(searchStartBlock, searchEndBlock, segmentCount);
       const internalBlocks = boundaries.slice(1, -1); // Exclude start and end (already known)
-      const stateMap = await this.getStatesInBatches(address, internalBlocks);
+      const stateMap = await this.getStatesInBatches(normalizedAddress, internalBlocks);
 
       // Add known start/end states
       stateMap.set(searchStartBlock, searchStartState);
