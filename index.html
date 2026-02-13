@@ -29,13 +29,39 @@
 
     <title>OpenScan - Open-Source Blockchain Explorer</title>
 
+    <!-- Structured Data: Organization -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "@id": "https://openscan.eth.link/#organization",
+      "name": "OpenScan",
+      "url": "https://openscan.eth.link",
+      "logo": "https://openscan.eth.link/openscan-logo.png",
+      "description": "Open-source, trustless blockchain explorer for Ethereum and EVM-compatible networks",
+      "knowsAbout": [
+        "Ethereum",
+        "Blockchain",
+        "Smart Contracts",
+        "ENS Domains",
+        "Web3",
+        "EVM",
+        "Layer 2 Networks",
+        "Decentralized Applications"
+      ],
+      "sameAs": [
+        "https://github.com/openscan-explorer"
+      ]
+    }
+    </script>
+
     <!-- Structured Data: WebApplication -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "WebApplication",
       "name": "OpenScan",
-      "url": "https://openscan.io",
+      "url": "https://openscan.eth.link",
       "description": "OpenScan is a trustless, open-source blockchain explorer for Bitcoin, Ethereum, and EVM-compatible networks. Connect directly to blockchain nodes with no intermediaries.",
       "applicationCategory": "Blockchain Explorer",
       "operatingSystem": "Web Browser",
@@ -58,8 +84,8 @@
       "license": "https://opensource.org/licenses/MIT",
       "sourceOrganization": {
         "@type": "Organization",
-        "name": "OpenScan",
-        "url": "https://github.com/openscan-explorer"
+        "@id": "https://openscan.eth.link/#organization",
+        "name": "OpenScan"
       },
       "softwareVersion": "1.2.0",
       "isAccessibleForFree": true
@@ -119,6 +145,38 @@
             "@type": "Answer",
             "text": "Yes. OpenScan has full support for local development chains including Hardhat and Anvil. It provides trace capabilities (debug_traceTransaction, trace_block) on localhost networks, making it useful for smart contract development and debugging."
           }
+        },
+        {
+          "@type": "Question",
+          "name": "What is a blockchain explorer?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A blockchain explorer is a tool that allows users to search and view transactions, addresses, blocks, and smart contracts on a blockchain network. OpenScan is an open-source blockchain explorer that connects directly to blockchain nodes via RPC, providing trustless and transparent access to on-chain data without relying on centralized servers."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can OpenScan be self-hosted or deployed on IPFS?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. OpenScan is a fully static web application that can be self-hosted on any web server or deployed on IPFS for complete decentralization. Since it connects directly to blockchain RPC nodes, no backend server or database is required."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does OpenScan support ENS domain lookups?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. OpenScan supports Ethereum Name Service (ENS) domain resolution. You can search for any ENS name (e.g., vitalik.eth) and OpenScan will resolve it to the corresponding Ethereum address, displaying its balance, transactions, and associated smart contracts."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is OpenScan open source?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. OpenScan is fully open-source under the MIT license. The source code is available on GitHub at github.com/openscan-explorer. Anyone can audit the code, contribute improvements, or fork the project to create their own blockchain explorer."
+          }
         }
       ]
     }
@@ -149,12 +207,15 @@
     </script>
     <noscript>
       <div style="max-width:800px;margin:0 auto;padding:40px 20px;font-family:system-ui,sans-serif;color:#e0e0e0;background:#0a0a0a;">
-        <h1>OpenScan - Open-Source Blockchain Explorer</h1>
+        <h1>OpenScan - Trustless Open-Source Blockchain Explorer</h1>
         <p>OpenScan is a trustless, open-source blockchain explorer for Bitcoin, Ethereum, and EVM-compatible networks. Connect directly to blockchain nodes with no intermediaries, no tracking, and no data harvesting.</p>
         <p>Please enable JavaScript to use the full application.</p>
         <p><a href="https://github.com/openscan-explorer/explorer" style="color:#58a6ff;">View on GitHub</a></p>
       </div>
     </noscript>
+    <h1 style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;">
+      OpenScan - Trustless Open-Source Blockchain Explorer
+    </h1>
     <div id="root"></div>
     <script type="module" src="/src/index.tsx"></script>
   </body>
