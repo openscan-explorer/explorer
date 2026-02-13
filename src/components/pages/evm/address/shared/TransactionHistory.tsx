@@ -82,6 +82,7 @@ interface TransactionHistoryProps {
   addressHash: string;
   contractAbi?: ABI[];
   txCount?: number; // Nonce (outgoing tx count) - used as minimum estimate for progress
+  onTransactionsChange?: (transactions: Transaction[]) => void;
 }
 
 const TransactionHistory: React.FC<TransactionHistoryProps> = ({
@@ -89,6 +90,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
   addressHash,
   contractAbi,
   txCount = 0,
+  onTransactionsChange,
 }) => {
   const numericNetworkId = Number(networkId) || 1;
   const dataService = useDataService(numericNetworkId);
@@ -125,6 +127,12 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
   const loadMoreDropdownRef = useRef<HTMLDivElement>(null);
 
   const { t } = useTranslation("address");
+
+  // Notify parent when transactions change
+  useEffect(() => {
+    onTransactionsChange?.(transactionDetails);
+  }, [transactionDetails, onTransactionsChange]);
+
   // Close dropdowns when clicking outside
   useEffect(() => {
     if (!dropdownOpen && !loadMoreDropdownOpen) return;

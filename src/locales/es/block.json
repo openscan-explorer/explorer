@@ -57,6 +57,9 @@
     "minute": "minuto",
     "minute_other": "minutos"
   },
+  "aiAnalysis": {
+    "sectionTitle": "Análisis IA"
+  },
   "errors": {
     "failedToFetchBlock": "No se pudieron obtener los datos del bloque",
     "failedToFetchBlocks": "No se pudieron obtener los bloques"

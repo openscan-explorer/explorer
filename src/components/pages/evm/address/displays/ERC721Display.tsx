@@ -1,5 +1,6 @@
 import type React from "react";
 import { useContext, useEffect, useMemo, useState } from "react";
+import { getNetworkById } from "../../../../../config/networks";
 import { AppContext } from "../../../../../context";
 import { useSourcify } from "../../../../../hooks/useSourcify";
 import {
@@ -10,6 +11,8 @@ import {
 import type { Address, ENSReverseResult, RPCMetadata } from "../../../../../types";
 import { decodeAbiString } from "../../../../../utils/hexUtils";
 import { logger } from "../../../../../utils/logger";
+import { formatNativeFromWei } from "../../../../../utils/unitFormatters";
+import AIAnalysisPanel from "../../../../common/AIAnalysis/AIAnalysisPanel";
 import { AddressHeader } from "../shared";
 import ContractInfoCard from "../shared/ContractInfoCard";
 import ContractInfoCards from "../shared/ContractInfoCards";
@@ -169,57 +172,98 @@ const ERC721Display: React.FC<ERC721DisplayProps> = ({
     ? getAssetUrl(tokenMetadata.logo)
     : getAssetUrl(`assets/tokens/${networkId}/${addressHash.toLowerCase()}.png`);
 
+  const network = getNetworkById(networkId);
+  const networkName = network?.name ?? "Unknown Network";
+  const networkCurrency = network?.currency ?? "ETH";
+
+  const aiContext = useMemo(
+    () => ({
+      address: addressHash,
+      balanceNative: formatNativeFromWei(address.balance, networkCurrency, 6),
+      txCount: address.txCount,
+      accountType: "erc721",
+      hasCode: true,
+      ensName: ensName ?? undefined,
+      collectionName: collectionName ?? undefined,
+      collectionSymbol: collectionSymbol ?? undefined,
+      totalSupply: totalSupply ?? undefined,
+      isVerified: hasVerifiedContract,
+      contractName: contractData?.name ?? undefined,
+    }),
+    [
+      addressHash,
+      address.balance,
+      address.txCount,
+      ensName,
+      collectionName,
+      collectionSymbol,
+      totalSupply,
+      hasVerifiedContract,
+      contractData?.name,
+      networkCurrency,
+    ],
+  );
+
   return (
-    <div className="block-display-card">
-      <AddressHeader
-        addressHash={addressHash}
-        addressType="erc721"
-        ensName={ensName || reverseResult?.ensName}
-        metadata={metadata}
-        selectedProvider={selectedProvider}
-        onProviderSelect={onProviderSelect}
-        tokenSymbol={collectionSymbol}
-        tokenName={collectionName}
-      />
-
-      <div className="address-section-content">
-        {/* Overview + More Info Cards */}
-        <ContractInfoCards
-          address={address}
+    <div className="page-with-analysis">
+      <div className="block-display-card">
+        <AddressHeader
           addressHash={addressHash}
-          networkId={Number(networkId)}
-          ensName={ensName}
-          reverseResult={reverseResult}
-          isMainnet={isMainnet}
+          addressType="erc721"
+          ensName={ensName || reverseResult?.ensName}
+          metadata={metadata}
+          selectedProvider={selectedProvider}
+          onProviderSelect={onProviderSelect}
+          tokenSymbol={collectionSymbol}
+          tokenName={collectionName}
         />
 
-        {/* NFT Collection Info Card */}
-        <NFTCollectionInfoCard
-          collectionName={collectionName}
-          collectionSymbol={collectionSymbol}
-          collectionLogo={collectionLogo}
-          tokenStandard="ERC-721"
-          totalSupply={totalSupply}
-          networkId={networkId}
-          addressHash={addressHash}
-        />
+        <div className="address-section-content">
+          {/* Overview + More Info Cards */}
+          <ContractInfoCards
+            address={address}
+            addressHash={addressHash}
+            networkId={Number(networkId)}
+            ensName={ensName}
+            reverseResult={reverseResult}
+            isMainnet={isMainnet}
+          />
 
-        {/* Contract Info Card (includes Contract Details) */}
-        <ContractInfoCard
-          address={address}
-          addressHash={addressHash}
-          networkId={networkId}
-          contractData={contractData}
-          hasVerifiedContract={hasVerifiedContract}
-          sourcifyLoading={sourcifyLoading}
-          isLocalArtifact={!!parsedLocalData && !isVerified}
-          sourcifyUrl={
-            sourcifyData
-              ? `https://repo.sourcify.dev/contracts/full_match/${networkId}/${addressHash}/`
-              : undefined
-          }
-        />
+          {/* NFT Collection Info Card */}
+          <NFTCollectionInfoCard
+            collectionName={collectionName}
+            collectionSymbol={collectionSymbol}
+            collectionLogo={collectionLogo}
+            tokenStandard="ERC-721"
+            totalSupply={totalSupply}
+            networkId={networkId}
+            addressHash={addressHash}
+          />
+
+          {/* Contract Info Card (includes Contract Details) */}
+          <ContractInfoCard
+            address={address}
+            addressHash={addressHash}
+            networkId={networkId}
+            contractData={contractData}
+            hasVerifiedContract={hasVerifiedContract}
+            sourcifyLoading={sourcifyLoading}
+            isLocalArtifact={!!parsedLocalData && !isVerified}
+            sourcifyUrl={
+              sourcifyData
+                ? `https://repo.sourcify.dev/contracts/full_match/${networkId}/${addressHash}/`
+                : undefined
+            }
+          />
+        </div>
       </div>
+      <AIAnalysisPanel
+        analysisType="contract"
+        context={aiContext}
+        networkName={networkName}
+        networkCurrency={networkCurrency}
+        cacheKey={`openscan_ai_contract_${networkId}_${addressHash}`}
+      />
     </div>
   );
 };

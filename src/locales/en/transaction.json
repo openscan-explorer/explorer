@@ -90,6 +90,9 @@
       "olderTitle": "View older transactions"
     }
   },
+  "aiAnalysis": {
+    "sectionTitle": "AI Analysis"
+  },
   "opcodeTrace": {
     "totalGasUsed": "Total Gas Used",
     "failed": "Failed",
