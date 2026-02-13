@@ -6,7 +6,7 @@ import type { Block, BlockArbitrum, RPCMetadata } from "../../../../types";
 import AIAnalysisPanel from "../../../common/AIAnalysisPanel";
 import ExtraDataDisplay from "../../../common/ExtraDataDisplay";
 import { RPCIndicator } from "../../../common/RPCIndicator";
-import { formatGweiFromWei, formatNativeFromWei } from "../../../../utils/aiUnits";
+import { formatGweiFromWei, formatNativeFromWei } from "../../../../utils/unitFormatters";
 
 interface BlockDisplayProps {
   block: Block | BlockArbitrum;

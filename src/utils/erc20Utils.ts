@@ -1,6 +1,7 @@
 /**
  * ERC20 utility functions for fetching token balances and metadata
  */
+import { formatUnitsValue } from "./unitFormatters";
 
 // ERC20 function selectors
 const ERC20_BALANCE_OF_SELECTOR = "0x70a08231"; // balanceOf(address)
@@ -177,39 +178,28 @@ export async function fetchERC20TokenInfo(
 }
 
 /**
- * Format token balance with decimals
+ * Format token balance with decimals and locale-formatted whole part.
  * @param balance - Raw balance string
  * @param decimals - Token decimals
  * @param maxDisplayDecimals - Maximum decimals to display (default 6)
- * @returns Formatted balance string
+ * @returns Formatted balance string with locale separators (e.g. "1,234.56")
  */
 export function formatTokenBalance(
   balance: string,
   decimals: number,
   maxDisplayDecimals = 6,
 ): string {
-  try {
-    const balanceBigInt = BigInt(balance);
-    const divisor = BigInt(10 ** decimals);
-    const wholePart = balanceBigInt / divisor;
-    const fractionalPart = balanceBigInt % divisor;
+  const formatted = formatUnitsValue(balance, decimals, { maxDecimals: maxDisplayDecimals });
+  if (formatted === undefined) return balance;
 
-    if (fractionalPart === BigInt(0)) {
-      return wholePart.toLocaleString();
-    }
-
-    // Convert fractional part to decimal string
-    const fractionalStr = fractionalPart.toString().padStart(decimals, "0");
-    const trimmedFractional = fractionalStr.slice(0, maxDisplayDecimals).replace(/0+$/, "");
-
-    if (!trimmedFractional) {
-      return wholePart.toLocaleString();
-    }
-
-    return `${wholePart.toLocaleString()}.${trimmedFractional}`;
-  } catch {
-    return balance;
+  const dotIndex = formatted.indexOf(".");
+  if (dotIndex === -1) {
+    return BigInt(formatted).toLocaleString();
   }
+
+  const whole = formatted.slice(0, dotIndex);
+  const frac = formatted.slice(dotIndex);
+  return `${BigInt(whole).toLocaleString()}${frac}`;
 }
 
 /**

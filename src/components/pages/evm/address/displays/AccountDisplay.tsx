@@ -5,7 +5,7 @@ import type { Address, ENSReverseResult, RPCMetadata, Transaction } from "../../
 import AIAnalysisPanel from "../../../../common/AIAnalysisPanel";
 import { AddressHeader, TransactionHistory } from "../shared";
 import AccountInfoCards from "../shared/AccountInfoCards";
-import { formatNativeFromWei } from "../../../../../utils/aiUnits";
+import { formatNativeFromWei } from "../../../../../utils/unitFormatters";
 
 interface AccountDisplayProps {
   address: Address;

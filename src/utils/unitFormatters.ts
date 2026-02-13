@@ -12,7 +12,7 @@ function parseBigIntValue(value: string): bigint | null {
   }
 }
 
-function formatUnitsValue(
+export function formatUnitsValue(
   value: string,
   decimals: number,
   { maxDecimals = 6 }: FormatOptions = {},

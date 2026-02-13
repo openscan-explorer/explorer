@@ -10,7 +10,7 @@ import ContractInfoCard from "../shared/ContractInfoCard";
 import ContractInfoCards from "../shared/ContractInfoCards";
 import { logger } from "../../../../../utils";
 import { compactContractDataForAI } from "../../../../../utils/aiContext";
-import { formatNativeFromWei } from "../../../../../utils/aiUnits";
+import { formatNativeFromWei } from "../../../../../utils/unitFormatters";
 
 interface ContractDisplayProps {
   address: Address;

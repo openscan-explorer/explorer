@@ -186,7 +186,7 @@
   "nonce": "Nonce (Transactions Sent)",
   "aiAnalysis": {
     "sectionTitle": "AI Analysis"
-  }
+  },
   "fetchingSentTxsByNonce": "Fetching sent transactions ({{current}}/{{total}})...",
   "searchingReceivedTxs": "Searching for received transactions..."
 }

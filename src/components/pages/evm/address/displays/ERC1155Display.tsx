@@ -11,7 +11,7 @@ import {
 import type { Address, ENSReverseResult, RPCMetadata } from "../../../../../types";
 import { decodeAbiString } from "../../../../../utils/hexUtils";
 import { logger } from "../../../../../utils/logger";
-import { formatNativeFromWei } from "../../../../../utils/aiUnits";
+import { formatNativeFromWei } from "../../../../../utils/unitFormatters";
 import AIAnalysisPanel from "../../../../common/AIAnalysisPanel";
 import { AddressHeader } from "../shared";
 import ContractInfoCard from "../shared/ContractInfoCard";

@@ -21,7 +21,7 @@ import {
   formatGweiFromWei,
   formatNativeFromWei,
   formatTokenAmount,
-} from "../../../../utils/aiUnits";
+} from "../../../../utils/unitFormatters";
 import type {
   RPCMetadata,
   Transaction,
