@@ -2,7 +2,7 @@ import type { AIAnalysisResult, AIAnalysisType, AIProviderConfig, PromptVersion 
 import { logger } from "../utils/logger";
 import { buildPrompt } from "./AIPromptTemplates";
 
-const MAX_TOKENS = 1024;
+const MAX_TOKENS = 4096;
 const RETRY_DELAY_MS = 5000;
 
 export type AIErrorType =

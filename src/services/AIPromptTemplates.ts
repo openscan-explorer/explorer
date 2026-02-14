@@ -78,20 +78,26 @@ const SHARED_RULES = {
 const POWER_STABLE_CONFIGS: Record<AIAnalysisType, PromptConfig> = {
   transaction: {
     role: "blockchain analyst",
-    conciseness: "3-5 sentences",
-    focusAreas: "what happened, who was involved, value/fees, and notable aspects",
-    audience: "power user",
+    conciseness: "8-10 sentences",
+    focusAreas:
+      "what happened, who was involved, dangerous contracts, notable aspects value/fees, calldata and calldata decoded",
+    audience: "senior blockchain developer",
     task: "Explain this transaction in plain English",
-    sections: ["Transaction Analysis", "Participants", "Value and Fees", "Notable Aspects"],
+    sections: [
+      "Transaction Analysis",
+      "Participants",
+      "intent vs what happen in the tx",
+      "Notable Aspects",
+    ],
     customRules:
       "If the transaction failed and no explicit reason is provided, you may mention 1-2 common causes as possibilities, clearly labeled as possibilities (not claims). If ERC-7730 fields include a formatted token amount (value already includes a token symbol/name), use that. If erc7730Fields include formattedValue, prefer it. Otherwise do not assume ETH or any token for raw numeric values. If callTargetToken is provided, use its symbol/name when describing token amounts related to direct token transfers; if no formatted amount is available, describe them as raw units of that token.",
   },
   account: {
     role: "blockchain analyst",
-    conciseness: "3-5 sentences",
+    conciseness: "5-10 sentences",
     focusAreas:
-      "activity level, balance significance, and any patterns visible from recent transactions",
-    audience: "power user",
+      "activity level, balance significance, suspicious activity, and any patterns visible from recent transactions",
+    audience: "senior blockchain developer",
     task: "Provide a brief analysis of this address",
     sections: [
       "Analysis of the Address",
@@ -100,29 +106,31 @@ const POWER_STABLE_CONFIGS: Record<AIAnalysisType, PromptConfig> = {
       "Transaction Patterns",
       "Known Vulnerabilities",
     ],
+    customRules:
+      "if the address has transactions with known malicious addresses, mention exact malicious address.",
   },
   contract: {
     role: "smart contract analyst",
-    conciseness: "5-8 sentences",
+    conciseness: "8-10 sentences",
     focusAreas:
       "contract purpose, key functions, security considerations, protocol or token standard identification, and any known vulnerabilities associated with this address if present in the context",
-    audience: "power user",
+    audience: "senior blockchain developer",
     task: "Analyze this smart contract",
     sections: [
       "Contract Analysis",
-      "Key Functions",
+      "Contract name and key Functions",
       "Security Considerations",
       "Protocol or Token Standard",
       "Known Vulnerabilities",
     ],
     customRules:
-      'Avoid generic boilerplate or a "General context" paragraph; stick to the provided context.',
+      'Avoid generic boilerplate or a "General context" paragraph; Research if is a known malicious address',
   },
   block: {
     role: "blockchain analyst",
     conciseness: "3-5 sentences",
     focusAreas: "transaction count, gas usage patterns, block utilization, and any notable aspects",
-    audience: "power user",
+    audience: "senior blockchain developer",
     task: "Analyze this block",
     sections: ["Block Analysis", "Utilization", "Transactions", "Notable Aspects"],
   },
@@ -132,7 +140,7 @@ const POWER_STABLE_CONFIGS: Record<AIAnalysisType, PromptConfig> = {
 const REGULAR_STABLE_CONFIGS: Record<AIAnalysisType, PromptConfig> = {
   transaction: {
     role: "blockchain educator",
-    conciseness: "2-3 sentences",
+    conciseness: "5-7 sentences",
     focusAreas: "what happened, who was involved, and key details",
     audience: "general user",
     task: "Explain this transaction in simple, easy-to-understand language",
@@ -142,7 +150,7 @@ const REGULAR_STABLE_CONFIGS: Record<AIAnalysisType, PromptConfig> = {
   },
   account: {
     role: "blockchain educator",
-    conciseness: "2-3 sentences",
+    conciseness: "3-5 sentences",
     focusAreas: "what this address is and its recent activity",
     audience: "general user",
     task: "Provide a simple overview of this address",
@@ -150,7 +158,7 @@ const REGULAR_STABLE_CONFIGS: Record<AIAnalysisType, PromptConfig> = {
   },
   contract: {
     role: "blockchain educator",
-    conciseness: "3-5 sentences",
+    conciseness: "5-7 sentences",
     focusAreas: "what this contract does and its main purpose",
     audience: "general user",
     task: "Explain this smart contract in simple terms",
