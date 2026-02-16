@@ -205,6 +205,10 @@ function buildSystemPrompt(
   customRules?: string,
 ): string {
   const sections = [
+    // Static universal rules (never change)
+    SHARED_RULES.DONT_GUESS,
+    SHARED_RULES.PRESENTATION(networkCurrency),
+    // Config-based instructions (static per analysis type)
     ROLE_INSTRUCTION(config.role, networkName, networkCurrency),
     `${config.task} for a ${config.audience} audience.`,
     CONCISENESS_INSTRUCTION(config.conciseness),
@@ -212,9 +216,8 @@ function buildSystemPrompt(
     `Use the following section headers exactly and in order: ${config.sections
       .map((section) => `"${section}"`)
       .join(", ")}. If a section cannot be supported by the provided context, omit it entirely.`,
-    SHARED_RULES.PRESENTATION(networkCurrency),
-    SHARED_RULES.DONT_GUESS,
     config.customRules ?? "",
+    // Dynamic per-request parts
     customRules ?? "",
     SHARED_RULES.LANGUAGE(language),
   ];
