@@ -604,8 +604,6 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
                   <span className="table-status-badge table-status-success">✓ Success</span>
                 ) : tx.receipt?.status === "0x0" || tx.receipt?.status === "0" ? (
                   <span className="table-status-badge table-status-failed">✗ Failed</span>
-                ) : tx.blockNumber && parseInt(tx.blockNumber, 16) > 0 ? (
-                  <span className="table-status-badge table-status-confirmed">Confirmed</span>
                 ) : (
                   <span className="table-status-badge table-status-pending">⏳ Pending</span>
                 )}

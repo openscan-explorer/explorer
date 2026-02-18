@@ -1,10 +1,12 @@
 import type {
+  EthBlock,
   EthereumClient,
   EthTransaction,
   EthTransactionReceipt,
 } from "@openscan/network-connectors";
 import type { Transaction } from "../types";
 import { logger } from "../utils/logger";
+import { extractData } from "./adapters/shared/extractData";
 import { hexToNumber } from "./adapters/EVMAdapter/utils";
 import type { NonceLookupService } from "./NonceLookupService";
 
@@ -80,27 +82,35 @@ type TransactionFoundCallback = (
   txs: Array<Transaction & { type: "sent" | "received" | "internal" }>,
 ) => void;
 
-/**
- * Extract data from strategy result, handling both fallback and parallel modes.
- * In parallel mode, StrategyResult.data is an array of RPCProviderResponse objects.
- * We find the first successful response and return its inner data.
- */
-function extractData<T>(data: T | T[] | null | undefined): T | null {
-  if (data === null || data === undefined) return null;
-  if (Array.isArray(data)) {
-    const firstItem = data[0];
-    // Parallel strategy wraps results in RPCProviderResponse objects
-    if (firstItem && typeof firstItem === "object" && "url" in firstItem && "status" in firstItem) {
-      // biome-ignore lint/suspicious/noExplicitAny: Provider response shape is dynamic
-      const successful = (data as any[]).find(
-        // biome-ignore lint/suspicious/noExplicitAny: Provider response shape is dynamic
-        (r: any) => r.status === "success" && r.data !== undefined,
-      );
-      return successful ? (successful.data as T) : null;
-    }
-    return firstItem ?? null;
-  }
-  return data;
+/** Build a Transaction object from raw EthTransaction data */
+function buildTransaction(
+  tx: EthTransaction,
+  block: EthBlock,
+  type: "sent" | "received" | "internal",
+  receipt: EthTransactionReceipt | undefined,
+): Transaction & { type: "sent" | "received" | "internal" } {
+  return {
+    hash: tx.hash,
+    blockNumber: tx.blockNumber || "",
+    blockHash: tx.blockHash || "",
+    from: tx.from,
+    to: tx.to || "",
+    value: tx.value,
+    gas: tx.gas,
+    gasPrice: tx.gasPrice || "0x0",
+    maxFeePerGas: tx.maxFeePerGas,
+    maxPriorityFeePerGas: tx.maxPriorityFeePerGas,
+    data: tx.input,
+    input: tx.input,
+    nonce: tx.nonce,
+    transactionIndex: tx.transactionIndex || "0x0",
+    timestamp: block.timestamp,
+    type,
+    v: tx.v || "0x0",
+    r: tx.r || "0x0",
+    s: tx.s || "0x0",
+    receipt,
+  } as Transaction & { type: "sent" | "received" | "internal" };
 }
 
 export class AddressTransactionSearch {
@@ -225,7 +235,7 @@ export class AddressTransactionSearch {
     const result = await this.rpcLimited(() =>
       this.client.getTransactionCount(address, `0x${block.toString(16)}`),
     );
-    const nonce = hexToNumber(extractData(result.data) || "0x0");
+    const nonce = hexToNumber(extractData<string>(result.data) || "0x0");
     this.nonceCache.set(key, nonce);
     return nonce;
   }
@@ -243,7 +253,7 @@ export class AddressTransactionSearch {
     const result = await this.rpcLimited(() =>
       this.client.getBalance(address, `0x${block.toString(16)}`),
     );
-    const balance = BigInt(extractData(result.data) || "0x0");
+    const balance = BigInt(extractData<string>(result.data) || "0x0");
     this.balanceCache.set(key, balance);
     return balance;
   }
@@ -285,7 +295,7 @@ export class AddressTransactionSearch {
     signal?: AbortSignal,
   ): Promise<{ fromBlock: number; toBlock: number } | null> {
     const blockNumberResult = await this.rpcLimited(() => this.client.blockNumber());
-    const latestBlock = hexToNumber(extractData(blockNumberResult.data) || "0x0");
+    const latestBlock = hexToNumber(extractData<string>(blockNumberResult.data) || "0x0");
 
     if (latestBlock === 0) return null;
 
@@ -326,9 +336,71 @@ export class AddressTransactionSearch {
   }
 
   /**
-   * Fetch transactions from a block and filter by address, including receipts
-   * Uses parallel receipt fetching for better performance
-   * Also detects internal transactions by scanning logs for address mentions
+   * Fetch all receipts for a block using eth_getBlockReceipts (single RPC call).
+   * Falls back to individual eth_getTransactionReceipt calls if the method is unsupported.
+   */
+  private async fetchBlockReceipts(
+    blockNum: number,
+    signal?: AbortSignal,
+  ): Promise<Map<string, EthTransactionReceipt>> {
+    const blockHex = `0x${blockNum.toString(16)}`;
+    const receipts = new Map<string, EthTransactionReceipt>();
+
+    try {
+      const result = await this.rpcLimited(() =>
+        this.client.execute<EthTransactionReceipt[]>("eth_getBlockReceipts", [blockHex]),
+      );
+      const allReceipts = extractData<EthTransactionReceipt[]>(result.data);
+      if (allReceipts && Array.isArray(allReceipts)) {
+        for (const receipt of allReceipts) {
+          if (receipt?.transactionHash) {
+            receipts.set(receipt.transactionHash.toLowerCase(), receipt);
+          }
+        }
+        return receipts;
+      }
+    } catch {
+      logger.debug("[Search] eth_getBlockReceipts not supported, falling back to individual calls");
+    }
+
+    // Fallback: not supported or returned empty — caller will use individual fetches
+    if (signal?.aborted) return receipts;
+    return receipts;
+  }
+
+  /**
+   * Fetch individual receipts for a list of transaction hashes.
+   * Used as fallback when eth_getBlockReceipts is unavailable.
+   */
+  private async fetchIndividualReceipts(
+    hashes: string[],
+    signal?: AbortSignal,
+  ): Promise<Map<string, EthTransactionReceipt>> {
+    const receipts = new Map<string, EthTransactionReceipt>();
+    const BATCH_SIZE = 20;
+
+    for (let i = 0; i < hashes.length; i += BATCH_SIZE) {
+      if (signal?.aborted) break;
+      const batch = hashes.slice(i, i + BATCH_SIZE);
+      const results = await Promise.all(
+        batch.map((hash) =>
+          this.rpcLimited(() => this.client.getTransactionReceipt(hash))
+            .then((res) => ({ hash, receipt: extractData<EthTransactionReceipt | null>(res.data) }))
+            .catch(() => ({ hash, receipt: null })),
+        ),
+      );
+      for (const { hash, receipt } of results) {
+        if (receipt) receipts.set(hash.toLowerCase(), receipt);
+      }
+    }
+    return receipts;
+  }
+
+  /**
+   * Fetch transactions from a block and filter by address, including receipts.
+   * Uses eth_getBlockReceipts for a single RPC call per block, falling back
+   * to individual receipt calls if the method is unsupported.
+   * Also detects internal transactions by scanning logs for address mentions.
    */
   private async fetchBlockTransactions(
     blockNum: number,
@@ -339,7 +411,7 @@ export class AddressTransactionSearch {
     const result = await this.rpcLimited(() =>
       this.client.getBlockByNumber(`0x${blockNum.toString(16)}`, true),
     );
-    const block = extractData(result.data);
+    const block = extractData<EthBlock | null>(result.data);
     if (!block || !block.transactions) return [];
 
     // First pass: identify direct transactions (from/to matches address)
@@ -362,78 +434,26 @@ export class AddressTransactionSearch {
       }
     }
 
-    // Second pass: fetch receipts for direct transactions
-    const RECEIPT_BATCH_SIZE = 20;
-    const receipts = new Map<string, EthTransactionReceipt | null>();
+    // Fetch all receipts for the block in a single call
+    let receipts = await this.fetchBlockReceipts(blockNum, signal);
 
-    for (let i = 0; i < directTxs.length; i += RECEIPT_BATCH_SIZE) {
-      if (signal?.aborted) break;
-      const batch = directTxs.slice(i, i + RECEIPT_BATCH_SIZE);
-      const receiptPromises = batch.map(({ tx }) =>
-        this.rpcLimited(() => this.client.getTransactionReceipt(tx.hash))
-          .then((receiptResult) => ({
-            hash: tx.hash,
-            receipt: extractData(receiptResult.data),
-          }))
-          .catch(() => ({ hash: tx.hash, receipt: null })),
-      );
-      const batchResults = await Promise.all(receiptPromises);
-      for (const { hash, receipt } of batchResults) {
-        receipts.set(hash, receipt);
+    // If eth_getBlockReceipts returned nothing, fall back to individual calls
+    // for the hashes we actually need
+    if (receipts.size === 0 && !signal?.aborted) {
+      const neededHashes = directTxs.map(({ tx }) => tx.hash);
+      if (searchForInternal) {
+        for (const { tx } of otherTxs) neededHashes.push(tx.hash);
       }
-    }
-
-    // Retry failed receipts in parallel (semaphore handles backpressure)
-    const failedHashes: string[] = [];
-    receipts.forEach((receipt, hash) => {
-      if (receipt === null) failedHashes.push(hash);
-    });
-
-    if (failedHashes.length > 0 && !signal?.aborted) {
-      await Promise.all(
-        failedHashes.map(async (hash) => {
-          try {
-            const receiptResult = await this.rpcLimited(() =>
-              this.client.getTransactionReceipt(hash),
-            );
-            const receipt = extractData(receiptResult.data);
-            if (receipt) {
-              receipts.set(hash, receipt);
-            }
-          } catch {
-            // Still failed after retry, keep as null
-          }
-        }),
-      );
+      if (neededHashes.length > 0) {
+        receipts = await this.fetchIndividualReceipts(neededHashes, signal);
+      }
     }
 
     // Build direct transaction results
     const transactions: Array<Transaction & { type: "sent" | "received" | "internal" }> = [];
     for (const { tx, isSent } of directTxs) {
-      const receipt = receipts.get(tx.hash);
-
-      transactions.push({
-        hash: tx.hash,
-        blockNumber: tx.blockNumber || "",
-        blockHash: tx.blockHash || "",
-        from: tx.from,
-        to: tx.to || "",
-        value: tx.value,
-        gas: tx.gas,
-        gasPrice: tx.gasPrice || "0x0",
-        maxFeePerGas: tx.maxFeePerGas,
-        maxPriorityFeePerGas: tx.maxPriorityFeePerGas,
-        data: tx.input,
-        input: tx.input,
-        nonce: tx.nonce,
-        transactionIndex: tx.transactionIndex || "0x0",
-        timestamp: block.timestamp,
-        type: isSent ? "sent" : "received",
-        v: tx.v || "0x0",
-        r: tx.r || "0x0",
-        s: tx.s || "0x0",
-        receipt: receipt || undefined,
-      } as Transaction & { type: "sent" | "received" | "internal" });
+      const receipt = receipts.get(tx.hash.toLowerCase());
+      transactions.push(buildTransaction(tx, block, isSent ? "sent" : "received", receipt));
     }
 
     // Third pass: if no direct transactions found and searchForInternal is true,
@@ -454,105 +474,37 @@ export class AddressTransactionSearch {
         }
       }
 
-      // Process transactions where address was found in input (just need receipt for status)
-      const INTERNAL_BATCH_SIZE = 15;
-      for (let i = 0; i < txsWithAddressInInput.length; i += INTERNAL_BATCH_SIZE) {
+      // Process transactions where address was found in input
+      for (const { tx } of txsWithAddressInInput) {
         if (signal?.aborted) break;
-        const batch = txsWithAddressInInput.slice(i, i + INTERNAL_BATCH_SIZE);
-        const receiptPromises = batch.map(({ tx }) =>
-          this.rpcLimited(() => this.client.getTransactionReceipt(tx.hash))
-            .then((receiptResult) => ({
-              tx,
-              receipt: extractData(receiptResult.data),
-            }))
-            .catch(() => ({ tx, receipt: null })),
-        );
-        const batchResults = await Promise.all(receiptPromises);
-
-        for (const { tx, receipt } of batchResults) {
-          transactions.push({
-            hash: tx.hash,
-            blockNumber: tx.blockNumber || "",
-            blockHash: tx.blockHash || "",
-            from: tx.from,
-            to: tx.to || "",
-            value: tx.value,
-            gas: tx.gas,
-            gasPrice: tx.gasPrice || "0x0",
-            maxFeePerGas: tx.maxFeePerGas,
-            maxPriorityFeePerGas: tx.maxPriorityFeePerGas,
-            data: tx.input,
-            input: tx.input,
-            nonce: tx.nonce,
-            transactionIndex: tx.transactionIndex || "0x0",
-            timestamp: block.timestamp,
-            type: "internal",
-            v: tx.v || "0x0",
-            r: tx.r || "0x0",
-            s: tx.s || "0x0",
-            receipt: receipt || undefined,
-          } as Transaction & { type: "internal" });
-        }
+        const receipt = receipts.get(tx.hash.toLowerCase());
+        transactions.push(buildTransaction(tx, block, "internal", receipt));
       }
 
-      // Only fetch receipts for remaining txs if we didn't find anything in input data
-      // This is expensive (many RPC calls) so we skip it if we already found the tx
+      // Only check remaining txs if we didn't find anything in input data
+      // This requires receipt logs — receipts are already fetched
       if (txsWithAddressInInput.length === 0 && txsNeedingReceiptCheck.length > 0) {
-        // Check logs for remaining transactions
-        for (let i = 0; i < txsNeedingReceiptCheck.length; i += INTERNAL_BATCH_SIZE) {
+        for (const { tx } of txsNeedingReceiptCheck) {
           if (signal?.aborted) break;
-          const batch = txsNeedingReceiptCheck.slice(i, i + INTERNAL_BATCH_SIZE);
-          const receiptPromises = batch.map(({ tx }) =>
-            this.rpcLimited(() => this.client.getTransactionReceipt(tx.hash))
-              .then((receiptResult) => ({
-                tx,
-                receipt: extractData(receiptResult.data),
-              }))
-              .catch(() => ({ tx, receipt: null })),
-          );
-          const batchResults = await Promise.all(receiptPromises);
+          const receipt = receipts.get(tx.hash.toLowerCase());
+          const logs = receipt?.logs || [];
 
-          for (const { tx, receipt } of batchResults) {
-            const logs = receipt?.logs || [];
-            // Only check logs here since we already checked input above
-            for (const log of logs) {
-              let found = false;
-              if (log.topics) {
-                for (const topic of log.topics) {
-                  if (topic.toLowerCase().includes(normalizedAddr)) {
-                    found = true;
-                    break;
-                  }
+          for (const log of logs) {
+            let found = false;
+            if (log.topics) {
+              for (const topic of log.topics) {
+                if (topic.toLowerCase().includes(normalizedAddr)) {
+                  found = true;
+                  break;
                 }
               }
-              if (!found && log.data && log.data.toLowerCase().includes(normalizedAddr)) {
-                found = true;
-              }
-              if (found) {
-                transactions.push({
-                  hash: tx.hash,
-                  blockNumber: tx.blockNumber || "",
-                  blockHash: tx.blockHash || "",
-                  from: tx.from,
-                  to: tx.to || "",
-                  value: tx.value,
-                  gas: tx.gas,
-                  gasPrice: tx.gasPrice || "0x0",
-                  maxFeePerGas: tx.maxFeePerGas,
-                  maxPriorityFeePerGas: tx.maxPriorityFeePerGas,
-                  data: tx.input,
-                  input: tx.input,
-                  nonce: tx.nonce,
-                  transactionIndex: tx.transactionIndex || "0x0",
-                  timestamp: block.timestamp,
-                  type: "internal",
-                  v: tx.v || "0x0",
-                  r: tx.r || "0x0",
-                  s: tx.s || "0x0",
-                  receipt: receipt || undefined,
-                } as Transaction & { type: "internal" });
-                break; // Don't add same tx multiple times
-              }
+            }
+            if (!found && log.data && log.data.toLowerCase().includes(normalizedAddr)) {
+              found = true;
+            }
+            if (found) {
+              transactions.push(buildTransaction(tx, block, "internal", receipt));
+              break; // Don't add same tx multiple times
             }
           }
         }
@@ -976,7 +928,7 @@ export class AddressTransactionSearch {
       endBlock = toBlock - 1; // Exclusive - don't include the toBlock itself
     } else {
       const blockNumberResult = await this.rpcLimited(() => this.client.blockNumber());
-      endBlock = hexToNumber(extractData(blockNumberResult.data) || "0x0");
+      endBlock = hexToNumber(extractData<string>(blockNumberResult.data) || "0x0");
     }
 
     // Get initial and final states
@@ -1242,8 +1194,8 @@ export class AddressTransactionSearch {
       this.client.getTransactionCount(address, "latest"),
     );
 
-    const latestBlock = hexToNumber(extractData(blockNumberResult.data) || "0x0");
-    const currentNonce = hexToNumber(extractData(nonceResult.data) || "0x0");
+    const latestBlock = hexToNumber(extractData<string>(blockNumberResult.data) || "0x0");
+    const currentNonce = hexToNumber(extractData<string>(nonceResult.data) || "0x0");
 
     // No transactions sent from this address
     if (currentNonce === 0) return null;

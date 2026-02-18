@@ -158,11 +158,6 @@
 	color: var(--badge-warning-text);
 }
 
-.table-status-confirmed {
-	background: var(--overlay-light-5);
-	color: var(--text-secondary);
-}
-
 /* Address Display Tables */
 .address-table-container {
 	overflow-x: auto;
