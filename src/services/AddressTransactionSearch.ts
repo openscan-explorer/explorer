@@ -80,11 +80,25 @@ type TransactionFoundCallback = (
 ) => void;
 
 /**
- * Extract data from strategy result, handling both fallback and parallel modes
+ * Extract data from strategy result, handling both fallback and parallel modes.
+ * In parallel mode, StrategyResult.data is an array of RPCProviderResponse objects.
+ * We find the first successful response and return its inner data.
  */
 function extractData<T>(data: T | T[] | null | undefined): T | null {
   if (data === null || data === undefined) return null;
-  if (Array.isArray(data)) return data[0] ?? null;
+  if (Array.isArray(data)) {
+    const firstItem = data[0];
+    // Parallel strategy wraps results in RPCProviderResponse objects
+    if (firstItem && typeof firstItem === "object" && "url" in firstItem && "status" in firstItem) {
+      // biome-ignore lint/suspicious/noExplicitAny: Provider response shape is dynamic
+      const successful = (data as any[]).find(
+        // biome-ignore lint/suspicious/noExplicitAny: Provider response shape is dynamic
+        (r: any) => r.status === "success" && r.data !== undefined,
+      );
+      return successful ? (successful.data as T) : null;
+    }
+    return firstItem ?? null;
+  }
   return data;
 }
 
