@@ -40,7 +40,7 @@ export function useENS(
   const isMainnet = chainId === 1;
 
   // Always use mainnet RPC for ENS resolution
-  const mainnetRpcUrls = rpcUrls[1];
+  const mainnetRpcUrls = rpcUrls["eip155:1"];
 
   // Memoize ENSService instance to avoid recreating on every render
   const ensService = useMemo(() => {
@@ -140,7 +140,7 @@ export function useENSResolve(ensName: string | undefined): {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const mainnetRpcUrls = rpcUrls[1];
+  const mainnetRpcUrls = rpcUrls["eip155:1"];
 
   // Memoize ENSService instance
   const ensService = useMemo(() => {

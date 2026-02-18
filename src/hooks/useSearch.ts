@@ -36,7 +36,7 @@ export function useSearch(): UseSearchResult {
   // Return the slug as networkId for backward compatibility
   const networkId = resolvedNetwork ? networkSlug : undefined;
 
-  const mainnetRpcUrls = rpcUrls[1];
+  const mainnetRpcUrls = rpcUrls["eip155:1"];
 
   // Memoize ENSService instance
   const ensService = useMemo(() => {

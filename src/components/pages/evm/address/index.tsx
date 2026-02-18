@@ -69,7 +69,7 @@ export default function Address() {
       return;
     }
 
-    const mainnetRpcUrls = rpcUrls[1];
+    const mainnetRpcUrls = rpcUrls["eip155:1"];
     if (!mainnetRpcUrls || mainnetRpcUrls.length === 0) {
       setEnsError(t("noRPCForEnsResolution"));
       setEnsResolving(false);
