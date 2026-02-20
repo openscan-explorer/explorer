@@ -84,11 +84,11 @@ export const SettingsProvider = React.memo<SettingsProviderProps>(({ children })
   }, [isDarkMode, updateSettings]);
 
   // Super user mode
-  const isSuperUser = settings.superUserMode ?? false;
+  const isSuperUser = settings.isSuperUser ?? false;
 
   const toggleSuperUserMode = React.useCallback(() => {
-    updateSettings({ superUserMode: !settings.superUserMode });
-  }, [settings.superUserMode, updateSettings]);
+    updateSettings({ isSuperUser: !settings.isSuperUser });
+  }, [settings.isSuperUser, updateSettings]);
 
   const value = React.useMemo(
     () => ({

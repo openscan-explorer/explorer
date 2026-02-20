@@ -32,11 +32,14 @@ export function useAIAnalysis(
   cacheKey: string,
   language?: string,
 ): UseAIAnalysisReturn {
-  const { settings } = useSettings();
+  const { settings, isSuperUser } = useSettings();
   const [result, setResult] = useState<AIAnalysisResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [errorType, setErrorType] = useState<string | null>(null);
+
+  const promptVersion = settings.promptVersion ?? "stable";
+  const userMode = isSuperUser ? "power" : "regular";
 
   const resolveProvider = useCallback((): {
     provider: (typeof AI_PROVIDERS)[AIProvider];
@@ -53,6 +56,9 @@ export function useAIAnalysis(
     }
     return null;
   }, [settings.apiKeys]);
+
+  // Augment cache key with version and mode so switching invalidates cache
+  const augmentedCacheKey = `${cacheKey}_v${promptVersion}_${userMode}`;
 
   const performAnalysis = useCallback(
     async (bypassCache: boolean) => {
@@ -71,7 +77,7 @@ export function useAIAnalysis(
       const contextHash = hashContext(context);
 
       if (!bypassCache) {
-        const cached = getCachedAnalysis(cacheKey, contextHash);
+        const cached = getCachedAnalysis(augmentedCacheKey, contextHash);
         if (cached) {
           setResult(cached);
           setLoading(false);
@@ -87,9 +93,11 @@ export function useAIAnalysis(
           networkName,
           networkCurrency,
           language,
+          isSuperUser,
+          promptVersion,
         });
 
-        setCachedAnalysis(cacheKey, contextHash, analysisResult);
+        setCachedAnalysis(augmentedCacheKey, contextHash, analysisResult);
         setResult(analysisResult);
       } catch (err) {
         if (err instanceof AIServiceError) {
@@ -104,7 +112,17 @@ export function useAIAnalysis(
         setLoading(false);
       }
     },
-    [resolveProvider, context, cacheKey, analysisType, networkName, networkCurrency, language],
+    [
+      resolveProvider,
+      context,
+      augmentedCacheKey,
+      analysisType,
+      networkName,
+      networkCurrency,
+      language,
+      isSuperUser,
+      promptVersion,
+    ],
   );
 
   const analyze = useCallback(() => performAnalysis(false), [performAnalysis]);

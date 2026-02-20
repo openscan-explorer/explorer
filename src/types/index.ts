@@ -427,13 +427,14 @@ export interface ApiKeys {
   groq?: string;
   openai?: string;
   anthropic?: string;
-  togetherai?: string;
+  perplexity?: string;
+  gemini?: string;
 }
 
 /**
  * Supported AI providers for blockchain analysis
  */
-export type AIProvider = "groq" | "openai" | "anthropic" | "togetherai";
+export type AIProvider = "groq" | "openai" | "anthropic" | "perplexity" | "gemini";
 
 /**
  * Configuration for an AI provider
@@ -463,6 +464,11 @@ export interface AIAnalysisResult {
 export type AIAnalysisType = "transaction" | "account" | "contract" | "block";
 
 /**
+ * Prompt version for AI analysis
+ */
+export type PromptVersion = "stable" | "latest";
+
+/**
  * User settings for the application
  */
 export interface UserSettings {
@@ -471,7 +477,8 @@ export interface UserSettings {
   rpcStrategy?: "fallback" | "parallel" | "race";
   maxParallelRequests?: number;
   apiKeys?: ApiKeys;
-  superUserMode?: boolean;
+  isSuperUser?: boolean;
+  promptVersion?: PromptVersion;
 }
 
 /**
@@ -483,7 +490,8 @@ export const DEFAULT_SETTINGS: UserSettings = {
   rpcStrategy: "fallback",
   maxParallelRequests: 3,
   apiKeys: {},
-  superUserMode: false,
+  isSuperUser: false,
+  promptVersion: "stable",
 };
 
 /**

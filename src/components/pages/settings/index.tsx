@@ -8,7 +8,7 @@ import { useSettings } from "../../../context/SettingsContext";
 import { useMetaMaskExplorer } from "../../../hooks/useMetaMaskExplorer";
 import { SUPPORTED_LANGUAGES } from "../../../i18n";
 import { clearSupportersCache } from "../../../services/MetadataService";
-import type { AIProvider, RPCUrls, RpcUrlsContextType } from "../../../types";
+import type { AIProvider, PromptVersion, RPCUrls, RpcUrlsContextType } from "../../../types";
 import { AI_PROVIDERS, AI_PROVIDER_ORDER } from "../../../config/aiProviders";
 import { clearAICache } from "../../common/AIAnalysis/aiCache";
 import { logger } from "../../../utils/logger";
@@ -76,7 +76,8 @@ const Settings: React.FC = () => {
     groq: settings.apiKeys?.groq || "",
     openai: settings.apiKeys?.openai || "",
     anthropic: settings.apiKeys?.anthropic || "",
-    togetherai: settings.apiKeys?.togetherai || "",
+    perplexity: settings.apiKeys?.perplexity || "",
+    gemini: settings.apiKeys?.gemini || "",
   });
   const [showApiKeys, setShowApiKeys] = useState({
     infura: false,
@@ -84,7 +85,8 @@ const Settings: React.FC = () => {
     groq: false,
     openai: false,
     anthropic: false,
-    togetherai: false,
+    perplexity: false,
+    gemini: false,
   });
   const [aiKeysExpanded, setAiKeysExpanded] = useState(false);
   const [metamaskStatus, setMetamaskStatus] = useState<
@@ -424,7 +426,8 @@ const Settings: React.FC = () => {
         groq: localApiKeys.groq || undefined,
         openai: localApiKeys.openai || undefined,
         anthropic: localApiKeys.anthropic || undefined,
-        togetherai: localApiKeys.togetherai || undefined,
+        perplexity: localApiKeys.perplexity || undefined,
+        gemini: localApiKeys.gemini || undefined,
       },
     });
 
@@ -446,7 +449,7 @@ const Settings: React.FC = () => {
     });
   }, []);
 
-  const primaryAIProviderId: AIProvider = "groq";
+  const primaryAIProviderId = AI_PROVIDER_ORDER[0] ?? ("groq" as AIProvider);
   const otherAIProviderIds = AI_PROVIDER_ORDER.filter(
     (providerId) => providerId !== primaryAIProviderId,
   );
@@ -825,6 +828,25 @@ const Settings: React.FC = () => {
                   })}
                 </div>
               )}
+
+              <div className="settings-item">
+                <div>
+                  <div className="settings-item-label">{t("apiKeys.promptVersion.label")}</div>
+                  <div className="settings-item-description">
+                    {t("apiKeys.promptVersion.description")}
+                  </div>
+                </div>
+                <select
+                  value={settings.promptVersion || "stable"}
+                  onChange={(e) =>
+                    updateSettings({ promptVersion: e.target.value as PromptVersion })
+                  }
+                  className="settings-select"
+                >
+                  <option value="stable">{t("apiKeys.promptVersion.stable")}</option>
+                  <option value="latest">{t("apiKeys.promptVersion.latest")}</option>
+                </select>
+              </div>
             </div>
           </div>
 

@@ -23,20 +23,34 @@ export const AI_PROVIDERS: Record<AIProvider, AIProviderConfig> = {
     id: "anthropic",
     name: "Anthropic",
     baseUrl: "https://api.anthropic.com/v1",
-    defaultModel: "claude-sonnet-4-5-20250929",
+    defaultModel: "claude-sonnet-4-6",
     keyUrl: "https://console.anthropic.com/settings/keys",
   },
-  togetherai: {
-    id: "togetherai",
-    name: "Together AI",
-    baseUrl: "https://api.together.xyz/v1",
-    defaultModel: "meta-llama/Llama-3.3-70B-Instruct-Turbo",
-    keyUrl: "https://api.together.xyz/settings/api-keys",
+  perplexity: {
+    id: "perplexity",
+    name: "Perplexity",
+    baseUrl: "https://api.perplexity.ai",
+    defaultModel: "llama-3.1-sonar-small-128k-online",
+    keyUrl: "https://www.perplexity.ai/settings/api",
+  },
+  gemini: {
+    id: "gemini",
+    name: "Gemini",
+    baseUrl: "https://generativelanguage.googleapis.com/v1beta",
+    defaultModel: "gemini-2.0-flash",
+    keyUrl: "https://aistudio.google.com/apikey",
   },
 };
 
 /**
  * Ordered list of AI provider IDs for priority resolution.
+ * Free providers first, then paid providers.
  * When resolving which provider to use, the first provider with a configured key wins.
  */
-export const AI_PROVIDER_ORDER: AIProvider[] = ["groq", "openai", "anthropic", "togetherai"];
+export const AI_PROVIDER_ORDER: AIProvider[] = [
+  "groq",
+  "gemini",
+  "perplexity",
+  "openai",
+  "anthropic",
+];

@@ -279,7 +279,11 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
           } else {
             const decoded: DecodedEvent | null = decodeEventLog(topics, data);
             if (decoded) {
-              eventSummaries.push({ name: decoded.name });
+              const params =
+                decoded.params.length > 0
+                  ? decoded.params.slice(0, 4).map((p) => ({ name: p.name, value: p.value }))
+                  : undefined;
+              eventSummaries.push({ name: decoded.name, params });
             }
           }
         }

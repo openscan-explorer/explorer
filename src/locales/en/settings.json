@@ -86,10 +86,21 @@
       "getKey": "Get Key",
       "placeholder": "Enter your Anthropic API key"
     },
-    "togetherai": {
-      "name": "Together AI",
+    "perplexity": {
+      "name": "Perplexity",
       "getKey": "Get Key",
-      "placeholder": "Enter your Together AI API key"
+      "placeholder": "Enter your Perplexity API key"
+    },
+    "gemini": {
+      "name": "Gemini",
+      "getKey": "Get Free Key",
+      "placeholder": "Enter your Gemini API key"
+    },
+    "promptVersion": {
+      "label": "Prompt Version",
+      "description": "Choose which prompt version to use for AI analysis.",
+      "stable": "Stable (Recommended)",
+      "latest": "Latest (Experimental)"
     }
   },
   "saveConfiguration": "Save Configuration",

@@ -1,9 +1,13 @@
-import type { AIAnalysisType } from "../types";
+import type { AIAnalysisType, PromptVersion } from "../types";
+
+type UserMode = "regular" | "power";
 
 interface PromptContext {
   networkName: string;
   networkCurrency: string;
   language?: string;
+  userMode?: UserMode;
+  version?: PromptVersion;
 }
 
 interface PromptPair {
@@ -33,15 +37,19 @@ export function buildPrompt(
   context: Record<string, unknown>,
   promptContext: PromptContext,
 ): PromptPair {
+  const userMode = promptContext.userMode ?? "power";
+  const version = promptContext.version ?? "stable";
+  const config = PROMPT_REGISTRY[version][userMode][type];
+
   switch (type) {
     case "transaction":
-      return buildTransactionPrompt(context, promptContext);
+      return buildTransactionPrompt(config, context, promptContext);
     case "account":
-      return buildAccountPrompt(context, promptContext);
+      return buildAccountPrompt(config, context, promptContext);
     case "contract":
-      return buildContractPrompt(context, promptContext);
+      return buildContractPrompt(config, context, promptContext);
     case "block":
-      return buildBlockPrompt(context, promptContext);
+      return buildBlockPrompt(config, context, promptContext);
   }
 }
 
@@ -56,7 +64,7 @@ const ROLE_INSTRUCTION = (role: string, networkName: string, networkCurrency: st
   `You are a ${role} for the ${networkName} network (native currency: ${networkCurrency}).`;
 
 const CONCISENESS_INSTRUCTION = (range: string) =>
-  `Be concise (${range}). Use markdown formatting.`;
+  `Be concise (${range}). Use markdown formatting. Take your time to analyze the context carefully and provide a thoughtful, thorough response that adheres to the specified conciseness.`;
 
 const FOCUS_INSTRUCTION = (focusAreas: string) => `Focus on: ${focusAreas}.`;
 
@@ -66,23 +74,30 @@ const SHARED_RULES = {
   LANGUAGE: (lang?: string) => languageInstruction(lang),
 };
 
-const PROMPT_CONFIGS: Record<AIAnalysisType, PromptConfig> = {
+// --- Power User Stable Configs (original prompts) ---
+const POWER_STABLE_CONFIGS: Record<AIAnalysisType, PromptConfig> = {
   transaction: {
     role: "blockchain analyst",
-    conciseness: "3-5 sentences",
-    focusAreas: "what happened, who was involved, value/fees, and notable aspects",
-    audience: "power user",
+    conciseness: "8-10 sentences",
+    focusAreas:
+      "what happened, who was involved, dangerous contracts, notable aspects value/fees, calldata and calldata decoded",
+    audience: "senior blockchain developer",
     task: "Explain this transaction in plain English",
-    sections: ["Transaction Analysis", "Participants", "Value and Fees", "Notable Aspects"],
+    sections: [
+      "Transaction Analysis",
+      "Participants",
+      "User Intent vs Execution",
+      "Notable Aspects",
+    ],
     customRules:
       "If the transaction failed and no explicit reason is provided, you may mention 1-2 common causes as possibilities, clearly labeled as possibilities (not claims). If ERC-7730 fields include a formatted token amount (value already includes a token symbol/name), use that. If erc7730Fields include formattedValue, prefer it. Otherwise do not assume ETH or any token for raw numeric values. If callTargetToken is provided, use its symbol/name when describing token amounts related to direct token transfers; if no formatted amount is available, describe them as raw units of that token.",
   },
   account: {
     role: "blockchain analyst",
-    conciseness: "3-5 sentences",
+    conciseness: "5-10 sentences",
     focusAreas:
-      "activity level, balance significance, and any patterns visible from recent transactions",
-    audience: "power user",
+      "activity level, balance significance, suspicious activity, and any patterns visible from recent transactions",
+    audience: "senior blockchain developer",
     task: "Provide a brief analysis of this address",
     sections: [
       "Analysis of the Address",
@@ -91,31 +106,96 @@ const PROMPT_CONFIGS: Record<AIAnalysisType, PromptConfig> = {
       "Transaction Patterns",
       "Known Vulnerabilities",
     ],
+    customRules:
+      "if the address has transactions with known malicious addresses, mention exact malicious address.",
   },
   contract: {
     role: "smart contract analyst",
-    conciseness: "5-8 sentences",
+    conciseness: "8-10 sentences",
     focusAreas:
       "contract purpose, key functions, security considerations, protocol or token standard identification, and any known vulnerabilities associated with this address if present in the context",
-    audience: "power user",
+    audience: "senior blockchain developer",
     task: "Analyze this smart contract",
     sections: [
       "Contract Analysis",
-      "Key Functions",
+      "Contract name and key Functions",
       "Security Considerations",
       "Protocol or Token Standard",
       "Known Vulnerabilities",
     ],
     customRules:
-      'Avoid generic boilerplate or a "General context" paragraph; stick to the provided context.',
+      'Avoid generic boilerplate or a "General context" paragraph; Research if is a known malicious address',
   },
   block: {
     role: "blockchain analyst",
     conciseness: "3-5 sentences",
     focusAreas: "transaction count, gas usage patterns, block utilization, and any notable aspects",
-    audience: "power user",
+    audience: "senior blockchain developer",
     task: "Analyze this block",
     sections: ["Block Analysis", "Utilization", "Transactions", "Notable Aspects"],
+  },
+};
+
+// --- Regular User Stable Configs (simpler prompts for non-super-users) ---
+const REGULAR_STABLE_CONFIGS: Record<AIAnalysisType, PromptConfig> = {
+  transaction: {
+    role: "blockchain educator",
+    conciseness: "5-7 sentences",
+    focusAreas: "what happened, who was involved, and key details",
+    audience: "general user",
+    task: "Explain this transaction in simple, easy-to-understand language",
+    sections: ["What Happened", "Who Was Involved", "Key Details"],
+    customRules:
+      "Use simple language. Avoid jargon when possible, or briefly explain technical terms. If ERC-7730 fields include a formatted token amount, use that. If callTargetToken is provided, use its symbol/name.",
+  },
+  account: {
+    role: "blockchain educator",
+    conciseness: "3-5 sentences",
+    focusAreas: "what this address is and its recent activity",
+    audience: "general user",
+    task: "Provide a simple overview of this address",
+    sections: ["Overview", "Recent Activity", "Balance"],
+  },
+  contract: {
+    role: "blockchain educator",
+    conciseness: "5-7 sentences",
+    focusAreas: "what this contract does and its main purpose",
+    audience: "general user",
+    task: "Explain this smart contract in simple terms",
+    sections: ["What This Contract Does", "Main Features", "Safety Notes"],
+    customRules: "Explain technical concepts in beginner-friendly terms.",
+  },
+  block: {
+    role: "blockchain educator",
+    conciseness: "2-3 sentences",
+    focusAreas: "what happened in this block and how busy it was",
+    audience: "general user",
+    task: "Summarize this block in simple terms",
+    sections: ["Block Summary", "Activity Level", "Highlights"],
+  },
+};
+
+// --- Latest Configs (initially copies of stable; experiment here) ---
+const POWER_LATEST_CONFIGS: Record<AIAnalysisType, PromptConfig> = {
+  ...structuredClone(POWER_STABLE_CONFIGS),
+};
+
+const REGULAR_LATEST_CONFIGS: Record<AIAnalysisType, PromptConfig> = {
+  ...structuredClone(REGULAR_STABLE_CONFIGS),
+};
+
+// --- Prompt Registry: O(1) lookup by version → mode → type ---
+const PROMPT_REGISTRY: Record<
+  PromptVersion,
+  Record<UserMode, Record<AIAnalysisType, PromptConfig>>
+> = {
+  stable: {
+    power: POWER_STABLE_CONFIGS,
+    regular: REGULAR_STABLE_CONFIGS,
+  },
+  latest: {
+    power: POWER_LATEST_CONFIGS,
+    regular: REGULAR_LATEST_CONFIGS,
   },
 };
 
@@ -125,6 +205,10 @@ function buildSystemPrompt(
   customRules?: string,
 ): string {
   const sections = [
+    // Static universal rules (never change)
+    SHARED_RULES.DONT_GUESS,
+    SHARED_RULES.PRESENTATION(networkCurrency),
+    // Config-based instructions (static per analysis type)
     ROLE_INSTRUCTION(config.role, networkName, networkCurrency),
     `${config.task} for a ${config.audience} audience.`,
     CONCISENESS_INSTRUCTION(config.conciseness),
@@ -132,9 +216,8 @@ function buildSystemPrompt(
     `Use the following section headers exactly and in order: ${config.sections
       .map((section) => `"${section}"`)
       .join(", ")}. If a section cannot be supported by the provided context, omit it entirely.`,
-    SHARED_RULES.PRESENTATION(networkCurrency),
-    SHARED_RULES.DONT_GUESS,
     config.customRules ?? "",
+    // Dynamic per-request parts
     customRules ?? "",
     SHARED_RULES.LANGUAGE(language),
   ];
@@ -143,6 +226,7 @@ function buildSystemPrompt(
 }
 
 function buildTransactionPrompt(
+  config: PromptConfig,
   context: Record<string, unknown>,
   promptContext: PromptContext,
 ): PromptPair {
@@ -152,37 +236,40 @@ function buildTransactionPrompt(
     : "";
 
   return {
-    system: buildSystemPrompt(PROMPT_CONFIGS.transaction, promptContext, preAnalysisHint),
+    system: buildSystemPrompt(config, promptContext, preAnalysisHint),
     user: formatContext(context),
   };
 }
 
 function buildAccountPrompt(
+  config: PromptConfig,
   context: Record<string, unknown>,
   promptContext: PromptContext,
 ): PromptPair {
   return {
-    system: buildSystemPrompt(PROMPT_CONFIGS.account, promptContext),
+    system: buildSystemPrompt(config, promptContext),
     user: formatContext(context),
   };
 }
 
 function buildContractPrompt(
+  config: PromptConfig,
   context: Record<string, unknown>,
   promptContext: PromptContext,
 ): PromptPair {
   return {
-    system: buildSystemPrompt(PROMPT_CONFIGS.contract, promptContext),
+    system: buildSystemPrompt(config, promptContext),
     user: formatContext(context),
   };
 }
 
 function buildBlockPrompt(
+  config: PromptConfig,
   context: Record<string, unknown>,
   promptContext: PromptContext,
 ): PromptPair {
   return {
-    system: buildSystemPrompt(PROMPT_CONFIGS.block, promptContext),
+    system: buildSystemPrompt(config, promptContext),
     user: formatContext(context),
   };
 }
