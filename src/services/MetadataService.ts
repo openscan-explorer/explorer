@@ -7,7 +7,7 @@ import networksData from "../config/networks.json";
 import { logger } from "../utils/logger";
 import { extractChainIdFromNetworkId } from "../utils/networkResolver";
 
-const METADATA_BASE_URL = "https://cdn.jsdelivr.net/npm/@openscan/metadata/dist";
+const METADATA_BASE_URL = "https://cdn.jsdelivr.net/npm/@openscan/metadata@1.1.0-alpha.0/dist";
 
 export interface NetworkLink {
   name: string;
@@ -580,7 +580,7 @@ export function getAssetUrl(assetPath: string): string {
 export async function fetchToken(chainId: number, address: string): Promise<TokenMetadata | null> {
   try {
     const response = await fetch(
-      `${METADATA_BASE_URL}/tokens/${chainId}/${address.toLowerCase()}.json`,
+      `${METADATA_BASE_URL}/tokens/evm/${chainId}/${address.toLowerCase()}.json`,
     );
 
     if (!response.ok) {
@@ -633,7 +633,7 @@ export async function fetchTokenList(chainId: number): Promise<TokenListResponse
   }
 
   try {
-    const response = await fetch(`${METADATA_BASE_URL}/tokens/${chainId}/all.json`);
+    const response = await fetch(`${METADATA_BASE_URL}/tokens/evm/${chainId}/all.json`);
 
     if (!response.ok) {
       return null;
