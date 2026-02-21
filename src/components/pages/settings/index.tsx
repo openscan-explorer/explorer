@@ -8,11 +8,13 @@ import { useSettings } from "../../../context/SettingsContext";
 import { useMetaMaskExplorer } from "../../../hooks/useMetaMaskExplorer";
 import { SUPPORTED_LANGUAGES } from "../../../i18n";
 import { clearSupportersCache } from "../../../services/MetadataService";
+import type { MetadataRpcEndpoint } from "../../../services/MetadataService";
 import type { AIProvider, PromptVersion, RPCUrls, RpcUrlsContextType } from "../../../types";
 import { AI_PROVIDERS, AI_PROVIDER_ORDER } from "../../../config/aiProviders";
 import { clearAICache } from "../../common/AIAnalysis/aiCache";
 import { logger } from "../../../utils/logger";
 import { getChainIdFromNetwork } from "../../../utils/networkResolver";
+import { getMetadataEndpointMap } from "../../../utils/rpcStorage";
 
 // Infura network slugs by chain ID
 const INFURA_NETWORKS: Record<number, string> = {
@@ -68,7 +70,6 @@ const Settings: React.FC = () => {
     networkId: string;
     index: number;
   } | null>(null);
-  const [fetchingNetworkId, setFetchingNetworkId] = useState<string | null>(null);
   const [expandedChains, setExpandedChains] = useState<Set<string>>(new Set());
   const [localApiKeys, setLocalApiKeys] = useState({
     infura: settings.apiKeys?.infura || "",
@@ -204,56 +205,57 @@ const Settings: React.FC = () => {
     return "";
   };
 
-  // Fetch RPCs from Chainlist API (only for EVM networks)
-  // networkId: CAIP-2 format (e.g., "eip155:1"), chainId: numeric for Chainlist API
-  const fetchFromChainlist = useCallback(async (networkId: string, chainId: number | undefined) => {
-    // Only EVM networks with numeric chainId are supported by Chainlist
-    if (chainId === undefined) return;
-    setFetchingNetworkId(networkId);
-    try {
-      const response = await fetch("https://chainlist.org/rpcs.json");
-      if (!response.ok) throw new Error("Failed to fetch from Chainlist");
-
-      const chains = await response.json();
-      const chain = chains.find((c: { chainId: number }) => c.chainId === chainId);
-
-      if (!chain?.rpc) {
-        throw new Error(`No RPCs found for chain ${chainId}`);
+  // Build URL→endpoint lookup map from cached metadata
+  const metadataUrlMap = useMemo(() => {
+    const endpointMap = getMetadataEndpointMap();
+    const urlMap = new Map<string, MetadataRpcEndpoint>();
+    for (const endpoints of Object.values(endpointMap)) {
+      for (const ep of endpoints) {
+        urlMap.set(ep.url, ep);
       }
-
-      // Filter for tracking: "none" and extract URLs
-      const newUrls = chain.rpc
-        .filter((rpc: { tracking?: string }) => rpc.tracking === "none")
-        .map((rpc: { url: string }) => rpc.url)
-        .filter((url: string) => url && !url.includes("${"))
-        .filter((url: string) => !url.startsWith("wss://"));
-
-      if (newUrls.length === 0) {
-        throw new Error(`No privacy-friendly RPCs found for chain ${chainId}`);
-      }
-
-      // Merge with existing URLs, avoiding duplicates (store by networkId)
-      setLocalRpc((prev) => {
-        const currentValue = prev[networkId];
-        const existingUrls = Array.isArray(currentValue)
-          ? currentValue
-          : typeof currentValue === "string"
-            ? currentValue
-                .split(",")
-                .map((s) => s.trim())
-                .filter(Boolean)
-            : [];
-        const mergedUrls = Array.from(new Set([...existingUrls, ...newUrls]));
-        return {
-          ...prev,
-          [networkId]: mergedUrls,
-        };
-      });
-    } catch (error) {
-      logger.error("Error fetching from Chainlist:", error);
-    } finally {
-      setFetchingNetworkId(null);
     }
+    return urlMap;
+  }, []);
+
+  /**
+   * Get CSS class for an RPC tag based on metadata endpoint properties
+   * - rpc-tracking: has tracking (tracking !== "none") → yellow
+   * - rpc-opensource: no tracking + open source → green
+   * - rpc-private: no tracking + not open source → light green
+   * - no class: URL not found in metadata (user-added)
+   */
+  const getRpcTagClass = useCallback(
+    (url: string): string => {
+      const ep = metadataUrlMap.get(url);
+      if (!ep) return "";
+      if (ep.tracking !== "none") return "rpc-tracking";
+      if (ep.isOpenSource) return "rpc-opensource";
+      return "rpc-private";
+    },
+    [metadataUrlMap],
+  );
+
+  /**
+   * Get display label for an RPC tag.
+   * Priority: metadata provider name → Infura/Alchemy badge → hostname from URL
+   */
+  const getRpcTagLabel = useCallback(
+    (url: string): string => {
+      const ep = metadataUrlMap.get(url);
+      if (ep?.provider && ep.provider.toLowerCase() !== "unknown") return ep.provider;
+      const badge = getProviderBadge(url);
+      if (badge) return badge;
+      try {
+        return new URL(url).hostname;
+      } catch {
+        return url;
+      }
+    },
+    [metadataUrlMap],
+  );
+
+  const copyToClipboard = useCallback((url: string) => {
+    navigator.clipboard.writeText(url);
   }, []);
 
   // Handle setting OpenScan as MetaMask default explorer
@@ -862,6 +864,18 @@ const Settings: React.FC = () => {
             <h2 className="settings-section-title">🔗 {t("rpcEndpoints.title")}</h2>
             <p className="settings-section-description">{t("rpcEndpoints.description")}</p>
 
+            <div className="flex-start settings-rpc-legend">
+              <span className="settings-rpc-tag rpc-opensource">
+                {t("rpcEndpoints.legendOpensource")}
+              </span>
+              <span className="settings-rpc-tag rpc-private">
+                {t("rpcEndpoints.legendPrivate")}
+              </span>
+              <span className="settings-rpc-tag rpc-tracking">
+                {t("rpcEndpoints.legendTracking")}
+              </span>
+            </div>
+
             <div className="flex-column settings-chain-list">
               {chainConfigs.map((chain) => {
                 const isExpanded = expandedChains.has(chain.id);
@@ -921,22 +935,6 @@ const Settings: React.FC = () => {
                     {/* Collapsible Content */}
                     {isExpanded && (
                       <div className="settings-chain-content">
-                        {/* Only show Chainlist fetch for EVM networks */}
-                        {chain.chainId !== undefined && (
-                          <div className="settings-chain-actions">
-                            <button
-                              type="button"
-                              className="settings-fetch-rpc-button"
-                              onClick={() => fetchFromChainlist(chain.id, chain.chainId)}
-                              disabled={fetchingNetworkId === chain.id}
-                            >
-                              {fetchingNetworkId === chain.id
-                                ? t("rpcEndpoints.fetchButton")
-                                : t("rpcEndpoints.fetchingButton")}
-                            </button>
-                          </div>
-                        )}
-
                         <input
                           className="settings-rpc-input"
                           value={getLocalRpcString(chain.id)}
@@ -973,21 +971,22 @@ const Settings: React.FC = () => {
                                   // biome-ignore lint/a11y/noStaticElementInteractions: Drag-and-drop requires these handlers
                                   <div
                                     key={url}
-                                    className={`settings-rpc-tag ${draggedItem?.networkId === chain.id && draggedItem?.index === idx ? "dragging" : ""}`}
+                                    className={`settings-rpc-tag ${getRpcTagClass(url)} ${draggedItem?.networkId === chain.id && draggedItem?.index === idx ? "dragging" : ""}`}
+                                    title={url}
                                     draggable
                                     onDragStart={() => handleDragStart(chain.id, idx)}
                                     onDragOver={handleDragOver}
                                     onDrop={() => handleDrop(chain.id, idx)}
                                     onDragEnd={() => setDraggedItem(null)}
+                                    onClick={() => copyToClipboard(url)}
+                                    onKeyDown={(e) => {
+                                      if (e.key === "Enter" || e.key === " ") copyToClipboard(url);
+                                    }}
                                   >
                                     <span className="settings-rpc-tag-index">{idx + 1}</span>
-                                    {getProviderBadge(url) ? (
-                                      <span className="settings-rpc-tag-provider">
-                                        {getProviderBadge(url)}
-                                      </span>
-                                    ) : (
-                                      <span className="settings-rpc-tag-url">{url}</span>
-                                    )}
+                                    <span className="settings-rpc-tag-provider">
+                                      {getRpcTagLabel(url)}
+                                    </span>
                                     <button
                                       type="button"
                                       className="settings-rpc-tag-delete"

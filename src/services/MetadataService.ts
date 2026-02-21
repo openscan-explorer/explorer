@@ -41,15 +41,104 @@ export interface NetworkMetadata {
   logo?: string;
   profile?: string;
   explorer?: NetworkExplorer;
-  rpc?: {
-    public: string[];
-  };
   links?: NetworkLink[];
 }
 
 export interface NetworksResponse {
   updatedAt: string;
   networks: NetworkMetadata[];
+}
+
+// ============================================
+// RPC Types and Functions
+// ============================================
+
+export interface MetadataRpcEndpoint {
+  url: string;
+  tracking: string;
+  isOpenSource: boolean;
+  provider: string;
+  isPublic: boolean;
+}
+
+interface RpcManifest {
+  updatedAt: string;
+  count: number;
+  totalEndpoints: number;
+  networks: Array<{ networkId: string; endpointCount: number }>;
+}
+
+interface RpcNetworkResponse {
+  networkId: string;
+  updatedAt: string;
+  endpoints: MetadataRpcEndpoint[];
+}
+
+// BTC genesis block hashes → friendly file names used in metadata
+const BTC_NETWORK_SLUGS: Record<string, string> = {
+  "000000000019d6689c085ae165831e93": "mainnet",
+  "00000000da84f2bafbbc53dee25a72ae": "testnet4",
+};
+
+/**
+ * Parse a CAIP-2 networkId to determine the RPC file path
+ * "eip155:{chainId}" → rpcs/evm/{chainId}.json
+ * "bip122:{hash}"    → rpcs/btc/{slug}.json (using genesis hash → slug mapping)
+ */
+function getRpcPathFromNetworkId(networkId: string): string | null {
+  if (networkId.startsWith("eip155:")) {
+    const chainId = networkId.slice(7);
+    return `rpcs/evm/${chainId}.json`;
+  }
+  if (networkId.startsWith("bip122:")) {
+    const hash = networkId.slice(7);
+    const slug = BTC_NETWORK_SLUGS[hash];
+    if (!slug) return null;
+    return `rpcs/btc/${slug}.json`;
+  }
+  return null;
+}
+
+/**
+ * Fetch all RPC endpoints from the metadata repository
+ * Fetches the manifest, then fetches all per-network files in parallel
+ * Excludes wss:// URLs and template URLs (containing "${")
+ */
+export async function fetchAllRpcs(): Promise<Record<string, MetadataRpcEndpoint[]>> {
+  const manifestUrl = `${METADATA_BASE_URL}/rpcs/all.json`;
+  const response = await fetch(manifestUrl);
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch RPC manifest: ${response.statusText}`);
+  }
+
+  const manifest: RpcManifest = await response.json();
+  const results: Record<string, MetadataRpcEndpoint[]> = {};
+
+  // Fetch all per-network files in parallel
+  const fetchPromises = manifest.networks.map(async ({ networkId }) => {
+    const path = getRpcPathFromNetworkId(networkId);
+    if (!path) return;
+
+    try {
+      const res = await fetch(`${METADATA_BASE_URL}/${path}`);
+      if (!res.ok) return;
+
+      const data: RpcNetworkResponse = await res.json();
+      const filtered = data.endpoints.filter(
+        (ep) => !ep.url.startsWith("wss://") && !ep.url.includes("${"),
+      );
+
+      if (filtered.length > 0) {
+        results[networkId] = filtered;
+      }
+    } catch (err) {
+      logger.warn(`Failed to fetch RPCs for ${networkId}:`, err);
+    }
+  });
+
+  await Promise.all(fetchPromises);
+  return results;
 }
 
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
@@ -456,7 +545,6 @@ export interface ProfileData {
   currency?: string;
   color?: string;
   isTestnet?: boolean;
-  rpc?: { public: string[] };
   // App-specific fields
   verified?: boolean;
   networks?: number[];
@@ -693,7 +781,6 @@ export async function fetchProfile(
             currency: network.currency,
             color: network.color,
             isTestnet: network.isTestnet,
-            rpc: network.rpc,
           };
           if (network.profile) {
             profileData.profileMarkdown =

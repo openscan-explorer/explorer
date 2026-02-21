@@ -16,10 +16,16 @@ import {
 } from "../config/networks";
 import { useWagmiConnection } from "../hooks/useWagmiConnection";
 import type { IAppContext, NetworkConfig, RpcUrlsContextType } from "../types";
+import { fetchAllRpcs } from "../services/MetadataService";
 import { loadJsonFilesFromStorage, saveJsonFilesToStorage } from "../utils/artifactsStorage";
 import { logger } from "../utils/logger";
 import { getChainIdFromNetwork } from "../utils/networkResolver";
-import { getEffectiveRpcUrls, saveRpcUrlsToStorage } from "../utils/rpcStorage";
+import {
+  getEffectiveRpcUrls,
+  isMetadataRpcCacheFresh,
+  saveMetadataRpcsToStorage,
+  saveRpcUrlsToStorage,
+} from "../utils/rpcStorage";
 
 // Alias exported for use across the app where a shorter/consistent name is preferred
 export type tRpcUrlsContextType = RpcUrlsContextType;
@@ -91,9 +97,6 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
       color: "#FFF100",
       currency: "ETH",
       isTestnet: true,
-      rpc: {
-        public: ["http://127.0.0.1:8545"],
-      },
     }),
     [],
   );
@@ -143,6 +146,20 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
   // biome-ignore lint/correctness/useExhaustiveDependencies: only run once on mount
   useEffect(() => {
     loadNetworkData();
+  }, []);
+
+  // Fetch metadata RPCs on mount if cache is stale or missing
+  useEffect(() => {
+    if (isMetadataRpcCacheFresh()) return;
+
+    fetchAllRpcs()
+      .then((rpcs) => {
+        saveMetadataRpcsToStorage(rpcs);
+        setRpcUrlsState(getEffectiveRpcUrls());
+      })
+      .catch((err) => {
+        logger.warn("Failed to fetch metadata RPCs:", err);
+      });
   }, []);
 
   useEffect(() => {

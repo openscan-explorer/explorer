@@ -1,25 +1,78 @@
-import { getAllNetworks } from "../config/networks";
+import type { MetadataRpcEndpoint } from "../services/MetadataService";
 import type { RpcUrlsContextType } from "../types";
 import { logger } from "./logger";
-import { getNetworkRpcKey } from "./networkResolver";
 
 const STORAGE_KEY = "OPENSCAN_RPC_URLS_V3"; // Version bump for networkId-based keys
+const METADATA_RPC_STORAGE_KEY = "OPENSCAN_METADATA_RPCS";
+const METADATA_RPC_TTL = 24 * 60 * 60 * 1000; // 24 hours
+
+interface MetadataRpcCache {
+  timestamp: number;
+  rpcs: Record<string, MetadataRpcEndpoint[]>;
+}
 
 /**
- * Get default RPC endpoints from loaded network metadata
- * Returns RPC URLs for all networks, keyed by networkId (CAIP-2 format)
+ * Load metadata RPC cache from localStorage
+ */
+export function loadMetadataRpcsFromStorage(): MetadataRpcCache | null {
+  try {
+    const raw = localStorage.getItem(METADATA_RPC_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as MetadataRpcCache;
+    if (!parsed || typeof parsed.timestamp !== "number" || !parsed.rpcs) return null;
+    return parsed;
+  } catch (err) {
+    logger.warn("Failed to parse metadata RPCs from storage", err);
+    return null;
+  }
+}
+
+/**
+ * Save metadata RPC endpoints to localStorage
+ */
+export function saveMetadataRpcsToStorage(rpcs: Record<string, MetadataRpcEndpoint[]>): void {
+  try {
+    const cache: MetadataRpcCache = { timestamp: Date.now(), rpcs };
+    localStorage.setItem(METADATA_RPC_STORAGE_KEY, JSON.stringify(cache));
+  } catch (err) {
+    logger.warn("Failed to save metadata RPCs to storage", err);
+  }
+}
+
+/**
+ * Check if the metadata RPC cache is fresh (within TTL)
+ */
+export function isMetadataRpcCacheFresh(): boolean {
+  const cache = loadMetadataRpcsFromStorage();
+  if (!cache) return false;
+  return Date.now() - cache.timestamp < METADATA_RPC_TTL;
+}
+
+/**
+ * Get the full endpoint map from cached metadata RPCs
+ * For use in Settings page to look up tracking/openSource per URL
+ */
+export function getMetadataEndpointMap(): Record<string, MetadataRpcEndpoint[]> {
+  const cache = loadMetadataRpcsFromStorage();
+  return cache?.rpcs ?? {};
+}
+
+/**
+ * Get default RPC endpoints from the metadata RPC cache
+ * Returns RPC URLs for all cached networks, keyed by networkId (CAIP-2 format)
+ * If no cache exists yet, returns empty {} (the app will fetch and populate on startup)
  */
 export function getDefaultRpcEndpoints(): RpcUrlsContextType {
-  const networks = getAllNetworks();
-  const endpoints: RpcUrlsContextType = {};
+  const cache = loadMetadataRpcsFromStorage();
+  if (!cache) return {};
 
-  for (const network of networks) {
-    if (network.rpc?.public && network.rpc.public.length > 0) {
-      const key = getNetworkRpcKey(network);
-      endpoints[key] = network.rpc.public;
+  const endpoints: RpcUrlsContextType = {};
+  for (const [networkId, epList] of Object.entries(cache.rpcs)) {
+    const urls = epList.map((ep) => ep.url);
+    if (urls.length > 0) {
+      endpoints[networkId] = urls;
     }
   }
-
   return endpoints;
 }
 

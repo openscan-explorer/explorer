@@ -401,9 +401,6 @@ export interface NetworkConfig {
   logo?: string;
   profile?: string;
   explorer?: NetworkExplorer;
-  rpc?: {
-    public: string[];
-  };
   links?: NetworkLink[];
 }
 
