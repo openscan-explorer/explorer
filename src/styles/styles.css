@@ -648,18 +648,6 @@ a.navbar-logo-dropdown-item {
   min-height: 40vh;
 }
 
-.wave-loading {
-  display: flex;
-  justify-content: center;
-  align-items: flex-end;
-}
-
-.wave {
-  width: 12px;
-  height: 12px;
-  margin: 0 6px;
-}
-
 /* Connect Wallet */
 .connect-wallet-content {
   margin: 40px auto 0;
@@ -827,12 +815,6 @@ a.navbar-logo-dropdown-item {
   display: flex;
   flex-direction: column;
   gap: 2px;
-}
-
-.loading-spinner {
-  width: 16px;
-  height: 16px;
-  flex-shrink: 0;
 }
 
 .error-message {
@@ -2557,40 +2539,6 @@ a.navbar-logo-dropdown-item {
   min-height: 40vh;
 }
 
-.wave-loading {
-  display: flex;
-  justify-content: center;
-  align-items: flex-end;
-}
-
-.wave {
-  width: 12px;
-  height: 12px;
-  margin: 0 6px;
-  background: var(--accent);
-  border-radius: 50%;
-  animation: wave 1s infinite ease-in-out;
-}
-
-.wave:nth-child(2) {
-  animation-delay: 0.2s;
-}
-
-.wave:nth-child(3) {
-  animation-delay: 0.4s;
-}
-
-@keyframes wave {
-
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-
-  50% {
-    transform: translateY(-18px);
-  }
-}
 
 /* Connect Wallet */
 .connect-wallet-content {
@@ -3421,15 +3369,6 @@ a.navbar-logo-dropdown-item {
   flex-shrink: 0;
 }
 
-.loading-spinner {
-  width: 16px;
-  height: 16px;
-  border: 2px solid var(--border-color);
-  border-top: 2px solid var(--accent);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  flex-shrink: 0;
-}
 
 @keyframes spin {
   0% {
@@ -5014,6 +4953,27 @@ code {
   letter-spacing: 0.5px;
   text-transform: uppercase;
   flex: 1;
+}
+
+.settings-rpc-legend {
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+  justify-content: center !important;
+}
+
+.settings-rpc-tag.rpc-opensource {
+  background: linear-gradient(135deg, #16a34a 0%, #22c55e 100%);
+}
+
+.settings-rpc-tag.rpc-private {
+  background: linear-gradient(135deg, #4ade80 0%, #86efac 100%);
+  color: #1a1a1a;
+}
+
+.settings-rpc-tag.rpc-tracking {
+  background: linear-gradient(135deg, #eab308 0%, #facc15 100%);
+  color: #1a1a1a;
 }
 
 .settings-save-button {

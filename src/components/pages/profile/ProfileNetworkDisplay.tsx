@@ -94,20 +94,6 @@ const ProfileNetworkDisplay: React.FC<ProfileNetworkDisplayProps> = ({ profile }
         </div>
       )}
 
-      {/* RPC Endpoints - Available for tier 2+ */}
-      {tier >= 2 && profile.rpc?.public && profile.rpc.public.length > 0 && (
-        <div className="profile-section">
-          <h2 className="profile-section-title">Public RPC Endpoints</h2>
-          <div className="profile-rpc-list">
-            {profile.rpc.public.map((rpcUrl) => (
-              <div key={rpcUrl} className="profile-rpc-item">
-                <code>{rpcUrl}</code>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
       {/* Profile Markdown Content - Always shown for networks */}
       {profile.profileMarkdown && (
         <div className="profile-section">

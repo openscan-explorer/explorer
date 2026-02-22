@@ -1855,6 +1855,65 @@
 	font-weight: 600;
 }
 
+/* Cube Loader */
+.cube-breathe-right {
+	animation: cube-breathe-right 3.14s linear infinite;
+}
+
+.cube-breathe-left {
+	animation: cube-breathe-left 3.14s linear infinite;
+}
+
+.cube-breathe-top {
+	animation: cube-breathe-top 3.14s linear infinite;
+}
+
+.cube-rotate-cw {
+	animation: cube-rotate-cw 7.2s linear infinite;
+	transform-box: view-box;
+	transform-origin: 50% 50%;
+}
+
+.cube-rotate-ccw {
+	animation: cube-rotate-ccw 7.2s linear infinite;
+	transform-box: view-box;
+	transform-origin: 50% 50%;
+}
+
+@keyframes cube-breathe-right {
+	0%   { transform: translate(0px, 0px); }
+	25%  { transform: translate(2.5px, 1px); }
+	50%  { transform: translate(0px, 0px); }
+	75%  { transform: translate(-2.5px, -1px); }
+	100% { transform: translate(0px, 0px); }
+}
+
+@keyframes cube-breathe-left {
+	0%   { transform: translate(0px, 0px); }
+	25%  { transform: translate(-2.5px, 1px); }
+	50%  { transform: translate(0px, 0px); }
+	75%  { transform: translate(2.5px, -1px); }
+	100% { transform: translate(0px, 0px); }
+}
+
+@keyframes cube-breathe-top {
+	0%   { transform: translate(0px, 0px); }
+	25%  { transform: translate(0px, -2.5px); }
+	50%  { transform: translate(0px, 0px); }
+	75%  { transform: translate(0px, 2.5px); }
+	100% { transform: translate(0px, 0px); }
+}
+
+@keyframes cube-rotate-cw {
+	from { transform: rotate(0deg); }
+	to   { transform: rotate(360deg); }
+}
+
+@keyframes cube-rotate-ccw {
+	from { transform: rotate(0deg); }
+	to   { transform: rotate(-360deg); }
+}
+
 /* Loader Component */
 .loader-container {
 	display: flex;
@@ -1862,16 +1921,6 @@
 	justify-content: center;
 	align-items: center;
 	padding: 20px;
-}
-
-.loader-spinner {
-	border-radius: 50%;
-	animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-	0% { transform: rotate(0deg); }
-	100% { transform: rotate(360deg); }
 }
 
 .loader-text {
@@ -2689,14 +2738,6 @@
 	background: linear-gradient(90deg, var(--color-primary), var(--color-primary-muted));
 	border-radius: 4px;
 	transition: width 0.3s ease;
-}
-
-/* Loader component styles */
-.loader-spinner-container {
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: center;
 }
 
 /* LongString component styles */
