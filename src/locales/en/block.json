@@ -1,6 +1,6 @@
 {
   "block": "Block",
-  "transactions": "Transactions:",
+  "transactions": "Transactions",
   "inThisBlock": "in this block",
   "withdrawals": "Withdrawals:",
   "withdrawal": "withdrawal",
@@ -15,7 +15,7 @@
   "totalDifficulty": "Total Difficulty",
   "moreDetails": "More Details",
   "index": "Index",
-  "size": "Size:",
+  "size": "Size",
   "bytes": "bytes",
   "finalized": "Finalized",
   "l1BlockNumber": "L1 Block Number:",

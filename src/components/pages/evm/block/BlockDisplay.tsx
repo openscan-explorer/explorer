@@ -5,6 +5,7 @@ import { getNetworkById } from "../../../../config/networks";
 import type { Block, BlockArbitrum, RPCMetadata } from "../../../../types";
 import AIAnalysisPanel from "../../../common/AIAnalysis/AIAnalysisPanel";
 import ExtraDataDisplay from "../../../common/ExtraDataDisplay";
+import LongString from "../../../common/LongString";
 import { RPCIndicator } from "../../../common/RPCIndicator";
 import { formatGweiFromWei, formatNativeFromWei } from "../../../../utils/unitFormatters";
 
@@ -167,127 +168,148 @@ const BlockDisplay: React.FC<BlockDisplayProps> = React.memo(
           </div>
 
           <div className="tx-details">
-            {/* Transactions */}
+            {/* Full-width: Block Hash */}
             <div className="tx-row">
-              <span className="tx-label">{t("transactions")}</span>
-              <span className="tx-value">
-                <span className="tx-value-highlight">
-                  {block.transactions ? block.transactions.length : 0} {t("transactions")}
-                </span>{" "}
-                {t("inThisBlock")}
-              </span>
-            </div>
-
-            {/* Withdrawals count */}
-            {block.withdrawals && block.withdrawals.length > 0 && (
-              <div className="tx-row">
-                <span className="tx-label">{t("withdrawals")}</span>
-                <span className="tx-value">
-                  {block.withdrawals.length}{" "}
-                  {block.withdrawals.length !== 1 ? t("withdrawalsPlural") : t("withdrawal")}{" "}
-                  {t("inThisBlock")}
-                </span>
-              </div>
-            )}
-
-            {/* Fee Recipient (Miner) */}
-            <div className="tx-row">
-              <span className="tx-label">{t("feeRecipient")}</span>
+              <span className="tx-label">Hash:</span>
               <span className="tx-value tx-mono">
-                {networkId ? (
-                  <Link to={`/${networkId}/address/${block.miner}`} className="link-accent">
-                    {block.miner}
-                  </Link>
-                ) : (
-                  block.miner
+                <LongString value={block.hash} start={20} end={16} />
+              </span>
+            </div>
+
+            {/* Two-column grid for block details */}
+            <div className="tx-details-grid">
+              {/* Left Column */}
+              <div className="tx-details-column">
+                {/* Transactions */}
+                <div className="tx-row">
+                  <span className="tx-label">{t("transactions")}</span>
+                  <span className="tx-value">
+                    <span className="tx-value-highlight">
+                      {block.transactions ? block.transactions.length : 0} {t("transactions")}
+                    </span>{" "}
+                    {t("inThisBlock")}
+                  </span>
+                </div>
+
+                {/* Withdrawals count */}
+                {block.withdrawals && block.withdrawals.length > 0 && (
+                  <div className="tx-row">
+                    <span className="tx-label">{t("withdrawals")}</span>
+                    <span className="tx-value">
+                      {block.withdrawals.length}{" "}
+                      {block.withdrawals.length !== 1 ? t("withdrawalsPlural") : t("withdrawal")}{" "}
+                      {t("inThisBlock")}
+                    </span>
+                  </div>
                 )}
-              </span>
-            </div>
 
-            {/* Gas Used */}
-            <div className="tx-row">
-              <span className="tx-label">{t("gasUsed")}</span>
-              <span className="tx-value">
-                {Number(block.gasUsed).toLocaleString()}
-                <span className="tx-gas-pct"> ({gasUsedPct}%)</span>
-              </span>
-            </div>
-
-            {/* Gas Limit */}
-            <div className="tx-row">
-              <span className="tx-label">{t("gasLimit")}</span>
-              <span className="tx-value">{Number(block.gasLimit).toLocaleString()}</span>
-            </div>
-
-            {/* Base Fee Per Gas */}
-            {block.baseFeePerGas && (
-              <div className="tx-row">
-                <span className="tx-label">{t("baseFeePerGas")}</span>
-                <span className="tx-value">{formatGwei(block.baseFeePerGas)}</span>
-              </div>
-            )}
-
-            {/* Burnt Fees */}
-            {burntFees && (
-              <div className="tx-row">
-                <span className="tx-label">{t("burntFees")}:</span>
-                <span className="tx-value">
-                  <span className="burnt-fees">🔥 {formatNative(burntFees)}</span>
-                </span>
-              </div>
-            )}
-
-            {/* Extra Data */}
-            {block.extraData && block.extraData !== "0x" && (
-              <div className="tx-row">
-                <span className="tx-label">{t("extraData")}:</span>
-                <span className="tx-value">
-                  <ExtraDataDisplay hexData={block.extraData} />
-                </span>
-              </div>
-            )}
-
-            {/* Difficulty */}
-            {Number(block.difficulty) > 0 && (
-              <div className="tx-row">
-                <span className="tx-label">{t("difficulty")}:</span>
-                <span className="tx-value">{Number(block.difficulty).toLocaleString()}</span>
-              </div>
-            )}
-
-            {/* Total Difficulty */}
-            {Number(block.totalDifficulty) > 0 && (
-              <div className="tx-row">
-                <span className="tx-label">{t("totalDifficulty")}:</span>
-                <span className="tx-value">{Number(block.totalDifficulty).toLocaleString()}</span>
-              </div>
-            )}
-
-            {/* Size */}
-            <div className="tx-row">
-              <span className="tx-label">{t("size")}:</span>
-              <span className="tx-value">{Number(block.size).toLocaleString()} bytes</span>
-            </div>
-
-            {/* Arbitrum-specific fields */}
-            {isArbitrumBlock(block) && (
-              <>
-                <div className="tx-row tx-row-arbitrum">
-                  <span className="tx-label">{t("l1BlockNumber")}:</span>
-                  <span className="tx-value">{Number(block.l1BlockNumber).toLocaleString()}</span>
+                {/* Fee Recipient (Miner) */}
+                <div className="tx-row">
+                  <span className="tx-label">{t("feeRecipient")}</span>
+                  <span className="tx-value tx-mono">
+                    {networkId ? (
+                      <Link to={`/${networkId}/address/${block.miner}`} className="link-accent">
+                        {block.miner}
+                      </Link>
+                    ) : (
+                      block.miner
+                    )}
+                  </span>
                 </div>
-                <div className="tx-row tx-row-arbitrum">
-                  <span className="tx-label">{t("sendCount")}:</span>
-                  <span className="tx-value">{block.sendCount}</span>
-                </div>
-                <div className="tx-row tx-row-arbitrum">
-                  <span className="tx-label">{t("sendRoot")}:</span>
-                  <span className="tx-value tx-mono">{block.sendRoot}</span>
-                </div>
-              </>
-            )}
 
-            {/* More Details (collapsible) */}
+                {/* Extra Data */}
+                {block.extraData && block.extraData !== "0x" && (
+                  <div className="tx-row">
+                    <span className="tx-label">{t("extraData")}:</span>
+                    <span className="tx-value">
+                      <ExtraDataDisplay hexData={block.extraData} />
+                    </span>
+                  </div>
+                )}
+
+                {/* Difficulty */}
+                {Number(block.difficulty) > 0 && (
+                  <div className="tx-row">
+                    <span className="tx-label">{t("difficulty")}:</span>
+                    <span className="tx-value">{Number(block.difficulty).toLocaleString()}</span>
+                  </div>
+                )}
+
+                {/* Total Difficulty */}
+                {Number(block.totalDifficulty) > 0 && (
+                  <div className="tx-row">
+                    <span className="tx-label">{t("totalDifficulty")}:</span>
+                    <span className="tx-value">
+                      {Number(block.totalDifficulty).toLocaleString()}
+                    </span>
+                  </div>
+                )}
+
+                {/* Size */}
+                <div className="tx-row">
+                  <span className="tx-label">{t("size")}:</span>
+                  <span className="tx-value">{Number(block.size).toLocaleString()} bytes</span>
+                </div>
+              </div>
+
+              {/* Right Column */}
+              <div className="tx-details-column">
+                {/* Gas Used */}
+                <div className="tx-row">
+                  <span className="tx-label">{t("gasUsed")}</span>
+                  <span className="tx-value">
+                    {Number(block.gasUsed).toLocaleString()}
+                    <span className="tx-gas-pct"> ({gasUsedPct}%)</span>
+                  </span>
+                </div>
+
+                {/* Gas Limit */}
+                <div className="tx-row">
+                  <span className="tx-label">{t("gasLimit")}</span>
+                  <span className="tx-value">{Number(block.gasLimit).toLocaleString()}</span>
+                </div>
+
+                {/* Base Fee Per Gas */}
+                {block.baseFeePerGas && (
+                  <div className="tx-row">
+                    <span className="tx-label">{t("baseFeePerGas")}</span>
+                    <span className="tx-value">{formatGwei(block.baseFeePerGas)}</span>
+                  </div>
+                )}
+
+                {/* Burnt Fees */}
+                {burntFees && (
+                  <div className="tx-row">
+                    <span className="tx-label">{t("burntFees")}:</span>
+                    <span className="tx-value">
+                      <span className="burnt-fees">🔥 {formatNative(burntFees)}</span>
+                    </span>
+                  </div>
+                )}
+
+                {/* Arbitrum-specific fields */}
+                {isArbitrumBlock(block) && (
+                  <>
+                    <div className="tx-row tx-row-arbitrum">
+                      <span className="tx-label">{t("l1BlockNumber")}:</span>
+                      <span className="tx-value">
+                        {Number(block.l1BlockNumber).toLocaleString()}
+                      </span>
+                    </div>
+                    <div className="tx-row tx-row-arbitrum">
+                      <span className="tx-label">{t("sendCount")}:</span>
+                      <span className="tx-value">{block.sendCount}</span>
+                    </div>
+                    <div className="tx-row tx-row-arbitrum">
+                      <span className="tx-label">{t("sendRoot")}:</span>
+                      <span className="tx-value tx-mono">{block.sendRoot}</span>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* Full-width: More Details (collapsible) */}
             <div className="tx-row tx-row-vertical">
               {/** biome-ignore lint/a11y/useButtonType: <TODO> */}
               <button
@@ -299,10 +321,6 @@ const BlockDisplay: React.FC<BlockDisplayProps> = React.memo(
 
               {showMoreDetails && (
                 <div className="more-details-content">
-                  <div className="detail-row">
-                    <span className="detail-label">Hash:</span>
-                    <span className="detail-value tx-mono">{block.hash}</span>
-                  </div>
                   <div className="detail-row">
                     <span className="detail-label">Parent Hash:</span>
                     <span className="detail-value tx-mono">

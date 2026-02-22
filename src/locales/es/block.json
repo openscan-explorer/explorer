@@ -1,6 +1,6 @@
 {
   "block": "Bloque",
-  "transactions": "Transacciones:",
+  "transactions": "Transacciones",
   "inThisBlock": "en este bloque",
   "withdrawals": "Retiros:",
   "withdrawal": "retiro",
@@ -15,7 +15,7 @@
   "totalDifficulty": "Dificultad total",
   "moreDetails": "Más detalles",
   "index": "Índice",
-  "size": "Tamaño:",
+  "size": "Tamaño",
   "bytes": "bytes",
   "finalized": "Finalizado",
   "l1BlockNumber": "Número de bloque L1:",
