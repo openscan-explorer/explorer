@@ -1464,6 +1464,17 @@
 	font-weight: 600;
 }
 
+/* Status text (non-badge) for transaction detail rows */
+.tx-status-text-success {
+	color: var(--badge-success-text, #065f46);
+	font-weight: 600;
+}
+
+.tx-status-text-failed {
+	color: var(--badge-error-text, #991b1b);
+	font-weight: 600;
+}
+
 /* Use CSS variables for badge colors for theming support */
 .status-badge-success {
 	background: var(--badge-success-bg, #d1fae5);

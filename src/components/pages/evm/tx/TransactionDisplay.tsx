@@ -488,15 +488,13 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
       [timestampMs, formatTimeAgo],
     );
 
-    const getStatusBadge = useCallback(
+    const getStatusText = useCallback(
       (status?: string) => {
         if (!status) return null;
         const isSuccess = status === "0x1" || status === "1";
         return (
-          <span
-            className={`status-badge ${isSuccess ? "status-badge-success" : "status-badge-failed"}`}
-          >
-            {isSuccess ? t("success") : t("failed")}
+          <span className={isSuccess ? "tx-status-text-success" : "tx-status-text-failed"}>
+            {isSuccess ? `✓ ${t("success")}` : `✗ ${t("failed")}`}
           </span>
         );
       },
@@ -591,7 +589,7 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
                 {/* Status */}
                 <div className="tx-row">
                   <span className="tx-label">{t("status")}</span>
-                  <span className="tx-value">{getStatusBadge(transaction.receipt?.status)}</span>
+                  <span className="tx-value">{getStatusText(transaction.receipt?.status)}</span>
                 </div>
 
                 {/* Block */}
