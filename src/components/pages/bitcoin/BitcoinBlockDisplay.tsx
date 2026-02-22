@@ -70,9 +70,7 @@ const BitcoinBlockDisplay: React.FC<BitcoinBlockDisplayProps> = React.memo(
           {block.miner && (
             <div className="tx-row">
               <span className="tx-label">Mined by:</span>
-              <span className="tx-value">
-                <span className="btc-miner-badge">{block.miner}</span>
-              </span>
+              <span className="tx-value">{block.miner}</span>
             </div>
           )}
 
