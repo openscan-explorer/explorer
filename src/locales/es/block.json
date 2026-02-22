@@ -26,7 +26,7 @@
   "validator": "Validador",
   "address": "Dirección",
   "amount": "Monto",
-  "latestBlocks": "Últimos bloques",
+  "latestBlocks": "Bloques de {{network}}",
   "loadingBlocks": "Cargando bloques...",
   "showingRecent": "Mostrando los {{count}} bloques más recientes",
   "showingRange": "Mostrando bloques {{oldest}} - {{newest}}",

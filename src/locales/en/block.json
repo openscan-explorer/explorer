@@ -26,7 +26,7 @@
   "validator": "Validator",
   "address": "Address",
   "amount": "Amount",
-  "latestBlocks": "Latest Blocks",
+  "latestBlocks": "{{network}} Blocks",
   "loadingBlocks": "Loading blocks...",
   "showingRecent": "Showing {{count}} most recent blocks",
   "showingRange": "Showing blocks {{oldest}} - {{newest}}",

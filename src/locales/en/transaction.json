@@ -68,7 +68,7 @@
   },
   "txs": {
     "failedToFetch": "Failed to fetch transactions",
-    "latests": "Latest Transactions",
+    "latests": "{{network}} Transactions",
     "loading": "Loading transactions...",
     "notFound": "No transactions found in this block",
     "block": "Block",
@@ -93,7 +93,7 @@
     "sectionTitle": "AI Analysis"
   },
   "btcTxs": {
-    "title": "Bitcoin Transactions",
+    "title": "{{network}} Transactions",
     "loading": "Loading transactions...",
     "failedToFetch": "Failed to fetch transactions",
     "notFound": "No transactions found in this block",

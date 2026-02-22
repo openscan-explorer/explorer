@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { getNetworkBySlug } from "../../../config/networks";
 import { useDataService } from "../../../hooks/useDataService";
 import type { BitcoinTransaction } from "../../../types";
 import { formatBTC, formatTimeAgo, truncateHash } from "../../../utils/bitcoinFormatters";
@@ -18,6 +19,7 @@ export default function BitcoinTransactionsPage() {
   // Extract network slug from path (e.g., "/tbtc/txs" → "tbtc")
   const networkSlug = location.pathname.split("/")[1] || "btc";
   const dataService = useDataService(networkSlug);
+  const networkName = getNetworkBySlug(networkSlug)?.name ?? networkSlug;
 
   const [transactions, setTransactions] = useState<BitcoinTransaction[]>([]);
   const [loading, setLoading] = useState(true);
@@ -131,7 +133,7 @@ export default function BitcoinTransactionsPage() {
       <div className="container-wide">
         <div className="block-display-card">
           <div className="blocks-header">
-            <span className="block-label">{t("btcTxs.title")}</span>
+            <span className="block-label">{t("btcTxs.title", { network: networkName })}</span>
           </div>
           <div className="card-content-loading">
             <Loader text={t("btcTxs.loading")} />
@@ -146,7 +148,7 @@ export default function BitcoinTransactionsPage() {
       <div className="container-wide">
         <div className="block-display-card">
           <div className="blocks-header">
-            <span className="block-label">{t("btcTxs.title")}</span>
+            <span className="block-label">{t("btcTxs.title", { network: networkName })}</span>
           </div>
           <div className="card-content">
             <p className="text-error margin-0">Error: {error}</p>
@@ -241,7 +243,7 @@ export default function BitcoinTransactionsPage() {
       <div className="block-display-card">
         <div className="blocks-header">
           <div className="blocks-header-main">
-            <span className="block-label">{t("btcTxs.title")}</span>
+            <span className="block-label">{t("btcTxs.title", { network: networkName })}</span>
             <span className="block-header-divider">•</span>
             <span className="blocks-header-info">{message}</span>
           </div>

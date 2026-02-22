@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { RPCIndicator } from "../../../common/RPCIndicator";
+import { getNetworkById } from "../../../../config/networks";
 import { useDataService } from "../../../../hooks/useDataService";
 import { useProviderSelection } from "../../../../hooks/useProviderSelection";
 import type { Block, DataWithMetadata } from "../../../../types";
@@ -17,6 +18,7 @@ export default function Blocks() {
   const navigate = useNavigate();
   const numericNetworkId = Number(networkId) || 1;
   const dataService = useDataService(numericNetworkId);
+  const networkName = getNetworkById(networkId ?? numericNetworkId)?.name ?? String(networkId);
   const [blocksResult, setBlocksResult] = useState<DataWithMetadata<Block>[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -163,7 +165,7 @@ export default function Blocks() {
       <div className="container-wide">
         <div className="block-display-card">
           <div className="blocks-header">
-            <span className="block-label">{t("latestBlocks")}</span>
+            <span className="block-label">{t("latestBlocks", { network: networkName })}</span>
           </div>
           <div className="card-content-loading">
             <Loader text={t("loadingBlocks")} />
@@ -178,7 +180,7 @@ export default function Blocks() {
       <div className="container-wide">
         <div className="block-display-card">
           <div className="blocks-header">
-            <span className="block-label">{t("latestBlocks")}</span>
+            <span className="block-label">{t("latestBlocks", { network: networkName })}</span>
           </div>
           <div className="card-content">
             <p className="text-error margin-0">{t("errorPrefix", { error })}</p>
@@ -196,7 +198,7 @@ export default function Blocks() {
       <div className="block-display-card">
         <div className="blocks-header">
           <div className="blocks-header-main">
-            <span className="block-label">{t("latestBlocks")}</span>
+            <span className="block-label">{t("latestBlocks", { network: networkName })}</span>
             <span className="block-header-divider">•</span>
             <span className="blocks-header-info">
               {isAtLatest

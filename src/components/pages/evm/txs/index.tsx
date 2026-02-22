@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { RPCIndicator } from "../../../../components/common/RPCIndicator";
+import { getNetworkById } from "../../../../config/networks";
 import { useDataService } from "../../../../hooks/useDataService";
 import { useProviderSelection } from "../../../../hooks/useProviderSelection";
 import type { Block, DataWithMetadata, Transaction } from "../../../../types";
@@ -14,6 +15,7 @@ export default function Txs() {
   const navigate = useNavigate();
   const numericNetworkId = Number(networkId) || 1;
   const dataService = useDataService(numericNetworkId);
+  const networkName = getNetworkById(networkId ?? numericNetworkId)?.name ?? String(networkId);
   const [blockResult, setBlockResult] = useState<DataWithMetadata<Block> | null>(null);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
@@ -130,7 +132,7 @@ export default function Txs() {
       <div className="container-wide">
         <div className="block-display-card">
           <div className="blocks-header">
-            <span className="block-label">{t("txs.latests")}</span>
+            <span className="block-label">{t("txs.latests", { network: networkName })}</span>
           </div>
           <div className="card-content-loading">
             <Loader text={t("txs.loading")} />
@@ -145,7 +147,7 @@ export default function Txs() {
       <div className="container-wide">
         <div className="block-display-card">
           <div className="blocks-header">
-            <span className="block-label">{t("txs.latests")}</span>
+            <span className="block-label">{t("txs.latests", { network: networkName })}</span>
           </div>
           <div className="card-content">
             <p className="text-error margin-0">Error: {error}</p>
@@ -212,7 +214,7 @@ export default function Txs() {
       <div className="block-display-card">
         <div className="blocks-header">
           <div className="blocks-header-main">
-            <span className="block-label">{t("txs.latests")}</span>
+            <span className="block-label">{t("txs.latests", { network: networkName })}</span>
             <span className="block-header-divider">•</span>
             <span className="blocks-header-info">{message}</span>
           </div>

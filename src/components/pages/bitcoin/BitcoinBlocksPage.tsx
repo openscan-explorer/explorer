@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { BLOCKS_PER_PAGE } from "../../../config/bitcoinConstants";
+import { getNetworkBySlug } from "../../../config/networks";
 import { useDataService } from "../../../hooks/useDataService";
 import type { BitcoinBlock } from "../../../types";
 import {
@@ -19,6 +21,8 @@ export default function BitcoinBlocksPage() {
   // Extract network slug from path (e.g., "/tbtc/blocks" → "tbtc")
   const networkSlug = location.pathname.split("/")[1] || "btc";
   const dataService = useDataService(networkSlug);
+  const networkName = getNetworkBySlug(networkSlug)?.name ?? networkSlug;
+  const { t } = useTranslation("block");
 
   const [blocks, setBlocks] = useState<BitcoinBlock[]>([]);
   const [loading, setLoading] = useState(true);
@@ -115,7 +119,7 @@ export default function BitcoinBlocksPage() {
       <div className="container-wide">
         <div className="block-display-card">
           <div className="blocks-header">
-            <span className="block-label">Bitcoin Blocks</span>
+            <span className="block-label">{t("latestBlocks", { network: networkName })}</span>
           </div>
           <div className="card-content-loading">
             <Loader text="Loading blocks..." />
@@ -130,7 +134,7 @@ export default function BitcoinBlocksPage() {
       <div className="container-wide">
         <div className="block-display-card">
           <div className="blocks-header">
-            <span className="block-label">Bitcoin Blocks</span>
+            <span className="block-label">{t("latestBlocks", { network: networkName })}</span>
           </div>
           <div className="card-content">
             <p className="text-error margin-0">Error: {error}</p>
@@ -145,7 +149,7 @@ export default function BitcoinBlocksPage() {
       <div className="block-display-card">
         <div className="blocks-header">
           <div className="blocks-header-main">
-            <span className="block-label">Bitcoin Blocks</span>
+            <span className="block-label">{t("latestBlocks", { network: networkName })}</span>
             <span className="block-header-divider">•</span>
             <span className="blocks-header-info">
               {isAtLatest
