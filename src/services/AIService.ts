@@ -97,7 +97,7 @@ export class AIService {
         { role: "user", content: user },
       ],
       max_tokens: MAX_TOKENS,
-      temperature: 0.3,
+      temperature: 0,
     };
 
     const response = await this.fetchWithRetry(url, {
@@ -125,7 +125,7 @@ export class AIService {
       max_tokens: MAX_TOKENS,
       system,
       messages: [{ role: "user", content: user }],
-      temperature: 0.3,
+      temperature: 0,
     };
 
     const response = await this.fetchWithRetry(url, {
@@ -157,7 +157,7 @@ export class AIService {
       systemInstruction: { parts: [{ text: system }] },
       generationConfig: {
         maxOutputTokens: MAX_TOKENS,
-        temperature: 0.3,
+        temperature: 0,
       },
     };
 

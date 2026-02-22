@@ -9,7 +9,7 @@ export const AI_PROVIDERS: Record<AIProvider, AIProviderConfig> = {
     id: "groq",
     name: "Groq",
     baseUrl: "https://api.groq.com/openai/v1",
-    defaultModel: "llama-3.3-70b-versatile",
+    defaultModel: "groq/compound",
     keyUrl: "https://console.groq.com/keys",
   },
   openai: {
