@@ -80,21 +80,12 @@
   white-space: pre-line;
 }
 
-/* Loading Spinner */
-.ai-analysis-spinner {
-  display: inline-block;
-  width: 16px;
-  height: 16px;
-  border: 2px solid var(--text-secondary);
-  border-top-color: transparent;
-  border-radius: 50%;
-  animation: ai-spin 0.8s linear infinite;
-}
-
-@keyframes ai-spin {
-  to {
-    transform: rotate(360deg);
-  }
+/* Loading State */
+.ai-analysis-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px 0;
 }
 
 /* Result Content */

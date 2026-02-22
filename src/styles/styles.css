@@ -648,18 +648,6 @@ a.navbar-logo-dropdown-item {
   min-height: 40vh;
 }
 
-.wave-loading {
-  display: flex;
-  justify-content: center;
-  align-items: flex-end;
-}
-
-.wave {
-  width: 12px;
-  height: 12px;
-  margin: 0 6px;
-}
-
 /* Connect Wallet */
 .connect-wallet-content {
   margin: 40px auto 0;
@@ -827,12 +815,6 @@ a.navbar-logo-dropdown-item {
   display: flex;
   flex-direction: column;
   gap: 2px;
-}
-
-.loading-spinner {
-  width: 16px;
-  height: 16px;
-  flex-shrink: 0;
 }
 
 .error-message {
@@ -2557,40 +2539,6 @@ a.navbar-logo-dropdown-item {
   min-height: 40vh;
 }
 
-.wave-loading {
-  display: flex;
-  justify-content: center;
-  align-items: flex-end;
-}
-
-.wave {
-  width: 12px;
-  height: 12px;
-  margin: 0 6px;
-  background: var(--accent);
-  border-radius: 50%;
-  animation: wave 1s infinite ease-in-out;
-}
-
-.wave:nth-child(2) {
-  animation-delay: 0.2s;
-}
-
-.wave:nth-child(3) {
-  animation-delay: 0.4s;
-}
-
-@keyframes wave {
-
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-
-  50% {
-    transform: translateY(-18px);
-  }
-}
 
 /* Connect Wallet */
 .connect-wallet-content {
@@ -3421,15 +3369,6 @@ a.navbar-logo-dropdown-item {
   flex-shrink: 0;
 }
 
-.loading-spinner {
-  width: 16px;
-  height: 16px;
-  border: 2px solid var(--border-color);
-  border-top: 2px solid var(--accent);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  flex-shrink: 0;
-}
 
 @keyframes spin {
   0% {

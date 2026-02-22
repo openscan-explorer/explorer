@@ -3,6 +3,7 @@ import { useEffect, useId, useState } from "react";
 import { useTranslation } from "react-i18next";
 import Markdown from "react-markdown";
 import { Link } from "react-router-dom";
+import OpenScanCubeLoader from "../../LoadingLogo";
 import { useAIAnalysis } from "../../../hooks/useAIAnalysis";
 import type { AIAnalysisType } from "../../../types";
 
@@ -56,7 +57,7 @@ const AIAnalysisPanel: React.FC<AIAnalysisProps> = ({
           >
             {loading ? (
               <>
-                <span className="ai-analysis-spinner" />
+                <OpenScanCubeLoader size={18} />
                 {t("aiAnalysis.analyzing")}
               </>
             ) : (
@@ -90,6 +91,12 @@ const AIAnalysisPanel: React.FC<AIAnalysisProps> = ({
         aria-hidden={!isOpen}
         style={{ display: isOpen ? "flex" : "none" }}
       >
+        {loading && !result && (
+          <div className="ai-analysis-loading">
+            <OpenScanCubeLoader size={60} />
+          </div>
+        )}
+
         {error && <AIAnalysisError errorType={errorType} onRetry={analyze} />}
 
         {result && (
