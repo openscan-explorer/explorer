@@ -35,7 +35,7 @@
 }
 
 .tx-details-column .tx-row:last-child {
-	border-bottom: none;
+	border-bottom: 1px solid var(--color-primary-alpha-15);
 }
 
 @media (max-width: 768px) {
