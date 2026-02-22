@@ -16,10 +16,16 @@ import {
 } from "../config/networks";
 import { useWagmiConnection } from "../hooks/useWagmiConnection";
 import type { IAppContext, NetworkConfig, RpcUrlsContextType } from "../types";
+import { fetchAllRpcs } from "../services/MetadataService";
 import { loadJsonFilesFromStorage, saveJsonFilesToStorage } from "../utils/artifactsStorage";
 import { logger } from "../utils/logger";
 import { getChainIdFromNetwork } from "../utils/networkResolver";
-import { getEffectiveRpcUrls, saveRpcUrlsToStorage } from "../utils/rpcStorage";
+import {
+  getEffectiveRpcUrls,
+  isMetadataRpcCacheFresh,
+  saveMetadataRpcsToStorage,
+  saveRpcUrlsToStorage,
+} from "../utils/rpcStorage";
 
 // Alias exported for use across the app where a shorter/consistent name is preferred
 export type tRpcUrlsContextType = RpcUrlsContextType;
@@ -91,9 +97,6 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
       color: "#FFF100",
       currency: "ETH",
       isTestnet: true,
-      rpc: {
-        public: ["http://127.0.0.1:8545"],
-      },
     }),
     [],
   );
@@ -121,7 +124,17 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
       }
 
       setNetworks(loadedNetworks);
-      // Update RPC URLs with the newly loaded network defaults
+
+      // Fetch metadata RPCs if cache is stale or missing, then update RPC state
+      if (!isMetadataRpcCacheFresh()) {
+        try {
+          const rpcs = await fetchAllRpcs();
+          saveMetadataRpcsToStorage(rpcs);
+        } catch (err) {
+          logger.warn("Failed to fetch metadata RPCs:", err);
+        }
+      }
+
       setRpcUrlsState(getEffectiveRpcUrls());
     } catch (err) {
       setNetworksError(err instanceof Error ? err.message : "Failed to load networks");
@@ -139,7 +152,7 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
     setIsHydrated(true);
   }, []);
 
-  // Load networks on mount
+  // Load networks and metadata RPCs on mount
   // biome-ignore lint/correctness/useExhaustiveDependencies: only run once on mount
   useEffect(() => {
     loadNetworkData();

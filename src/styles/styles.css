@@ -4955,6 +4955,27 @@ code {
   flex: 1;
 }
 
+.settings-rpc-legend {
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+  justify-content: center !important;
+}
+
+.settings-rpc-tag.rpc-opensource {
+  background: linear-gradient(135deg, #16a34a 0%, #22c55e 100%);
+}
+
+.settings-rpc-tag.rpc-private {
+  background: linear-gradient(135deg, #4ade80 0%, #86efac 100%);
+  color: #1a1a1a;
+}
+
+.settings-rpc-tag.rpc-tracking {
+  background: linear-gradient(135deg, #eab308 0%, #facc15 100%);
+  color: #1a1a1a;
+}
+
 .settings-save-button {
   padding: 12px 24px;
   background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-muted) 100%);

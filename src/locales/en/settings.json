@@ -111,8 +111,9 @@
   "rpcEndpoints": {
     "title": "RPC Endpoints",
     "description": "Configure RPC URLs for each network. Click on a network to expand and configure its endpoints.",
-    "fetchButton": "Fetch from Chainlist",
-    "fetchingButton": "Fetching...",
+    "legendOpensource": "Open source & no tracking",
+    "legendPrivate": "Closed source & no tracking",
+    "legendTracking": "Tracking enabled",
     "currentRPCs": "Current RPCs:",
     "removeRpc": "Remove RPC",
     "localhostHelp": "Need to access your local network remotely?",

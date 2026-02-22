@@ -36,9 +36,6 @@ interface NetworkMetadata {
     features?: string[];
     priority?: number;
   };
-  rpc?: {
-    public: string[];
-  };
   links?: Array<{
     name: string;
     url: string;
@@ -64,7 +61,6 @@ function metadataToNetworkConfig(network: NetworkMetadata): NetworkConfig {
     logo: network.logo,
     profile: network.profile,
     explorer: network.explorer,
-    rpc: network.rpc,
     links: network.links,
   };
 }

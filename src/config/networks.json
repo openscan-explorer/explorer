@@ -17,15 +17,6 @@
       },
       "logo": "assets/networks/1.svg",
       "profile": "profiles/networks/1.md",
-      "rpc": {
-        "public": [
-          "https://ethereum.publicnode.com",
-          "https://eth.merkle.io",
-          "https://eth.blockrazor.xyz",
-          "https://eth.llamarpc.com",
-          "https://rpc.ankr.com/eth"
-        ]
-      },
       "links": [
         {
           "name": "Website",
@@ -55,13 +46,6 @@
       "color": "#0052FF",
       "isTestnet": false,
       "logo": "assets/networks/8453.svg",
-      "rpc": {
-        "public": [
-          "https://mainnet.base.org",
-          "https://base.publicnode.com",
-          "https://rpc.ankr.com/base"
-        ]
-      },
       "links": [
         {
           "name": "Website",
@@ -91,13 +75,6 @@
       "color": "#28A0F0",
       "isTestnet": false,
       "logo": "assets/networks/42161.svg",
-      "rpc": {
-        "public": [
-          "https://arb1.arbitrum.io/rpc",
-          "https://rpc.ankr.com/arbitrum",
-          "https://arbitrum.publicnode.com"
-        ]
-      },
       "links": [
         {
           "name": "Website",
@@ -132,13 +109,6 @@
       "color": "#FF0420",
       "isTestnet": false,
       "logo": "assets/networks/10.svg",
-      "rpc": {
-        "public": [
-          "https://mainnet.optimism.io",
-          "https://optimism.publicnode.com",
-          "https://rpc.ankr.com/optimism"
-        ]
-      },
       "links": [
         {
           "name": "Website",
@@ -168,13 +138,6 @@
       "color": "#F0B90B",
       "isTestnet": false,
       "logo": "assets/networks/56.svg",
-      "rpc": {
-        "public": [
-          "https://bsc-dataseed.binance.org",
-          "https://bsc.publicnode.com",
-          "https://rpc.ankr.com/bsc"
-        ]
-      },
       "links": [
         {
           "name": "Website",
@@ -204,13 +167,6 @@
       "color": "#8247E5",
       "isTestnet": false,
       "logo": "assets/networks/137.svg",
-      "rpc": {
-        "public": [
-          "https://polygon-rpc.com",
-          "https://polygon-bor.publicnode.com",
-          "https://rpc.ankr.com/polygon"
-        ]
-      },
       "links": [
         {
           "name": "Website",
@@ -240,13 +196,6 @@
       "color": "#CFB5F0",
       "isTestnet": true,
       "logo": "assets/networks/11155111.svg",
-      "rpc": {
-        "public": [
-          "https://rpc.sepolia.org",
-          "https://ethereum-sepolia.publicnode.com",
-          "https://rpc.ankr.com/eth_sepolia"
-        ]
-      },
       "links": [
         {
           "name": "Faucet",
@@ -271,13 +220,6 @@
       "color": "#F0B90B",
       "isTestnet": true,
       "logo": "assets/networks/97.svg",
-      "rpc": {
-        "public": [
-          "https://data-seed-prebsc-1-s1.binance.org:8545",
-          "https://bsc-testnet.publicnode.com",
-          "https://rpc.ankr.com/bsc_testnet_chapel"
-        ]
-      },
       "links": [
         {
           "name": "Faucet",
@@ -302,14 +244,6 @@
       "color": "#F7931A",
       "isTestnet": false,
       "logo": "assets/networks/bitcoin-mainnet.svg",
-      "rpc": {
-        "public": [
-          "https://bitcoin-rpc.publicnode.com",
-          "https://bitcoin.api.onfinality.io/public",
-          "https://public-btc.nownodes.io/",
-          "https://bitcoin-mainnet.gateway.tatum.io/"
-        ]
-      },
       "links": [
         {
           "name": "Website",
@@ -339,9 +273,6 @@
       "color": "#F7931A",
       "isTestnet": true,
       "logo": "assets/networks/bitcoin-mainnet.svg",
-      "rpc": {
-        "public": ["https://bitcoin-testnet-rpc.publicnode.com"]
-      },
       "links": [
         {
           "name": "Faucet",
