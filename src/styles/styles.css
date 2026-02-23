@@ -246,15 +246,18 @@ body {
 }
 
 .navbar-logo-dropdown-item:hover {
-  background: var(--color-primary-alpha-10);
+  background: var(--color-primary-alpha-15);
 }
 
 .navbar-logo-dropdown-item.active {
   background: var(--overlay-light-10);
 }
 
-a.navbar-logo-dropdown-item {
+a.navbar-logo-dropdown-item,
+a.navbar-logo-dropdown-item:hover {
   text-decoration: none;
+  color: var(--text-primary);
+  transform: none;
 }
 
 .navbar-logo-dropdown-item svg {
