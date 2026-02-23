@@ -51,7 +51,7 @@ export function buildRpcUrls(): RpcUrlMap | null {
     }
 
     if (urls.length > 0) {
-      rpcMap[String(chainId)] = urls;
+      rpcMap[`eip155:${chainId}`] = urls;
     }
   }
 

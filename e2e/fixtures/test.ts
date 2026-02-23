@@ -21,7 +21,7 @@ export const test = base.extend({
       // Inject RPC URLs into localStorage before the app initializes
       const rpcJson = JSON.stringify(customRpcUrls);
       await page.addInitScript((json) => {
-        localStorage.setItem("OPENSCAN_RPC_URLS_V1", json);
+        localStorage.setItem("OPENSCAN_RPC_URLS_V3", json);
       }, rpcJson);
     }
     await use(page);
