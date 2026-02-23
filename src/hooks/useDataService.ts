@@ -55,7 +55,13 @@ export function useDataService(networkIdOrConfig: string | number | NetworkConfi
     }
 
     return new DataService(network, limitedRpcUrls, settings.rpcStrategy);
-  }, [networkIdOrConfig, rpcUrls, networksLoading, settings.rpcStrategy, settings.maxParallelRequests]);
+  }, [
+    networkIdOrConfig,
+    rpcUrls,
+    networksLoading,
+    settings.rpcStrategy,
+    settings.maxParallelRequests,
+  ]);
 
   return dataService;
 }
