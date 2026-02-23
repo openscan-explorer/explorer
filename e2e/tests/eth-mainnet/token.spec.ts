@@ -1,6 +1,6 @@
 import { test, expect } from "../../fixtures/test";
 import { MAINNET } from "../../fixtures/mainnet";
-import { waitForTokenContent, DEFAULT_TIMEOUT } from "../../helpers/wait";
+import { waitForAddressContent, waitForTokenContent, DEFAULT_TIMEOUT } from "../../helpers/wait";
 
 test.describe("ERC721 Token Details", () => {
   test("displays BAYC #1 NFT details section", async ({ page }, testInfo) => {
@@ -32,11 +32,11 @@ test.describe("ERC721 Token Details", () => {
       await expect(page.locator(".token-standard-badge")).toBeVisible();
 
       // Verify Collection Size
-      await expect(page.locator("text=Collection Size:")).toBeVisible();
+      await expect(page.locator("text=Size")).toBeVisible();
       await expect(page.locator(`text=${token.collectionSize}`)).toBeVisible();
 
       // Verify Owner is displayed
-      await expect(page.locator("text=Owner:")).toBeVisible();
+      await expect(page.locator("text=Owner")).toBeVisible();
     }
   });
 
@@ -133,15 +133,9 @@ test.describe("ERC721 Token Details", () => {
     // Go to collection page
     await page.goto(`/#/${MAINNET.chainId}/address/${addr.address}`);
 
-    // Wait for page to load - could be ERC721 collection, generic address/contract, or error
-    await expect(
-      page
-        .locator(".nft-token-input")
-        .or(page.locator("text=Balance:"))
-        .or(page.locator("text=Error:"))
-        .or(page.locator("text=Something went wrong"))
-        .or(page.locator("text=Failed to fetch"))
-    ).toBeVisible({ timeout: DEFAULT_TIMEOUT * 5 });
+    // Wait for address page to load
+    const addressLoaded = await waitForAddressContent(page, testInfo);
+    if (!addressLoaded) return;
 
     // Only proceed if the token input is visible (detected as NFT collection)
     if (await page.locator(".nft-token-input").first().isVisible()) {
@@ -216,16 +210,9 @@ test.describe("ERC1155 Token Details", () => {
     // Go to collection page
     await page.goto(`/#/${MAINNET.chainId}/address/${addr.address}`);
 
-    // Wait for page to load - could be ERC1155 view, generic address/contract, or error
-    await expect(
-      page
-        .locator(".nft-token-input")
-        .or(page.locator("text=Balance:"))
-        .or(page.locator("text=Contract Details"))
-        .or(page.locator("text=Error:"))
-        .or(page.locator("text=Something went wrong"))
-        .or(page.locator("text=Failed to fetch"))
-    ).toBeVisible({ timeout: DEFAULT_TIMEOUT * 5 });
+    // Wait for address page to load
+    const addressLoaded = await waitForAddressContent(page, testInfo);
+    if (!addressLoaded) return;
 
     // Only proceed if the ERC1155 token input is visible (contract detected as ERC1155)
     if (await page.locator(".nft-token-input").isVisible()) {

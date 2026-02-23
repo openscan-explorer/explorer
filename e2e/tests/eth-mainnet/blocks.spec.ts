@@ -14,7 +14,7 @@ test.describe("Blocks Page", () => {
     await expect(blocksPage.blocksHeader).toBeVisible();
     await expect(blocksPage.blocksHeaderMain).toBeVisible();
     await expect(blocksPage.blockLabel).toBeVisible();
-    await expect(blocksPage.blockLabel).toHaveText("Ethereum Blocks");
+    await expect(blocksPage.blockLabel).toHaveText("Ethereum Mainnet Blocks");
 
     // Verify header info is present
     await expect(blocksPage.blocksHeaderInfo).toBeVisible();

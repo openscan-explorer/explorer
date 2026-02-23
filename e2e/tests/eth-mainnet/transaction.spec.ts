@@ -71,8 +71,7 @@ test.describe("Transaction Page", () => {
 
     const loaded = await waitForTxContent(page, testInfo);
     if (loaded) {
-      // Verify other attributes section
-      await expect(page.locator("text=Other Attributes:")).toBeVisible();
+      // Verify transaction detail fields
       await expect(page.locator("text=Nonce:")).toBeVisible();
       await expect(page.locator("text=Position:")).toBeVisible();
     }

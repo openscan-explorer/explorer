@@ -13,12 +13,12 @@ test.describe("Transactions Page", () => {
       await expect(txsPage.blocksHeader).toBeVisible();
       await expect(txsPage.blocksHeaderMain).toBeVisible();
       await expect(txsPage.blockLabel).toBeVisible();
-      await expect(txsPage.blockLabel).toHaveText("Latest Transactions");
+      await expect(txsPage.blockLabel).toHaveText("Ethereum Mainnet Transactions");
 
       // Verify header info is present
       await expect(txsPage.blocksHeaderInfo).toBeVisible();
       const infoText = await txsPage.getInfoText();
-      expect(infoText).toMatch(/Showing \d+ transactions from the last \d+ blocks/);
+      expect(infoText).toMatch(/Showing \d+ transactions in latest block #[\d,]+/);
 
       // Verify table is present with transactions
       await expect(txsPage.tableWrapper).toBeVisible();
@@ -106,7 +106,7 @@ test.describe("Transactions Page", () => {
 
       // Click Older and wait for URL to change (navigation happened)
       await txsPage.olderBtn.first().click();
-      await page.waitForURL(/fromBlock=/, { timeout: DEFAULT_TIMEOUT });
+      await page.waitForURL(/block=/, { timeout: DEFAULT_TIMEOUT });
 
       // Wait for older page data to load (RPC-dependent)
       const olderLoaded = await waitForTxsContent(page, testInfo);
@@ -125,7 +125,7 @@ test.describe("Transactions Page", () => {
     if (loaded) {
       // Navigate to older transactions and wait for URL change
       await txsPage.olderBtn.first().click();
-      await page.waitForURL(/fromBlock=/, { timeout: DEFAULT_TIMEOUT });
+      await page.waitForURL(/block=/, { timeout: DEFAULT_TIMEOUT });
 
       // Wait for older page data to load (RPC-dependent)
       const olderLoaded = await waitForTxsContent(page, testInfo);
@@ -180,8 +180,8 @@ test.describe("Transactions Page", () => {
     if (loaded) {
       // Verify header shows block range instead of "last N blocks"
       const infoText = await txsPage.getInfoText();
-      expect(infoText).toMatch(/Showing \d+ transactions from blocks/);
-      expect(infoText).not.toMatch(/last \d+ blocks/);
+      expect(infoText).toMatch(/Showing \d+ transactions in block #[\d,]+/);
+      expect(infoText).not.toMatch(/latest block/);
     }
   });
 

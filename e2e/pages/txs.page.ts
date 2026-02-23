@@ -45,7 +45,7 @@ export class TxsPage {
   }
 
   async gotoWithFromBlock(fromBlock: number, chainId = "1") {
-    await this.page.goto(`/#/${chainId}/txs?fromBlock=${fromBlock}`);
+    await this.page.goto(`/#/${chainId}/txs?block=${fromBlock}`);
   }
 
   async waitForLoad() {
