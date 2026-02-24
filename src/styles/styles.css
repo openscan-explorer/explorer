@@ -4734,6 +4734,34 @@ code {
   gap: 8px;
 }
 
+.settings-section-title-row {
+  position: relative;
+}
+
+.settings-section-title-row .settings-section-link {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+}
+
+.settings-section-link {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #fff;
+  text-decoration: none;
+  white-space: nowrap;
+  background: var(--color-primary);
+  border: 1px solid var(--color-primary);
+  border-radius: 20px;
+  padding: 0.3rem 0.9rem;
+  transition: opacity 0.15s;
+}
+
+.settings-section-link:hover {
+  opacity: 0.85;
+}
+
 .settings-section-description {
   font-size: 0.85rem;
   color: var(--text-secondary);
@@ -4858,6 +4886,36 @@ code {
 
 .settings-metamask-button svg {
   flex-shrink: 0;
+}
+
+/* Sync RPCs Button */
+.settings-sync-button {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--color-primary-muted);
+  background: var(--overlay-light-2);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.settings-sync-button:hover:not(:disabled) {
+  background: var(--color-primary-alpha-20);
+  border-color: var(--color-primary);
+  color: var(--text-primary);
+}
+
+.settings-sync-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.settings-sync-button.loading {
+  opacity: 0.7;
+  cursor: wait;
 }
 
 .settings-rpc-input {

@@ -6,6 +6,14 @@ const STORAGE_KEY = "OPENSCAN_RPC_URLS_V3"; // Version bump for networkId-based 
 const METADATA_RPC_STORAGE_KEY = "OPENSCAN_METADATA_RPCS";
 const METADATA_RPC_TTL = 24 * 60 * 60 * 1000; // 24 hours
 
+/**
+ * Hardcoded fallback defaults for networks that are never in the metadata service.
+ * Localhost (eip155:31337) always points to the default Hardhat/Anvil port.
+ */
+const BUILTIN_RPC_DEFAULTS: RpcUrlsContextType = {
+  "eip155:31337": ["http://localhost:8545"],
+};
+
 interface MetadataRpcCache {
   timestamp: number;
   rpcs: Record<string, MetadataRpcEndpoint[]>;
@@ -128,7 +136,8 @@ export function saveRpcUrlsToStorage(map: RpcUrlsContextType): void {
  * Keys are networkId strings (CAIP-2 format)
  */
 export function getEffectiveRpcUrls(): RpcUrlsContextType {
-  const defaults = getDefaultRpcEndpoints();
+  // Merge builtin defaults first, then metadata defaults, so stored user values win
+  const defaults = { ...BUILTIN_RPC_DEFAULTS, ...getDefaultRpcEndpoints() };
   const stored = loadRpcUrlsFromStorage();
   if (!stored) return defaults;
 

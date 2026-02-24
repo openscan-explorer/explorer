@@ -1,0 +1,287 @@
+{
+  "nav": {
+    "searchPlaceholderDesktop": "搜索地址 / 交易哈希 / 区块 / ENS",
+    "searchPlaceholderMobile": "搜索地址、交易、区块、ENS...",
+    "searchAriaLabel": "搜索",
+    "searchTitle": "搜索",
+    "switchToLightMode": "切换到浅色模式",
+    "switchToDarkMode": "切换到深色模式",
+    "lightModeTitle": "浅色模式",
+    "darkModeTitle": "深色模式",
+    "settingsAriaLabel": "设置",
+    "settingsTitle": "设置",
+    "openMenuAriaLabel": "打开菜单",
+    "closeMenuAriaLabel": "关闭菜单",
+    "blocksMobile": "区块",
+    "transactionsMobile": "交易",
+    "home": "首页",
+    "lightMode": "浅色模式",
+    "darkMode": "深色模式",
+    "githubTitle": "在 GitHub 上查看",
+    "xTwitterTitle": "在 X 上关注",
+    "xTwitterLabel": "X (Twitter)",
+    "githubLabel": "GitHub",
+    "close": "关闭",
+    "dismissError": "关闭错误",
+    "disableSuperUser": "禁用超级用户模式",
+    "enableSuperUser": "启用超级用户模式",
+    "mempool": "内存池",
+    "txs": "交易"
+  },
+  "footer": {
+    "about": "关于",
+    "subscribe": "订阅",
+    "contact": "联系",
+    "supporters": "支持者",
+    "reportBug": "报告错误",
+    "reportBugTitle": "报告错误",
+    "viewCommitTitle": "在 GitHub 上查看提交 {{hash}}",
+    "versionLabel": "v{{version}} {{hash}}",
+    "githubTitle": "在 GitHub 上查看",
+    "xTitle": "在 X 上关注"
+  },
+  "errors": {
+    "somethingWentWrong": "出了些问题",
+    "errorMessage": "抱歉，发生了意外错误。应用程序遇到了一个错误。",
+    "reloadPage": "重新加载页面",
+    "goHome": "返回首页",
+    "errorDetailsSummary": "错误详情（开发模式）",
+    "errorLabel": "错误：",
+    "componentStackLabel": "组件堆栈："
+  },
+  "notifications": {
+    "closeAriaLabel": "关闭通知"
+  },
+  "about": {
+    "heading": "OPENSCAN",
+    "subtitle": "无需信任的区块链探索",
+    "missionStatement": "OpenScan 是一个开源、轻量级的区块链浏览器，旨在提供透明度和真正的开放性。我们直接连接到区块链节点，让您无需中间商或中心化服务即可访问链上数据。",
+    "principles": "原则",
+    "freeOpenSource": "免费且开源",
+    "freeOpenSourceDescription": "100% 开源，可公开审计，对所有用户免费。无供应商锁定。",
+    "privacyFirst": "隐私优先",
+    "privacyFirstDescription": "无广告，无跟踪器，不收集用户数据。您的数据属于您。",
+    "trustlessByDesign": "无需信任的设计",
+    "trustlessByDesignDescription": "直接 RPC 连接到区块链节点。独立验证数据，无需中间商。",
+    "publicInfrastructure": "公共基础设施",
+    "publicInfrastructureDescription": "作为去中心化生态系统的公共产品构建，由道德资金支持。",
+    "features": "功能",
+    "multiChainExplorer": "多链浏览器",
+    "multiChainExplorerDescription": "探索多个 EVM 网络上的区块、交易和地址。",
+    "contractInteraction": "合约交互",
+    "contractInteractionDescription": "直接从浏览器读取和写入已验证的智能合约。",
+    "localDevelopment": "本地开发",
+    "localDevelopmentDescription": "完全支持具有追踪功能的 Hardhat 和 Anvil 本地网络。",
+    "rpcTransparency": "RPC 透明度",
+    "rpcTransparencyDescription": "比较多个 RPC 提供商的响应。检测不一致性。",
+    "supportedNetworks": "支持的网络",
+    "openSource": "开源",
+    "openSourceDescription": "整个代码库公开可用，欢迎社区贡献。",
+    "viewOnGithub": "在 GitHub 上查看",
+    "version": "版本",
+    "commit": "提交",
+    "totalCommits": "总提交数",
+    "contributors": "贡献者",
+    "licensedUnderMIT": "基于 MIT 许可"
+  },
+  "contact": {
+    "title": "联系我们",
+    "subtitle": "与 OpenScan 团队取得联系",
+    "xmtpTitle": "通过 XMTP 发送消息",
+    "xmtpDescription": "我们使用 XMTP 进行去中心化的钱包到钱包消息传递。使用您的以太坊钱包直接发送消息——无需电子邮件，完全加密，抗审查。",
+    "sendMessage": "发送消息",
+    "whatIsXmtp": "什么是 XMTP？",
+    "walletMessaging": "基于钱包的消息传递",
+    "walletMessagingDescription": "XMTP 支持以太坊钱包之间的消息传递。无需创建账户——只需连接您的钱包。",
+    "endToEnd": "端对端加密",
+    "endToEndDescription": "所有消息均已加密。只有您和收件人可以阅读对话。",
+    "decentralized": "去中心化",
+    "decentralizedDescription": "没有中央服务器控制您的消息。协议是开放且无许可的。",
+    "interoperable": "可互操作",
+    "interoperableDescription": "适用于任何支持 XMTP 的应用——Converse、Coinbase Wallet 等。",
+    "alsoReachUs": "您也可以在以下平台联系我们",
+    "orOpenIssue": "或在以下平台提交问题",
+    "xTwitter": "X (Twitter)",
+    "github": "GitHub"
+  },
+  "subscriptions": {
+    "title": "支持 OpenScan",
+    "subtitle": "开源区块链基础设施的可持续、道德融资",
+    "valueProposition": "OpenScan 对所有终端用户完全免费。收入来源于认可平台价值并希望正式成为开放生态系统经过验证的支持者的项目、应用程序、代币和网络。",
+    "freeForAllUsers": "对所有终端用户完全免费",
+    "pricingOverview": "定价概览",
+    "earlyAdopterDiscount": "早期采用者折扣",
+    "limitedTimeDiscounts": "所有订阅的限时折扣",
+    "activeNow": "现在有效",
+    "discountAvailable": "可用 {{percent}}% 折扣",
+    "percentOff": "{{percent}}% 优惠",
+    "subscriptionType": "订阅类型",
+    "perMonth": "/ 月",
+    "perYear": "/ 年",
+    "save20": "节省 20%",
+    "includesAllBenefits": "包含所有 {{tier}} 权益",
+    "tierLabel": "第 {{number}} 级 - {{name}}",
+    "sharedRoadmapPlanning": "共享路线图规划",
+    "roadmapDescription": "Ally 级订阅者在我们每半年一次的路线图规划会议中获得投票权，OpenScan 团队和 Allies 共同塑造平台的未来。",
+    "featurePrioritization": "功能优先级排序",
+    "featurePrioritizationDescription": "根据社区需求投票决定哪些功能和改进将被优先开发。",
+    "networkExpansion": "网络扩展",
+    "networkExpansionDescription": "帮助决定 OpenScan 应该支持和集成哪些区块链网络。",
+    "strategicDirection": "战略方向",
+    "strategicDirectionDescription": "参与讨论 OpenScan 的长期愿景和技术方向。",
+    "howToSubscribe": "如何订阅",
+    "step1Title": "提交 Pull Request",
+    "step1Description": "向 explorer-metadata 仓库创建一个包含您的项目信息和订阅详情的 PR。",
+    "step2Title": "PR 审查与批准",
+    "step2Description": "OpenScan 团队将审查您的 PR，以验证资格并确保提供了所有必要信息。",
+    "step3Title": "付款并证明所有权",
+    "step3Description": "一旦您的 PR 获得批准，在以太坊主网上发送订阅付款。然后使用 OpenScan Devtools 签署付款交易哈希，并在您的 PR 上分享以证明所有权。",
+    "step4Title": "订阅已激活",
+    "step4Description": "付款和签名验证后，您的 PR 将被合并，订阅权益将立即激活。",
+    "paymentAddress": "付款地址",
+    "paymentAddressDescription": "所有订阅付款直接发送到 OpenScan DAO 地址：",
+    "submitSubscriptionPR": "提交订阅 PR",
+    "viewDaoAddress": "查看 DAO 地址",
+    "footerNote": "所有收入仅用于平台的持续开发、增长和基础设施改善。",
+    "categories": {
+      "tokens": {
+        "name": "代币",
+        "description": "已验证合约标签、元数据集成、Logo 显示、官方链接和代币余额获取器集成。"
+      },
+      "networks": {
+        "name": "网络",
+        "description": "完整 RPC 方法支持、专用技术维护、子域可用性和突出品牌展示。"
+      },
+      "apps": {
+        "name": "加密应用",
+        "description": "钱包、dApp、辅助浏览器工具和交易所的专属列表和已验证品牌，促进集成和知名度。"
+      },
+      "companies": {
+        "name": "公司和组织",
+        "description": "为基础设施提供商、风险基金和其他支持项目持续发展的实体提供正式认可和知名度。"
+      }
+    },
+    "tierNames": {
+      "backer": "支持者",
+      "partner": "合作伙伴",
+      "ally": "盟友"
+    },
+    "tierBenefits": {
+      "tokens": {
+        "backer": [
+          "包含代币信息的代币页面：ERC20 详情、项目名称、自定义 URL",
+          "已验证合约和重要合约标签"
+        ],
+        "partner": ["主浏览器显示代币余额", "简单个人资料页面", "多网络列表"],
+        "ally": [
+          "带有 Markdown 描述的完整个人资料页面",
+          "OpenScan 子域",
+          "与技术团队的直接沟通渠道"
+        ]
+      },
+      "networks": {
+        "backer": ["网络页面上的 Markdown 个人资料", "首页优先排名"],
+        "partner": ["专属子域网络浏览器", "与技术团队的直接沟通渠道"],
+        "ally": ["路线图投票权", "专属网络浏览器中的网络特定功能"]
+      },
+      "apps": {
+        "backer": ["简单个人资料页面", "重要合约已验证并标记", "合约事件列表"],
+        "partner": ["OpenScan 子域", "带有 Markdown 描述的完整个人资料页面"],
+        "ally": ["路线图投票权", "与技术团队的直接沟通渠道"]
+      },
+      "companies": {
+        "backer": ["简单个人资料页面", "重要合约已验证并标记", "合约事件列表"],
+        "partner": ["带有 Markdown 描述的完整个人资料页面", "OpenScan 子域"],
+        "ally": ["与技术团队的直接沟通渠道", "路线图投票权"]
+      }
+    }
+  },
+  "supporters": {
+    "title": "支持者",
+    "subtitle": "感谢我们的支持者",
+    "loading": "加载支持者...",
+    "error": "错误：{{error}}",
+    "noSupporters": "暂无支持者。成为第一个！",
+    "becomeSupporterTitle": "成为支持者",
+    "becomeSupporterDescription": "通过订阅网络来支持 OpenScan 的开发。",
+    "viewPlans": "查看订阅计划",
+    "allies": "盟友",
+    "partners": "合作伙伴",
+    "backers": "支持者"
+  },
+  "profile": {
+    "notFound": "未找到个人资料",
+    "loading": "加载个人资料...",
+    "invalidUrl": "无效的个人资料 URL。请提供个人资料类型和 ID。",
+    "invalidType": "无效的个人资料类型：{{type}}。必须是以下之一：network、app、organization。",
+    "notFoundMessage": "未找到个人资料：{{type}}/{{id}}",
+    "fetchError": "获取个人资料失败",
+    "unknownType": "未知的个人资料类型"
+  },
+  "extraData": {
+    "showDecoded": "显示解码",
+    "showRawHex": "显示原始十六进制"
+  },
+  "searchBox": {
+    "placeholder": "搜索地址 / 交易哈希 / 区块 / ENS 名称",
+    "ariaLabel": "搜索",
+    "title": "搜索"
+  },
+  "wallet": {
+    "connectWallet": "连接钱包",
+    "wrongNetwork": "错误的网络",
+    "chainIcon": "链图标"
+  },
+  "rpcIndicator": {
+    "clickToSeeDetails": "点击查看 RPC 提供商详情",
+    "inconsistentResponses": "响应不一致",
+    "rpcProviders": "RPC 提供商",
+    "strategy": "策略：{{strategy}}",
+    "succeededOnAttempt": "在第 {{count}} 次尝试时成功",
+    "fastestResponseWins": "最快响应获胜 • 显示所有时间",
+    "responsesDiffer": "提供商之间的响应不同",
+    "selected": "已选择",
+    "winner": "获胜者",
+    "fallbackNote": "回退模式：按顺序尝试提供商",
+    "raceNote": "竞速模式：返回第一个成功响应。待处理的将被丢弃"
+  },
+  "buildWarning": {
+    "notProductionBuild": "这不是经过生产验证的构建"
+  },
+  "aiAnalysis": {
+    "title": "AI 分析",
+    "analyzeButton": "使用 AI 分析",
+    "analyzing": "分析中...",
+    "expand": "展开分析",
+    "collapse": "折叠分析",
+    "refreshButton": "刷新",
+    "disclaimer": "AI 生成的分析。可能包含错误。",
+    "generatedBy": "由 {{model}} 生成 ",
+    "cachedResult": "已缓存",
+    "errors": {
+      "rateLimited": "请求过于频繁。请稍后再试。",
+      "invalidKey": "无效的 API 密钥。请在设置中检查您的密钥。",
+      "no_api_key": "未配置 API 密钥。请在设置中添加 AI 提供商密钥。",
+      "networkError": "网络错误。请检查您的连接并重试。",
+      "serviceUnavailable": "AI 服务暂时不可用。请稍后再试。",
+      "parseError": "解析 AI 响应失败。请重试。",
+      "generic": "分析失败。请重试。",
+      "tryAgain": "重试",
+      "goToSettings": "前往设置"
+    }
+  },
+  "search": {
+    "title": "搜索",
+    "resultsTitle": "搜索结果",
+    "noQuery": "未提供搜索查询",
+    "invalidQuery": "无效的搜索查询。请输入地址 (0x...)、交易哈希、区块号或 ENS 名称。",
+    "invalidBadge": "无效",
+    "ensInfo": "ENS 名称在以太坊主网上解析为地址。",
+    "in": "在",
+    "badgeAddress": "地址",
+    "badgeTxHash": "交易哈希",
+    "badgeBlock": "区块",
+    "badgeEns": "ENS",
+    "badgeUnknown": "未知"
+  }
+}

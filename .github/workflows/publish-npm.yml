@@ -38,3 +38,4 @@ jobs:
         with:
           registry: "https://registry.npmjs.org/"
           package: ./dist
+          tag: "alpha"

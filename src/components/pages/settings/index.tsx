@@ -1,5 +1,6 @@
 import type React from "react";
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { MetaMaskIcon } from "../../common/MetaMaskIcon";
 import { getEnabledNetworks } from "../../../config/networks";
@@ -9,13 +10,20 @@ import { useMetaMaskExplorer } from "../../../hooks/useMetaMaskExplorer";
 import { SUPPORTED_LANGUAGES } from "../../../i18n";
 import { clearSupportersCache } from "../../../services/MetadataService";
 import type { MetadataRpcEndpoint } from "../../../services/MetadataService";
-import type { AIProvider, PromptVersion, RPCUrls, RpcUrlsContextType } from "../../../types";
+import type {
+  AIProvider,
+  NetworkType,
+  PromptVersion,
+  RPCUrls,
+  RpcUrlsContextType,
+} from "../../../types";
 import { AI_PROVIDERS, AI_PROVIDER_ORDER } from "../../../config/aiProviders";
 import { clearAICache } from "../../common/AIAnalysis/aiCache";
 import { logger } from "../../../utils/logger";
 import { getChainIdFromNetwork } from "../../../utils/networkResolver";
 import { clearPersistentCache, getPersistentCacheSize } from "../../../utils/persistentCache";
 import { clearMetadataRpcCache, getMetadataEndpointMap } from "../../../utils/rpcStorage";
+import { type RpcTestResult, testRpcEndpoint } from "../rpcs/useRpcLatencyTest";
 
 // Infura network slugs by chain ID
 const INFURA_NETWORKS: Record<number, string> = {
@@ -49,6 +57,34 @@ const getAlchemyUrl = (chainId: number, apiKey: string): string | null => {
 
 const isInfuraUrl = (url: string): boolean => url.includes("infura.io");
 const isAlchemyUrl = (url: string): boolean => url.includes("alchemy.com");
+
+function getPrivacyTier(url: string, metadata: Map<string, MetadataRpcEndpoint>): number {
+  const ep = metadata.get(url);
+  if (!ep) return 1;
+  if (ep.tracking !== "none") return 2;
+  if (ep.isOpenSource) return 0;
+  return 1;
+}
+
+function sortRpcsByQuality(
+  urls: string[],
+  results: Map<string, RpcTestResult>,
+  metadata: Map<string, MetadataRpcEndpoint>,
+): string[] {
+  return [...urls].sort((a, b) => {
+    const rA = results.get(a);
+    const rB = results.get(b);
+    const aOnline = rA?.status === "online" && rA.latency != null;
+    const bOnline = rB?.status === "online" && rB.latency != null;
+    if (!aOnline && !bOnline) return 0;
+    if (!aOnline) return 1;
+    if (!bOnline) return -1;
+    const tierA = getPrivacyTier(a, metadata);
+    const tierB = getPrivacyTier(b, metadata);
+    if (tierA !== tierB) return tierA - tierB;
+    return (rA.latency as number) - (rB.latency as number);
+  });
+}
 
 const Settings: React.FC = () => {
   const { t, i18n } = useTranslation("settings");
@@ -89,15 +125,16 @@ const Settings: React.FC = () => {
     Record<string, "idle" | "loading" | "success" | "error">
   >({});
   const [persistentCacheBytes, setPersistentCacheBytes] = useState(() => getPersistentCacheSize());
+  const [syncingChain, setSyncingChain] = useState<string | null>(null);
 
   // Sync localRpc when context rpcUrls changes (e.g., after save)
   useEffect(() => {
     setLocalRpc({ ...rpcUrls });
   }, [rpcUrls]);
 
-  const updateField = (networkId: string, value: string) => {
+  const updateField = useCallback((networkId: string, value: string) => {
     setLocalRpc((prev) => ({ ...prev, [networkId]: value }));
-  };
+  }, []);
 
   // Toggle chain section expand/collapse
   const toggleChainExpanded = (networkId: string) => {
@@ -186,17 +223,20 @@ const Settings: React.FC = () => {
   }, [t]);
 
   // Helper to get URLs as array from localRpc
-  const getLocalRpcArray = (networkId: string): string[] => {
-    const value = localRpc[networkId];
-    if (Array.isArray(value)) return [...value];
-    if (typeof value === "string") {
-      return value
-        .split(",")
-        .map((s) => s.trim())
-        .filter(Boolean);
-    }
-    return [];
-  };
+  const getLocalRpcArray = useCallback(
+    (networkId: string): string[] => {
+      const value = localRpc[networkId];
+      if (Array.isArray(value)) return [...value];
+      if (typeof value === "string") {
+        return value
+          .split(",")
+          .map((s) => s.trim())
+          .filter(Boolean);
+      }
+      return [];
+    },
+    [localRpc],
+  );
 
   // Helper to get URLs as string for input display
   const getLocalRpcString = (networkId: string): string => {
@@ -359,6 +399,31 @@ const Settings: React.FC = () => {
     [draggedItem],
   );
 
+  const handleSyncRpcs = useCallback(
+    async (chainId: string, networkType: NetworkType) => {
+      const urls = getLocalRpcArray(chainId);
+      if (urls.length < 2) return;
+      setSyncingChain(chainId);
+
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 10_000);
+      const allResults = await Promise.all(
+        urls.map((url) => testRpcEndpoint(url, controller.signal, networkType)),
+      );
+      clearTimeout(timeout);
+
+      const resultsMap = new Map<string, RpcTestResult>();
+      for (const r of allResults) {
+        resultsMap.set(r.url, r);
+      }
+      const sorted = sortRpcsByQuality(urls, resultsMap, metadataUrlMap);
+      updateField(chainId, sorted.join(","));
+      setRpcUrls({ ...rpcUrls, [chainId]: sorted });
+      setSyncingChain(null);
+    },
+    [getLocalRpcArray, metadataUrlMap, updateField, setRpcUrls, rpcUrls],
+  );
+
   const save = () => {
     // Convert comma-separated strings into arrays for each networkId
     const parsed: RpcUrlsContextType = Object.keys(localRpc).reduce((acc, networkId) => {
@@ -450,6 +515,7 @@ const Settings: React.FC = () => {
         id: network.networkId, // Primary key for RPC storage (CAIP-2 format)
         chainId: chainId, // Keep chainId separate for EVM-specific features (Infura, Alchemy, MetaMask)
         name: network.name,
+        type: network.type,
       };
     });
   }, []);
@@ -919,7 +985,12 @@ const Settings: React.FC = () => {
 
           {/* RPC Configuration Section */}
           <div className="settings-section">
-            <h2 className="settings-section-title">🔗 {t("rpcEndpoints.title")}</h2>
+            <div className="settings-section-title-row">
+              <h2 className="settings-section-title">🔗 {t("rpcEndpoints.title")}</h2>
+              <Link to="/rpcs" className="settings-section-link">
+                {t("rpcEndpoints.testEndpoints")} →
+              </Link>
+            </div>
             <p className="settings-section-description">{t("rpcEndpoints.description")}</p>
 
             <div className="flex-start settings-rpc-legend">
@@ -985,6 +1056,20 @@ const Settings: React.FC = () => {
                           </span>
                         </button>
                       )}
+                      <button
+                        type="button"
+                        className={`settings-sync-button ${syncingChain === chain.id ? "loading" : ""}`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleSyncRpcs(chain.id, chain.type);
+                        }}
+                        disabled={syncingChain !== null || rpcCount < 2}
+                        title={t("rpcEndpoints.syncRpcs")}
+                      >
+                        {syncingChain === chain.id
+                          ? t("rpcEndpoints.syncing")
+                          : t("rpcEndpoints.syncRpcs")}
+                      </button>
                       <span className="settings-chain-rpc-count">
                         {rpcCount} RPC{rpcCount !== 1 ? "s" : ""}
                       </span>

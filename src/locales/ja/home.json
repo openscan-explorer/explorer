@@ -1,0 +1,10 @@
+{
+  "title": "OPENSCAN",
+  "loading": "ネットワークを読み込み中...",
+  "showTestnets": "テストネットを表示",
+  "hideTestnets": "テストネットを非表示",
+  "invalidSearchTerm": "無効な検索です。アドレス(0x...)、トランザクションハッシュ、ブロック番号、またはENS名を入力してください。",
+  "searchBy": "アドレス / Txハッシュ / ブロック / ENS名で検索",
+  "search": "検索",
+  "chainID": "チェーンID"
+}

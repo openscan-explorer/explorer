@@ -18,6 +18,7 @@ import "./styles/forms.css";
 import "./styles/rainbowkit.css";
 import "./styles/responsive.css";
 import "./styles/ai-analysis.css";
+import "./styles/rpcs.css";
 
 import Loading from "./components/common/Loading";
 import {
@@ -39,6 +40,7 @@ import {
   LazyHome,
   LazyMempool,
   LazyProfile,
+  LazyRpcs,
   LazySearch,
   LazySettings,
   LazySubscriptions,
@@ -127,6 +129,7 @@ function AppContent() {
               <Route path="about" element={<LazyAbout />} />
               <Route path="contact" element={<LazyContact />} />
               <Route path="devtools" element={<LazyDevTools />} />
+              <Route path="rpcs" element={<LazyRpcs />} />
               <Route path="subscriptions" element={<LazySubscriptions />} />
               <Route path="profile/:profileType/:profileId" element={<LazyProfile />} />
               <Route path="supporters" element={<LazySupporters />} />

@@ -1,0 +1,10 @@
+{
+  "title": "OPENSCAN",
+  "loading": "加载网络...",
+  "showTestnets": "显示测试网",
+  "hideTestnets": "隐藏测试网",
+  "invalidSearchTerm": "无效的搜索。请输入地址 (0x...)、交易哈希、区块号或 ENS 名称。",
+  "searchBy": "搜索地址 / 交易哈希 / 区块 / ENS 名称",
+  "search": "搜索",
+  "chainID": "链 ID"
+}

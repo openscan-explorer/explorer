@@ -132,10 +132,13 @@
     "legendOpensource": "Open source & no tracking",
     "legendPrivate": "Closed source & no tracking",
     "legendTracking": "Tracking enabled",
+    "testEndpoints": "Test RPCs",
     "currentRPCs": "Current RPCs:",
     "removeRpc": "Remove RPC",
     "localhostHelp": "Need to access your local network remotely?",
     "localhostHelpLink": "Learn how to set up a tunnel with ngrok",
+    "syncRpcs": "Sync RPCs",
+    "syncing": "Syncing...",
     "metamask": {
       "notSupported": "Not supported for this chain",
       "configured": "OpenScan configured!",

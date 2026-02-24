@@ -1,0 +1,132 @@
+{
+  "pageTitle": "設定",
+  "appearance": {
+    "title": "外観",
+    "description": "アプリケーションの見た目をカスタマイズします。",
+    "backgroundBlocks": {
+      "label": "楽しい背景ブロック",
+      "description": "背景にアニメーションのアイソメトリックブロックを表示"
+    }
+  },
+  "language": {
+    "title": "言語",
+    "description": "アプリケーションの言語を選択します。",
+    "label": "表示言語",
+    "selectDescription": "ユーザーインターフェースの言語を選択してください。"
+  },
+  "cacheData": {
+    "title": "キャッシュとデータ",
+    "description": "キャッシュデータとアプリケーションストレージを管理します。",
+    "clearCache": {
+      "label": "キャッシュをクリア",
+      "description": "設定を失わずにキャッシュされたメタデータをクリアします。",
+      "button": "キャッシュをクリア"
+    },
+    "clearSiteData": {
+      "label": "サイトデータをクリア",
+      "description": "設定、RPC設定、APIキーを含むすべてのデータをクリアします。",
+      "button": "サイトデータをクリア",
+      "confirmMessage": "これにより、すべての設定、RPC設定、APIキー、キャッシュデータがクリアされます。ページが再読み込みされます。続行しますか？"
+    }
+  },
+  "rpcStrategy": {
+    "title": "RPCストラテジー",
+    "description": "複数のRPCエンドポイントへのリクエストの送信方法を選択します。",
+    "requestStrategy": {
+      "label": "リクエストストラテジー",
+      "fallbackDesc": "成功するまでエンドポイントを一つずつ試みます。",
+      "parallelDesc": "すべてのエンドポイントを同時にクエリします。",
+      "raceDesc": "すべてのエンドポイントをクエリし、最速のレスポンスを返します。",
+      "fallback": "フォールバック（デフォルト）",
+      "parallel": "並列",
+      "race": "レース（最速）"
+    },
+    "maxParallelRequests": {
+      "label": "最大並列リクエスト数",
+      "description": "同時にクエリされるRPCエンドポイントの数を制限します。低い値は帯域幅使用量を削減します。RPCリストの最初のNエンドポイントを使用します（ドラッグで並べ替え可能）。",
+      "option1": "1エンドポイント",
+      "option2": "2エンドポイント",
+      "option3": "3エンドポイント（デフォルト）",
+      "option5": "5エンドポイント",
+      "option10": "10エンドポイント",
+      "optionUnlimited": "無制限"
+    }
+  },
+  "apiKeys": {
+    "title": "APIキー",
+    "description": "RPCプロバイダーのAPIキーを入力してください。",
+    "infura": {
+      "name": "Infura",
+      "getKey": "キーを取得",
+      "placeholder": "InfuraのAPIキーを入力"
+    },
+    "alchemy": {
+      "name": "Alchemy",
+      "getKey": "キーを取得",
+      "placeholder": "AlchemyのAPIキーを入力"
+    },
+    "toggleHide": "APIキーを非表示",
+    "toggleShow": "APIキーを表示",
+    "aiTitle": "AI分析キー",
+    "aiDescription": "AIを活用したブロックチェーン分析のAPIキーを入力してください。AIアナライザーを使用するには少なくとも1つのキーが必要です。",
+    "aiProvidersShow": "他のプロバイダーを表示",
+    "aiProvidersHide": "他のプロバイダーを非表示",
+    "groq": {
+      "name": "Groq",
+      "getKey": "無料キーを取得",
+      "placeholder": "GroqのAPIキーを入力"
+    },
+    "openai": {
+      "name": "OpenAI",
+      "getKey": "キーを取得",
+      "placeholder": "OpenAIのAPIキーを入力"
+    },
+    "anthropic": {
+      "name": "Anthropic",
+      "getKey": "キーを取得",
+      "placeholder": "AnthropicのAPIキーを入力"
+    },
+    "perplexity": {
+      "name": "Perplexity",
+      "getKey": "キーを取得",
+      "placeholder": "PerplexityのAPIキーを入力"
+    },
+    "gemini": {
+      "name": "Gemini",
+      "getKey": "無料キーを取得",
+      "placeholder": "GeminiのAPIキーを入力"
+    },
+    "promptVersion": {
+      "label": "プロンプトバージョン",
+      "description": "AI分析に使用するプロンプトバージョンを選択します。",
+      "stable": "安定版（推奨）",
+      "latest": "最新版（実験的）"
+    }
+  },
+  "saveConfiguration": "設定を保存",
+  "toasts": {
+    "settingsSaved": "設定が正常に保存されました！",
+    "cacheCleared": "キャッシュをクリアしました！"
+  },
+  "rpcEndpoints": {
+    "title": "RPCエンドポイント",
+    "description": "各ネットワークのRPC URLを設定します。ネットワークをクリックして展開し、エンドポイントを設定してください。",
+    "legendOpensource": "オープンソース・トラッキングなし",
+    "legendPrivate": "クローズドソース・トラッキングなし",
+    "legendTracking": "トラッキング有効",
+    "currentRPCs": "現在のRPC：",
+    "removeRpc": "RPCを削除",
+    "localhostHelp": "ローカルネットワークにリモートアクセスが必要ですか？",
+    "localhostHelpLink": "ngrokでトンネルを設定する方法を学ぶ",
+    "syncRpcs": "RPCを同期",
+    "syncing": "同期中...",
+    "metamask": {
+      "notSupported": "このチェーンはサポートされていません",
+      "configured": "OpenScanが設定されました！",
+      "setDefault": "MetaMaskでOpenScanをデフォルトのブロックエクスプローラーに設定",
+      "configuring": "設定中...",
+      "configuredText": "設定完了！",
+      "useAsDefault": "デフォルトエクスプローラーとして使用"
+    }
+  }
+}

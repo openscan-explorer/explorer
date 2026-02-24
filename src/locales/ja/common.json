@@ -1,0 +1,302 @@
+{
+  "nav": {
+    "searchPlaceholderDesktop": "アドレス / Txハッシュ / ブロック / ENSで検索",
+    "searchPlaceholderMobile": "アドレス、Tx、ブロック、ENSを検索...",
+    "searchAriaLabel": "検索",
+    "searchTitle": "検索",
+    "switchToLightMode": "ライトモードに切り替え",
+    "switchToDarkMode": "ダークモードに切り替え",
+    "lightModeTitle": "ライトモード",
+    "darkModeTitle": "ダークモード",
+    "settingsAriaLabel": "設定",
+    "settingsTitle": "設定",
+    "openMenuAriaLabel": "メニューを開く",
+    "closeMenuAriaLabel": "メニューを閉じる",
+    "blocksMobile": "ブロック",
+    "transactionsMobile": "トランザクション",
+    "home": "ホーム",
+    "lightMode": "ライトモード",
+    "darkMode": "ダークモード",
+    "githubTitle": "GitHubで表示",
+    "xTwitterTitle": "Xでフォロー",
+    "xTwitterLabel": "X (Twitter)",
+    "githubLabel": "GitHub",
+    "close": "閉じる",
+    "dismissError": "エラーを閉じる",
+    "disableSuperUser": "スーパーユーザーモードを無効化",
+    "enableSuperUser": "スーパーユーザーモードを有効化",
+    "mempool": "メモリープール",
+    "txs": "トランザクション"
+  },
+  "footer": {
+    "about": "概要",
+    "subscribe": "サブスクライブ",
+    "contact": "お問い合わせ",
+    "supporters": "サポーター",
+    "reportBug": "バグを報告",
+    "reportBugTitle": "バグを報告",
+    "viewCommitTitle": "GitHubでコミット {{hash}} を表示",
+    "versionLabel": "v{{version}} {{hash}}",
+    "githubTitle": "GitHubで表示",
+    "xTitle": "Xでフォロー"
+  },
+  "errors": {
+    "somethingWentWrong": "問題が発生しました",
+    "errorMessage": "申し訳ありませんが、予期しないエラーが発生しました。アプリケーションでエラーが発生しています。",
+    "reloadPage": "ページを再読み込み",
+    "goHome": "ホームへ",
+    "errorDetailsSummary": "エラー詳細（開発モード）",
+    "errorLabel": "エラー：",
+    "componentStackLabel": "コンポーネントスタック："
+  },
+  "notifications": {
+    "closeAriaLabel": "通知を閉じる"
+  },
+  "about": {
+    "heading": "OPENSCAN",
+    "subtitle": "トラストレスなブロックチェーン探索",
+    "missionStatement": "OpenScanは、透明性と真の開放性を提供するために構築されたオープンソースの軽量ブロックチェーンエクスプローラーです。ブロックチェーンノードに直接接続し、仲介者や中央集権サービスなしにオンチェーンデータへのアクセスを提供します。",
+    "principles": "原則",
+    "freeOpenSource": "無料かつオープンソース",
+    "freeOpenSourceDescription": "100%オープンソース、公開監査可能、すべてのユーザーに無料。ベンダーロックインなし。",
+    "privacyFirst": "プライバシー優先",
+    "privacyFirstDescription": "広告なし、トラッカーなし、ユーザーデータ収集なし。あなたのデータはあなたのもの。",
+    "trustlessByDesign": "トラストレス設計",
+    "trustlessByDesignDescription": "ブロックチェーンノードへの直接RPC接続。仲介者なしで独立してデータを検証。",
+    "publicInfrastructure": "パブリックインフラ",
+    "publicInfrastructureDescription": "分散化されたエコシステムのための公共財として構築され、倫理的な資金によって維持されています。",
+    "features": "機能",
+    "multiChainExplorer": "マルチチェーンエクスプローラー",
+    "multiChainExplorerDescription": "複数のEVMネットワークにわたるブロック、トランザクション、アドレスを探索。",
+    "contractInteraction": "コントラクト操作",
+    "contractInteractionDescription": "エクスプローラーから直接、検証済みスマートコントラクトの読み書きが可能。",
+    "localDevelopment": "ローカル開発",
+    "localDevelopmentDescription": "トレース機能を備えたHardhatおよびAnvilローカルネットワークを完全サポート。",
+    "rpcTransparency": "RPC透明性",
+    "rpcTransparencyDescription": "複数のRPCプロバイダー間でレスポンスを比較。不整合を検出。",
+    "supportedNetworks": "対応ネットワーク",
+    "openSource": "オープンソース",
+    "openSourceDescription": "コードベース全体が公開されており、コミュニティの貢献を歓迎しています。",
+    "viewOnGithub": "GitHubで表示",
+    "version": "バージョン",
+    "commit": "コミット",
+    "totalCommits": "総コミット数",
+    "contributors": "コントリビューター",
+    "licensedUnderMIT": "MITライセンス"
+  },
+  "contact": {
+    "title": "お問い合わせ",
+    "subtitle": "OpenScanチームに連絡する",
+    "xmtpTitle": "XMTPでメッセージを送る",
+    "xmtpDescription": "分散型のウォレット間メッセージングにXMTPを使用しています。Ethereumウォレットを使って直接メッセージを送信できます。メールアドレス不要、完全暗号化、検閲耐性あり。",
+    "sendMessage": "メッセージを送る",
+    "whatIsXmtp": "XMTPとは？",
+    "walletMessaging": "ウォレットベースのメッセージング",
+    "walletMessagingDescription": "XMTPはEthereumウォレット間のメッセージングを可能にします。アカウント作成不要——ウォレットを接続するだけ。",
+    "endToEnd": "エンドツーエンド暗号化",
+    "endToEndDescription": "すべてのメッセージが暗号化されています。あなたと受信者のみが会話を読めます。",
+    "decentralized": "分散型",
+    "decentralizedDescription": "中央サーバーがメッセージを制御しません。プロトコルはオープンかつパーミッションレスです。",
+    "interoperable": "相互運用可能",
+    "interoperableDescription": "Converse、Coinbase WalletなどXMTPをサポートするあらゆるアプリで動作します。",
+    "alsoReachUs": "以下からもお問い合わせいただけます",
+    "orOpenIssue": "または以下でイシューを開く",
+    "xTwitter": "X (Twitter)",
+    "github": "GitHub"
+  },
+  "subscriptions": {
+    "title": "OpenScanをサポート",
+    "subtitle": "オープンソースブロックチェーンインフラの持続可能で倫理的な資金調達",
+    "valueProposition": "OpenScanはすべてのエンドユーザーに完全無料です。収益は、プラットフォームの価値を認め、開かれたエコシステムの検証済みサポーターとして正式に参加したいプロジェクト、アプリ、トークン、ネットワークから得られます。",
+    "freeForAllUsers": "すべてのエンドユーザーに完全無料",
+    "pricingOverview": "料金概要",
+    "earlyAdopterDiscount": "アーリーアダプター割引",
+    "limitedTimeDiscounts": "全サブスクリプションの期間限定割引",
+    "activeNow": "現在有効",
+    "discountAvailable": "{{percent}}%割引利用可能",
+    "percentOff": "{{percent}}%オフ",
+    "subscriptionType": "サブスクリプション種類",
+    "perMonth": "/ 月",
+    "perYear": "/ 年",
+    "save20": "20%節約",
+    "includesAllBenefits": "すべての{{tier}}特典を含む",
+    "tierLabel": "ティア{{number}} - {{name}}",
+    "sharedRoadmapPlanning": "共有ロードマップ計画",
+    "roadmapDescription": "Allyティアのサブスクライバーは、OpenScanチームとAlliesがプラットフォームの未来を形作る半年ごとのロードマップ計画セッションで投票権を得ます。",
+    "featurePrioritization": "機能優先度付け",
+    "featurePrioritizationDescription": "コミュニティのニーズに基づいて、次に開発する機能や改善事項を投票で決定。",
+    "networkExpansion": "ネットワーク拡張",
+    "networkExpansionDescription": "OpenScanがサポートおよび統合すべきブロックチェーンネットワークの決定を支援。",
+    "strategicDirection": "戦略的方向性",
+    "strategicDirectionDescription": "OpenScanの長期ビジョンと技術的方向性についての議論に参加。",
+    "howToSubscribe": "サブスクライブ方法",
+    "step1Title": "プルリクエストを提出",
+    "step1Description": "プロジェクト情報とサブスクリプション詳細を含むPRをexplorer-metadataリポジトリに作成してください。",
+    "step2Title": "PRのレビューと承認",
+    "step2Description": "OpenScanチームがあなたのPRをレビューし、資格を確認し、必要な情報がすべて提供されているか確認します。",
+    "step3Title": "支払いと所有権の証明",
+    "step3Description": "PRが承認されたら、Ethereum Mainnetでサブスクリプション料金を送信してください。その後、OpenScan Devtoolsを使用して支払いトランザクションハッシュに署名し、所有権を証明するためにPRで共有してください。",
+    "step4Title": "サブスクリプション有効化",
+    "step4Description": "支払いと署名の確認後、PRがマージされ、サブスクリプション特典が即座に有効化されます。",
+    "paymentAddress": "支払いアドレス",
+    "paymentAddressDescription": "すべてのサブスクリプション支払いはOpenScan DAOアドレスに直接送信されます：",
+    "submitSubscriptionPR": "サブスクリプションPRを提出",
+    "viewDaoAddress": "DAOアドレスを表示",
+    "footerNote": "すべての収益はプラットフォームの継続的な開発、成長、インフラ改善のためだけに再投資されます。",
+    "categories": {
+      "tokens": {
+        "name": "トークン",
+        "description": "検証済みコントラクトタグ、メタデータ統合、ロゴ表示、公式リンクおよびトークン残高フェッチャー統合。"
+      },
+      "networks": {
+        "name": "ネットワーク",
+        "description": "完全なRPCメソッドサポート、専用技術メンテナンス、サブドメイン可用性、および目立つブランディング。"
+      },
+      "apps": {
+        "name": "暗号アプリ",
+        "description": "ウォレット、dApp、補助エクスプローラーツール、取引所の専用リストと検証済みブランディング。統合と知名度を促進。"
+      },
+      "companies": {
+        "name": "企業・組織",
+        "description": "インフラプロバイダー、ベンチャーファンド、プロジェクトの継続性に貢献するその他のサポート組織に対する公式認定と知名度。"
+      }
+    },
+    "tierNames": {
+      "backer": "バッカー",
+      "partner": "パートナー",
+      "ally": "アライ"
+    },
+    "tierBenefits": {
+      "tokens": {
+        "backer": [
+          "トークン情報を含むトークンページ：ERC20詳細、プロジェクト名、カスタムURL",
+          "検証済みコントラクトと重要なコントラクトのタグ付け"
+        ],
+        "partner": [
+          "メインエクスプローラーにトークン残高を表示",
+          "シンプルなプロフィールページ",
+          "マルチネットワークリスト"
+        ],
+        "ally": [
+          "Markdown説明付きの完全プロフィールページ",
+          "OpenScanサブドメイン",
+          "技術チームとの直接コミュニケーションライン"
+        ]
+      },
+      "networks": {
+        "backer": ["ネットワークページのMarkdownプロフィール", "ホームページの優先配置"],
+        "partner": [
+          "専用サブドメインネットワークエクスプローラー",
+          "技術チームとの直接コミュニケーションライン"
+        ],
+        "ally": ["ロードマップ投票権", "専用ネットワークエクスプローラーでのネットワーク固有機能"]
+      },
+      "apps": {
+        "backer": [
+          "シンプルなプロフィールページ",
+          "重要なコントラクトの検証とタグ付け",
+          "コントラクトイベントリスト"
+        ],
+        "partner": ["OpenScanサブドメイン", "Markdown説明付きの完全プロフィールページ"],
+        "ally": ["ロードマップ投票権", "技術チームとの直接コミュニケーションライン"]
+      },
+      "companies": {
+        "backer": [
+          "シンプルなプロフィールページ",
+          "重要なコントラクトの検証とタグ付け",
+          "コントラクトイベントリスト"
+        ],
+        "partner": ["Markdown説明付きの完全プロフィールページ", "OpenScanサブドメイン"],
+        "ally": ["技術チームとの直接コミュニケーションライン", "ロードマップ投票権"]
+      }
+    }
+  },
+  "supporters": {
+    "title": "サポーター",
+    "subtitle": "サポーターの皆様に感謝します",
+    "loading": "サポーターを読み込み中...",
+    "error": "エラー：{{error}}",
+    "noSupporters": "まだサポーターはいません。最初のサポーターになりましょう！",
+    "becomeSupporterTitle": "サポーターになる",
+    "becomeSupporterDescription": "ネットワークをサブスクライブしてOpenScanの開発をサポートしてください。",
+    "viewPlans": "サブスクリプションプランを表示",
+    "allies": "アライ",
+    "partners": "パートナー",
+    "backers": "バッカー"
+  },
+  "profile": {
+    "notFound": "プロフィールが見つかりません",
+    "loading": "プロフィールを読み込み中...",
+    "invalidUrl": "無効なプロフィールURL。プロフィールタイプとIDの両方を指定してください。",
+    "invalidType": "無効なプロフィールタイプ：{{type}}。network、app、organizationのいずれかである必要があります。",
+    "notFoundMessage": "プロフィールが見つかりません：{{type}}/{{id}}",
+    "fetchError": "プロフィールの取得に失敗しました",
+    "unknownType": "不明なプロフィールタイプ"
+  },
+  "extraData": {
+    "showDecoded": "デコードを表示",
+    "showRawHex": "生の16進数を表示"
+  },
+  "searchBox": {
+    "placeholder": "アドレス / トランザクションハッシュ / ブロック / ENS名で検索",
+    "ariaLabel": "検索",
+    "title": "検索"
+  },
+  "wallet": {
+    "connectWallet": "ウォレットを接続",
+    "wrongNetwork": "ネットワークが違います",
+    "chainIcon": "チェーンアイコン"
+  },
+  "rpcIndicator": {
+    "clickToSeeDetails": "クリックしてRPCプロバイダーの詳細を表示",
+    "inconsistentResponses": "レスポンスに不整合があります",
+    "rpcProviders": "RPCプロバイダー",
+    "strategy": "ストラテジー：{{strategy}}",
+    "succeededOnAttempt": "{{count}}回目の試みで成功",
+    "fastestResponseWins": "最速レスポンスが優先 • すべての時間を表示",
+    "responsesDiffer": "プロバイダー間でレスポンスが異なります",
+    "selected": "選択済み",
+    "winner": "勝者",
+    "fallbackNote": "フォールバックモード：プロバイダーを順番に試行",
+    "raceNote": "レースモード：最初の成功レスポンスを返す。保留中のものは破棄されます"
+  },
+  "buildWarning": {
+    "notProductionBuild": "これは本番検証済みビルドではありません"
+  },
+  "aiAnalysis": {
+    "title": "AI分析",
+    "analyzeButton": "AIで分析",
+    "analyzing": "分析中...",
+    "expand": "分析を展開",
+    "collapse": "分析を折りたたむ",
+    "refreshButton": "更新",
+    "disclaimer": "AI生成の分析。エラーを含む可能性があります。",
+    "generatedBy": "{{model}}による ",
+    "cachedResult": "キャッシュ済み",
+    "errors": {
+      "rateLimited": "レート制限されています。しばらくしてからもう一度お試しください。",
+      "invalidKey": "無効なAPIキーです。設定でキーを確認してください。",
+      "no_api_key": "APIキーが設定されていません。設定でAIプロバイダーキーを追加してください。",
+      "networkError": "ネットワークエラー。接続を確認して再試行してください。",
+      "serviceUnavailable": "AIサービスが一時的に利用できません。後でもう一度お試しください。",
+      "parseError": "AIレスポンスの解析に失敗しました。再試行してください。",
+      "generic": "分析に失敗しました。もう一度お試しください。",
+      "tryAgain": "再試行",
+      "goToSettings": "設定へ"
+    }
+  },
+  "search": {
+    "title": "検索",
+    "resultsTitle": "検索結果",
+    "noQuery": "検索クエリが指定されていません",
+    "invalidQuery": "無効な検索クエリです。アドレス(0x...)、トランザクションハッシュ、ブロック番号、またはENS名を入力してください。",
+    "invalidBadge": "無効",
+    "ensInfo": "ENS名はEthereum Mainnetでアドレスに解決されます。",
+    "in": "の中で",
+    "badgeAddress": "アドレス",
+    "badgeTxHash": "TXハッシュ",
+    "badgeBlock": "ブロック",
+    "badgeEns": "ENS",
+    "badgeUnknown": "不明"
+  }
+}

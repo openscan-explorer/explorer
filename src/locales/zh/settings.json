@@ -1,0 +1,132 @@
+{
+  "pageTitle": "设置",
+  "appearance": {
+    "title": "外观",
+    "description": "自定义应用程序的视觉外观。",
+    "backgroundBlocks": {
+      "label": "有趣的背景块",
+      "description": "在背景中显示动画等距块"
+    }
+  },
+  "language": {
+    "title": "语言",
+    "description": "选择应用程序语言。",
+    "label": "显示语言",
+    "selectDescription": "选择用户界面的语言。"
+  },
+  "cacheData": {
+    "title": "缓存和数据",
+    "description": "管理缓存数据和应用程序存储。",
+    "clearCache": {
+      "label": "清除缓存",
+      "description": "清除缓存的元数据而不丢失设置。",
+      "button": "清除缓存"
+    },
+    "clearSiteData": {
+      "label": "清除站点数据",
+      "description": "清除所有数据，包括设置、RPC 配置和 API 密钥。",
+      "button": "清除站点数据",
+      "confirmMessage": "这将清除所有设置、RPC 配置、API 密钥和缓存数据。页面将重新加载。继续？"
+    }
+  },
+  "rpcStrategy": {
+    "title": "RPC 策略",
+    "description": "选择如何将请求发送到多个 RPC 端点。",
+    "requestStrategy": {
+      "label": "请求策略",
+      "fallbackDesc": "逐一尝试端点，直到某个端点响应成功。",
+      "parallelDesc": "同时查询所有端点。",
+      "raceDesc": "查询所有端点并返回最快的响应。",
+      "fallback": "回退（默认）",
+      "parallel": "并行",
+      "race": "竞速（最快）"
+    },
+    "maxParallelRequests": {
+      "label": "最大并行请求数",
+      "description": "限制同时查询的 RPC 端点数量。较低的值可减少带宽使用。使用 RPC 列表中的前 N 个端点（可通过拖动重新排序）。",
+      "option1": "1 个端点",
+      "option2": "2 个端点",
+      "option3": "3 个端点（默认）",
+      "option5": "5 个端点",
+      "option10": "10 个端点",
+      "optionUnlimited": "无限制"
+    }
+  },
+  "apiKeys": {
+    "title": "API 密钥",
+    "description": "输入 RPC 提供商的 API 密钥。",
+    "infura": {
+      "name": "Infura",
+      "getKey": "获取密钥",
+      "placeholder": "输入您的 Infura API 密钥"
+    },
+    "alchemy": {
+      "name": "Alchemy",
+      "getKey": "获取密钥",
+      "placeholder": "输入您的 Alchemy API 密钥"
+    },
+    "toggleHide": "隐藏 API 密钥",
+    "toggleShow": "显示 API 密钥",
+    "aiTitle": "AI 分析密钥",
+    "aiDescription": "输入 AI 驱动的区块链分析 API 密钥。使用 AI 分析器至少需要一个密钥。",
+    "aiProvidersShow": "显示其他提供商",
+    "aiProvidersHide": "隐藏其他提供商",
+    "groq": {
+      "name": "Groq",
+      "getKey": "获取免费密钥",
+      "placeholder": "输入您的 Groq API 密钥"
+    },
+    "openai": {
+      "name": "OpenAI",
+      "getKey": "获取密钥",
+      "placeholder": "输入您的 OpenAI API 密钥"
+    },
+    "anthropic": {
+      "name": "Anthropic",
+      "getKey": "获取密钥",
+      "placeholder": "输入您的 Anthropic API 密钥"
+    },
+    "perplexity": {
+      "name": "Perplexity",
+      "getKey": "获取密钥",
+      "placeholder": "输入您的 Perplexity API 密钥"
+    },
+    "gemini": {
+      "name": "Gemini",
+      "getKey": "获取免费密钥",
+      "placeholder": "输入您的 Gemini API 密钥"
+    },
+    "promptVersion": {
+      "label": "提示版本",
+      "description": "选择 AI 分析使用的提示版本。",
+      "stable": "稳定版（推荐）",
+      "latest": "最新版（实验性）"
+    }
+  },
+  "saveConfiguration": "保存配置",
+  "toasts": {
+    "settingsSaved": "配置保存成功！",
+    "cacheCleared": "缓存已清除！"
+  },
+  "rpcEndpoints": {
+    "title": "RPC 端点",
+    "description": "为每个网络配置 RPC URL。点击网络展开并配置其端点。",
+    "legendOpensource": "开源且无追踪",
+    "legendPrivate": "闭源且无追踪",
+    "legendTracking": "已启用追踪",
+    "currentRPCs": "当前 RPC：",
+    "removeRpc": "删除 RPC",
+    "localhostHelp": "需要远程访问本地网络？",
+    "localhostHelpLink": "了解如何使用 ngrok 设置隧道",
+    "syncRpcs": "同步 RPC",
+    "syncing": "同步中...",
+    "metamask": {
+      "notSupported": "此链不支持",
+      "configured": "OpenScan 已配置！",
+      "setDefault": "在 MetaMask 中将 OpenScan 设置为默认区块浏览器",
+      "configuring": "配置中...",
+      "configuredText": "已配置！",
+      "useAsDefault": "用作默认浏览器"
+    }
+  }
+}

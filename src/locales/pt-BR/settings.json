@@ -1,0 +1,132 @@
+{
+  "pageTitle": "Configurações",
+  "appearance": {
+    "title": "Aparência",
+    "description": "Personalize a aparência visual do aplicativo.",
+    "backgroundBlocks": {
+      "label": "Blocos de Fundo Divertidos",
+      "description": "Mostrar blocos isométricos animados no fundo"
+    }
+  },
+  "language": {
+    "title": "Idioma",
+    "description": "Selecione o idioma do aplicativo.",
+    "label": "Idioma de Exibição",
+    "selectDescription": "Escolha o idioma para a interface do usuário."
+  },
+  "cacheData": {
+    "title": "Cache e Dados",
+    "description": "Gerencie os dados em cache e o armazenamento do aplicativo.",
+    "clearCache": {
+      "label": "Limpar Cache",
+      "description": "Limpar metadados em cache sem perder suas configurações.",
+      "button": "Limpar Cache"
+    },
+    "clearSiteData": {
+      "label": "Limpar Dados do Site",
+      "description": "Limpar todos os dados incluindo configurações, configurações RPC e chaves de API.",
+      "button": "Limpar Dados do Site",
+      "confirmMessage": "Isso vai limpar todas as configurações, configurações RPC, chaves de API e dados em cache. A página será recarregada. Continuar?"
+    }
+  },
+  "rpcStrategy": {
+    "title": "Estratégia RPC",
+    "description": "Escolha como as requisições são enviadas para múltiplos endpoints RPC.",
+    "requestStrategy": {
+      "label": "Estratégia de Requisição",
+      "fallbackDesc": "Tentar endpoints um por um até que um tenha sucesso.",
+      "parallelDesc": "Consultar todos os endpoints simultaneamente.",
+      "raceDesc": "Consultar todos os endpoints e retornar a resposta mais rápida.",
+      "fallback": "Fallback (Padrão)",
+      "parallel": "Paralelo",
+      "race": "Race (Mais Rápido)"
+    },
+    "maxParallelRequests": {
+      "label": "Máximo de Requisições Paralelas",
+      "description": "Limite quantos endpoints RPC são consultados simultaneamente. Valores menores reduzem o uso de largura de banda. Usa os primeiros N endpoints da sua lista RPC (reordene arrastando).",
+      "option1": "1 endpoint",
+      "option2": "2 endpoints",
+      "option3": "3 endpoints (Padrão)",
+      "option5": "5 endpoints",
+      "option10": "10 endpoints",
+      "optionUnlimited": "Ilimitado"
+    }
+  },
+  "apiKeys": {
+    "title": "Chaves de API",
+    "description": "Insira suas chaves de API para provedores RPC.",
+    "infura": {
+      "name": "Infura",
+      "getKey": "Obter Chave",
+      "placeholder": "Insira sua chave de API do Infura"
+    },
+    "alchemy": {
+      "name": "Alchemy",
+      "getKey": "Obter Chave",
+      "placeholder": "Insira sua chave de API do Alchemy"
+    },
+    "toggleHide": "Ocultar chave de API",
+    "toggleShow": "Mostrar chave de API",
+    "aiTitle": "Chaves de Análise de IA",
+    "aiDescription": "Insira chaves de API para análise de blockchain com IA. Pelo menos uma chave é necessária para usar o analisador de IA.",
+    "aiProvidersShow": "Mostrar outros provedores",
+    "aiProvidersHide": "Ocultar outros provedores",
+    "groq": {
+      "name": "Groq",
+      "getKey": "Obter Chave Grátis",
+      "placeholder": "Insira sua chave de API do Groq"
+    },
+    "openai": {
+      "name": "OpenAI",
+      "getKey": "Obter Chave",
+      "placeholder": "Insira sua chave de API do OpenAI"
+    },
+    "anthropic": {
+      "name": "Anthropic",
+      "getKey": "Obter Chave",
+      "placeholder": "Insira sua chave de API do Anthropic"
+    },
+    "perplexity": {
+      "name": "Perplexity",
+      "getKey": "Obter Chave",
+      "placeholder": "Insira sua chave de API do Perplexity"
+    },
+    "gemini": {
+      "name": "Gemini",
+      "getKey": "Obter Chave Grátis",
+      "placeholder": "Insira sua chave de API do Gemini"
+    },
+    "promptVersion": {
+      "label": "Versão do Prompt",
+      "description": "Escolha qual versão de prompt usar para análise de IA.",
+      "stable": "Estável (Recomendado)",
+      "latest": "Mais Recente (Experimental)"
+    }
+  },
+  "saveConfiguration": "Salvar Configuração",
+  "toasts": {
+    "settingsSaved": "Configurações salvas com sucesso!",
+    "cacheCleared": "Cache limpo!"
+  },
+  "rpcEndpoints": {
+    "title": "Endpoints RPC",
+    "description": "Configure URLs RPC para cada rede. Clique em uma rede para expandir e configurar seus endpoints.",
+    "legendOpensource": "Código aberto e sem rastreamento",
+    "legendPrivate": "Código fechado e sem rastreamento",
+    "legendTracking": "Rastreamento habilitado",
+    "currentRPCs": "RPCs atuais:",
+    "removeRpc": "Remover RPC",
+    "localhostHelp": "Precisa acessar sua rede local remotamente?",
+    "localhostHelpLink": "Aprenda como configurar um túnel com ngrok",
+    "syncRpcs": "Sincronizar RPCs",
+    "syncing": "Sincronizando...",
+    "metamask": {
+      "notSupported": "Não suportado para esta chain",
+      "configured": "OpenScan configurado!",
+      "setDefault": "Definir OpenScan como explorador de blocos padrão no MetaMask",
+      "configuring": "Configurando...",
+      "configuredText": "Configurado!",
+      "useAsDefault": "Usar como explorador padrão"
+    }
+  }
+}

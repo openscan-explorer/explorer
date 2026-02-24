@@ -1,0 +1,305 @@
+{
+  "nav": {
+    "searchPlaceholderDesktop": "Pesquisar por Endereço / Hash de Tx / Bloco / ENS",
+    "searchPlaceholderMobile": "Pesquisar endereço, tx, bloco, ENS...",
+    "searchAriaLabel": "Pesquisar",
+    "searchTitle": "Pesquisar",
+    "switchToLightMode": "Mudar para modo claro",
+    "switchToDarkMode": "Mudar para modo escuro",
+    "lightModeTitle": "Modo claro",
+    "darkModeTitle": "Modo escuro",
+    "settingsAriaLabel": "Configurações",
+    "settingsTitle": "Configurações",
+    "openMenuAriaLabel": "Abrir menu",
+    "closeMenuAriaLabel": "Fechar menu",
+    "blocksMobile": "Blocos",
+    "transactionsMobile": "Transações",
+    "home": "Início",
+    "lightMode": "Modo Claro",
+    "darkMode": "Modo Escuro",
+    "githubTitle": "Ver no GitHub",
+    "xTwitterTitle": "Seguir no X",
+    "xTwitterLabel": "X (Twitter)",
+    "githubLabel": "GitHub",
+    "close": "Fechar",
+    "dismissError": "Dispensar erro",
+    "disableSuperUser": "Desativar Modo Super Usuário",
+    "enableSuperUser": "Ativar Modo Super Usuário",
+    "mempool": "Mempool",
+    "txs": "Transações"
+  },
+  "footer": {
+    "about": "Sobre",
+    "subscribe": "Assinar",
+    "contact": "Contato",
+    "supporters": "Apoiadores",
+    "reportBug": "Reportar Bug",
+    "reportBugTitle": "Reportar um bug",
+    "viewCommitTitle": "Ver commit {{hash}} no GitHub",
+    "versionLabel": "v{{version}} {{hash}}",
+    "githubTitle": "Ver no GitHub",
+    "xTitle": "Seguir no X"
+  },
+  "errors": {
+    "somethingWentWrong": "Algo deu errado",
+    "errorMessage": "Pedimos desculpas, mas algo inesperado aconteceu. O aplicativo encontrou um erro.",
+    "reloadPage": "Recarregar Página",
+    "goHome": "Ir para o Início",
+    "errorDetailsSummary": "Detalhes do Erro (Modo de Desenvolvimento)",
+    "errorLabel": "Erro:",
+    "componentStackLabel": "Pilha de Componentes:"
+  },
+  "notifications": {
+    "closeAriaLabel": "Fechar notificação"
+  },
+  "about": {
+    "heading": "OPENSCAN",
+    "subtitle": "Exploração de Blockchain Sem Confiança",
+    "missionStatement": "OpenScan é um explorador de blockchain de código aberto e leve, construído para fornecer transparência e verdadeira abertura. Conectamos diretamente aos nós da blockchain, dando a você acesso irrestrito aos dados on-chain sem intermediários ou serviços centralizados.",
+    "principles": "Princípios",
+    "freeOpenSource": "Gratuito e de Código Aberto",
+    "freeOpenSourceDescription": "100% de código aberto, publicamente auditável e gratuito para todos os usuários. Sem bloqueio de fornecedor.",
+    "privacyFirst": "Privacidade em Primeiro Lugar",
+    "privacyFirstDescription": "Sem publicidade, sem rastreadores, sem coleta de dados do usuário. Seus dados são seus.",
+    "trustlessByDesign": "Sem Confiança por Design",
+    "trustlessByDesignDescription": "Conexões RPC diretas aos nós da blockchain. Verifique dados de forma independente, sem intermediários.",
+    "publicInfrastructure": "Infraestrutura Pública",
+    "publicInfrastructureDescription": "Construído como bem público para o ecossistema descentralizado, sustentado por financiamento ético.",
+    "features": "Recursos",
+    "multiChainExplorer": "Explorador Multi-Chain",
+    "multiChainExplorerDescription": "Explore blocos, transações e endereços em múltiplas redes EVM.",
+    "contractInteraction": "Interação com Contratos",
+    "contractInteractionDescription": "Leia e escreva em contratos inteligentes verificados diretamente pelo explorador.",
+    "localDevelopment": "Desenvolvimento Local",
+    "localDevelopmentDescription": "Suporte completo para redes locais Hardhat e Anvil com capacidades de rastreamento.",
+    "rpcTransparency": "Transparência RPC",
+    "rpcTransparencyDescription": "Compare respostas entre múltiplos provedores RPC. Detecte inconsistências.",
+    "supportedNetworks": "Redes Suportadas",
+    "openSource": "Código Aberto",
+    "openSourceDescription": "Todo o código-fonte está disponível publicamente e aceita contribuições da comunidade.",
+    "viewOnGithub": "Ver no GitHub",
+    "version": "Versão",
+    "commit": "Commit",
+    "totalCommits": "Total de Commits",
+    "contributors": "Contribuidores",
+    "licensedUnderMIT": "Licenciado sob MIT"
+  },
+  "contact": {
+    "title": "Fale Conosco",
+    "subtitle": "Entre em contato com a equipe OpenScan",
+    "xmtpTitle": "Mensagem via XMTP",
+    "xmtpDescription": "Usamos XMTP para mensagens descentralizadas de carteira para carteira. Envie-nos uma mensagem direta usando sua carteira Ethereum - sem necessidade de e-mail, totalmente criptografado e resistente à censura.",
+    "sendMessage": "Enviar uma Mensagem",
+    "whatIsXmtp": "O que é XMTP?",
+    "walletMessaging": "Mensagens Baseadas em Carteira",
+    "walletMessagingDescription": "XMTP permite mensagens entre carteiras Ethereum. Sem necessidade de criar conta - basta conectar sua carteira.",
+    "endToEnd": "Criptografia de Ponta a Ponta",
+    "endToEndDescription": "Todas as mensagens são criptografadas. Somente você e o destinatário podem ler a conversa.",
+    "decentralized": "Descentralizado",
+    "decentralizedDescription": "Nenhum servidor central controla suas mensagens. O protocolo é aberto e sem permissão.",
+    "interoperable": "Interoperável",
+    "interoperableDescription": "Funciona em qualquer aplicativo que suporte XMTP - Converse, Coinbase Wallet e mais.",
+    "alsoReachUs": "Você também pode nos encontrar em",
+    "orOpenIssue": "ou abrir um issue em",
+    "xTwitter": "X (Twitter)",
+    "github": "GitHub"
+  },
+  "subscriptions": {
+    "title": "Apoie o OpenScan",
+    "subtitle": "Financiamento sustentável e ético para infraestrutura blockchain de código aberto",
+    "valueProposition": "O OpenScan permanece totalmente gratuito para todos os usuários finais. A receita é proveniente de projetos, aplicativos, tokens e redes que reconhecem o valor da plataforma e desejam aparecer formalmente como apoiadores verificados do ecossistema aberto.",
+    "freeForAllUsers": "totalmente gratuito para todos os usuários finais",
+    "pricingOverview": "Visão Geral de Preços",
+    "earlyAdopterDiscount": "Desconto para Primeiros Usuários",
+    "limitedTimeDiscounts": "Descontos por tempo limitado em todas as assinaturas",
+    "activeNow": "Ativo agora",
+    "discountAvailable": "{{percent}}% de desconto disponível",
+    "percentOff": "{{percent}}% de desconto",
+    "subscriptionType": "Tipo de Assinatura",
+    "perMonth": "/ mês",
+    "perYear": "/ ano",
+    "save20": "Economize 20%",
+    "includesAllBenefits": "Inclui todos os benefícios {{tier}}",
+    "tierLabel": "Nível {{number}} - {{name}}",
+    "sharedRoadmapPlanning": "Planejamento Compartilhado do Roadmap",
+    "roadmapDescription": "Assinantes do nível Ally ganham poder de voto em nossas sessões de planejamento de roadmap semestrais, onde a equipe OpenScan e os Allies colaboram para moldar o futuro da plataforma.",
+    "featurePrioritization": "Priorização de Recursos",
+    "featurePrioritizationDescription": "Vote em quais recursos e melhorias serão desenvolvidos a seguir com base nas necessidades da comunidade.",
+    "networkExpansion": "Expansão de Redes",
+    "networkExpansionDescription": "Ajude a decidir quais redes blockchain o OpenScan deve suportar e integrar.",
+    "strategicDirection": "Direção Estratégica",
+    "strategicDirectionDescription": "Participe de discussões sobre a visão de longo prazo e direção técnica do OpenScan.",
+    "howToSubscribe": "Como Assinar",
+    "step1Title": "Enviar Pull Request",
+    "step1Description": "Crie um pull request para o repositório explorer-metadata com as informações do seu projeto e detalhes da assinatura.",
+    "step2Title": "Revisão e Aprovação do PR",
+    "step2Description": "A equipe OpenScan revisará seu pull request para verificar a elegibilidade e garantir que todas as informações necessárias sejam fornecidas.",
+    "step3Title": "Fazer Pagamento e Provar Propriedade",
+    "step3Description": "Uma vez que seu PR for aprovado, envie o pagamento da assinatura na Ethereum Mainnet. Em seguida, use o OpenScan Devtools para assinar o hash da transação de pagamento e compartilhe no seu PR para provar a propriedade.",
+    "step4Title": "Assinatura Ativada",
+    "step4Description": "Após verificação do pagamento e assinatura, seu PR será mesclado e os benefícios da assinatura serão ativados imediatamente.",
+    "paymentAddress": "Endereço de Pagamento",
+    "paymentAddressDescription": "Todos os pagamentos de assinatura são enviados diretamente para o endereço DAO do OpenScan:",
+    "submitSubscriptionPR": "Enviar PR de Assinatura",
+    "viewDaoAddress": "Ver Endereço DAO",
+    "footerNote": "Toda a receita é reinvestida exclusivamente para o desenvolvimento contínuo, crescimento e melhoria de infraestrutura da plataforma.",
+    "categories": {
+      "tokens": {
+        "name": "Tokens",
+        "description": "Tags de contratos verificados, integração de metadados, exibição de logo, links oficiais e integração de buscador de saldo de tokens."
+      },
+      "networks": {
+        "name": "Redes",
+        "description": "Suporte completo a métodos RPC, manutenção técnica dedicada, disponibilidade de subdomínio e branding proeminente."
+      },
+      "apps": {
+        "name": "Apps de Cripto",
+        "description": "Listagem dedicada e branding verificado para carteiras, dApps, ferramentas complementares de explorador e exchanges, promovendo integração e visibilidade."
+      },
+      "companies": {
+        "name": "Empresas e Organizações",
+        "description": "Reconhecimento formal e visibilidade para provedores de infraestrutura, fundos de venture e outras entidades de suporte que contribuem para a continuidade do projeto."
+      }
+    },
+    "tierNames": {
+      "backer": "Apoiador",
+      "partner": "Parceiro",
+      "ally": "Aliado"
+    },
+    "tierBenefits": {
+      "tokens": {
+        "backer": [
+          "Página de token com informações do token: detalhes ERC20, nome do projeto, URLs personalizadas",
+          "Contratos verificados e contratos importantes marcados"
+        ],
+        "partner": [
+          "Saldo de token exibido no explorador principal",
+          "Página de perfil simples",
+          "Listagem em múltiplas redes"
+        ],
+        "ally": [
+          "Página de perfil completa com descrição em markdown",
+          "Subdomínio OpenScan",
+          "Linha de comunicação direta com a equipe técnica"
+        ]
+      },
+      "networks": {
+        "backer": [
+          "Perfil em markdown na página de rede",
+          "Posicionamento prioritário na página inicial"
+        ],
+        "partner": [
+          "Explorador de rede com subdomínio dedicado",
+          "Linha de comunicação direta com a equipe técnica"
+        ],
+        "ally": ["Poder de voto no roadmap", "Recursos específicos de rede no explorador dedicado"]
+      },
+      "apps": {
+        "backer": [
+          "Página de perfil simples",
+          "Contratos importantes verificados e marcados",
+          "Listagem de eventos de contratos"
+        ],
+        "partner": ["Subdomínio OpenScan", "Página de perfil completa com descrição em markdown"],
+        "ally": ["Poder de voto no roadmap", "Linha de comunicação direta com a equipe técnica"]
+      },
+      "companies": {
+        "backer": [
+          "Página de perfil simples",
+          "Contratos importantes verificados e marcados",
+          "Listagem de eventos de contratos"
+        ],
+        "partner": ["Página de perfil completa com descrição em markdown", "Subdomínio OpenScan"],
+        "ally": ["Linha de comunicação direta com a equipe técnica", "Poder de voto no roadmap"]
+      }
+    }
+  },
+  "supporters": {
+    "title": "Apoiadores",
+    "subtitle": "Obrigado aos nossos apoiadores",
+    "loading": "Carregando apoiadores...",
+    "error": "Erro: {{error}}",
+    "noSupporters": "Nenhum apoiador ainda. Seja o primeiro!",
+    "becomeSupporterTitle": "Torne-se um Apoiador",
+    "becomeSupporterDescription": "Apoie o desenvolvimento do OpenScan assinando uma rede.",
+    "viewPlans": "Ver Planos de Assinatura",
+    "allies": "Aliados",
+    "partners": "Parceiros",
+    "backers": "Apoiadores"
+  },
+  "profile": {
+    "notFound": "Perfil Não Encontrado",
+    "loading": "Carregando perfil...",
+    "invalidUrl": "URL de perfil inválida. Forneça o tipo de perfil e o ID.",
+    "invalidType": "Tipo de perfil inválido: {{type}}. Deve ser um dos: network, app, organization.",
+    "notFoundMessage": "Perfil não encontrado: {{type}}/{{id}}",
+    "fetchError": "Falha ao buscar perfil",
+    "unknownType": "Tipo de perfil desconhecido"
+  },
+  "extraData": {
+    "showDecoded": "Mostrar decodificado",
+    "showRawHex": "Mostrar hex bruto"
+  },
+  "searchBox": {
+    "placeholder": "Pesquisar por Endereço / Hash de Txn / Bloco / Nome ENS",
+    "ariaLabel": "Pesquisar",
+    "title": "Pesquisar"
+  },
+  "wallet": {
+    "connectWallet": "Conectar Carteira",
+    "wrongNetwork": "Rede Incorreta",
+    "chainIcon": "Ícone da chain"
+  },
+  "rpcIndicator": {
+    "clickToSeeDetails": "Clique para ver detalhes do provedor RPC",
+    "inconsistentResponses": "Respostas inconsistentes",
+    "rpcProviders": "Provedores RPC",
+    "strategy": "Estratégia: {{strategy}}",
+    "succeededOnAttempt": "Sucesso na tentativa #{{count}}",
+    "fastestResponseWins": "Resposta mais rápida vence • Todos os tempos exibidos",
+    "responsesDiffer": "Respostas diferem entre provedores",
+    "selected": "Selecionado",
+    "winner": "Vencedor",
+    "fallbackNote": "Modo fallback: provedores tentados sequencialmente",
+    "raceNote": "Modo race: primeira resposta bem-sucedida retornada. Pendentes são descartados"
+  },
+  "buildWarning": {
+    "notProductionBuild": "Esta não é uma build verificada de produção"
+  },
+  "aiAnalysis": {
+    "title": "Análise de IA",
+    "analyzeButton": "Analisar com IA",
+    "analyzing": "Analisando...",
+    "expand": "Expandir análise",
+    "collapse": "Recolher análise",
+    "refreshButton": "Atualizar",
+    "disclaimer": "Análise gerada por IA. Pode conter erros.",
+    "generatedBy": "por {{model}} ",
+    "cachedResult": "em cache",
+    "errors": {
+      "rateLimited": "Limite de taxa atingido. Tente novamente em breve.",
+      "invalidKey": "Chave de API inválida. Verifique sua chave nas Configurações.",
+      "no_api_key": "Nenhuma chave de API configurada. Adicione uma chave de provedor de IA nas Configurações.",
+      "networkError": "Erro de rede. Verifique sua conexão e tente novamente.",
+      "serviceUnavailable": "Serviço de IA temporariamente indisponível. Tente novamente mais tarde.",
+      "parseError": "Falha ao analisar resposta da IA. Tente novamente.",
+      "generic": "Análise falhou. Por favor, tente novamente.",
+      "tryAgain": "Tentar Novamente",
+      "goToSettings": "Ir para Configurações"
+    }
+  },
+  "search": {
+    "title": "Pesquisa",
+    "resultsTitle": "Resultados da Pesquisa",
+    "noQuery": "Nenhuma consulta de pesquisa fornecida",
+    "invalidQuery": "Consulta de pesquisa inválida. Digite um endereço (0x...), hash de transação, número de bloco ou nome ENS.",
+    "invalidBadge": "Inválido",
+    "ensInfo": "Nomes ENS resolvem para endereços na Ethereum Mainnet.",
+    "in": "em",
+    "badgeAddress": "Endereço",
+    "badgeTxHash": "Hash de TX",
+    "badgeBlock": "Bloco",
+    "badgeEns": "ENS",
+    "badgeUnknown": "Desconhecido"
+  }
+}
