@@ -1,3 +1,4 @@
+import { SUPPORTED_LANGUAGES } from "../i18n";
 import type { AIAnalysisType, PromptVersion } from "../types";
 
 type UserMode = "regular" | "power";
@@ -50,13 +51,19 @@ export function buildPrompt(
       return buildContractPrompt(config, context, promptContext);
     case "block":
       return buildBlockPrompt(config, context, promptContext);
+    case "bitcoin_transaction":
+      return buildBitcoinTransactionPrompt(config, context, promptContext);
+    case "bitcoin_block":
+      return buildBitcoinBlockPrompt(config, context, promptContext);
+    case "bitcoin_address":
+      return buildBitcoinAddressPrompt(config, context, promptContext);
   }
 }
 
 function languageInstruction(language?: string): string {
   if (!language || language === "en") return "";
-  const LANGUAGE_NAMES: Record<string, string> = { es: "Spanish" };
-  const name = LANGUAGE_NAMES[language] ?? language;
+  const found = SUPPORTED_LANGUAGES.find((l) => l.code === language);
+  const name = found?.name ?? language;
   return ` Respond in ${name}.`;
 }
 
@@ -134,6 +141,38 @@ const POWER_STABLE_CONFIGS: Record<AIAnalysisType, PromptConfig> = {
     task: "Analyze this block",
     sections: ["Block Analysis", "Utilization", "Transactions", "Notable Aspects"],
   },
+  bitcoin_transaction: {
+    role: "Bitcoin blockchain analyst",
+    conciseness: "6-8 sentences",
+    focusAreas:
+      "UTXO flow, inputs and outputs, fee efficiency, coinbase vs regular, SegWit/Taproot adoption, RBF opt-in, and any OP_RETURN data",
+    audience: "senior Bitcoin developer",
+    task: "Analyze this Bitcoin transaction",
+    sections: ["Transaction Analysis", "Inputs and Outputs", "Fee Analysis", "Notable Aspects"],
+    customRules:
+      "Express all amounts in BTC unless displaying fee rates (use sat/vB). Never use gas, wei, Gwei, or EVM terminology. For coinbase transactions, focus on block reward and coinbase message.",
+  },
+  bitcoin_block: {
+    role: "Bitcoin blockchain analyst",
+    conciseness: "3-5 sentences",
+    focusAreas:
+      "transaction count, total fees, fee rate distribution, block utilization (size vs 4 MWU limit), miner identity, and coinbase message if present",
+    audience: "senior Bitcoin developer",
+    task: "Analyze this Bitcoin block",
+    sections: ["Block Analysis", "Miner and Reward", "Fee Analysis", "Notable Aspects"],
+    customRules:
+      "Express amounts in BTC. Use sat/vB for fee rates. Never use gas, wei, Gwei, or EVM terminology.",
+  },
+  bitcoin_address: {
+    role: "Bitcoin blockchain analyst",
+    conciseness: "4-6 sentences",
+    focusAreas:
+      "address type (legacy/P2SH/SegWit/Taproot), balance, UTXO count, transaction history, and privacy/fee implications of the address type",
+    audience: "senior Bitcoin developer",
+    task: "Analyze this Bitcoin address",
+    sections: ["Address Analysis", "Balance and UTXOs", "Activity", "Notable Aspects"],
+    customRules: "Express amounts in BTC. Never use gas, wei, Gwei, or EVM terminology.",
+  },
 };
 
 // --- Regular User Stable Configs (simpler prompts for non-super-users) ---
@@ -172,6 +211,34 @@ const REGULAR_STABLE_CONFIGS: Record<AIAnalysisType, PromptConfig> = {
     audience: "general user",
     task: "Summarize this block in simple terms",
     sections: ["Block Summary", "Activity Level", "Highlights"],
+  },
+  bitcoin_transaction: {
+    role: "Bitcoin educator",
+    conciseness: "4-6 sentences",
+    focusAreas: "what happened, who sent and received BTC, and the fee paid",
+    audience: "general user",
+    task: "Explain this Bitcoin transaction in simple, easy-to-understand language",
+    sections: ["What Happened", "Sender and Receiver", "Fee Details"],
+    customRules:
+      "Use simple language. Avoid jargon. Express amounts in BTC. Never use gas, wei, or EVM terminology.",
+  },
+  bitcoin_block: {
+    role: "Bitcoin educator",
+    conciseness: "2-3 sentences",
+    focusAreas: "what happened in this block, how many transactions it included, and who mined it",
+    audience: "general user",
+    task: "Summarize this Bitcoin block in simple terms",
+    sections: ["Block Summary", "Activity"],
+    customRules: "Express amounts in BTC. Use sat/vB for fee rates only if mentioned.",
+  },
+  bitcoin_address: {
+    role: "Bitcoin educator",
+    conciseness: "3-4 sentences",
+    focusAreas: "what this address is, its current balance, and its type",
+    audience: "general user",
+    task: "Provide a simple overview of this Bitcoin address",
+    sections: ["Overview", "Balance"],
+    customRules: "Express amounts in BTC. No EVM terminology.",
   },
 };
 
@@ -264,6 +331,39 @@ function buildContractPrompt(
 }
 
 function buildBlockPrompt(
+  config: PromptConfig,
+  context: Record<string, unknown>,
+  promptContext: PromptContext,
+): PromptPair {
+  return {
+    system: buildSystemPrompt(config, promptContext),
+    user: formatContext(context),
+  };
+}
+
+function buildBitcoinTransactionPrompt(
+  config: PromptConfig,
+  context: Record<string, unknown>,
+  promptContext: PromptContext,
+): PromptPair {
+  return {
+    system: buildSystemPrompt(config, promptContext),
+    user: formatContext(context),
+  };
+}
+
+function buildBitcoinBlockPrompt(
+  config: PromptConfig,
+  context: Record<string, unknown>,
+  promptContext: PromptContext,
+): PromptPair {
+  return {
+    system: buildSystemPrompt(config, promptContext),
+    user: formatContext(context),
+  };
+}
+
+function buildBitcoinAddressPrompt(
   config: PromptConfig,
   context: Record<string, unknown>,
   promptContext: PromptContext,
