@@ -114,6 +114,7 @@
     "legendOpensource": "Open source & no tracking",
     "legendPrivate": "Closed source & no tracking",
     "legendTracking": "Tracking enabled",
+    "testEndpoints": "Test RPCs",
     "currentRPCs": "Current RPCs:",
     "removeRpc": "Remove RPC",
     "localhostHelp": "Need to access your local network remotely?",

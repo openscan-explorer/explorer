@@ -11,6 +11,7 @@ import enNetwork from "./locales/en/network.json";
 import enSettings from "./locales/en/settings.json";
 import enTransaction from "./locales/en/transaction.json";
 import enTokenDetails from "./locales/en/tokenDetails.json";
+import enRpcs from "./locales/en/rpcs.json";
 
 import esAddress from "./locales/es/address.json";
 import esBlock from "./locales/es/block.json";
@@ -21,6 +22,7 @@ import esNetwork from "./locales/es/network.json";
 import esSettings from "./locales/es/settings.json";
 import esTransaction from "./locales/es/transaction.json";
 import esTokenDetails from "./locales/es/tokenDetails.json";
+import esRpcs from "./locales/es/rpcs.json";
 
 import zhAddress from "./locales/zh/address.json";
 import zhBlock from "./locales/zh/block.json";
@@ -75,6 +77,7 @@ i18n
         devtools: enDevtools,
         network: enNetwork,
         tokenDetails: enTokenDetails,
+        rpcs: enRpcs,
       },
       es: {
         common: esCommon,
@@ -86,6 +89,7 @@ i18n
         devtools: esDevtools,
         network: esNetwork,
         tokenDetails: esTokenDetails,
+        rpcs: esRpcs,
       },
       zh: {
         common: zhCommon,
@@ -123,7 +127,17 @@ i18n
     },
     fallbackLng: "en",
     defaultNS: "common",
-    ns: ["common", "home", "settings", "address", "block", "transaction", "devtools", "network"],
+    ns: [
+      "common",
+      "home",
+      "settings",
+      "address",
+      "block",
+      "transaction",
+      "devtools",
+      "network",
+      "rpcs",
+    ],
     interpolation: {
       escapeValue: false,
     },

@@ -1,5 +1,6 @@
 import type React from "react";
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { MetaMaskIcon } from "../../common/MetaMaskIcon";
 import { getEnabledNetworks } from "../../../config/networks";
@@ -859,7 +860,12 @@ const Settings: React.FC = () => {
 
           {/* RPC Configuration Section */}
           <div className="settings-section">
-            <h2 className="settings-section-title">🔗 {t("rpcEndpoints.title")}</h2>
+            <div className="settings-section-title-row">
+              <h2 className="settings-section-title">🔗 {t("rpcEndpoints.title")}</h2>
+              <Link to="/rpcs" className="settings-section-link">
+                {t("rpcEndpoints.testEndpoints")} →
+              </Link>
+            </div>
             <p className="settings-section-description">{t("rpcEndpoints.description")}</p>
 
             <div className="flex-start settings-rpc-legend">

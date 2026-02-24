@@ -12,6 +12,7 @@ const Profile = lazy(() => import("./pages/profile"));
 const Supporters = lazy(() => import("./pages/supporters"));
 const Contact = lazy(() => import("./pages/contact"));
 const Search = lazy(() => import("./pages/search"));
+const Rpcs = lazy(() => import("./pages/rpcs"));
 
 // Lazy load page components - Bitcoin
 const BitcoinNetwork = lazy(() => import("./pages/bitcoin"));
@@ -71,6 +72,7 @@ export const LazyProfile = withSuspense(Profile);
 export const LazySupporters = withSuspense(Supporters);
 export const LazyContact = withSuspense(Contact);
 export const LazySearch = withSuspense(Search);
+export const LazyRpcs = withSuspense(Rpcs);
 export const LazyGasTracker = withSuspense(GasTracker);
 
 /**
@@ -89,6 +91,7 @@ export function preloadAllRoutes() {
   import("./pages/supporters");
   import("./pages/contact");
   import("./pages/search");
+  import("./pages/rpcs");
   // Bitcoin pages
   import("./pages/bitcoin");
   import("./pages/bitcoin/BitcoinBlockPage");

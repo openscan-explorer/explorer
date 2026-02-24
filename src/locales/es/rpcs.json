@@ -1,0 +1,59 @@
+{
+  "pageTitle": "Endpoints RPC",
+  "description": "Probá y compará el rendimiento de los endpoints RPC en distintas redes. Agregá endpoints rápidos a tu configuración con un click.",
+  "networkSelector": {
+    "label": "Seleccionar Red",
+    "placeholder": "Elegí una red..."
+  },
+  "table": {
+    "provider": "Proveedor",
+    "url": "URL",
+    "latency": "Latencia",
+    "status": "Estado",
+    "tracking": "Privacidad",
+    "actions": "Acciones"
+  },
+  "status": {
+    "online": "En línea",
+    "offline": "Sin conexión",
+    "timeout": "Tiempo agotado",
+    "pending": "Probando...",
+    "untested": "Sin probar"
+  },
+  "tracking": {
+    "none": "Sin rastreo",
+    "opensource": "Código abierto",
+    "private": "Sin rastreo",
+    "enabled": "Rastreo"
+  },
+  "actions": {
+    "testAll": "Probar Todos",
+    "testing": "Probando...",
+    "retest": "Re-probar",
+    "add": "Agregar",
+    "added": "Activo",
+    "copyUrl": "Copiar URL"
+  },
+  "sort": {
+    "asc": "Ascendente",
+    "desc": "Descendente"
+  },
+  "latency": {
+    "ms": "{{ms}}ms",
+    "na": "N/A"
+  },
+  "empty": {
+    "noEndpoints": "No hay endpoints RPC disponibles para esta red.",
+    "noResults": "No hay resultados todavía. Hacé click en \"Probar Todos\" para empezar."
+  },
+  "toast": {
+    "added": "Endpoint agregado a tu configuración RPC.",
+    "copied": "URL copiada al portapapeles.",
+    "alreadyActive": "Este endpoint ya está en tu configuración."
+  },
+  "legend": {
+    "opensource": "Código abierto y sin rastreo",
+    "private": "Código cerrado y sin rastreo",
+    "tracking": "Rastreo habilitado"
+  }
+}

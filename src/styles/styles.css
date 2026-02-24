@@ -4705,6 +4705,34 @@ code {
   gap: 8px;
 }
 
+.settings-section-title-row {
+  position: relative;
+}
+
+.settings-section-title-row .settings-section-link {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+}
+
+.settings-section-link {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #fff;
+  text-decoration: none;
+  white-space: nowrap;
+  background: var(--color-primary);
+  border: 1px solid var(--color-primary);
+  border-radius: 20px;
+  padding: 0.3rem 0.9rem;
+  transition: opacity 0.15s;
+}
+
+.settings-section-link:hover {
+  opacity: 0.85;
+}
+
 .settings-section-description {
   font-size: 0.85rem;
   color: var(--text-secondary);

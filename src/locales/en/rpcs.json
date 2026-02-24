@@ -1,0 +1,59 @@
+{
+  "pageTitle": "RPC Endpoints",
+  "description": "Test and compare RPC endpoint performance across networks. Add fast endpoints to your configuration with one click.",
+  "networkSelector": {
+    "label": "Select Network",
+    "placeholder": "Choose a network..."
+  },
+  "table": {
+    "provider": "Provider",
+    "url": "URL",
+    "latency": "Latency",
+    "status": "Status",
+    "tracking": "Privacy",
+    "actions": "Actions"
+  },
+  "status": {
+    "online": "Online",
+    "offline": "Offline",
+    "timeout": "Timeout",
+    "pending": "Testing...",
+    "untested": "Untested"
+  },
+  "tracking": {
+    "none": "No tracking",
+    "opensource": "Open source",
+    "private": "No tracking",
+    "enabled": "Tracking"
+  },
+  "actions": {
+    "testAll": "Test All",
+    "testing": "Testing...",
+    "retest": "Re-test",
+    "add": "Add",
+    "added": "Active",
+    "copyUrl": "Copy URL"
+  },
+  "sort": {
+    "asc": "Ascending",
+    "desc": "Descending"
+  },
+  "latency": {
+    "ms": "{{ms}}ms",
+    "na": "N/A"
+  },
+  "empty": {
+    "noEndpoints": "No RPC endpoints available for this network.",
+    "noResults": "No test results yet. Click \"Test All\" to begin."
+  },
+  "toast": {
+    "added": "Endpoint added to your RPC configuration.",
+    "copied": "URL copied to clipboard.",
+    "alreadyActive": "This endpoint is already in your configuration."
+  },
+  "legend": {
+    "opensource": "Open source & no tracking",
+    "private": "Closed source & no tracking",
+    "tracking": "Tracking enabled"
+  }
+}
