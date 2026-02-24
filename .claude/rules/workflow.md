@@ -235,6 +235,13 @@ What outcome or resolution are you looking for?
 Any other details that might be helpful.
 ```
 
+## No AI Attribution
+
+**NEVER include any AI or Claude attribution** in commits, PRs, issues, or any generated content. This includes:
+- No `Co-Authored-By: Claude` in commit messages
+- No "Generated with Claude Code" in PR bodies
+- No AI-related footers, badges, or mentions anywhere
+
 ## Creating PRs with Claude
 
 **IMPORTANT: Always use the PR template when creating pull requests.**
