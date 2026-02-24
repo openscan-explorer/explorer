@@ -256,7 +256,7 @@
     "fastestResponseWins": "最速レスポンスが優先 • すべての時間を表示",
     "responsesDiffer": "プロバイダー間でレスポンスが異なります",
     "selected": "選択済み",
-    "winner": "優勝者",
+    "winner": "勝者",
     "fallbackNote": "フォールバックモード：プロバイダーを順番に試行",
     "raceNote": "レースモード：最初の成功レスポンスを返す。保留中のものは破棄されます"
   },
