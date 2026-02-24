@@ -119,6 +119,8 @@
     "removeRpc": "Eliminar RPC",
     "localhostHelp": "¿Necesitás acceder a tu red local de forma remota?",
     "localhostHelpLink": "Aprendé cómo configurar un túnel con ngrok",
+    "syncRpcs": "Sincronizar RPCs",
+    "syncing": "Sincronizando...",
     "metamask": {
       "notSupported": "No soportado para esta chain",
       "configured": "¡OpenScan configurado!",

@@ -22,7 +22,7 @@ function buildRpcBody(networkType: NetworkType): string {
   return JSON.stringify({ jsonrpc: "2.0", id: 1, method: "eth_blockNumber", params: [] });
 }
 
-async function testEndpoint(
+export async function testRpcEndpoint(
   url: string,
   signal: AbortSignal,
   networkType: NetworkType,
@@ -93,7 +93,7 @@ export function useRpcLatencyTest() {
 
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), TIMEOUT_MS);
-    const result = await testEndpoint(url, controller.signal, networkType);
+    const result = await testRpcEndpoint(url, controller.signal, networkType);
     clearTimeout(timeout);
 
     setResults((prev) => {
@@ -134,7 +134,7 @@ export function useRpcLatencyTest() {
           const onParentAbort = () => itemController.abort();
           controller.signal.addEventListener("abort", onParentAbort);
 
-          return testEndpoint(url, itemController.signal, networkType).finally(() => {
+          return testRpcEndpoint(url, itemController.signal, networkType).finally(() => {
             clearTimeout(itemTimeout);
             controller.signal.removeEventListener("abort", onParentAbort);
           });
