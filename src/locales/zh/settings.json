@@ -118,6 +118,8 @@
     "removeRpc": "删除 RPC",
     "localhostHelp": "需要远程访问本地网络？",
     "localhostHelpLink": "了解如何使用 ngrok 设置隧道",
+    "syncRpcs": "同步 RPC",
+    "syncing": "同步中...",
     "metamask": {
       "notSupported": "此链不支持",
       "configured": "OpenScan 已配置！",

@@ -118,6 +118,8 @@
     "removeRpc": "RPCを削除",
     "localhostHelp": "ローカルネットワークにリモートアクセスが必要ですか？",
     "localhostHelpLink": "ngrokでトンネルを設定する方法を学ぶ",
+    "syncRpcs": "RPCを同期",
+    "syncing": "同期中...",
     "metamask": {
       "notSupported": "このチェーンはサポートされていません",
       "configured": "OpenScanが設定されました！",
