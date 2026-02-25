@@ -1,4 +1,4 @@
-import { decodeFunctionData, toFunctionSelector } from "viem";
+import { decodeEventLog, decodeFunctionData, keccak256, toBytes, toFunctionSelector } from "viem";
 import type { DecodedParam } from "./eventDecoder";
 
 // Decoded function call result
@@ -173,7 +173,6 @@ export function decodeEventWithAbi(
       const paramTypes = inputs.map((i: { type: string }) => i.type);
       const signature = `${evt.name}(${paramTypes.join(",")})`;
       // Event topic0 is keccak256 of signature - we can use the same approach
-      const { keccak256, toBytes } = require("viem");
       const computedTopic = keccak256(toBytes(signature)).toLowerCase();
       if (computedTopic === topic0.toLowerCase()) {
         matchedEvent = evt;
@@ -192,12 +191,11 @@ export function decodeEventWithAbi(
 
   // Decode event parameters
   try {
-    const { decodeEventLog } = require("viem");
     const decoded = decodeEventLog({
       abi: [matchedEvent],
       data: data as `0x${string}`,
       topics: topics as [`0x${string}`, ...`0x${string}`[]],
-    });
+    }) as { args: Record<string | number, unknown> };
 
     const params: DecodedParam[] = [];
     const args = decoded.args || {};
