@@ -6215,10 +6215,37 @@
 }
 
 /* Token Holdings States */
-.token-holdings-loading,
+.token-holdings-loading {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	padding: 12px 0;
+	color: var(--text-secondary);
+	font-style: italic;
+}
+
 .token-holdings-empty {
 	color: var(--text-secondary);
 	font-style: italic;
+}
+
+.token-holdings-actions .btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	min-width: 160px;
+	height: 28px;
+	box-sizing: border-box;
+}
+
+.token-holdings-actions .btn svg {
+	display: block;
+	flex-shrink: 0;
+	width: 18px;
+	height: 18px;
+	overflow: hidden;
 }
 
 .token-holdings-error {

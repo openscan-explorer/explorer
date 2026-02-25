@@ -3,6 +3,18 @@ import { useCallback, useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { AppContext } from "../../../../../context";
 import { logger } from "../../../../../utils/logger";
+import {
+  fetchToken,
+  fetchTokenList,
+  getAssetUrl,
+  getTokenSupportersByChain,
+  type Supporter,
+  type TokenListItem,
+} from "../../../../../services/MetadataService";
+import { fetchERC20Balances, formatTokenBalance } from "../../../../../utils/erc20Utils";
+import { useTranslation } from "react-i18next";
+import CustomTokenModal from "./CustomTokenModal";
+import OpenScanCubeLoader from "../../../../LoadingLogo";
 
 interface TokenLogoProps {
   src?: string;
@@ -38,17 +50,6 @@ const TokenLogo: React.FC<TokenLogoProps> = ({ src, symbol, name }) => {
     />
   );
 };
-import {
-  fetchToken,
-  fetchTokenList,
-  getAssetUrl,
-  getTokenSupportersByChain,
-  type Supporter,
-  type TokenListItem,
-} from "../../../../../services/MetadataService";
-import { fetchERC20Balances, formatTokenBalance } from "../../../../../utils/erc20Utils";
-import { useTranslation } from "react-i18next";
-import CustomTokenModal from "./CustomTokenModal";
 
 export interface TokenHolding {
   tokenAddress: string;
@@ -312,8 +313,9 @@ const TokenHoldings: React.FC<TokenHoldingsProps> = ({
       {error && <div className="token-holdings-error">{error}</div>}
 
       {loading ? (
-        <div className="tx-row">
-          <span className="tx-value token-holdings-loading">{t("loadingTokenHoldings")}</span>
+        <div className="token-holdings-loading">
+          <OpenScanCubeLoader size={40} />
+          <span>{t("loadingTokenHoldings")}</span>
         </div>
       ) : hasAnyTokens ? (
         <div className="token-holdings-list">
@@ -351,11 +353,16 @@ const TokenHoldings: React.FC<TokenHoldingsProps> = ({
           onClick={handleFetchPopularTokens}
           disabled={popularLoading || popularLoaded}
         >
-          {popularLoading
-            ? t("loading")
-            : popularLoaded
-              ? t("popularTokensLoaded")
-              : t("fetchPopularTokens")}
+          {popularLoading ? (
+            <>
+              <OpenScanCubeLoader size={18} />
+              {t("loading")}
+            </>
+          ) : popularLoaded ? (
+            t("popularTokensLoaded")
+          ) : (
+            t("fetchPopularTokens")
+          )}
         </button>
         <button
           type="button"
