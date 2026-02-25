@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import { encodeFunctionData, parseEther } from "viem";
 import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import { AppContext } from "../../../../../context";
+import { useNotify } from "../../../../../hooks/useNotify";
 import type { ABI, ABIParameter, EventABI, FunctionABI } from "../../../../../types";
 import { logger } from "../../../../../utils/logger";
 
@@ -103,6 +104,7 @@ const ContractInteraction: React.FC<ContractInteractionProps> = ({
   abi,
 }) => {
   const { t } = useTranslation("address");
+  const notify = useNotify();
   const [selectedWriteFunction, setSelectedWriteFunction] = useState<FunctionABI | null>(null);
   const [selectedReadFunction, setSelectedReadFunction] = useState<FunctionABI | null>(null);
   const [functionInputs, setFunctionInputs] = useState<Record<string, string>>({});
@@ -127,7 +129,7 @@ const ContractInteraction: React.FC<ContractInteractionProps> = ({
           const value = functionInputs[paramName];
 
           if (!value && value !== "0") {
-            alert(`Please provide value for ${paramName}`);
+            notify.warning(t("contract.missingParam", { paramName }));
             return;
           }
 
@@ -141,7 +143,7 @@ const ContractInteraction: React.FC<ContractInteractionProps> = ({
         try {
           txValue = parseEther(functionInputs[valueKey]);
         } catch {
-          alert("Invalid ETH value");
+          notify.error(t("contract.invalidEthValue"));
           return;
         }
       }
@@ -155,9 +157,11 @@ const ContractInteraction: React.FC<ContractInteractionProps> = ({
       });
     } catch (err) {
       logger.error("Error writing to contract:", err);
-      alert(`Error: ${err instanceof Error ? err.message : "Unknown error"}`);
+      notify.error(
+        t("contract.error", { message: err instanceof Error ? err.message : "Unknown error" }),
+      );
     }
-  }, [selectedWriteFunction, functionInputs, addressHash, abi, writeContract]);
+  }, [selectedWriteFunction, functionInputs, addressHash, abi, writeContract, notify, t]);
 
   const handleReadFunction = useCallback(async () => {
     if (!selectedReadFunction) return;
@@ -187,7 +191,7 @@ const ContractInteraction: React.FC<ContractInteractionProps> = ({
           const value = functionInputs[paramName];
 
           if (!value && value !== "0") {
-            alert(`Please provide value for ${paramName}`);
+            notify.warning(t("contract.missingParam", { paramName }));
             setIsReadingFunction(false);
             return;
           }
@@ -230,7 +234,7 @@ const ContractInteraction: React.FC<ContractInteractionProps> = ({
     } finally {
       setIsReadingFunction(false);
     }
-  }, [selectedReadFunction, functionInputs, addressHash, abi, networkId, rpcUrls]);
+  }, [selectedReadFunction, functionInputs, addressHash, abi, networkId, rpcUrls, notify, t]);
 
   const readFunctions = abi.filter(
     (item: ABI): item is FunctionABI =>
