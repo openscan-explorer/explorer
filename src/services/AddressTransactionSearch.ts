@@ -595,8 +595,8 @@ export class AddressTransactionSearch {
             this.rpcLimited(() => this.client.getTransactionReceipt(nr.txHash)),
           ]);
 
-          const tx = extractData(txResult.data);
-          const receipt = extractData(receiptResult.data);
+          const tx = extractData<EthTransaction | null>(txResult.data);
+          const receipt = extractData<EthTransactionReceipt | null>(receiptResult.data);
           if (!tx) return null;
 
           // Also get block timestamp
@@ -605,7 +605,7 @@ export class AddressTransactionSearch {
             const blockResult = await this.rpcLimited(() =>
               this.client.getBlockByNumber(`0x${nr.blockNumber.toString(16)}`, false),
             );
-            const block = extractData(blockResult.data);
+            const block = extractData<EthBlock | null>(blockResult.data);
             if (block) timestamp = block.timestamp;
           } catch {
             // timestamp remains empty
