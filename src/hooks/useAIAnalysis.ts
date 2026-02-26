@@ -39,7 +39,7 @@ export function useAIAnalysis(
   const [errorType, setErrorType] = useState<string | null>(null);
 
   const promptVersion = settings.promptVersion ?? "stable";
-  const userMode = isSuperUser ? "power" : "regular";
+  const userMode = isSuperUser ? "super" : "regular";
 
   const resolveProvider = useCallback((): {
     provider: (typeof AI_PROVIDERS)[AIProvider];
