@@ -6,7 +6,7 @@ import type {
 } from "@openscan/network-connectors";
 import type { Transaction } from "../types";
 import { logger } from "../utils/logger";
-import { extractData } from "./adapters/shared/extractData";
+
 import { hexToNumber } from "./adapters/EVMAdapter/utils";
 import type { NonceLookupService } from "./NonceLookupService";
 
@@ -235,7 +235,7 @@ export class AddressTransactionSearch {
     const result = await this.rpcLimited(() =>
       this.client.getTransactionCount(address, `0x${block.toString(16)}`),
     );
-    const nonce = hexToNumber(extractData<string>(result.data) || "0x0");
+    const nonce = hexToNumber(result.data || "0x0");
     this.nonceCache.set(key, nonce);
     return nonce;
   }
@@ -253,7 +253,7 @@ export class AddressTransactionSearch {
     const result = await this.rpcLimited(() =>
       this.client.getBalance(address, `0x${block.toString(16)}`),
     );
-    const balance = BigInt(extractData<string>(result.data) || "0x0");
+    const balance = BigInt(result.data || "0x0");
     this.balanceCache.set(key, balance);
     return balance;
   }
@@ -295,7 +295,7 @@ export class AddressTransactionSearch {
     signal?: AbortSignal,
   ): Promise<{ fromBlock: number; toBlock: number } | null> {
     const blockNumberResult = await this.rpcLimited(() => this.client.blockNumber());
-    const latestBlock = hexToNumber(extractData<string>(blockNumberResult.data) || "0x0");
+    const latestBlock = hexToNumber(blockNumberResult.data || "0x0");
 
     if (latestBlock === 0) return null;
 
@@ -350,7 +350,7 @@ export class AddressTransactionSearch {
       const result = await this.rpcLimited(() =>
         this.client.execute<EthTransactionReceipt[]>("eth_getBlockReceipts", [blockHex]),
       );
-      const allReceipts = extractData<EthTransactionReceipt[]>(result.data);
+      const allReceipts = result.data;
       if (allReceipts && Array.isArray(allReceipts)) {
         for (const receipt of allReceipts) {
           if (receipt?.transactionHash) {
@@ -385,7 +385,7 @@ export class AddressTransactionSearch {
       const results = await Promise.all(
         batch.map((hash) =>
           this.rpcLimited(() => this.client.getTransactionReceipt(hash))
-            .then((res) => ({ hash, receipt: extractData<EthTransactionReceipt | null>(res.data) }))
+            .then((res) => ({ hash, receipt: res.data }))
             .catch(() => ({ hash, receipt: null })),
         ),
       );
@@ -411,7 +411,7 @@ export class AddressTransactionSearch {
     const result = await this.rpcLimited(() =>
       this.client.getBlockByNumber(`0x${blockNum.toString(16)}`, true),
     );
-    const block = extractData<EthBlock | null>(result.data);
+    const block = result.data;
     if (!block || !block.transactions) return [];
 
     // First pass: identify direct transactions (from/to matches address)
@@ -595,8 +595,8 @@ export class AddressTransactionSearch {
             this.rpcLimited(() => this.client.getTransactionReceipt(nr.txHash)),
           ]);
 
-          const tx = extractData<EthTransaction | null>(txResult.data);
-          const receipt = extractData<EthTransactionReceipt | null>(receiptResult.data);
+          const tx = txResult.data;
+          const receipt = receiptResult.data;
           if (!tx) return null;
 
           // Also get block timestamp
@@ -605,7 +605,7 @@ export class AddressTransactionSearch {
             const blockResult = await this.rpcLimited(() =>
               this.client.getBlockByNumber(`0x${nr.blockNumber.toString(16)}`, false),
             );
-            const block = extractData<EthBlock | null>(blockResult.data);
+            const block = blockResult.data;
             if (block) timestamp = block.timestamp;
           } catch {
             // timestamp remains empty
@@ -928,7 +928,7 @@ export class AddressTransactionSearch {
       endBlock = toBlock - 1; // Exclusive - don't include the toBlock itself
     } else {
       const blockNumberResult = await this.rpcLimited(() => this.client.blockNumber());
-      endBlock = hexToNumber(extractData<string>(blockNumberResult.data) || "0x0");
+      endBlock = hexToNumber(blockNumberResult.data || "0x0");
     }
 
     // Get initial and final states
@@ -1194,8 +1194,8 @@ export class AddressTransactionSearch {
       this.client.getTransactionCount(address, "latest"),
     );
 
-    const latestBlock = hexToNumber(extractData<string>(blockNumberResult.data) || "0x0");
-    const currentNonce = hexToNumber(extractData<string>(nonceResult.data) || "0x0");
+    const latestBlock = hexToNumber(blockNumberResult.data || "0x0");
+    const currentNonce = hexToNumber(nonceResult.data || "0x0");
 
     // No transactions sent from this address
     if (currentNonce === 0) return null;

@@ -9,7 +9,6 @@ import type {
   DataWithMetadata,
 } from "../../../types";
 import { logger } from "../../../utils/logger";
-import { extractData } from "../shared/extractData";
 
 /**
  * Bitcoin blockchain adapter
@@ -36,8 +35,7 @@ export class BitcoinAdapter {
    */
   async getLatestBlockNumber(): Promise<number> {
     const result = await this.client.getBlockCount();
-    const blockCount = extractData<number>(result.data);
-    return blockCount ?? 0;
+    return result.data ?? 0;
   }
 
   /**
@@ -49,17 +47,8 @@ export class BitcoinAdapter {
       this.client.getMempoolInfo(),
     ]);
 
-    const blockchainInfo = extractData<{
-      chain: string;
-      blocks: number;
-      bestblockhash: string;
-      difficulty: number;
-    }>(blockchainInfoResult.data);
-
-    const mempoolInfo = extractData<{
-      size: number;
-      bytes: number;
-    }>(mempoolInfoResult.data);
+    const blockchainInfo = blockchainInfoResult.data;
+    const mempoolInfo = mempoolInfoResult.data;
 
     const stats: BitcoinNetworkStats = {
       blockHeight: blockchainInfo?.blocks ?? 0,
@@ -93,7 +82,7 @@ export class BitcoinAdapter {
     );
 
     const hashes = hashResults
-      .map((result) => (result ? extractData<string>(result.data) : null))
+      .map((result) => (result ? result.data : null))
       .filter((hash): hash is string => hash !== null);
 
     // Fetch all block details in parallel
@@ -106,20 +95,7 @@ export class BitcoinAdapter {
     for (const result of blockResults) {
       if (!result) continue;
 
-      const blockData = extractData<{
-        hash: string;
-        height: number;
-        time: number;
-        nTx?: number;
-        tx?: string[];
-        size: number;
-        weight: number;
-        merkleroot: string;
-        previousblockhash?: string;
-        version: number;
-        bits: string;
-        nonce: number;
-      }>(result.data);
+      const blockData = result.data;
 
       if (blockData) {
         blocks.push({
@@ -160,7 +136,7 @@ export class BitcoinAdapter {
     );
 
     const hashes = hashResults
-      .map((result) => (result ? extractData<string>(result.data) : null))
+      .map((result) => (result ? result.data : null))
       .filter((hash): hash is string => hash !== null);
 
     // Fetch all block headers in parallel (lighter than full blocks)
@@ -173,17 +149,7 @@ export class BitcoinAdapter {
     for (const result of headerResults) {
       if (!result) continue;
 
-      const headerData = extractData<{
-        hash: string;
-        height: number;
-        time: number;
-        nTx?: number;
-        merkleroot: string;
-        previousblockhash?: string;
-        version: number;
-        bits: string;
-        nonce: number;
-      }>(result.data);
+      const headerData = result.data;
 
       if (headerData) {
         blocks.push({
@@ -223,7 +189,7 @@ export class BitcoinAdapter {
       try {
         // Get block hash
         const hashResult = await this.client.getBlockHash(currentHeight);
-        const blockHash = extractData<string>(hashResult.data);
+        const blockHash = hashResult.data;
 
         if (!blockHash) {
           currentHeight--;
@@ -233,8 +199,7 @@ export class BitcoinAdapter {
 
         // Get block with full transaction data (verbosity 2)
         const blockResult = await this.client.getBlock(blockHash, 2);
-        // biome-ignore lint/suspicious/noExplicitAny: RPC response type varies
-        const blockData = extractData<any>(blockResult.data);
+        const blockData = blockResult.data;
 
         if (blockData?.tx) {
           // Transform and add transactions (newest first within block)
@@ -262,15 +227,14 @@ export class BitcoinAdapter {
    */
   async getBlockTransactions(blockHeight: number): Promise<BitcoinTransaction[]> {
     const hashResult = await this.client.getBlockHash(blockHeight);
-    const blockHash = extractData<string>(hashResult.data);
+    const blockHash = hashResult.data;
 
     if (!blockHash) {
       throw new Error(`Block at height ${blockHeight} not found`);
     }
 
     const blockResult = await this.client.getBlock(blockHash, 2);
-    // biome-ignore lint/suspicious/noExplicitAny: RPC response type varies
-    const blockData = extractData<any>(blockResult.data);
+    const blockData = blockResult.data;
 
     if (!blockData?.tx) {
       return [];
@@ -438,7 +402,7 @@ export class BitcoinAdapter {
       const height =
         typeof blockHashOrHeight === "number" ? blockHashOrHeight : Number(blockHashOrHeight);
       const hashResult = await this.client.getBlockHash(height);
-      const hash = extractData<string>(hashResult.data);
+      const hash = hashResult.data;
       if (!hash) {
         throw new Error(`Block at height ${blockHashOrHeight} not found`);
       }
@@ -454,11 +418,8 @@ export class BitcoinAdapter {
       this.client.getBlockHeader(blockHash, true).catch(() => null),
     ]);
 
-    // biome-ignore lint/suspicious/noExplicitAny: RPC response varies
-    const blockData = extractData<any>(blockResult.data);
-    const headerData = headerResult
-      ? extractData<{ nTx?: number; size?: number; weight?: number }>(headerResult.data)
-      : null;
+    const blockData = blockResult.data;
+    const headerData = headerResult ? headerResult.data : null;
 
     if (!blockData) {
       throw new Error(`Block ${blockHashOrHeight} not found`);
@@ -534,8 +495,8 @@ export class BitcoinAdapter {
       height: blockData.height,
       time: blockData.time,
       nTx: headerData?.nTx || blockData.nTx || txids.length,
-      size: headerData?.size || blockData.size,
-      weight: headerData?.weight || blockData.weight,
+      size: blockData.size,
+      weight: blockData.weight,
       merkleRoot: blockData.merkleroot,
       previousBlockHash: blockData.previousblockhash,
       nextBlockHash: blockData.nextblockhash,
@@ -577,7 +538,7 @@ export class BitcoinAdapter {
     // Try verbosity 2 first to get prevout data for fee calculation (confirmed txs)
     try {
       const txResult = await this.client.getRawTransaction(txid, 2);
-      txData = extractData<unknown>(txResult.data);
+      txData = txResult.data;
       metadata = txResult.metadata;
     } catch {
       // Verbosity 2 failed
@@ -587,7 +548,7 @@ export class BitcoinAdapter {
     if (!txData) {
       try {
         const txResult = await this.client.getRawTransaction(txid, 1);
-        txData = extractData<unknown>(txResult.data);
+        txData = txResult.data;
         metadata = txResult.metadata;
       } catch {
         // Verbosity 1 also failed
@@ -598,10 +559,10 @@ export class BitcoinAdapter {
     if (!txData) {
       try {
         const rawResult = await this.client.getRawTransaction(txid, 0);
-        const rawHex = extractData<string>(rawResult.data);
+        const rawHex = rawResult.data;
         if (rawHex && typeof rawHex === "string") {
           const decodeResult = await this.client.decodeRawTransaction(rawHex);
-          txData = extractData<unknown>(decodeResult.data);
+          txData = decodeResult.data;
           metadata = rawResult.metadata;
         }
       } catch {
@@ -615,13 +576,7 @@ export class BitcoinAdapter {
       if (!txData.blockhash) {
         try {
           const mempoolResult = await this.client.getMempoolEntry(txid);
-          const mempoolEntry = extractData<{
-            vsize: number;
-            weight: number;
-            fees: { base: number };
-            time: number;
-            "bip125-replaceable": boolean;
-          }>(mempoolResult.data);
+          const mempoolEntry = mempoolResult.data;
 
           if (mempoolEntry) {
             // Enrich transaction with mempool data
@@ -647,14 +602,7 @@ export class BitcoinAdapter {
     // Last resort: check if tx exists in mempool even if getRawTransaction failed
     try {
       const mempoolResult = await this.client.getMempoolEntry(txid);
-      const mempoolEntry = extractData<{
-        vsize: number;
-        weight: number;
-        fees: { base: number };
-        time: number;
-        wtxid: string;
-        "bip125-replaceable": boolean;
-      }>(mempoolResult.data);
+      const mempoolEntry = mempoolResult.data;
 
       if (mempoolEntry) {
         // Transaction is in mempool but we couldn't get full data
@@ -686,12 +634,7 @@ export class BitcoinAdapter {
     // Last attempt: Check if output 0 exists in UTXO set (confirms tx exists even if we can't get details)
     try {
       const utxoResult = await this.client.getTxOut(txid, 0, true);
-      const utxo = extractData<{
-        bestblock: string;
-        confirmations: number;
-        value: number;
-        scriptPubKey: { address?: string; type: string };
-      } | null>(utxoResult.data);
+      const utxo = utxoResult.data;
 
       if (utxo) {
         // Transaction exists! Build minimal tx from UTXO data
@@ -744,8 +687,7 @@ export class BitcoinAdapter {
       // Use scanTxOutSet with addr() descriptor to query any address
       // This works without requiring the address to be in a wallet
       const scanResult = await this.client.scanTxOutSet("start", [`addr(${address})`]);
-      // biome-ignore lint/suspicious/noExplicitAny: RPC response type varies
-      const scanData = extractData<any>(scanResult.data);
+      const scanData = scanResult.data;
 
       if (!scanData) {
         throw new Error("scanTxOutSet returned no data");
@@ -782,8 +724,7 @@ export class BitcoinAdapter {
       // If scanTxOutSet fails, try listUnspent (wallet addresses only)
       try {
         const utxoResult = await this.client.listUnspent(0, 9999999, [address]);
-        // biome-ignore lint/suspicious/noExplicitAny: RPC response type varies
-        const utxos = extractData<any[]>(utxoResult.data) || [];
+        const utxos = utxoResult.data || [];
 
         // biome-ignore lint/suspicious/noExplicitAny: RPC response type varies
         const balance = utxos.reduce((sum: number, utxo: any) => sum + utxo.amount, 0);
@@ -882,20 +823,7 @@ export class BitcoinAdapter {
   }> {
     try {
       const mempoolResult = await this.client.getRawMempool(true);
-      const mempoolData = extractData<
-        Record<
-          string,
-          {
-            vsize: number;
-            weight: number;
-            time: number;
-            fees: { base: number; modified: number; ancestor: number; descendant: number };
-            depends: string[];
-            spentby: string[];
-            "bip125-replaceable": boolean;
-          }
-        >
-      >(mempoolResult.data);
+      const mempoolData = mempoolResult.data;
 
       if (!mempoolData) {
         return { total: 0, entries: [] };
@@ -946,8 +874,7 @@ export class BitcoinAdapter {
       const txPromises = pageEntries.map(async (entry) => {
         try {
           const txResult = await this.client.getRawTransaction(entry.txid, 1).catch(() => null);
-          // biome-ignore lint/suspicious/noExplicitAny: RPC response varies
-          const txData = txResult ? extractData<any>(txResult.data) : null;
+          const txData = txResult ? txResult.data : null;
 
           if (txData) {
             return {

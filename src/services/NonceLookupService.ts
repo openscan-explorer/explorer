@@ -1,15 +1,6 @@
 import type { EthereumClient } from "@openscan/network-connectors";
 import { logger } from "../utils/logger";
 
-/**
- * Extract data from strategy result, handling both fallback and parallel modes
- */
-function extractData<T>(data: T | T[] | null | undefined): T | null {
-  if (data === null || data === undefined) return null;
-  if (Array.isArray(data)) return data[0] ?? null;
-  return data;
-}
-
 export interface NonceLookupResult {
   nonce: number;
   txHash: string;
@@ -124,7 +115,7 @@ export class NonceLookupService {
         [address, nonceHex],
       );
 
-      const data = extractData(result.data);
+      const data = result.data;
       if (!data || !data.hash || !data.blockNumber) return null;
 
       return {

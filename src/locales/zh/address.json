@@ -188,5 +188,10 @@
     "sectionTitle": "AI 分析"
   },
   "fetchingSentTxsByNonce": "按 Nonce 获取已发送交易（{{current}}/{{total}}）...",
-  "searchingReceivedTxs": "搜索已接收交易..."
+  "searchingReceivedTxs": "搜索已接收交易...",
+  "contract": {
+    "missingParam": "请提供 {{paramName}} 的值",
+    "invalidEthValue": "ETH 值无效",
+    "error": "错误：{{message}}"
+  }
 }

@@ -188,5 +188,10 @@
     "sectionTitle": "Análise de IA"
   },
   "fetchingSentTxsByNonce": "Buscando transações enviadas ({{current}}/{{total}})...",
-  "searchingReceivedTxs": "Pesquisando transações recebidas..."
+  "searchingReceivedTxs": "Pesquisando transações recebidas...",
+  "contract": {
+    "missingParam": "Por favor, forneça um valor para {{paramName}}",
+    "invalidEthValue": "Valor de ETH inválido",
+    "error": "Erro: {{message}}"
+  }
 }

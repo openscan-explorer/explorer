@@ -7,7 +7,7 @@ import {
   createAddressFromBalance,
   hexToNumber,
 } from "./utils";
-import { extractData } from "../shared/extractData";
+
 import { normalizeBlockNumber } from "../shared/normalizeBlockNumber";
 import { mergeMetadata } from "../shared/mergeMetadata";
 import type { OptimismClient, EthereumClient } from "@openscan/network-connectors";
@@ -34,7 +34,7 @@ export class OptimismAdapter extends NetworkAdapter {
     const normalizedBlockNumber = normalizeBlockNumber(blockNumber);
     const result = await this.client.getBlockByNumber(normalizedBlockNumber);
 
-    const blockData = extractData<typeof result.data>(result.data);
+    const blockData = result.data;
     if (!blockData) {
       throw new Error(`Block ${blockNumber} not found`);
     }
@@ -53,7 +53,7 @@ export class OptimismAdapter extends NetworkAdapter {
     const normalizedBlockNumber = normalizeBlockNumber(blockNumber);
     const result = await this.client.getBlockByNumber(normalizedBlockNumber, true);
 
-    const blockData = extractData<typeof result.data>(result.data);
+    const blockData = result.data;
     if (!blockData) {
       throw new Error(`Block ${blockNumber} not found`);
     }
@@ -82,12 +82,12 @@ export class OptimismAdapter extends NetworkAdapter {
       this.client.getTransactionReceipt(txHash),
     ]);
 
-    const txData = extractData<typeof txResult.data>(txResult.data);
+    const txData = txResult.data;
     if (!txData) {
       throw new Error(`Transaction ${txHash} not found`);
     }
 
-    const receiptData = extractData<typeof receiptResult.data>(receiptResult.data);
+    const receiptData = receiptResult.data;
     const transaction = transformOptimismTransactionToTransaction(txData, receiptData);
 
     // Get timestamp and baseFeePerGas from block if available
@@ -117,9 +117,9 @@ export class OptimismAdapter extends NetworkAdapter {
       this.client.getTransactionCount(address, "latest"),
     ]);
 
-    const balance = extractData<string>(balanceResult.data) || "0x0";
-    const code = extractData<string>(codeResult.data) || "0x";
-    const txCount = extractData<string>(txCountResult.data) || "0x0";
+    const balance = balanceResult.data || "0x0";
+    const code = codeResult.data || "0x";
+    const txCount = txCountResult.data || "0x0";
 
     const addressData = createAddressFromBalance(address, balance, code, txCount);
 
@@ -131,7 +131,7 @@ export class OptimismAdapter extends NetworkAdapter {
 
   async getLatestBlockNumber(): Promise<number> {
     const result = await this.client.blockNumber();
-    const blockNumber = extractData<string>(result.data) || "0x0";
+    const blockNumber = result.data || "0x0";
     return hexToNumber(blockNumber);
   }
 
@@ -143,11 +143,10 @@ export class OptimismAdapter extends NetworkAdapter {
       this.client.clientVersion(),
     ]);
 
-    // Extract actual data from strategy results (handles both fallback and parallel modes)
-    const gasPrice = extractData<string>(gasPriceResult.data) || "0x0";
-    const syncing = extractData<boolean | object>(syncingResult.data);
-    const blockNumber = extractData<string>(blockNumberResult.data) || "0x0";
-    const clientVersion = extractData<string>(versionResult.data) || "unknown";
+    const gasPrice = gasPriceResult.data || "0x0";
+    const syncing = syncingResult.data;
+    const blockNumber = blockNumberResult.data || "0x0";
+    const clientVersion = versionResult.data || "unknown";
 
     const stats: NetworkStats = {
       currentGasPrice: gasPrice,
@@ -249,7 +248,7 @@ export class OptimismAdapter extends NetworkAdapter {
 
     try {
       const result = await this.client.debugTraceTransaction(txHash, {});
-      return extractData<TraceResult | null>(result.data);
+      return result.data;
     } catch (error) {
       logger.error("Error getting transaction trace:", error);
       return null;
@@ -265,8 +264,7 @@ export class OptimismAdapter extends NetworkAdapter {
 
     try {
       const result = await this.client.traceTransaction(txHash);
-      // biome-ignore lint/suspicious/noExplicitAny: Generic trace result type
-      return extractData<any>(result.data);
+      return result.data;
     } catch (error) {
       logger.error("Error getting call trace:", error);
       return null;
@@ -282,12 +280,12 @@ export class OptimismAdapter extends NetworkAdapter {
     try {
       // Convert block hash to block number first
       const blockResult = await this.client.getBlockByHash(blockHash, false);
-      const blockData = extractData<typeof blockResult.data>(blockResult.data);
+      const blockData = blockResult.data;
       if (!blockData) return null;
 
       const blockNumber = hexToNumber(blockData.number);
       const result = await this.client.traceBlock(blockNumber);
-      return extractData<TraceResult[] | null>(result.data);
+      return result.data;
     } catch (error) {
       logger.error("Error getting block trace:", error);
       return null;

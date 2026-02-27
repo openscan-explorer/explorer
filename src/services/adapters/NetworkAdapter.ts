@@ -9,7 +9,7 @@ import type {
   GasPrices,
 } from "../../types";
 import { logger } from "../../utils/logger";
-import { extractData } from "./shared/extractData";
+
 import { AddressTransactionSearch } from "../AddressTransactionSearch";
 import type { NonceLookupService } from "../NonceLookupService";
 
@@ -222,19 +222,14 @@ export abstract class NetworkAdapter {
 
     // Fetch fee history for last 20 blocks with 25th, 50th, 75th percentiles
     const feeHistoryResult = await client.feeHistory("0x14", "latest", [25, 50, 75]);
-    const feeHistory = extractData<{
-      baseFeePerGas: string[];
-      gasUsedRatio: number[];
-      oldestBlock: string;
-      reward?: string[][];
-    }>(feeHistoryResult.data);
+    const feeHistory = feeHistoryResult.data;
 
     if (!feeHistory || !feeHistory.reward || feeHistory.reward.length === 0) {
       // Fallback to simple gas price if feeHistory not available
       const gasPriceResult = await client.gasPrice();
-      const gasPrice = extractData<string>(gasPriceResult.data) || "0x0";
+      const gasPrice = gasPriceResult.data || "0x0";
       const blockNumResult = await client.blockNumber();
-      const blockNum = extractData<string>(blockNumResult.data) || "0x0";
+      const blockNum = blockNumResult.data || "0x0";
 
       return {
         data: {

@@ -188,5 +188,10 @@
     "sectionTitle": "AI分析"
   },
   "fetchingSentTxsByNonce": "Nonceで送信済みトランザクションを取得中（{{current}}/{{total}}）...",
-  "searchingReceivedTxs": "受信済みトランザクションを検索中..."
+  "searchingReceivedTxs": "受信済みトランザクションを検索中...",
+  "contract": {
+    "missingParam": "{{paramName}}の値を入力してください",
+    "invalidEthValue": "無効なETH値です",
+    "error": "エラー: {{message}}"
+  }
 }

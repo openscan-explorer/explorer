@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { encodeFunctionData, parseEther, toFunctionSelector } from "viem";
 import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import { AppContext } from "../../../../context";
+import { useNotify } from "../../../../hooks/useNotify";
 import { useSourcify } from "../../../../hooks/useSourcify";
 import { logger } from "../../../../utils/logger";
 import type {
@@ -77,6 +78,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
     });
 
     const { t } = useTranslation("address");
+    const notify = useNotify();
 
     const isContract = useMemo(() => address.code && address.code !== "0x", [address.code]);
 
@@ -214,7 +216,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
             const value = functionInputs[paramName];
 
             if (!value && value !== "0") {
-              alert(`Please provide value for ${paramName}`);
+              notify.warning(t("contract.missingParam", { paramName }));
               return;
             }
 
@@ -229,7 +231,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
           try {
             txValue = parseEther(functionInputs[valueKey]);
           } catch (_e) {
-            alert("Invalid ETH value");
+            notify.error(t("contract.invalidEthValue"));
             return;
           }
         }
@@ -244,9 +246,19 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
         });
       } catch (err) {
         logger.error("Error writing to contract:", err);
-        alert(`Error: ${err instanceof Error ? err.message : "Unknown error"}`);
+        notify.error(
+          t("contract.error", { message: err instanceof Error ? err.message : "Unknown error" }),
+        );
       }
-    }, [selectedWriteFunction, functionInputs, addressHash, contractData?.abi, writeContract]);
+    }, [
+      selectedWriteFunction,
+      functionInputs,
+      addressHash,
+      contractData?.abi,
+      writeContract,
+      notify,
+      t,
+    ]);
 
     const handleReadFunction = useCallback(async () => {
       if (!selectedReadFunction || !contractData) return;
@@ -280,7 +292,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
             const value = functionInputs[paramName];
 
             if (!value && value !== "0") {
-              alert(`Please provide value for ${paramName}`);
+              notify.warning(t("contract.missingParam", { paramName }));
               setIsReadingFunction(false);
               return;
             }
@@ -326,7 +338,16 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
       } finally {
         setIsReadingFunction(false);
       }
-    }, [selectedReadFunction, contractData, networkId, functionInputs, addressHash, rpcUrls]);
+    }, [
+      selectedReadFunction,
+      contractData,
+      networkId,
+      functionInputs,
+      addressHash,
+      rpcUrls,
+      notify,
+      t,
+    ]);
 
     return (
       <div className="block-display-card">

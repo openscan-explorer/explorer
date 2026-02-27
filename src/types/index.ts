@@ -458,7 +458,14 @@ export interface AIAnalysisResult {
 /**
  * Analysis types for the AI analyzer
  */
-export type AIAnalysisType = "transaction" | "account" | "contract" | "block";
+export type AIAnalysisType =
+  | "transaction"
+  | "account"
+  | "contract"
+  | "block"
+  | "bitcoin_transaction"
+  | "bitcoin_block"
+  | "bitcoin_address";
 
 /**
  * Prompt version for AI analysis
