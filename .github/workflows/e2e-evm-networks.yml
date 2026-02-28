@@ -9,6 +9,14 @@ jobs:
   e2e-evm:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        shard:
+          - name: shard-a
+            tests: "e2e/tests/evm-networks/arbitrum.spec.ts e2e/tests/evm-networks/base.spec.ts e2e/tests/evm-networks/optimism.spec.ts"
+          - name: shard-b
+            tests: "e2e/tests/evm-networks/bsc.spec.ts e2e/tests/evm-networks/polygon.spec.ts"
 
     steps:
       - uses: actions/checkout@v4
@@ -27,8 +35,8 @@ jobs:
       - name: Build application
         run: ./scripts/build-production.sh
 
-      - name: Run EVM Networks E2E tests
-        run: bun run test:e2e:evm-networks
+      - name: Run EVM Networks E2E tests (${{ matrix.shard.name }})
+        run: bunx playwright test ${{ matrix.shard.tests }}
         env:
           CI: true
           INFURA_API_KEY: ${{ secrets.INFURA_API_KEY }}
@@ -38,6 +46,6 @@ jobs:
         uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: playwright-report-evm
+          name: playwright-report-evm-${{ matrix.shard.name }}
           path: playwright-report/
           retention-days: 7
