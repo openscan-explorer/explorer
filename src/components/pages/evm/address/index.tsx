@@ -121,6 +121,13 @@ export default function Address() {
     setTypeLoading(true);
     setError(null);
 
+    // Use address code as resilient fallback when type detection RPC calls fail
+    const fallbackTypeFromCode = (code?: string | null): AddressType => {
+      if (!code) return "account";
+      const normalized = code.toLowerCase().replace(/^0x0*/, "");
+      return normalized.length > 0 ? "contract" : "account";
+    };
+
     // Use DataService to fetch address data with metadata support
     dataService.networkAdapter
       .getAddress(address)
@@ -147,13 +154,15 @@ export default function Address() {
               setAddressType(typeResult.addressType);
             })
             .catch(() => {
-              // Fallback to account if type detection fails
-              setAddressType("account");
+              // If detection fails, infer from already-fetched address code instead of forcing account
+              setAddressType(fallbackTypeFromCode(addressData?.code));
             })
             .finally(() => {
               setTypeLoading(false);
             });
         } else {
+          // No RPC available for type detection: still infer type from fetched address code
+          setAddressType(fallbackTypeFromCode(addressData?.code));
           setTypeLoading(false);
         }
       })
