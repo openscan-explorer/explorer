@@ -27,8 +27,6 @@ jobs:
 
       - name: Build Staging
         run: ./scripts/build-staging.sh
-        env:
-          VITE_THE_GRAPH_API_KEY: ${{ secrets.VITE_THE_GRAPH_API_KEY }}
 
       - name: Deploy to Netlify
         id: netlify

@@ -34,8 +34,6 @@ jobs:
 
       - name: Build Production
         run: ./scripts/build-production.sh
-        env:
-          VITE_THE_GRAPH_API_KEY: ${{ secrets.VITE_THE_GRAPH_API_KEY }}
 
       - name: Get IPFS Hash
         id: ipfs-hash

@@ -17,12 +17,15 @@ export const getKlerosCurateItemUrl = (itemID: string) =>
 const cache = new Map<string, { tag: KlerosTag | null; expires: number }>();
 const CACHE_TTL = 60 * 60 * 1000; // 1 hour
 
+// Public key with authorized domains — safe to include in source
+const THE_GRAPH_API_KEY = "60ced6ff18cad4b921e4f9df32ed6f32";
+
 export function isKlerosGraphEnabled(): boolean {
-  return !!import.meta.env.VITE_THE_GRAPH_API_KEY;
+  return true;
 }
 
 const GRAPH_URL = () =>
-  `https://gateway-arbitrum.network.thegraph.com/api/${import.meta.env.VITE_THE_GRAPH_API_KEY}/subgraphs/id/9hHo5MpjpC1JqfD3BsgFnojGurXRHTrHWcUcZPPCo6m8`;
+  `https://gateway-arbitrum.network.thegraph.com/api/${THE_GRAPH_API_KEY}/subgraphs/id/9hHo5MpjpC1JqfD3BsgFnojGurXRHTrHWcUcZPPCo6m8`;
 
 async function graphQuery(query: string): Promise<unknown> {
   const response = await fetch(GRAPH_URL(), {

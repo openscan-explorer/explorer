@@ -31,8 +31,6 @@ jobs:
 
       - name: Build Staging
         run: GITHUB_PAGES=true ./scripts/build-staging.sh
-        env:
-          VITE_THE_GRAPH_API_KEY: ${{ secrets.VITE_THE_GRAPH_API_KEY }}
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
