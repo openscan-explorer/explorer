@@ -18,7 +18,7 @@ const cache = new Map<string, { tag: KlerosTag | null; expires: number }>();
 const CACHE_TTL = 60 * 60 * 1000; // 1 hour
 
 // Public key with authorized domains — safe to include in source
-const THE_GRAPH_API_KEY = "60ced6ff18cad4b921e4f9df32ed6f32";
+const THE_GRAPH_API_KEY = "90d378ffb102d0bcce31c59bc16057b6";
 
 export function isKlerosGraphEnabled(): boolean {
   return true;
