@@ -1,5 +1,6 @@
-import type { SupportedChainId, EthereumClient } from "@openscan/network-connectors";
+import type { EthereumClient } from "@openscan/network-connectors";
 import type {
+  AppChainId,
   Block,
   Transaction,
   Address,
@@ -51,7 +52,7 @@ export abstract class NetworkAdapter {
   isLocalHost: boolean;
   protected txSearch: AddressTransactionSearch | null = null;
 
-  constructor(networkId: SupportedChainId | 31337 | 11155111 | 97 | 43114) {
+  constructor(networkId: AppChainId) {
     this.networkId = networkId;
     this.isLocalHost = networkId === 31337;
   }

@@ -8,7 +8,7 @@ import {
 import { AdapterFactory } from "./adapters/adaptersFactory";
 import type { NetworkAdapter } from "./adapters/NetworkAdapter";
 import type { BitcoinAdapter } from "./adapters/BitcoinAdapter/BitcoinAdapter";
-import type { NetworkConfig, RpcUrlsContextType } from "../types";
+import type { AppChainId, NetworkConfig, RpcUrlsContextType } from "../types";
 import { getRPCUrls } from "../config/rpcConfig";
 import { getNetworkRpcKey, getChainIdFromNetwork } from "../utils/networkResolver";
 
@@ -46,18 +46,19 @@ export class DataService {
       this.networkAdapter = null as unknown as NetworkAdapter;
     } else {
       // Create EVM client and adapter
-      const chainId = getChainIdFromNetwork(network) as SupportedChainId;
+      const chainId = getChainIdFromNetwork(network) as AppChainId;
 
       // Chains not registered in ClientFactory need a direct EthereumClient
-      const unsupportedByFactory = [43114];
+      const unsupportedByFactory: number[] = [43114];
       if (unsupportedByFactory.includes(chainId)) {
         const networkClient = new EthereumClient({ rpcUrls, type: strategy });
         this.networkAdapter = AdapterFactory.createAdapter(chainId, networkClient);
       } else {
-        const networkClient = ClientFactory.createTypedClient<typeof chainId>(chainId, {
-          rpcUrls,
-          type: strategy,
-        });
+        const factoryChainId = chainId as SupportedChainId;
+        const networkClient = ClientFactory.createTypedClient<typeof factoryChainId>(
+          factoryChainId,
+          { rpcUrls, type: strategy },
+        );
         this.networkAdapter = AdapterFactory.createAdapter(chainId, networkClient);
       }
     }

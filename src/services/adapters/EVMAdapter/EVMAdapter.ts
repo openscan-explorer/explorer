@@ -11,7 +11,8 @@ import {
 
 import { normalizeBlockNumber } from "../shared/normalizeBlockNumber";
 import { mergeMetadata } from "../shared/mergeMetadata";
-import type { EthereumClient, SupportedChainId } from "@openscan/network-connectors";
+import type { EthereumClient } from "@openscan/network-connectors";
+import type { AppChainId } from "../../../types";
 import { getRethClient, NONCE_LOOKUP_CHAIN_ID } from "../../../config/rethProviders";
 import { NonceLookupService } from "../../NonceLookupService";
 
@@ -22,7 +23,7 @@ import { NonceLookupService } from "../../NonceLookupService";
 export class EVMAdapter extends NetworkAdapter {
   private client: EthereumClient;
 
-  constructor(networkId: SupportedChainId | 11155111 | 97 | 31337 | 43114, client: EthereumClient) {
+  constructor(networkId: AppChainId, client: EthereumClient) {
     super(networkId);
     this.client = client;
 
