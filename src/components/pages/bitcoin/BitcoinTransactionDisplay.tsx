@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
 import { Link } from "react-router-dom";
+import CopyButton from "../../common/CopyButton";
 import { SATOSHIS_PER_BTC } from "../../../config/bitcoinConstants";
 import { getNetworkById } from "../../../config/networks";
 import type { BitcoinTransaction } from "../../../types";
@@ -120,13 +121,13 @@ const BitcoinTransactionDisplay: React.FC<BitcoinTransactionDisplayProps> = Reac
           <div className="tx-details">
             <div className="tx-row">
               <span className="tx-label">Transaction ID:</span>
-              <span className="tx-value tx-mono">{transaction.txid}</span>
+              <span className="tx-value tx-mono" style={{ display: "inline-flex", alignItems: "center" }}>{transaction.txid}<CopyButton value={transaction.txid} /></span>
             </div>
 
             {transaction.hash !== transaction.txid && (
               <div className="tx-row">
                 <span className="tx-label">Witness Hash:</span>
-                <span className="tx-value tx-mono">{transaction.hash}</span>
+                <span className="tx-value tx-mono" style={{ display: "inline-flex", alignItems: "center" }}>{transaction.hash}<CopyButton value={transaction.hash} /></span>
               </div>
             )}
 

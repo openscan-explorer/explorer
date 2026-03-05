@@ -7481,3 +7481,34 @@ button.tx-section-header-toggle {
 		transform: rotate(90deg);
 	}
 }
+
+/* Copy Button */
+.copy-button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	background: none;
+	border: none;
+	cursor: pointer;
+	color: var(--text-muted, #888);
+	padding: 2px 4px;
+	border-radius: 4px;
+	transition: color 0.2s ease, background-color 0.2s ease;
+	vertical-align: middle;
+	margin-left: 4px;
+	flex-shrink: 0;
+}
+
+.copy-button:hover {
+	color: var(--color-primary, #3ecfa0);
+	background-color: var(--color-primary-alpha-10, rgba(62, 207, 160, 0.1));
+}
+
+.copy-button:focus-visible {
+	outline: 2px solid var(--color-primary, #3ecfa0);
+	outline-offset: 1px;
+}
+
+.copy-button-copied {
+	color: var(--color-primary, #3ecfa0);
+}

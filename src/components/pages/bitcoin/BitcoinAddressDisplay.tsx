@@ -6,6 +6,7 @@ import type { BitcoinAddress } from "../../../types";
 import { formatBTC, truncateHash } from "../../../utils/bitcoinFormatters";
 import { getAddressTypeLabel } from "../../../utils/bitcoinUtils";
 import AIAnalysisPanel from "../../common/AIAnalysis/AIAnalysisPanel";
+import CopyButton from "../../common/CopyButton";
 
 interface BitcoinAddressDisplayProps {
   address: BitcoinAddress;
@@ -69,7 +70,7 @@ const BitcoinAddressDisplay: React.FC<BitcoinAddressDisplayProps> = React.memo(
             {/* Address */}
             <div className="tx-row">
               <span className="tx-label">Address:</span>
-              <span className="tx-value tx-mono">{address.address}</span>
+              <span className="tx-value tx-mono" style={{ display: "inline-flex", alignItems: "center" }}>{address.address}<CopyButton value={address.address} /></span>
             </div>
 
             {/* Balance */}

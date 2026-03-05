@@ -1,14 +1,22 @@
 import type React from "react";
 import { useState } from "react";
+import CopyButton from "./CopyButton";
 
 interface LongStringProps {
   value: string;
   start?: number;
   end?: number;
   style?: React.CSSProperties;
+  copyable?: boolean;
 }
 
-const LongString: React.FC<LongStringProps> = ({ value, start = 10, end = 8, style = {} }) => {
+const LongString: React.FC<LongStringProps> = ({
+  value,
+  start = 10,
+  end = 8,
+  style = {},
+  copyable = true,
+}) => {
   const [isHovered, setIsHovered] = useState(false);
 
   const truncate = (str: string) => {
@@ -20,19 +28,24 @@ const LongString: React.FC<LongStringProps> = ({ value, start = 10, end = 8, sty
   const shouldTruncate = value && value.length > start + end;
 
   return (
-    // biome-ignore lint/a11y/noStaticElementInteractions: <TODO>
     <span
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      style={{
-        wordBreak: isHovered && shouldTruncate ? "break-all" : "normal",
-        transition: "all 0.2s ease",
-        cursor: shouldTruncate ? "pointer" : "default",
-        ...style,
-      }}
-      title={shouldTruncate ? value : undefined}
+      style={{ display: "inline-flex", alignItems: "center", gap: 0 }}
     >
-      {isHovered && shouldTruncate ? value : truncate(value)}
+      {/* biome-ignore lint/a11y/noStaticElementInteractions: hover expand for long strings */}
+      <span
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        style={{
+          wordBreak: isHovered && shouldTruncate ? "break-all" : "normal",
+          transition: "all 0.2s ease",
+          cursor: shouldTruncate ? "pointer" : "default",
+          ...style,
+        }}
+        title={shouldTruncate ? value : undefined}
+      >
+        {isHovered && shouldTruncate ? value : truncate(value)}
+      </span>
+      {copyable && value && <CopyButton value={value} size={13} />}
     </span>
   );
 };

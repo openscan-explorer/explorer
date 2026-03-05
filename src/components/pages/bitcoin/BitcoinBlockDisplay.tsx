@@ -11,6 +11,7 @@ import {
   truncateBlockHash,
 } from "../../../utils/bitcoinFormatters";
 import AIAnalysisPanel from "../../common/AIAnalysis/AIAnalysisPanel";
+import CopyButton from "../../common/CopyButton";
 
 interface BitcoinBlockDisplayProps {
   block: BitcoinBlock;
@@ -93,7 +94,7 @@ const BitcoinBlockDisplay: React.FC<BitcoinBlockDisplayProps> = React.memo(
             {/* Block Hash */}
             <div className="tx-row">
               <span className="tx-label">Block Hash:</span>
-              <span className="tx-value tx-mono">{block.hash}</span>
+              <span className="tx-value tx-mono" style={{ display: "inline-flex", alignItems: "center" }}>{block.hash}<CopyButton value={block.hash} /></span>
             </div>
 
             {/* Miner */}
