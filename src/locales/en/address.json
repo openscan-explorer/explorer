@@ -197,5 +197,6 @@
   "proxyType": "Proxy Type",
   "implementationAddress": "Implementation",
   "implementationFunctions": "Implementation",
-  "proxyFunctions": "Proxy"
+  "proxyFunctions": "Proxy",
+  "implementationNotVerified": "Implementation not verified on Sourcify"
 }

@@ -169,6 +169,14 @@ const ContractInfoCard: React.FC<ContractInfoCardProps> = ({
         </div>
       )}
 
+      {/* Implementation not verified warning */}
+      {proxyInfo && !hasImplAbi && (
+        <div className="account-card-row">
+          <span className="account-card-label" />
+          <span className="account-card-value contract-not-verified">{t("implementationNotVerified")}</span>
+        </div>
+      )}
+
       {/* Sourcify Link */}
       {sourcifyUrl && (
         <div className="account-card-row">

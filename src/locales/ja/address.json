@@ -197,5 +197,6 @@
   "proxyType": "プロキシタイプ",
   "implementationAddress": "実装",
   "implementationFunctions": "実装",
-  "proxyFunctions": "プロキシ"
+  "proxyFunctions": "プロキシ",
+  "implementationNotVerified": "実装はSourcifyで検証されていません"
 }

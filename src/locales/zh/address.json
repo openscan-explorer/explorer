@@ -197,5 +197,6 @@
   "proxyType": "代理类型",
   "implementationAddress": "实现合约",
   "implementationFunctions": "实现",
-  "proxyFunctions": "代理"
+  "proxyFunctions": "代理",
+  "implementationNotVerified": "实现合约未在Sourcify上验证"
 }
