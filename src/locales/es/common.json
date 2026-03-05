@@ -293,7 +293,9 @@
     "badgeTxHash": "Hash de TX",
     "badgeBlock": "Bloque",
     "badgeEns": "ENS",
-    "badgeUnknown": "Desconocido"
+    "badgeUnknown": "Desconocido",
+    "noQueryHelp": "Buscá una dirección, hash de transacción, número de bloque o nombre ENS.",
+    "goHome": "Ir al Inicio"
   },
   "searchBox": {
     "placeholder": "Buscar por dirección / hash de tx / bloque / nombre ENS",
