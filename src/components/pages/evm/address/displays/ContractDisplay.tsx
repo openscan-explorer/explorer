@@ -3,6 +3,7 @@ import { useContext, useMemo } from "react";
 import { getNetworkById } from "../../../../../config/networks";
 import { AppContext } from "../../../../../context";
 import { useSourcify } from "../../../../../hooks/useSourcify";
+import { useProxyInfo } from "../../../../../hooks/useProxyInfo";
 import type { Address, ENSReverseResult, RPCMetadata } from "../../../../../types";
 import AIAnalysisPanel from "../../../../common/AIAnalysis/AIAnalysisPanel";
 import { AddressHeader } from "../shared";
@@ -47,6 +48,16 @@ const ContractDisplay: React.FC<ContractDisplayProps> = ({
     loading: sourcifyLoading,
     isVerified,
   } = useSourcify(Number(networkId), addressHash, true);
+
+  // Detect proxy pattern
+  const proxyInfo = useProxyInfo(addressHash, networkId, address.code ?? "");
+
+  // Fetch implementation contract data from Sourcify (only when proxy detected)
+  const { data: implSourcifyData, isVerified: implIsVerified } = useSourcify(
+    Number(networkId),
+    proxyInfo?.implementationAddress,
+    !!proxyInfo,
+  );
 
   // Check if we have local artifact data for this address
   const localArtifact = jsonFiles[addressHash.toLowerCase()];
@@ -153,6 +164,8 @@ const ContractDisplay: React.FC<ContractDisplayProps> = ({
                 ? `https://repo.sourcify.dev/contracts/full_match/${networkId}/${addressHash}/`
                 : undefined
             }
+            proxyInfo={proxyInfo}
+            implementationContractData={implIsVerified ? implSourcifyData : null}
           />
         </div>
       </div>

@@ -193,5 +193,9 @@
     "missingParam": "Por favor ingrese un valor para {{paramName}}",
     "invalidEthValue": "Valor de ETH inválido",
     "error": "Error: {{message}}"
-  }
+  },
+  "proxyType": "Tipo de Proxy",
+  "implementationAddress": "Implementación",
+  "implementationFunctions": "Implementación",
+  "proxyFunctions": "Proxy"
 }

@@ -193,5 +193,9 @@
     "missingParam": "{{paramName}}の値を入力してください",
     "invalidEthValue": "無効なETH値です",
     "error": "エラー: {{message}}"
-  }
+  },
+  "proxyType": "プロキシタイプ",
+  "implementationAddress": "実装",
+  "implementationFunctions": "実装",
+  "proxyFunctions": "プロキシ"
 }

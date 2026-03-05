@@ -1,8 +1,11 @@
 import type React from "react";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import type { Address, ABI } from "../../../../../types";
 import { useTranslation } from "react-i18next";
 import ContractInteraction from "./ContractInteraction";
+import type { ProxyInfo } from "../../../../../utils/proxyDetection";
+import type { SourcifyContractDetails } from "../../../../../hooks/useSourcify";
 
 interface ContractData {
   name?: string;
@@ -31,7 +34,11 @@ interface ContractInfoCardProps {
   sourcifyLoading: boolean;
   isLocalArtifact: boolean;
   sourcifyUrl?: string;
+  proxyInfo?: ProxyInfo | null;
+  implementationContractData?: SourcifyContractDetails | null;
 }
+
+type AbiView = "implementation" | "proxy";
 
 const ContractInfoCard: React.FC<ContractInfoCardProps> = ({
   address,
@@ -42,12 +49,15 @@ const ContractInfoCard: React.FC<ContractInfoCardProps> = ({
   sourcifyLoading,
   isLocalArtifact,
   sourcifyUrl,
+  proxyInfo,
+  implementationContractData,
 }) => {
   const { t } = useTranslation("address");
   const [showBytecode, setShowBytecode] = useState(false);
   const [showContractDetails, setShowContractDetails] = useState(false);
   const [showSourceCode, setShowSourceCode] = useState(false);
   const [showRawAbi, setShowRawAbi] = useState(false);
+  const [abiView, setAbiView] = useState<AbiView>("implementation");
 
   const getMatchBadgeText = () => {
     if (isLocalArtifact) return "Local JSON";
@@ -57,6 +67,21 @@ const ContractInfoCard: React.FC<ContractInfoCardProps> = ({
   };
 
   const matchBadgeText = getMatchBadgeText();
+
+  // Determine the active ABI based on tab selection
+  const hasImplAbi = !!(
+    implementationContractData?.abi && implementationContractData.abi.length > 0
+  );
+  const hasProxyAbi = !!(contractData?.abi && contractData.abi.length > 0);
+  const showAbiTabSwitcher = !!(proxyInfo && hasImplAbi && hasProxyAbi);
+
+  const activeAbi: ABI[] | undefined = showAbiTabSwitcher
+    ? abiView === "implementation"
+      ? ((implementationContractData?.abi as ABI[] | undefined) ?? contractData?.abi)
+      : contractData?.abi
+    : proxyInfo && hasImplAbi
+      ? (implementationContractData?.abi as ABI[] | undefined)
+      : contractData?.abi;
 
   // Prepare source files array
   const sourceFiles =
@@ -118,6 +143,32 @@ const ContractInfoCard: React.FC<ContractInfoCardProps> = ({
         </div>
       )}
 
+      {/* Proxy Type */}
+      {proxyInfo && (
+        <div className="account-card-row">
+          <span className="account-card-label">{t("proxyType")}:</span>
+          <span className="account-card-value">{proxyInfo.type}</span>
+        </div>
+      )}
+
+      {/* Implementation Address */}
+      {proxyInfo?.implementationAddress && (
+        <div className="account-card-row">
+          <span className="account-card-label">{t("implementationAddress")}:</span>
+          <span className="account-card-value">
+            <Link
+              to={`/address/${proxyInfo.implementationAddress}?network=${networkId}`}
+              className="account-card-link"
+            >
+              {proxyInfo.implementationAddress}
+            </Link>
+            {implementationContractData?.name && (
+              <span className="contract-match-badge">{implementationContractData.name}</span>
+            )}
+          </span>
+        </div>
+      )}
+
       {/* Sourcify Link */}
       {sourcifyUrl && (
         <div className="account-card-row">
@@ -149,6 +200,26 @@ const ContractInfoCard: React.FC<ContractInfoCardProps> = ({
 
           {showContractDetails && (
             <div className="contract-details-content">
+              {/* ABI tab switcher - only shown when proxy has verified implementation */}
+              {showAbiTabSwitcher && (
+                <div className="abi-tab-switcher">
+                  <button
+                    type="button"
+                    className={`abi-tab${abiView === "implementation" ? " abi-tab--active" : ""}`}
+                    onClick={() => setAbiView("implementation")}
+                  >
+                    {t("implementationFunctions")}
+                  </button>
+                  <button
+                    type="button"
+                    className={`abi-tab${abiView === "proxy" ? " abi-tab--active" : ""}`}
+                    onClick={() => setAbiView("proxy")}
+                  >
+                    {t("proxyFunctions")}
+                  </button>
+                </div>
+              )}
+
               {/* Contract Bytecode */}
               {address.code && address.code !== "0x" && (
                 <div className="contract-collapsible-item">
@@ -195,7 +266,7 @@ const ContractInfoCard: React.FC<ContractInfoCardProps> = ({
               )}
 
               {/* Raw ABI */}
-              {contractData.abi && contractData.abi.length > 0 && (
+              {activeAbi && activeAbi.length > 0 && (
                 <div className="contract-collapsible-item">
                   <button
                     type="button"
@@ -207,18 +278,18 @@ const ContractInfoCard: React.FC<ContractInfoCardProps> = ({
                   </button>
                   {showRawAbi && (
                     <div className="contract-code-content">
-                      <code>{JSON.stringify(contractData.abi, null, 2)}</code>
+                      <code>{JSON.stringify(activeAbi, null, 2)}</code>
                     </div>
                   )}
                 </div>
               )}
 
               {/* Contract Interaction */}
-              {contractData.abi && contractData.abi.length > 0 && (
+              {activeAbi && activeAbi.length > 0 && (
                 <ContractInteraction
                   addressHash={addressHash}
                   networkId={networkId}
-                  abi={contractData.abi}
+                  abi={activeAbi}
                 />
               )}
             </div>
