@@ -131,7 +131,7 @@ const ContractInfoCard: React.FC<ContractInfoCardProps> = ({
           <span className="account-card-label">{t("implementationAddress")}:</span>
           <span className="account-card-value">
             <Link
-              to={`/address/${proxyInfo.implementationAddress}?network=${networkId}`}
+              to={`/${networkId}/address/${proxyInfo.implementationAddress}`}
               className="account-card-link"
             >
               {proxyInfo.implementationAddress}
