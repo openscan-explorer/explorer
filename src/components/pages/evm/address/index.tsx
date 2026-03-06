@@ -1,6 +1,7 @@
 import { useContext, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation, useParams } from "react-router-dom";
+import { getNetworkById } from "../../../../config/networks";
 import { AppContext } from "../../../../context";
 import { useDataService } from "../../../../hooks/useDataService";
 import { useENS } from "../../../../hooks/useENS";
@@ -26,6 +27,8 @@ export default function Address() {
   }>();
   const location = useLocation();
   const numericNetworkId = Number(networkId) || 1;
+  const networkConfigData = getNetworkById(networkId ?? numericNetworkId);
+  const networkLabel = networkConfigData?.shortName || networkConfigData?.name || `Chain ${networkId}`;
   const { rpcUrls } = useContext(AppContext);
   const [addressData, setAddressData] = useState<AddressData | null>(null);
   const [addressType, setAddressType] = useState<AddressType>("account");
@@ -260,7 +263,7 @@ export default function Address() {
     <div className="container-wide">
       <Breadcrumb items={[
         { label: "Home", to: "/" },
-        { label: `Chain ${networkId}`, to: `/${networkId}` },
+        { label: networkLabel, to: `/${networkId}` },
         { label: truncatedAddr },
       ]} />
       {addressType === "account" && <AccountDisplay {...displayProps} />}

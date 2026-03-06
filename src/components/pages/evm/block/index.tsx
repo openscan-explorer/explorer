@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
+import { getNetworkById } from "../../../../config/networks";
 import { useDataService } from "../../../../hooks/useDataService";
 import { usePersistentCache } from "../../../../hooks/usePersistentCache";
 import { useProviderSelection } from "../../../../hooks/useProviderSelection";
@@ -19,6 +20,8 @@ export default function BlockPage() {
 
   const blockNumber = filter === "latest" ? "latest" : Number(filter);
   const numericNetworkId = Number(networkId) || 1;
+  const networkConfig = getNetworkById(networkId ?? numericNetworkId);
+  const networkLabel = networkConfig?.shortName || networkConfig?.name || `Chain ${networkId}`;
 
   const dataService = useDataService(numericNetworkId);
   const { getCached, setCached } = usePersistentCache();
@@ -104,7 +107,7 @@ export default function BlockPage() {
     <div className="container-wide">
       <Breadcrumb items={[
         { label: "Home", to: "/" },
-        { label: `Chain ${networkId}`, to: `/${networkId}` },
+        { label: networkLabel, to: `/${networkId}` },
         { label: "Blocks", to: `/${networkId}/blocks` },
         { label: `Block #${filter}` },
       ]} />
