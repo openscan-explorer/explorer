@@ -251,7 +251,7 @@ export function checkEIP7702Delegation(code: string | null | undefined): boolean
  * Check if an address has contract code
  * Handles various RPC response formats
  */
-function hasContractCode(code: string | null | undefined): boolean {
+export function hasContractCode(code: string | null | undefined): boolean {
   if (!code) return false;
   // Normalize and check - empty code can be "0x", "0x0", "0x00", "", etc.
   const normalized = code.toLowerCase().replace(/^0x0*/, "");

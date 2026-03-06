@@ -8,7 +8,7 @@ import { useENS } from "../../../../hooks/useENS";
 import { useProviderSelection } from "../../../../hooks/useProviderSelection";
 import { ENSService } from "../../../../services/ENS/ENSService";
 import type { Address as AddressData, AddressType, DataWithMetadata } from "../../../../types";
-import { fetchAddressWithType } from "../../../../utils/addressTypeDetection";
+import { fetchAddressWithType, hasContractCode } from "../../../../utils/addressTypeDetection";
 import Breadcrumb from "../../../common/Breadcrumb";
 import LoaderWithTimeout from "../../../common/LoaderWithTimeout";
 import {
@@ -151,13 +151,15 @@ export default function Address() {
               setAddressType(typeResult.addressType);
             })
             .catch(() => {
-              // Fallback to account if type detection fails
-              setAddressType("account");
+              // If detection fails, infer from already-fetched address code instead of forcing account
+              setAddressType(hasContractCode(addressData?.code) ? "contract" : "account");
             })
             .finally(() => {
               setTypeLoading(false);
             });
         } else {
+          // No RPC available for type detection: still infer type from fetched address code
+          setAddressType(hasContractCode(addressData?.code) ? "contract" : "account");
           setTypeLoading(false);
         }
       })
