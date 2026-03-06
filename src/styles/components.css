@@ -913,6 +913,26 @@ button.tx-section-header-toggle {
 	font-weight: 500;
 }
 
+/* Super user compact card */
+.network-card-compact {
+	padding: 10px 16px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: auto;
+}
+
+.network-card-id {
+	font-family: "JetBrains Mono", monospace;
+	font-size: 0.9rem;
+	font-weight: 600;
+	color: var(--network-color, var(--color-primary));
+}
+
+.network-card-link-compact {
+	min-width: auto;
+}
+
 /* Testnet toggle */
 .testnet-grid {
 	margin-top: 24px;

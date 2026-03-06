@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import type { NetworkConfig } from "../../../config/networks";
 import { useNetworks } from "../../../context/AppContext";
+import { useSettings } from "../../../context/SettingsContext";
 import { getChainIdFromNetwork } from "../../../utils/networkResolver";
 import NetworkIcon from "../../common/NetworkIcon";
 import TierBadge from "../../common/TierBadge";
@@ -45,10 +46,27 @@ const NetworkCard: React.FC<NetworkCardProps> = ({ network }) => {
   );
 };
 
+const SuperUserNetworkCard: React.FC<NetworkCardProps> = ({ network }) => {
+  const chainId = getChainIdFromNetwork(network);
+  return (
+    <Link
+      to={`/${chainId ?? network.slug}`}
+      className="network-card-link network-card-link-compact"
+      style={{ "--network-color": network.color } as React.CSSProperties}
+    >
+      <div className="network-card network-card-compact">
+        <span className="network-card-id">{chainId ?? network.slug}</span>
+      </div>
+    </Link>
+  );
+};
+
 export default function Home() {
   const { t } = useTranslation("home");
   const { enabledNetworks, isLoading } = useNetworks();
+  const { isSuperUser } = useSettings();
   const [showTestnets, setShowTestnets] = useState(false);
+  const Card = isSuperUser ? SuperUserNetworkCard : NetworkCard;
 
   const { productionNetworks, testnetNetworks } = useMemo(() => {
     const isDevelopment = process.env.REACT_APP_ENVIRONMENT === "development";
@@ -80,7 +98,7 @@ export default function Home() {
             <p className="loading-text">{t("loading")}</p>
           ) : (
             productionNetworks.map((network) => (
-              <NetworkCard key={network.networkId} network={network} />
+              <Card key={network.networkId} network={network} />
             ))
           )}
         </div>
@@ -90,7 +108,7 @@ export default function Home() {
             {showTestnets && (
               <div className="network-grid testnet-grid">
                 {testnetNetworks.map((network) => (
-                  <NetworkCard key={network.networkId} network={network} />
+                  <Card key={network.networkId} network={network} />
                 ))}
               </div>
             )}
