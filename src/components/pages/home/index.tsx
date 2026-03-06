@@ -25,7 +25,7 @@ const NetworkCard: React.FC<NetworkCardProps> = ({ network, showChainId = false,
       style={{ "--network-color": network.color } as React.CSSProperties}
     >
       <div className="network-card">
-        <div className="network-card-header">
+        <div className={featured ? "network-card-header-centered" : "network-card-header"}>
           <div className="network-card-icon">
             <NetworkIcon network={network} size={32} />
           </div>
