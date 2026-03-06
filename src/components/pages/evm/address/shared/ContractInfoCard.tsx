@@ -48,6 +48,7 @@ interface ContractInfoCardProps {
   verificationSource?: VerificationSource;
   proxyInfo?: ProxyInfo | null;
   implementationContractData?: SourcifyContractDetails | null;
+  implIsVerified?: boolean;
 }
 
 type AbiView = "implementation" | "proxy";
@@ -63,6 +64,7 @@ const ContractInfoCard: React.FC<ContractInfoCardProps> = ({
   verificationSource,
   proxyInfo,
   implementationContractData,
+  implIsVerified = false,
 }) => {
   const { t } = useTranslation("address");
   const [showBytecode, setShowBytecode] = useState(false);
@@ -82,9 +84,11 @@ const ContractInfoCard: React.FC<ContractInfoCardProps> = ({
       ? `${etherscanBase}/address/${addressHash}#code`
       : null;
 
-  // Determine the active ABI based on tab selection
+  // Only use implementation ABI when the implementation is actually verified
   const hasImplAbi = !!(
-    implementationContractData?.abi && implementationContractData.abi.length > 0
+    implIsVerified &&
+    implementationContractData?.abi &&
+    implementationContractData.abi.length > 0
   );
   const hasProxyAbi = !!(contractData?.abi && contractData.abi.length > 0);
   const showAbiTabSwitcher = !!(proxyInfo && hasImplAbi && hasProxyAbi);
@@ -187,11 +191,13 @@ const ContractInfoCard: React.FC<ContractInfoCardProps> = ({
         </div>
       )}
 
-      {/* Contract Name */}
-      {contractData?.name && (
+      {/* Contract Name — fall back to implementation name for unverified proxies */}
+      {(contractData?.name || implementationContractData?.name) && (
         <div className="account-card-row">
           <span className="account-card-label">{t("contractName")}:</span>
-          <span className="account-card-value contract-name">{contractData.name}</span>
+          <span className="account-card-value contract-name">
+            {contractData?.name ?? implementationContractData?.name}
+          </span>
         </div>
       )}
 

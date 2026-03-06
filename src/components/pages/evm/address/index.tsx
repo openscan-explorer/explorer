@@ -8,7 +8,7 @@ import { useKlerosTag } from "../../../../hooks/useKlerosTag";
 import { useProviderSelection } from "../../../../hooks/useProviderSelection";
 import { ENSService } from "../../../../services/ENS/ENSService";
 import type { Address as AddressData, AddressType, DataWithMetadata } from "../../../../types";
-import { fetchAddressWithType, hasContractCode } from "../../../../utils/addressTypeDetection";
+import { fetchAddressWithType } from "../../../../utils/addressTypeDetection";
 import Loader from "../../../common/Loader";
 import {
   AccountDisplay,
@@ -206,7 +206,7 @@ export default function Address() {
     );
   }
 
-  if (loading || typeLoading) {
+  if ((loading || typeLoading) && !addressData) {
     return (
       <div className="container-wide">
         <div className="block-display-card">

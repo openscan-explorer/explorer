@@ -166,7 +166,8 @@ const ContractDisplay: React.FC<ContractDisplayProps> = ({
             isLocalArtifact={!!parsedLocalData && !isVerified}
             verificationSource={verificationSource}
             proxyInfo={proxyInfo}
-            implementationContractData={implIsVerified ? implSourcifyData : null}
+            implementationContractData={implSourcifyData}
+            implIsVerified={implIsVerified}
           />
         </div>
       </div>
