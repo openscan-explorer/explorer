@@ -147,22 +147,22 @@ export default function BitcoinBlocksPage() {
                   // biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholder
                   <tr key={i}>
                     <td>
-                      <span className="skeleton-pulse" style={{ width: "70px", height: 14 }} />
+                      <span className="skeleton-pulse" style={{ width: "70px", height: 18 }} />
                     </td>
                     <td>
-                      <span className="skeleton-pulse" style={{ width: "120px", height: 14 }} />
+                      <span className="skeleton-pulse" style={{ width: "120px", height: 18 }} />
                     </td>
                     <td>
-                      <span className="skeleton-pulse" style={{ width: "60px", height: 14 }} />
+                      <span className="skeleton-pulse" style={{ width: "60px", height: 18 }} />
                     </td>
                     <td>
-                      <span className="skeleton-pulse" style={{ width: "40px", height: 14 }} />
+                      <span className="skeleton-pulse" style={{ width: "40px", height: 18 }} />
                     </td>
                     <td className="hide-mobile">
-                      <span className="skeleton-pulse" style={{ width: "80px", height: 14 }} />
+                      <span className="skeleton-pulse" style={{ width: "80px", height: 18 }} />
                     </td>
                     <td className="hide-mobile">
-                      <span className="skeleton-pulse" style={{ width: "80px", height: 14 }} />
+                      <span className="skeleton-pulse" style={{ width: "80px", height: 18 }} />
                     </td>
                   </tr>
                 ))}
