@@ -7,7 +7,7 @@ import { useENS } from "../../../../hooks/useENS";
 import { useProviderSelection } from "../../../../hooks/useProviderSelection";
 import { ENSService } from "../../../../services/ENS/ENSService";
 import type { Address as AddressData, AddressType, DataWithMetadata } from "../../../../types";
-import { fetchAddressWithType } from "../../../../utils/addressTypeDetection";
+import { fetchAddressWithType, hasContractCode } from "../../../../utils/addressTypeDetection";
 import Loader from "../../../common/Loader";
 import {
   AccountDisplay,
