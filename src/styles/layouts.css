@@ -83,6 +83,10 @@
 	width: 100%;
 }
 
+.network-card-featured {
+	grid-column: 1 / -1;
+}
+
 /* Additional Flex Utilities
    Note: Base flex utilities (.flex, .flex-center, .flex-between, .flex-column,
    .items-center, .justify-between, etc.) are defined in base.css.

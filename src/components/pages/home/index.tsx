@@ -12,15 +12,16 @@ import HomeSearchBar from "./HomeSearchBar";
 interface NetworkCardProps {
   network: NetworkConfig;
   showChainId?: boolean;
+  featured?: boolean;
 }
 
-const NetworkCard: React.FC<NetworkCardProps> = ({ network, showChainId = false }) => {
+const NetworkCard: React.FC<NetworkCardProps> = ({ network, showChainId = false, featured = false }) => {
   const chainId = getChainIdFromNetwork(network);
   const { t } = useTranslation("home");
   return (
     <Link
       to={`/${chainId ?? network.slug}`}
-      className="network-card-link"
+      className={`network-card-link ${featured ? "network-card-featured" : ""}`}
       style={{ "--network-color": network.color } as React.CSSProperties}
     >
       <div className="network-card">
@@ -82,8 +83,13 @@ export default function Home() {
           {isLoading && productionNetworks.length === 0 ? (
             <p className="loading-text">{t("loading")}</p>
           ) : (
-            productionNetworks.map((network) => (
-              <NetworkCard key={network.networkId} network={network} showChainId={isSuperUser} />
+            productionNetworks.map((network, index) => (
+              <NetworkCard
+                key={network.networkId}
+                network={network}
+                showChainId={isSuperUser}
+                featured={index === 0}
+              />
             ))
           )}
         </div>
