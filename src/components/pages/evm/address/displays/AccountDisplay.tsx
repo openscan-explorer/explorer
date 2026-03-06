@@ -79,6 +79,7 @@ const AccountDisplay: React.FC<AccountDisplayProps> = ({
         <AddressHeader
           addressHash={addressHash}
           addressType="account"
+          ensName={ensName || reverseResult?.ensName}
           metadata={metadata}
           selectedProvider={selectedProvider}
           onProviderSelect={onProviderSelect}

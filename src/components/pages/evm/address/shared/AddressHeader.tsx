@@ -2,6 +2,7 @@ import type React from "react";
 import type { AddressType, RPCMetadata } from "../../../../../types";
 import { getAddressTypeIcon, getAddressTypeLabel } from "../../../../../utils/addressTypeDetection";
 import { RPCIndicator } from "../../../../common/RPCIndicator";
+import CopyButton from "../../../../common/CopyButton";
 
 interface AddressHeaderProps {
   addressHash: string;
@@ -43,8 +44,20 @@ const AddressHeader: React.FC<AddressHeaderProps> = ({
           {tokenSymbol && <span className="address-token-symbol">{tokenSymbol}</span>}
         </div>
         {(ensName || tokenName) && <span className="address-ens-name">{ensName || tokenName}</span>}
-        <span className="tx-mono header-subtitle hide-mobile">{addressHash}</span>
-        <span className="tx-mono header-subtitle show-mobile">{truncatedHash}</span>
+        <span
+          className="tx-mono header-subtitle hide-mobile"
+          style={{ display: "inline-flex", alignItems: "center" }}
+        >
+          {addressHash}
+          <CopyButton value={addressHash} size={14} />
+        </span>
+        <span
+          className="tx-mono header-subtitle show-mobile"
+          style={{ display: "inline-flex", alignItems: "center" }}
+        >
+          {truncatedHash}
+          <CopyButton value={addressHash} size={14} />
+        </span>
       </div>
       {metadata && selectedProvider !== undefined && onProviderSelect && (
         <RPCIndicator

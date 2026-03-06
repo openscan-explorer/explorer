@@ -184,25 +184,25 @@ export default function Blocks() {
                   // biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholder
                   <tr key={i}>
                     <td>
-                      <span className="skeleton-pulse" style={{ width: "80px", height: 14 }} />
+                      <span className="skeleton-pulse" style={{ width: "72px", height: 14 }} />
                     </td>
                     <td>
-                      <span className="skeleton-pulse" style={{ width: "140px", height: 14 }} />
+                      <span className="skeleton-pulse" style={{ width: "165px", height: 14 }} />
                     </td>
                     <td>
-                      <span className="skeleton-pulse" style={{ width: "40px", height: 14 }} />
+                      <span className="skeleton-pulse" style={{ width: "28px", height: 14 }} />
                     </td>
                     <td className="hide-mobile">
-                      <span className="skeleton-pulse" style={{ width: "120px", height: 14 }} />
+                      <span className="skeleton-pulse" style={{ width: "95px", height: 14 }} />
                     </td>
                     <td>
-                      <span className="skeleton-pulse" style={{ width: "80px", height: 14 }} />
+                      <span className="skeleton-pulse" style={{ width: "85px", height: 14 }} />
                     </td>
                     <td className="hide-mobile">
-                      <span className="skeleton-pulse" style={{ width: "80px", height: 14 }} />
+                      <span className="skeleton-pulse" style={{ width: "85px", height: 14 }} />
                     </td>
                     <td className="hide-mobile">
-                      <span className="skeleton-pulse" style={{ width: "60px", height: 14 }} />
+                      <span className="skeleton-pulse" style={{ width: "55px", height: 14 }} />
                     </td>
                   </tr>
                 ))}

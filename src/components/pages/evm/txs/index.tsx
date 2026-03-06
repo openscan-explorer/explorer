@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { RPCIndicator } from "../../../../components/common/RPCIndicator";
+import Breadcrumb from "../../../../components/common/Breadcrumb";
 import { getNetworkById } from "../../../../config/networks";
 import { useDataService } from "../../../../hooks/useDataService";
 import { useProviderSelection } from "../../../../hooks/useProviderSelection";
@@ -14,7 +15,9 @@ export default function Txs() {
   const navigate = useNavigate();
   const numericNetworkId = Number(networkId) || 1;
   const dataService = useDataService(numericNetworkId);
-  const networkName = getNetworkById(networkId ?? numericNetworkId)?.name ?? String(networkId);
+  const networkConfig = getNetworkById(networkId ?? numericNetworkId);
+  const networkName = networkConfig?.name ?? String(networkId);
+  const networkLabel = networkConfig?.shortName || networkConfig?.name || `Chain ${networkId}`;
   const [blockResult, setBlockResult] = useState<DataWithMetadata<Block> | null>(null);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
@@ -168,6 +171,13 @@ export default function Txs() {
   if (loading) {
     return (
       <div className="container-wide">
+        <Breadcrumb
+          items={[
+            { label: "Home", to: "/" },
+            { label: networkLabel, to: `/${networkId}` },
+            { label: "Transactions" },
+          ]}
+        />
         <div className="block-display-card">
           <div className="blocks-header">
             <span className="block-label">{t("txs.latests", { network: networkName })}</span>
@@ -187,7 +197,7 @@ export default function Txs() {
                 </tr>
               </thead>
               <tbody>
-                {Array.from({ length: 10 }).map((_, i) => (
+                {Array.from({ length: 20 }).map((_, i) => (
                   // biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholder
                   <tr key={i}>
                     <td>
@@ -225,6 +235,13 @@ export default function Txs() {
   if (error) {
     return (
       <div className="container-wide">
+        <Breadcrumb
+          items={[
+            { label: "Home", to: "/" },
+            { label: networkLabel, to: `/${networkId}` },
+            { label: "Transactions" },
+          ]}
+        />
         <div className="block-display-card">
           <div className="blocks-header">
             <span className="block-label">{t("txs.latests", { network: networkName })}</span>
@@ -252,6 +269,13 @@ export default function Txs() {
 
   return (
     <div className="container-wide">
+      <Breadcrumb
+        items={[
+          { label: "Home", to: "/" },
+          { label: networkLabel, to: `/${networkId}` },
+          { label: "Transactions" },
+        ]}
+      />
       <div className="block-display-card">
         <div className="blocks-header">
           <div className="blocks-header-main">
