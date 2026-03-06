@@ -8,6 +8,8 @@ import { getNetworkById } from "../../../../config/networks";
 import { AppContext } from "../../../../context";
 import { useSourcify } from "../../../../hooks/useSourcify";
 import { useTransactionPreAnalysis } from "../../../../hooks/useTransactionPreAnalysis";
+import { useSettings } from "../../../../context/SettingsContext";
+import TxAnalyser from "./TxAnalyser";
 import type { DataService } from "../../../../services/DataService";
 import {
   fetchToken,
@@ -62,12 +64,14 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
     onProviderSelect,
   }) => {
     const { t } = useTranslation("transaction");
+    const { isSuperUser } = useSettings();
     const network = networkId ? getNetworkById(networkId) : undefined;
     const networkName = network?.name ?? "Unknown Network";
     const networkCurrency = network?.currency ?? "ETH";
 
     const [_showRawData, _setShowRawData] = useState(false);
     const [_showLogs, _setShowLogs] = useState(false);
+    const [showAnalyser, setShowAnalyser] = useState(false);
     const [callTargetToken, setCallTargetToken] = useState<TokenMetadata | null>(null);
     const [callTargetTokenListMatch, setCallTargetTokenListMatch] = useState<TokenListItem | null>(
       null,
@@ -989,6 +993,29 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
               </div>
             )}
           </div>
+
+          {/* TX Analyser (Super User Mode) */}
+          {isSuperUser && dataService && networkId && (
+            <div className="collapsible-container">
+              {/** biome-ignore lint/a11y/useButtonType: <TODO> */}
+              <button
+                className="collapsible-button-purple"
+                onClick={() => setShowAnalyser(!showAnalyser)}
+              >
+                {`${t("analyser.title")} ${showAnalyser ? "▲" : "▼"}`}
+              </button>
+              {showAnalyser && (
+                <div className="collapsible-content">
+                  <TxAnalyser
+                    txHash={transaction.hash}
+                    networkId={networkId}
+                    networkCurrency={networkCurrency}
+                    dataService={dataService}
+                  />
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Debug Trace Section (Localhost Only) */}
           {isTraceAvailable && (

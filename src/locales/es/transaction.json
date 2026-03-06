@@ -137,5 +137,24 @@
     "cost": "Costo",
     "depth": "Profundidad",
     "stack": "Stack"
+  },
+  "analyser": {
+    "title": "Analizador de TX",
+    "analyse": "Analizar",
+    "callTree": "Árbol de Llamadas",
+    "stateChanges": "Cambios de Estado",
+    "loading": "Cargando datos de trace...",
+    "notSupported": "Tu RPC no soporta métodos de trace. Probá un nodo archivo o un proveedor con soporte de trace.",
+    "traceHint": "Proveedores como dRPC y Tenderly soportan debug_traceTransaction.",
+    "error": "Error",
+    "summaryGas": "Gas usado: {{gas}}",
+    "summaryCalls": "{{calls}} llamadas",
+    "summaryReverts": "{{reverts}} reverts",
+    "noChanges": "No se detectaron cambios de estado",
+    "balanceChange": "Balance",
+    "nonceChange": "Nonce",
+    "storageChange": "Storage",
+    "codeDeployed": "Código",
+    "enriching": "Cargando info de contratos..."
   }
 }

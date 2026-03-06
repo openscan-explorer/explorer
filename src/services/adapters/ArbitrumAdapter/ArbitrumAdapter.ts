@@ -1,5 +1,7 @@
 import { type BlockNumberOrTag, NetworkAdapter, type TraceResult } from "../NetworkAdapter";
 import type { Block, Transaction, Address, NetworkStats, DataWithMetadata } from "../../../types";
+import type { CallNode, PrestateTrace } from "../NetworkAdapter";
+import { normalizeGethCallTrace, normalizeParityCallTrace } from "../../../utils/callTreeUtils";
 import { logger } from "../../../utils/logger";
 import {
   transformArbitrumBlockToBlock,
@@ -289,6 +291,42 @@ export class ArbitrumAdapter extends NetworkAdapter {
       return (result.data as unknown as TraceResult[]) ?? null;
     } catch (error) {
       logger.error("Error getting block trace:", error);
+      return null;
+    }
+  }
+
+  async getAnalyserCallTrace(txHash: string): Promise<CallNode | null> {
+    // Try Geth callTracer first (works on dRPC, Tenderly for Arbitrum)
+    try {
+      const result = await this.client.debugTraceTransaction(txHash, { tracer: "callTracer" });
+      if (result.data) return normalizeGethCallTrace(result.data);
+    } catch {
+      // Fall through to arbtrace
+    }
+
+    // Fall back to arbtrace_transaction (Parity format — always available on Arbitrum)
+    try {
+      const result = await this.client.arbtraceTransaction(txHash);
+      if (result.data) {
+        // biome-ignore lint/suspicious/noExplicitAny: Parity trace format
+        return normalizeParityCallTrace(result.data as any);
+      }
+      return null;
+    } catch (error) {
+      logger.error("Error getting Arbitrum analyser call trace:", error);
+      return null;
+    }
+  }
+
+  async getAnalyserPrestateTrace(txHash: string): Promise<PrestateTrace | null> {
+    try {
+      const result = await this.client.debugTraceTransaction(txHash, {
+        tracer: "prestateTracer",
+        tracerConfig: { diffMode: true },
+      });
+      return (result.data as PrestateTrace) ?? null;
+    } catch (error) {
+      logger.error("Error getting Arbitrum analyser prestate trace:", error);
       return null;
     }
   }

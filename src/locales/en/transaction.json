@@ -137,5 +137,24 @@
     "cost": "Cost",
     "depth": "Depth",
     "stack": "Stack"
+  },
+  "analyser": {
+    "title": "TX Analyser",
+    "analyse": "Analyse",
+    "callTree": "Call Tree",
+    "stateChanges": "State Changes",
+    "loading": "Loading trace data...",
+    "notSupported": "Your RPC does not support trace methods. Try an archive node or a trace-enabled provider.",
+    "traceHint": "Providers like dRPC and Tenderly support debug_traceTransaction.",
+    "error": "Error",
+    "summaryGas": "Gas used: {{gas}}",
+    "summaryCalls": "{{calls}} calls",
+    "summaryReverts": "{{reverts}} reverts",
+    "noChanges": "No state changes detected",
+    "balanceChange": "Balance",
+    "nonceChange": "Nonce",
+    "storageChange": "Storage",
+    "codeDeployed": "Code",
+    "enriching": "Loading contract info..."
   }
 }

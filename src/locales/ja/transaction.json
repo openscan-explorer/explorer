@@ -137,5 +137,24 @@
     "cost": "コスト",
     "depth": "深度",
     "stack": "スタック"
+  },
+  "analyser": {
+    "title": "TXアナライザー",
+    "analyse": "分析",
+    "callTree": "コールツリー",
+    "stateChanges": "状態変化",
+    "loading": "トレースデータを読み込み中...",
+    "notSupported": "お使いのRPCはトレースメソッドをサポートしていません。アーカイブノードまたはトレース対応プロバイダーをお試しください。",
+    "traceHint": "dRPCやTenderlyなどのプロバイダーはdebug_traceTransactionをサポートしています。",
+    "error": "エラー",
+    "summaryGas": "ガス使用量: {{gas}}",
+    "summaryCalls": "{{calls}} コール",
+    "summaryReverts": "{{reverts}} リバート",
+    "noChanges": "状態変化は検出されませんでした",
+    "balanceChange": "残高",
+    "nonceChange": "ノンス",
+    "storageChange": "ストレージ",
+    "codeDeployed": "コード",
+    "enriching": "コントラクト情報を読み込み中..."
   }
 }

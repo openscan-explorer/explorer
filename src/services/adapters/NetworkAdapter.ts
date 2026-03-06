@@ -42,6 +42,32 @@ export interface TraceCallConfig {
     withLog?: boolean;
   };
 }
+
+export interface CallNode {
+  type: string;
+  from: string;
+  to?: string;
+  value?: string;
+  gas?: string;
+  gasUsed?: string;
+  input?: string;
+  output?: string;
+  error?: string;
+  revertReason?: string;
+  calls?: CallNode[];
+}
+
+export interface PrestateAccountState {
+  balance?: string;
+  nonce?: number;
+  code?: string;
+  storage?: Record<string, string>;
+}
+
+export interface PrestateTrace {
+  pre: Record<string, PrestateAccountState>;
+  post: Record<string, PrestateAccountState>;
+}
 /**
  * Base interface for blockchain-specific services
  * All chain implementations must conform to this unified API
@@ -351,4 +377,20 @@ export abstract class NetworkAdapter {
    * @returns Array of trace results or null
    */
   abstract getBlockTrace(blockHash: string): Promise<TraceResult[] | null>;
+
+  /**
+   * Get call tree trace using debug_traceTransaction with callTracer.
+   * Available in Super User Mode — no localhost restriction.
+   * @param txHash - Transaction hash
+   * @returns Nested CallNode tree or null
+   */
+  abstract getAnalyserCallTrace(txHash: string): Promise<CallNode | null>;
+
+  /**
+   * Get prestate diff trace using debug_traceTransaction with prestateTracer.
+   * Available in Super User Mode — no localhost restriction.
+   * @param txHash - Transaction hash
+   * @returns PrestateTrace with pre/post state or null
+   */
+  abstract getAnalyserPrestateTrace(txHash: string): Promise<PrestateTrace | null>;
 }
