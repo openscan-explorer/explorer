@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import Breadcrumb from "../../common/Breadcrumb";
 import { BLOCKS_PER_PAGE } from "../../../config/bitcoinConstants";
 import { getNetworkBySlug } from "../../../config/networks";
 import { useDataService } from "../../../hooks/useDataService";
@@ -20,7 +21,9 @@ export default function BitcoinBlocksPage() {
   // Extract network slug from path (e.g., "/tbtc/blocks" → "tbtc")
   const networkSlug = location.pathname.split("/")[1] || "btc";
   const dataService = useDataService(networkSlug);
-  const networkName = getNetworkBySlug(networkSlug)?.name ?? networkSlug;
+  const networkConfig = getNetworkBySlug(networkSlug);
+  const networkName = networkConfig?.name ?? networkSlug;
+  const networkLabel = networkConfig?.shortName || networkConfig?.name || networkSlug.toUpperCase();
   const { t } = useTranslation("block");
 
   const [blocks, setBlocks] = useState<BitcoinBlock[]>([]);
@@ -116,6 +119,13 @@ export default function BitcoinBlocksPage() {
   if (loading) {
     return (
       <div className="container-wide">
+        <Breadcrumb
+          items={[
+            { label: "Home", to: "/" },
+            { label: networkLabel, to: `/${networkSlug}` },
+            { label: "Blocks" },
+          ]}
+        />
         <div className="block-display-card">
           <div className="blocks-header">
             <span className="block-label">{t("latestBlocks", { network: networkName })}</span>
@@ -167,6 +177,13 @@ export default function BitcoinBlocksPage() {
   if (error) {
     return (
       <div className="container-wide">
+        <Breadcrumb
+          items={[
+            { label: "Home", to: "/" },
+            { label: networkLabel, to: `/${networkSlug}` },
+            { label: "Blocks" },
+          ]}
+        />
         <div className="block-display-card">
           <div className="blocks-header">
             <span className="block-label">{t("latestBlocks", { network: networkName })}</span>
@@ -181,6 +198,13 @@ export default function BitcoinBlocksPage() {
 
   return (
     <div className="container-wide">
+      <Breadcrumb
+        items={[
+          { label: "Home", to: "/" },
+          { label: networkLabel, to: `/${networkSlug}` },
+          { label: "Blocks" },
+        ]}
+      />
       <div className="block-display-card">
         <div className="blocks-header">
           <div className="blocks-header-main">
