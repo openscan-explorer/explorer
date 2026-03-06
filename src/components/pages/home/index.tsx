@@ -12,20 +12,19 @@ import HomeSearchBar from "./HomeSearchBar";
 interface NetworkCardProps {
   network: NetworkConfig;
   showChainId?: boolean;
-  featured?: boolean;
 }
 
-const NetworkCard: React.FC<NetworkCardProps> = ({ network, showChainId = false, featured = false }) => {
+const NetworkCard: React.FC<NetworkCardProps> = ({ network, showChainId = false }) => {
   const chainId = getChainIdFromNetwork(network);
   const { t } = useTranslation("home");
   return (
     <Link
       to={`/${chainId ?? network.slug}`}
-      className={`network-card-link ${featured ? "network-card-featured" : ""}`}
+      className="network-card-link"
       style={{ "--network-color": network.color } as React.CSSProperties}
     >
       <div className="network-card">
-        <div className={featured ? "network-card-header-centered" : "network-card-header"}>
+        <div className="network-card-header">
           <div className="network-card-icon">
             <NetworkIcon network={network} size={32} />
           </div>
@@ -54,7 +53,7 @@ export default function Home() {
   const { isSuperUser } = useSettings();
   const [showTestnets, setShowTestnets] = useState(false);
 
-  const { productionNetworks, testnetNetworks } = useMemo(() => {
+  const { featuredNetworks, productionNetworks, testnetNetworks } = useMemo(() => {
     const isDevelopment = process.env.REACT_APP_ENVIRONMENT === "development";
     const localhostChainId = 31337;
 
@@ -66,10 +65,18 @@ export default function Home() {
       return !n.isTestnet;
     };
 
-    const productionNetworks = enabledNetworks.filter(isProductionNetwork);
+    const allProduction = enabledNetworks.filter(isProductionNetwork);
     const testnetNetworks = enabledNetworks.filter((n) => !isProductionNetwork(n));
 
-    return { productionNetworks, testnetNetworks };
+    // Featured on top: Ethereum Mainnet + Bitcoin Mainnet
+    const ethMainnet = allProduction.find((n) => n.networkId === "eip155:1");
+    const btcMainnet = allProduction.find((n) => n.type === "bitcoin" && !n.isTestnet);
+    const featuredNetworks = [ethMainnet, btcMainnet].filter((n): n is NetworkConfig => Boolean(n));
+
+    const featuredIds = new Set(featuredNetworks.map((n) => n.networkId));
+    const productionNetworks = allProduction.filter((n) => !featuredIds.has(n.networkId));
+
+    return { featuredNetworks, productionNetworks, testnetNetworks };
   }, [enabledNetworks]);
 
   return (
@@ -79,16 +86,27 @@ export default function Home() {
 
         <HomeSearchBar networks={enabledNetworks} />
 
-        <div className="network-grid">
-          {isLoading && productionNetworks.length === 0 ? (
-            <p className="loading-text">{t("loading")}</p>
-          ) : (
-            productionNetworks.map((network, index) => (
+        {featuredNetworks.length > 0 && (
+          <div className="network-grid network-grid-featured">
+            {featuredNetworks.map((network) => (
               <NetworkCard
                 key={network.networkId}
                 network={network}
                 showChainId={isSuperUser}
-                featured={index === 0}
+              />
+            ))}
+          </div>
+        )}
+
+        <div className="network-grid">
+          {isLoading && productionNetworks.length === 0 && featuredNetworks.length === 0 ? (
+            <p className="loading-text">{t("loading")}</p>
+          ) : (
+            productionNetworks.map((network) => (
+              <NetworkCard
+                key={network.networkId}
+                network={network}
+                showChainId={isSuperUser}
               />
             ))
           )}

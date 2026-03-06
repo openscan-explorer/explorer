@@ -83,12 +83,9 @@
 	width: 100%;
 }
 
-.network-card-featured {
-	grid-column: 1 / -1;
-}
-
-.network-card-featured .network-card-info {
-	flex: none;
+.network-grid-featured {
+	grid-template-columns: repeat(2, minmax(320px, 1fr));
+	margin-top: 12px;
 }
 
 /* Additional Flex Utilities
@@ -211,7 +208,8 @@
 
 /* Responsive utilities */
 @media (max-width: 768px) {
-	.network-grid {
+	.network-grid,
+	.network-grid-featured {
 		grid-template-columns: 1fr;
 	}
 
