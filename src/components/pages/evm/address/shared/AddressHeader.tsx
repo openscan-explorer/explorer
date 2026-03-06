@@ -65,17 +65,11 @@ const AddressHeader: React.FC<AddressHeaderProps> = ({
           )}
         </div>
         {(ensName || tokenName) && <span className="address-ens-name">{ensName || tokenName}</span>}
-        <span
-          className="tx-mono header-subtitle hide-mobile"
-          style={{ display: "inline-flex", alignItems: "center" }}
-        >
+        <span className="tx-mono header-subtitle hide-mobile address-hash-inline">
           {addressHash}
           <CopyButton value={addressHash} size={14} />
         </span>
-        <span
-          className="tx-mono header-subtitle show-mobile"
-          style={{ display: "inline-flex", alignItems: "center" }}
-        >
+        <span className="tx-mono header-subtitle show-mobile-inline-flex address-hash-inline">
           {truncatedHash}
           <CopyButton value={addressHash} size={14} />
         </span>

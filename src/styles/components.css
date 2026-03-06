@@ -2248,6 +2248,11 @@ button.tx-section-header-toggle {
 	color: var(--text-tertiary);
 }
 
+.address-hash-inline {
+	display: inline-flex;
+	align-items: center;
+}
+
 /* Text colors */
 .text-muted {
 	color: var(--text-tertiary);

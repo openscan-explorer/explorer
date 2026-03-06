@@ -131,7 +131,7 @@ export default function BitcoinBlocksPage() {
             <span className="block-label">{t("latestBlocks", { network: networkName })}</span>
           </div>
           <div className="table-wrapper">
-            <table className="dash-table">
+            <table className="dash-table blocks-table">
               <thead>
                 <tr>
                   <th>Height</th>
@@ -219,7 +219,7 @@ export default function BitcoinBlocksPage() {
         </div>
 
         <div className="table-wrapper">
-          <table className="dash-table">
+          <table className="dash-table blocks-table">
             <thead>
               <tr>
                 <th>Height</th>
