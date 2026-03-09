@@ -42,32 +42,31 @@ const Footer: React.FC<FooterProps> = ({ className = "" }) => {
     <footer className={`app-footer ${isSuperUser ? "super-user-active" : ""} ${className}`}>
       <div className="footer-content">
         <div className="footer-left">
-          <a
-            href={`${DOCS_URL}/introduction`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="footer-link"
+          <button
+            type="button"
+            onClick={() => window.open(`${DOCS_URL}/introduction`, "_blank", "noopener,noreferrer")}
+            className="footer-link btn-reset"
           >
             {t("footer.about")}
-          </a>
+          </button>
           <span className="footer-separator hide-mobile">|</span>
-          <a
-            href={`${DOCS_URL}/subscriptions`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="footer-link"
+          <button
+            type="button"
+            onClick={() =>
+              window.open(`${DOCS_URL}/subscriptions`, "_blank", "noopener,noreferrer")
+            }
+            className="footer-link btn-reset"
           >
             {t("footer.subscribe")}
-          </a>
+          </button>
           <span className="footer-separator hide-mobile">|</span>
-          <a
-            href={`${DOCS_URL}/contact`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="footer-link"
+          <button
+            type="button"
+            onClick={() => window.open(`${DOCS_URL}/contact`, "_blank", "noopener,noreferrer")}
+            className="footer-link btn-reset"
           >
             {t("footer.contact")}
-          </a>
+          </button>
           <span className="footer-separator hide-mobile">|</span>
           <button type="button" onClick={goToSupporters} className="footer-link btn-reset">
             {t("footer.supporters")} ❤️
