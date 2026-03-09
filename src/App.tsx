@@ -52,6 +52,7 @@ import {
 } from "./components/LazyComponents";
 import { SettingsProvider, useSettings, useTheme } from "./context/SettingsContext";
 import { useAppReady, useOnAppReady } from "./hooks/useAppReady";
+import { useRpcAutoSync } from "./hooks/useRpcAutoSync";
 
 // Component that handles subdomain redirects
 function SubdomainRedirect() {
@@ -85,6 +86,8 @@ function SubdomainRedirect() {
 
 // Separate component that uses the theme context
 function AppContent() {
+  useRpcAutoSync();
+
   const onAppReadyCallback = useCallback(async () => {}, []);
 
   useOnAppReady(onAppReadyCallback);

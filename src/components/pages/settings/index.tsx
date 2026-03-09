@@ -23,6 +23,7 @@ import { logger } from "../../../utils/logger";
 import { getChainIdFromNetwork } from "../../../utils/networkResolver";
 import { clearPersistentCache, getPersistentCacheSize } from "../../../utils/persistentCache";
 import { clearMetadataRpcCache, getMetadataEndpointMap } from "../../../utils/rpcStorage";
+import { sortRpcsByQuality } from "../../../utils/rpcAutoSync";
 import { type RpcTestResult, testRpcEndpoint } from "../rpcs/useRpcLatencyTest";
 
 // Infura network slugs by chain ID
@@ -57,34 +58,6 @@ const getAlchemyUrl = (chainId: number, apiKey: string): string | null => {
 
 const isInfuraUrl = (url: string): boolean => url.includes("infura.io");
 const isAlchemyUrl = (url: string): boolean => url.includes("alchemy.com");
-
-function getPrivacyTier(url: string, metadata: Map<string, MetadataRpcEndpoint>): number {
-  const ep = metadata.get(url);
-  if (!ep) return 1;
-  if (ep.tracking !== "none") return 2;
-  if (ep.isOpenSource) return 0;
-  return 1;
-}
-
-function sortRpcsByQuality(
-  urls: string[],
-  results: Map<string, RpcTestResult>,
-  metadata: Map<string, MetadataRpcEndpoint>,
-): string[] {
-  return [...urls].sort((a, b) => {
-    const rA = results.get(a);
-    const rB = results.get(b);
-    const aOnline = rA?.status === "online" && rA.latency != null;
-    const bOnline = rB?.status === "online" && rB.latency != null;
-    if (!aOnline && !bOnline) return 0;
-    if (!aOnline) return 1;
-    if (!bOnline) return -1;
-    const tierA = getPrivacyTier(a, metadata);
-    const tierB = getPrivacyTier(b, metadata);
-    if (tierA !== tierB) return tierA - tierB;
-    return (rA.latency as number) - (rB.latency as number);
-  });
-}
 
 const Settings: React.FC = () => {
   const { t, i18n } = useTranslation("settings");
@@ -166,7 +139,9 @@ const Settings: React.FC = () => {
     setPersistentCacheBytes(0);
     setCacheCleared(true);
     setTimeout(() => setCacheCleared(false), 3000);
-  }, []);
+    // Reset sync flag so RPCs are re-sorted on next load
+    updateSettings({ rpcsSynced: false });
+  }, [updateSettings]);
 
   // Clear all site data (like browser dev tools)
   const clearSiteData = useCallback(async () => {
