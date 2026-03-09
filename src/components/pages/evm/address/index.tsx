@@ -1,6 +1,7 @@
 import { useContext, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation, useParams } from "react-router-dom";
+import { getNetworkById } from "../../../../config/networks";
 import { AppContext } from "../../../../context";
 import { useDataService } from "../../../../hooks/useDataService";
 import { useENS } from "../../../../hooks/useENS";
@@ -9,7 +10,8 @@ import { useProviderSelection } from "../../../../hooks/useProviderSelection";
 import { ENSService } from "../../../../services/ENS/ENSService";
 import type { Address as AddressData, AddressType, DataWithMetadata } from "../../../../types";
 import { fetchAddressWithType, hasContractCode } from "../../../../utils/addressTypeDetection";
-import Loader from "../../../common/Loader";
+import Breadcrumb from "../../../common/Breadcrumb";
+import LoaderWithTimeout from "../../../common/LoaderWithTimeout";
 import {
   AccountDisplay,
   ContractDisplay,
@@ -26,6 +28,9 @@ export default function Address() {
   }>();
   const location = useLocation();
   const numericNetworkId = Number(networkId) || 1;
+  const networkConfigData = getNetworkById(networkId ?? numericNetworkId);
+  const networkLabel =
+    networkConfigData?.shortName || networkConfigData?.name || `Chain ${networkId}`;
   const { rpcUrls } = useContext(AppContext);
   const [addressData, setAddressData] = useState<AddressData | null>(null);
   const [addressType, setAddressType] = useState<AddressType>("account");
@@ -175,7 +180,10 @@ export default function Address() {
       <div className="container-wide">
         <div className="block-display-card">
           <div className="card-content-loading">
-            <Loader text={t("resolvingEns", { name: addressParam })} />
+            <LoaderWithTimeout
+              text={t("resolvingEns", { name: addressParam })}
+              onRetry={() => window.location.reload()}
+            />
           </div>
         </div>
       </div>
@@ -202,7 +210,10 @@ export default function Address() {
       <div className="container-wide">
         <div className="block-display-card">
           <div className="card-content-loading">
-            <Loader text={loading ? t("loadingAddressData") : t("detectingAddressType")} />
+            <LoaderWithTimeout
+              text={loading ? t("loadingAddressData") : t("detectingAddressType")}
+              onRetry={() => window.location.reload()}
+            />
           </div>
         </div>
       </div>
@@ -259,8 +270,17 @@ export default function Address() {
   };
 
   // Render appropriate display component based on detected type
+  const truncatedAddr = address ? `${address.slice(0, 10)}...${address.slice(-6)}` : "";
+
   return (
     <div className="container-wide">
+      <Breadcrumb
+        items={[
+          { label: "Home", to: "/" },
+          { label: networkLabel, to: `/${networkId}` },
+          { label: truncatedAddr },
+        ]}
+      />
       {addressType === "account" && <AccountDisplay {...displayProps} />}
       {addressType === "contract" && <ContractDisplay {...displayProps} />}
       {addressType === "erc20" && <ERC20Display {...displayProps} />}

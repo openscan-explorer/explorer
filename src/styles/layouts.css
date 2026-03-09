@@ -83,6 +83,11 @@
 	width: 100%;
 }
 
+.network-grid-featured {
+	grid-template-columns: repeat(2, minmax(320px, 1fr));
+	margin-top: 12px;
+}
+
 /* Additional Flex Utilities
    Note: Base flex utilities (.flex, .flex-center, .flex-between, .flex-column,
    .items-center, .justify-between, etc.) are defined in base.css.
@@ -203,7 +208,8 @@
 
 /* Responsive utilities */
 @media (max-width: 768px) {
-	.network-grid {
+	.network-grid,
+	.network-grid-featured {
 		grid-template-columns: 1fr;
 	}
 

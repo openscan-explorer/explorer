@@ -28,7 +28,35 @@ const BitcoinTransactionsTable: React.FC<BitcoinTransactionsTableProps> = ({
       </div>
 
       {loading && transactions.length === 0 ? (
-        <div className="dashboard-table-loading">Loading transactions...</div>
+        <div className="dashboard-table-compact dashboard-table-scrollable">
+          {Array.from({ length: 5 }).map((_, i) => (
+            // biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholder
+            <div key={i} className="dashboard-table-row">
+              <div className="dashboard-tx-info">
+                <span className="dashboard-tx-hash tx-mono" style={{ pointerEvents: "none" }}>
+                  <span
+                    className="skeleton-pulse"
+                    style={{ width: "90px", height: 14, display: "inline-block" }}
+                  />
+                </span>
+              </div>
+              <div className="dashboard-tx-details">
+                <span className="dashboard-tx-ios">
+                  <span
+                    className="skeleton-pulse"
+                    style={{ width: "60px", height: 12, display: "inline-block" }}
+                  />
+                </span>
+              </div>
+              <div className="dashboard-tx-value">
+                <span
+                  className="skeleton-pulse"
+                  style={{ width: "70px", height: 14, display: "inline-block" }}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
       ) : transactions.length === 0 ? (
         <div className="dashboard-table-empty">No transactions found</div>
       ) : (

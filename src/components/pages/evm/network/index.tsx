@@ -4,7 +4,6 @@ import { useNetwork } from "../../../../context/AppContext";
 import { useNetworkDashboard } from "../../../../hooks/useNetworkDashboard";
 import { resolveNetwork, getChainIdFromNetwork } from "../../../../utils/networkResolver";
 import { getAllNetworks } from "../../../../config/networks";
-import Loader from "../../../common/Loader";
 import SearchBox from "../../../common/SearchBox";
 import DashboardStats from "./DashboardStats";
 import LatestBlocksTable from "./LatestBlocksTable";
@@ -54,10 +53,6 @@ export default function Network() {
           <p className="network-description">{networkConfig.description}</p>
         )}
         <SearchBox />
-
-        {dashboard.loading && dashboard.latestBlocks.length === 0 && (
-          <Loader text={t("loadingNetworkData")} />
-        )}
 
         {dashboard.error && (
           <p className="error-text-center">{t("errorLoadingData", { error: dashboard.error })}</p>

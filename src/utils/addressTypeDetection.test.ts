@@ -52,7 +52,7 @@ describe("checkEIP7702Delegation", () => {
 describe("getEIP7702DelegateAddress", () => {
   it("extracts address from valid delegation", () => {
     const addr = "1234567890abcdef1234567890abcdef12345678";
-    const delegation = "0xef0100" + addr;
+    const delegation = `0xef0100${addr}`;
     expect(getEIP7702DelegateAddress(delegation)).toBe(`0x${addr}`);
   });
 

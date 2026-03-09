@@ -126,6 +126,7 @@ const ContractDisplay: React.FC<ContractDisplayProps> = ({
         <AddressHeader
           addressHash={addressHash}
           addressType="contract"
+          ensName={ensName || reverseResult?.ensName}
           metadata={metadata}
           selectedProvider={selectedProvider}
           onProviderSelect={onProviderSelect}

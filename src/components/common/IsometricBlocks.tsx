@@ -115,10 +115,17 @@ export const IsometricBlocks: React.FC<IsometricBlocksProps> = ({
   }, [gridPositions, maxCubes]);
 
   // Spawn cubes periodically
+  // Respect prefers-reduced-motion: show static cubes only
+  const prefersReducedMotion = useMemo(() => {
+    if (typeof window === "undefined") return false;
+    return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  }, []);
+
   useEffect(() => {
+    if (prefersReducedMotion) return;
     const spawn = setInterval(spawnCube, spawnInterval);
     return () => clearInterval(spawn);
-  }, [spawnCube, spawnInterval]);
+  }, [spawnCube, spawnInterval, prefersReducedMotion]);
 
   return (
     // biome-ignore lint/a11y/noSvgWithoutTitle: <TODO>

@@ -2,6 +2,7 @@ import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } 
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import AIAnalysisPanel from "../../../common/AIAnalysis/AIAnalysisPanel";
+import CopyButton from "../../../../components/common/CopyButton";
 import LongString from "../../../../components/common/LongString";
 import { RPCIndicator } from "../../../../components/common/RPCIndicator";
 import { getNetworkById } from "../../../../config/networks";
@@ -543,6 +544,7 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
                 ) : (
                   transaction.from
                 )}
+                <CopyButton value={transaction.from} />
               </span>
             </div>
 
@@ -551,13 +553,16 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
               <span className="tx-label">{transaction.to ? t("to") : t("interactedWith")}</span>
               <span className="tx-value tx-mono">
                 {transaction.to ? (
-                  networkId ? (
-                    <Link to={`/${networkId}/address/${transaction.to}`} className="link-accent">
-                      {transaction.to}
-                    </Link>
-                  ) : (
-                    transaction.to
-                  )
+                  <>
+                    {networkId ? (
+                      <Link to={`/${networkId}/address/${transaction.to}`} className="link-accent">
+                        {transaction.to}
+                      </Link>
+                    ) : (
+                      transaction.to
+                    )}
+                    <CopyButton value={transaction.to} />
+                  </>
                 ) : (
                   <span className="contract-creation-badge">{t("contractCreation")}</span>
                 )}
@@ -579,6 +584,7 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
                   ) : (
                     transaction.receipt.contractAddress
                   )}
+                  <CopyButton value={transaction.receipt.contractAddress} />
                 </span>
               </div>
             )}

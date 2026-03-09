@@ -7,7 +7,8 @@ import { usePersistentCache } from "../../../hooks/usePersistentCache";
 import { getBTCPrice } from "../../../services/PriceService";
 import type { BitcoinTransaction, DataWithMetadata } from "../../../types";
 import { resolveNetwork } from "../../../utils/networkResolver";
-import Loader from "../../common/Loader";
+import Breadcrumb from "../../common/Breadcrumb";
+import LoaderWithTimeout from "../../common/LoaderWithTimeout";
 import BitcoinTransactionDisplay from "./BitcoinTransactionDisplay";
 
 export default function BitcoinTransactionPage() {
@@ -82,7 +83,10 @@ export default function BitcoinTransactionPage() {
             <span className="block-label">Bitcoin Transaction</span>
           </div>
           <div className="card-content-loading">
-            <Loader text="Loading transaction..." />
+            <LoaderWithTimeout
+              text="Loading transaction..."
+              onRetry={() => window.location.reload()}
+            />
           </div>
         </div>
       </div>
@@ -101,8 +105,18 @@ export default function BitcoinTransactionPage() {
     );
   }
 
+  const truncatedTxid = txid ? `${txid.slice(0, 10)}...${txid.slice(-6)}` : "";
+
   return (
     <div className="container-wide page-container-padded">
+      <Breadcrumb
+        items={[
+          { label: "Home", to: "/" },
+          { label: networkSlug === "tbtc" ? "Bitcoin Testnet" : "Bitcoin", to: `/${networkSlug}` },
+          { label: "Transactions", to: `/${networkSlug}/txs` },
+          { label: truncatedTxid },
+        ]}
+      />
       {txResult?.data ? (
         <BitcoinTransactionDisplay
           transaction={txResult.data}

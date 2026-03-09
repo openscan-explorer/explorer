@@ -12,7 +12,7 @@ import {
   getImageUrl,
 } from "../../../../utils/erc1155Metadata";
 import { logger } from "../../../../utils/logger";
-import Loader from "../../../common/Loader";
+import LoaderWithTimeout from "../../../common/LoaderWithTimeout";
 
 const ERC1155TokenDetails: React.FC = () => {
   const {
@@ -119,7 +119,10 @@ const ERC1155TokenDetails: React.FC = () => {
             </span>
           </div>
           <div className="card-content-loading">
-            <Loader text="Loading token metadata..." />
+            <LoaderWithTimeout
+              text="Loading token metadata..."
+              onRetry={() => window.location.reload()}
+            />
           </div>
         </div>
       </div>

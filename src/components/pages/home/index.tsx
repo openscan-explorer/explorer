@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import type { NetworkConfig } from "../../../config/networks";
 import { useNetworks } from "../../../context/AppContext";
+import { useSettings } from "../../../context/SettingsContext";
 import { getChainIdFromNetwork } from "../../../utils/networkResolver";
 import NetworkIcon from "../../common/NetworkIcon";
 import TierBadge from "../../common/TierBadge";
@@ -10,9 +11,10 @@ import HomeSearchBar from "./HomeSearchBar";
 
 interface NetworkCardProps {
   network: NetworkConfig;
+  showChainId?: boolean;
 }
 
-const NetworkCard: React.FC<NetworkCardProps> = ({ network }) => {
+const NetworkCard: React.FC<NetworkCardProps> = ({ network, showChainId = false }) => {
   const chainId = getChainIdFromNetwork(network);
   const { t } = useTranslation("home");
   return (
@@ -33,7 +35,7 @@ const NetworkCard: React.FC<NetworkCardProps> = ({ network }) => {
                 <TierBadge subscription={network.subscription} size="small" />
               )}
             </div>
-            {chainId !== undefined && (
+            {showChainId && chainId !== undefined && (
               <div className="network-card-chain-id">
                 {t("chainID")}: {chainId}
               </div>
@@ -48,9 +50,10 @@ const NetworkCard: React.FC<NetworkCardProps> = ({ network }) => {
 export default function Home() {
   const { t } = useTranslation("home");
   const { enabledNetworks, isLoading } = useNetworks();
+  const { isSuperUser } = useSettings();
   const [showTestnets, setShowTestnets] = useState(false);
 
-  const { productionNetworks, testnetNetworks } = useMemo(() => {
+  const { featuredNetworks, productionNetworks, testnetNetworks } = useMemo(() => {
     const isDevelopment = import.meta.env.VITE_ENVIRONMENT === "development";
     const localhostChainId = 31337;
 
@@ -62,10 +65,18 @@ export default function Home() {
       return !n.isTestnet;
     };
 
-    const productionNetworks = enabledNetworks.filter(isProductionNetwork);
+    const allProduction = enabledNetworks.filter(isProductionNetwork);
     const testnetNetworks = enabledNetworks.filter((n) => !isProductionNetwork(n));
 
-    return { productionNetworks, testnetNetworks };
+    // Featured on top: Ethereum Mainnet + Bitcoin Mainnet
+    const ethMainnet = allProduction.find((n) => n.networkId === "eip155:1");
+    const btcMainnet = allProduction.find((n) => n.type === "bitcoin" && !n.isTestnet);
+    const featuredNetworks = [ethMainnet, btcMainnet].filter((n): n is NetworkConfig => Boolean(n));
+
+    const featuredIds = new Set(featuredNetworks.map((n) => n.networkId));
+    const productionNetworks = allProduction.filter((n) => !featuredIds.has(n.networkId));
+
+    return { featuredNetworks, productionNetworks, testnetNetworks };
   }, [enabledNetworks]);
 
   return (
@@ -75,22 +86,34 @@ export default function Home() {
 
         <HomeSearchBar networks={enabledNetworks} />
 
+        {featuredNetworks.length > 0 && (
+          <div className="network-grid network-grid-featured">
+            {featuredNetworks.map((network) => (
+              <NetworkCard key={network.networkId} network={network} showChainId={isSuperUser} />
+            ))}
+          </div>
+        )}
+
         <div className="network-grid">
-          {isLoading && productionNetworks.length === 0 ? (
+          {isLoading && productionNetworks.length === 0 && featuredNetworks.length === 0 ? (
             <p className="loading-text">{t("loading")}</p>
           ) : (
             productionNetworks.map((network) => (
-              <NetworkCard key={network.networkId} network={network} />
+              <NetworkCard key={network.networkId} network={network} showChainId={isSuperUser} />
             ))
           )}
         </div>
 
-        {testnetNetworks.length > 0 && (
+        {isSuperUser && testnetNetworks.length > 0 && (
           <>
             {showTestnets && (
               <div className="network-grid testnet-grid">
                 {testnetNetworks.map((network) => (
-                  <NetworkCard key={network.networkId} network={network} />
+                  <NetworkCard
+                    key={network.networkId}
+                    network={network}
+                    showChainId={isSuperUser}
+                  />
                 ))}
               </div>
             )}
