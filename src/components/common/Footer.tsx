@@ -4,6 +4,8 @@ import { useNavigate } from "react-router";
 import { useSettings } from "../../context/SettingsContext";
 import { ENVIRONMENT } from "../../utils/constants";
 
+const DOCS_URL = "https://openscan-explorer.github.io/docs";
+
 interface FooterProps {
   className?: string;
 }
@@ -33,10 +35,6 @@ const Footer: React.FC<FooterProps> = ({ className = "" }) => {
     return "";
   };
 
-  const goToSubscriptions = () => {
-    navigate("/subscriptions");
-  };
-
   const goToSupporters = () => {
     navigate("/supporters");
   };
@@ -44,25 +42,32 @@ const Footer: React.FC<FooterProps> = ({ className = "" }) => {
     <footer className={`app-footer ${isSuperUser ? "super-user-active" : ""} ${className}`}>
       <div className="footer-content">
         <div className="footer-left">
-          <button
-            type="button"
-            onClick={() => navigate("/about")}
-            className="footer-link btn-reset"
+          <a
+            href={`${DOCS_URL}/introduction`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="footer-link"
           >
             {t("footer.about")}
-          </button>
+          </a>
           <span className="footer-separator hide-mobile">|</span>
-          <button type="button" onClick={goToSubscriptions} className="footer-link btn-reset">
+          <a
+            href={`${DOCS_URL}/subscriptions`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="footer-link"
+          >
             {t("footer.subscribe")}
-          </button>
+          </a>
           <span className="footer-separator hide-mobile">|</span>
-          <button
-            type="button"
-            onClick={() => navigate("/contact")}
-            className="footer-link btn-reset"
+          <a
+            href={`${DOCS_URL}/contact`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="footer-link"
           >
             {t("footer.contact")}
-          </button>
+          </a>
           <span className="footer-separator hide-mobile">|</span>
           <button type="button" onClick={goToSupporters} className="footer-link btn-reset">
             {t("footer.supporters")} ❤️
