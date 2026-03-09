@@ -1,5 +1,6 @@
 # Dependencies
 node_modules/
+package-lock.json
 .pnp
 .pnp.js
 
@@ -53,6 +54,10 @@ ehthumbs.db
 
 # Dev files
 src/config/dev.json
+
+# Claude Code (local-only files)
+.claude/plans/
+.claude/settings.local.json
 
 # Playwright
 /test-results/
