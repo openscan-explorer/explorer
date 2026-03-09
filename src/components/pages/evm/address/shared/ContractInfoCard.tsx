@@ -1,13 +1,20 @@
 import type React from "react";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import type { Address, ABI } from "../../../../../types";
 import { useTranslation } from "react-i18next";
 import ContractInteraction from "./ContractInteraction";
+import type { VerificationSource } from "../../../../../hooks/useContractVerification";
+import type { SourcifyContractDetails } from "../../../../../hooks/useSourcify";
+import type { ProxyInfo } from "../../../../../utils/proxyDetection";
 
 interface ContractData {
   name?: string;
   compilerVersion?: string;
   evmVersion?: string;
+  language?: string;
+  optimizerEnabled?: boolean;
+  optimizerRuns?: number;
   match?: "perfect" | "partial" | null;
   abi?: ABI[];
   chainId?: string;
@@ -20,7 +27,19 @@ interface ContractData {
   runtime_match?: string | null;
   files?: Array<{ name: string; path: string; content: string }>;
   sources?: Record<string, { content: string }>;
+  runtimeBytecode?: { onchainBytecode?: string };
 }
+
+const ETHERSCAN_EXPLORERS: Record<number, string> = {
+  1: "https://etherscan.io",
+  42161: "https://arbiscan.io",
+  10: "https://optimistic.etherscan.io",
+  8453: "https://basescan.org",
+  56: "https://bscscan.com",
+  137: "https://polygonscan.com",
+  11155111: "https://sepolia.etherscan.io",
+  97: "https://testnet.bscscan.com",
+};
 
 interface ContractInfoCardProps {
   address: Address;
@@ -30,8 +49,17 @@ interface ContractInfoCardProps {
   hasVerifiedContract: boolean;
   sourcifyLoading: boolean;
   isLocalArtifact: boolean;
-  sourcifyUrl?: string;
+  verificationSource?: VerificationSource;
+  proxyInfo?: ProxyInfo | null;
+  implementationContractData?: SourcifyContractDetails | null;
+  implIsVerified?: boolean;
+  /** Implementation contract name from Sourcify's proxyResolution — available immediately without a second fetch. */
+  sourcifyImplName?: string;
+  /** Implementation bytecode fetched via RPC — fallback when Sourcify data lacks runtimeBytecode. */
+  implCode?: string;
 }
+
+type AbiView = "implementation" | "proxy";
 
 const ContractInfoCard: React.FC<ContractInfoCardProps> = ({
   address,
@@ -41,34 +69,76 @@ const ContractInfoCard: React.FC<ContractInfoCardProps> = ({
   hasVerifiedContract,
   sourcifyLoading,
   isLocalArtifact,
-  sourcifyUrl,
+  verificationSource,
+  proxyInfo,
+  implementationContractData,
+  implIsVerified = false,
+  sourcifyImplName,
+  implCode,
 }) => {
   const { t } = useTranslation("address");
   const [showBytecode, setShowBytecode] = useState(false);
   const [showContractDetails, setShowContractDetails] = useState(false);
   const [showSourceCode, setShowSourceCode] = useState(false);
   const [showRawAbi, setShowRawAbi] = useState(false);
+  const [abiView, setAbiView] = useState<AbiView>("implementation");
 
-  const getMatchBadgeText = () => {
-    if (isLocalArtifact) return "Local JSON";
-    if (contractData?.match === "perfect") return "Perfect Match";
-    if (contractData?.match === "partial") return "Partial Match";
-    return null;
-  };
+  // Compute verification source URLs
+  const sourcifyMatchPath = contractData?.match === "partial" ? "partial_match" : "full_match";
+  const sourcifyTagUrl = verificationSource?.includes("sourcify")
+    ? `https://repo.sourcify.dev/contracts/${sourcifyMatchPath}/${networkId}/${addressHash}/`
+    : null;
+  const etherscanBase = ETHERSCAN_EXPLORERS[Number(networkId)];
+  const etherscanTagUrl =
+    verificationSource?.includes("etherscan") && etherscanBase
+      ? `${etherscanBase}/address/${addressHash}#code`
+      : null;
 
-  const matchBadgeText = getMatchBadgeText();
+  // Only use implementation ABI when the implementation is actually verified
+  const hasImplAbi = !!(
+    implIsVerified &&
+    implementationContractData?.abi &&
+    implementationContractData.abi.length > 0
+  );
+  const hasProxyAbi = !!(contractData?.abi && contractData.abi.length > 0);
+  const showAbiTabSwitcher = !!(proxyInfo && hasImplAbi && hasProxyAbi);
 
-  // Prepare source files array
+  const activeAbi: ABI[] | undefined = showAbiTabSwitcher
+    ? abiView === "implementation"
+      ? ((implementationContractData?.abi as ABI[] | undefined) ?? contractData?.abi)
+      : contractData?.abi
+    : proxyInfo && hasImplAbi
+      ? (implementationContractData?.abi as ABI[] | undefined)
+      : contractData?.abi;
+
+  // Derive source files from the same data source as the active ABI:
+  // - tab switcher active + impl tab → implementation source files
+  // - tab switcher active + proxy tab → proxy source files
+  // - no tab switcher, proxy with verified impl → implementation source files
+  // - otherwise → proxy (contractData) source files
+  const activeSourceData = showAbiTabSwitcher
+    ? abiView === "implementation"
+      ? implementationContractData
+      : contractData
+    : proxyInfo && hasImplAbi
+      ? implementationContractData
+      : contractData;
+
   const sourceFiles =
-    contractData?.files && contractData.files.length > 0
-      ? contractData.files
-      : contractData?.sources
-        ? Object.entries(contractData.sources).map(([path, source]) => ({
+    activeSourceData?.files && activeSourceData.files.length > 0
+      ? activeSourceData.files
+      : activeSourceData?.sources
+        ? Object.entries(activeSourceData.sources).map(([path, source]) => ({
             name: path,
             path: path,
             content: source.content || "",
           }))
         : [];
+
+  // Bytecode: prefer Sourcify's runtimeBytecode; fall back to RPC-fetched bytecode per tab
+  const activeBytecode =
+    activeSourceData?.runtimeBytecode?.onchainBytecode ??
+    (activeSourceData === contractData ? address.code : implCode);
 
   return (
     <div className="contract-info-card">
@@ -84,7 +154,27 @@ const ContractInfoCard: React.FC<ContractInfoCardProps> = ({
             <span className="contract-verification-badge">
               <span className="contract-verified-icon">✓</span>
               <span className="contract-verified-text">{t("verified")}</span>
-              {matchBadgeText && <span className="contract-match-badge">{matchBadgeText}</span>}
+              {isLocalArtifact && <span className="contract-match-badge">Local JSON</span>}
+              {sourcifyTagUrl && (
+                <a
+                  href={sourcifyTagUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="verification-source-tag verification-source-tag--sourcify"
+                >
+                  Sourcify ↗
+                </a>
+              )}
+              {etherscanTagUrl && (
+                <a
+                  href={etherscanTagUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="verification-source-tag verification-source-tag--etherscan"
+                >
+                  Etherscan ↗
+                </a>
+              )}
             </span>
           ) : (
             <span className="contract-not-verified">{t("notVerified")}</span>
@@ -92,11 +182,51 @@ const ContractInfoCard: React.FC<ContractInfoCardProps> = ({
         </span>
       </div>
 
-      {/* Contract Name */}
-      {contractData?.name && (
+      {/* Proxy Type */}
+      {proxyInfo && (
+        <div className="account-card-row">
+          <span className="account-card-label">{t("proxyType")}:</span>
+          <span className="account-card-value">{proxyInfo.type}</span>
+        </div>
+      )}
+
+      {/* Implementation Address */}
+      {proxyInfo?.implementationAddress && (
+        <div className="account-card-row">
+          <span className="account-card-label">{t("implementationAddress")}:</span>
+          <span className="account-card-value">
+            <Link
+              to={`/${networkId}/address/${proxyInfo.implementationAddress}`}
+              className="account-card-link"
+            >
+              {proxyInfo.implementationAddress}
+            </Link>
+            {(implementationContractData?.name ?? sourcifyImplName) && (
+              <span className="contract-match-badge">
+                {implementationContractData?.name ?? sourcifyImplName}
+              </span>
+            )}
+          </span>
+        </div>
+      )}
+
+      {/* Implementation not verified warning */}
+      {proxyInfo && !hasImplAbi && (
+        <div className="account-card-row">
+          <span className="account-card-label" />
+          <span className="account-card-value contract-not-verified">
+            {t("implementationNotVerified")}
+          </span>
+        </div>
+      )}
+
+      {/* Contract Name — fall back to implementation name (from full fetch or Sourcify's proxyResolution) */}
+      {(contractData?.name || implementationContractData?.name || sourcifyImplName) && (
         <div className="account-card-row">
           <span className="account-card-label">{t("contractName")}:</span>
-          <span className="account-card-value contract-name">{contractData.name}</span>
+          <span className="account-card-value contract-name">
+            {contractData?.name ?? implementationContractData?.name ?? sourcifyImplName}
+          </span>
         </div>
       )}
 
@@ -118,25 +248,30 @@ const ContractInfoCard: React.FC<ContractInfoCardProps> = ({
         </div>
       )}
 
-      {/* Sourcify Link */}
-      {sourcifyUrl && (
+      {/* Language */}
+      {contractData?.language && contractData.language !== "Solidity" && (
         <div className="account-card-row">
-          <span className="account-card-label">Sourcify:</span>
+          <span className="account-card-label">{t("language")}:</span>
+          <span className="account-card-value">{contractData.language}</span>
+        </div>
+      )}
+
+      {/* Optimizer */}
+      {contractData?.optimizerEnabled !== undefined && (
+        <div className="account-card-row">
+          <span className="account-card-label">{t("optimizer")}:</span>
           <span className="account-card-value">
-            <a
-              href={sourcifyUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="account-card-link"
-            >
-              View on Sourcify ↗
-            </a>
+            {contractData.optimizerEnabled
+              ? t("optimizerEnabled", { runs: contractData.optimizerRuns ?? "?" })
+              : t("optimizerDisabled")}
           </span>
         </div>
       )}
 
-      {/* Contract Details Section - for verified contracts */}
-      {hasVerifiedContract && contractData && (
+      {/* Contract Details Section - shown when:
+          a) proxy contract itself has a verified ABI, OR
+          b) proxy is detected and its implementation has a verified ABI */}
+      {(hasVerifiedContract && contractData) || (proxyInfo && hasImplAbi) ? (
         <div className="contract-details-section">
           <button
             type="button"
@@ -149,8 +284,28 @@ const ContractInfoCard: React.FC<ContractInfoCardProps> = ({
 
           {showContractDetails && (
             <div className="contract-details-content">
-              {/* Contract Bytecode */}
-              {address.code && address.code !== "0x" && (
+              {/* ABI tab switcher - only shown when proxy has verified implementation */}
+              {showAbiTabSwitcher && (
+                <div className="abi-tab-switcher">
+                  <button
+                    type="button"
+                    className={`abi-tab${abiView === "implementation" ? " abi-tab--active" : ""}`}
+                    onClick={() => setAbiView("implementation")}
+                  >
+                    {t("implementationFunctions")}
+                  </button>
+                  <button
+                    type="button"
+                    className={`abi-tab${abiView === "proxy" ? " abi-tab--active" : ""}`}
+                    onClick={() => setAbiView("proxy")}
+                  >
+                    {t("proxyFunctions")}
+                  </button>
+                </div>
+              )}
+
+              {/* Contract Bytecode — switches with the active tab (impl vs proxy) */}
+              {activeBytecode && activeBytecode !== "0x" && (
                 <div className="contract-collapsible-item">
                   <button
                     type="button"
@@ -162,7 +317,7 @@ const ContractInfoCard: React.FC<ContractInfoCardProps> = ({
                   </button>
                   {showBytecode && (
                     <div className="contract-code-content">
-                      <code>{address.code}</code>
+                      <code>{activeBytecode}</code>
                     </div>
                   )}
                 </div>
@@ -195,7 +350,7 @@ const ContractInfoCard: React.FC<ContractInfoCardProps> = ({
               )}
 
               {/* Raw ABI */}
-              {contractData.abi && contractData.abi.length > 0 && (
+              {activeAbi && activeAbi.length > 0 && (
                 <div className="contract-collapsible-item">
                   <button
                     type="button"
@@ -207,43 +362,46 @@ const ContractInfoCard: React.FC<ContractInfoCardProps> = ({
                   </button>
                   {showRawAbi && (
                     <div className="contract-code-content">
-                      <code>{JSON.stringify(contractData.abi, null, 2)}</code>
+                      <code>{JSON.stringify(activeAbi, null, 2)}</code>
                     </div>
                   )}
                 </div>
               )}
 
               {/* Contract Interaction */}
-              {contractData.abi && contractData.abi.length > 0 && (
+              {activeAbi && activeAbi.length > 0 && (
                 <ContractInteraction
                   addressHash={addressHash}
                   networkId={networkId}
-                  abi={contractData.abi}
+                  abi={activeAbi}
                 />
               )}
             </div>
           )}
         </div>
-      )}
+      ) : null}
 
-      {/* Bytecode for unverified contracts */}
-      {!hasVerifiedContract && address.code && address.code !== "0x" && (
-        <div className="contract-bytecode-section">
-          <button
-            type="button"
-            className="contract-bytecode-toggle"
-            onClick={() => setShowBytecode(!showBytecode)}
-          >
-            <span className="account-card-label">{t("contractBytecode")}</span>
-            <span className="contract-toggle-icon">{showBytecode ? "−" : "+"}</span>
-          </button>
-          {showBytecode && (
-            <div className="contract-bytecode-content">
-              <code>{address.code}</code>
-            </div>
-          )}
-        </div>
-      )}
+      {/* Bytecode for unverified contracts — hidden when contract-details-section already shows it */}
+      {!hasVerifiedContract &&
+        !(proxyInfo && hasImplAbi) &&
+        address.code &&
+        address.code !== "0x" && (
+          <div className="contract-bytecode-section">
+            <button
+              type="button"
+              className="contract-bytecode-toggle"
+              onClick={() => setShowBytecode(!showBytecode)}
+            >
+              <span className="account-card-label">{t("contractBytecode")}</span>
+              <span className="contract-toggle-icon">{showBytecode ? "−" : "+"}</span>
+            </button>
+            {showBytecode && (
+              <div className="contract-bytecode-content">
+                <code>{address.code}</code>
+              </div>
+            )}
+          </div>
+        )}
     </div>
   );
 };

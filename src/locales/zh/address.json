@@ -193,5 +193,14 @@
     "missingParam": "请提供 {{paramName}} 的值",
     "invalidEthValue": "ETH 值无效",
     "error": "错误：{{message}}"
-  }
+  },
+  "proxyType": "代理类型",
+  "implementationAddress": "实现合约",
+  "implementationFunctions": "实现",
+  "proxyFunctions": "代理",
+  "implementationNotVerified": "实现合约未在Sourcify上验证",
+  "language": "语言",
+  "optimizer": "优化器",
+  "optimizerEnabled": "启用 ({{runs}} 次)",
+  "optimizerDisabled": "禁用"
 }

@@ -421,6 +421,7 @@ export type RpcUrlsContextType = Record<string, RPCUrls>;
 export interface ApiKeys {
   infura?: string;
   alchemy?: string;
+  etherscan?: string;
   groq?: string;
   openai?: string;
   anthropic?: string;

@@ -65,6 +65,11 @@
       "getKey": "キーを取得",
       "placeholder": "AlchemyのAPIキーを入力"
     },
+    "etherscan": {
+      "name": "Etherscan",
+      "getKey": "キーを取得",
+      "placeholder": "EtherscanのAPIキーを入力"
+    },
     "toggleHide": "APIキーを非表示",
     "toggleShow": "APIキーを表示",
     "aiTitle": "AI分析キー",

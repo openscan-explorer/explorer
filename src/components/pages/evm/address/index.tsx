@@ -1,4 +1,4 @@
-import { useContext, useEffect, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation, useParams } from "react-router-dom";
 import { getNetworkById } from "../../../../config/networks";
@@ -33,9 +33,8 @@ export default function Address() {
     networkConfigData?.shortName || networkConfigData?.name || `Chain ${networkId}`;
   const { rpcUrls } = useContext(AppContext);
   const [addressData, setAddressData] = useState<AddressData | null>(null);
-  const [addressType, setAddressType] = useState<AddressType>("account");
+  const [addressType, setAddressType] = useState<AddressType | null>(null);
   const [loading, setLoading] = useState(true);
-  const [typeLoading, setTypeLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   // ENS resolution state
@@ -67,6 +66,11 @@ export default function Address() {
   );
 
   const klerosTag = useKlerosTag(address, numericNetworkId);
+
+  // Track the last address for which type detection completed, so background
+  // re-fetches (e.g. dataService reference change) don't reset the type and
+  // unmount the active display component.
+  const prevAddressRef = useRef<string | undefined>(undefined);
 
   // Resolve ENS name to address
   useEffect(() => {
@@ -121,12 +125,19 @@ export default function Address() {
   useEffect(() => {
     if (!address || !dataService) {
       setLoading(false);
-      setTypeLoading(false);
       return;
     }
 
+    // Reset display state only when navigating to a different address.
+    // Background re-fetches triggered by dataService reference changes must
+    // not reset the type — doing so unmounts the display component and clears
+    // all its child hook state (proxy detection, Sourcify data, etc.).
+    if (address !== prevAddressRef.current) {
+      prevAddressRef.current = address;
+      setAddressType(null);
+    }
+
     setLoading(true);
-    setTypeLoading(true);
     setError(null);
 
     // Use DataService to fetch address data with metadata support
@@ -150,26 +161,26 @@ export default function Address() {
             addressHash: address,
             chainId: numericNetworkId,
             rpcUrl,
+            // Pass already-fetched address data to skip the redundant eth_getCode call.
+            // This prevents contracts from being misclassified as EOA when the
+            // secondary RPC fetch fails (rate-limit, L2 quirks, etc.).
+            preloadedAddress: addressData,
           })
             .then((typeResult) => {
               setAddressType(typeResult.addressType);
             })
             .catch(() => {
-              // If detection fails, infer from already-fetched address code instead of forcing account
-              setAddressType(hasContractCode(addressData?.code) ? "contract" : "account");
-            })
-            .finally(() => {
-              setTypeLoading(false);
+              // Type detection failed — use the code we already have to distinguish
+              // contract from EOA rather than blindly defaulting to "account".
+              setAddressType(hasContractCode(addressData.code) ? "contract" : "account");
             });
         } else {
-          // No RPC available for type detection: still infer type from fetched address code
-          setAddressType(hasContractCode(addressData?.code) ? "contract" : "account");
-          setTypeLoading(false);
+          // No RPC URL configured for type detection — derive type from pre-fetched code.
+          setAddressType(hasContractCode(addressData.code) ? "contract" : "account");
         }
       })
       .catch((err) => {
         setError(err.message || t("failedToFetchAddressData"));
-        setTypeLoading(false);
       })
       .finally(() => setLoading(false));
   }, [address, dataService, numericNetworkId, rpcUrls, t]);
@@ -205,7 +216,11 @@ export default function Address() {
     );
   }
 
-  if (loading || typeLoading) {
+  // Show loader only until both the address data *and* the type are determined for
+  // the first time. Background re-fetches (e.g. dataService reference change) must
+  // not unmount the display component — that would reset all child hook state
+  // (proxy detection, Sourcify data, etc.) and cause visible flicker.
+  if (!addressData || addressType === null) {
     return (
       <div className="container-wide">
         <div className="block-display-card">

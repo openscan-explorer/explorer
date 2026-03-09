@@ -2,7 +2,8 @@ import type React from "react";
 import { useContext, useEffect, useMemo, useState } from "react";
 import { getNetworkById } from "../../../../../config/networks";
 import { AppContext } from "../../../../../context";
-import { useSourcify } from "../../../../../hooks/useSourcify";
+import { useContractVerification } from "../../../../../hooks/useContractVerification";
+import { useProxyInfo } from "../../../../../hooks/useProxyInfo";
 import {
   fetchToken,
   getAssetUrl,
@@ -53,12 +54,21 @@ const ERC721Display: React.FC<ERC721DisplayProps> = ({
     totalSupply?: string;
   } | null>(null);
 
-  // Fetch Sourcify data
+  // Fetch verified contract data (Sourcify → Etherscan fallback)
   const {
-    data: sourcifyData,
+    data: contractVerifiedData,
     loading: sourcifyLoading,
     isVerified,
-  } = useSourcify(Number(networkId), addressHash, true);
+    source: verificationSource,
+  } = useContractVerification(Number(networkId), addressHash, true);
+
+  // Detect proxy pattern and fetch implementation contract data
+  const proxyInfo = useProxyInfo(addressHash, networkId, address.code ?? "");
+  const { data: implSourcifyData, isVerified: implIsVerified } = useContractVerification(
+    Number(networkId),
+    proxyInfo?.implementationAddress,
+    !!proxyInfo,
+  );
 
   // Fetch token metadata from explorer-metadata
   useEffect(() => {
@@ -161,8 +171,8 @@ const ERC721Display: React.FC<ERC721DisplayProps> = ({
   }, [localArtifact, networkId, addressHash]);
 
   const contractData = useMemo(
-    () => (isVerified && sourcifyData ? sourcifyData : parsedLocalData),
-    [isVerified, sourcifyData, parsedLocalData],
+    () => (isVerified && contractVerifiedData ? contractVerifiedData : parsedLocalData),
+    [isVerified, contractVerifiedData, parsedLocalData],
   );
 
   const hasVerifiedContract = isVerified || !!parsedLocalData;
@@ -253,11 +263,9 @@ const ERC721Display: React.FC<ERC721DisplayProps> = ({
             hasVerifiedContract={hasVerifiedContract}
             sourcifyLoading={sourcifyLoading}
             isLocalArtifact={!!parsedLocalData && !isVerified}
-            sourcifyUrl={
-              sourcifyData
-                ? `https://repo.sourcify.dev/contracts/full_match/${networkId}/${addressHash}/`
-                : undefined
-            }
+            verificationSource={verificationSource}
+            proxyInfo={proxyInfo}
+            implementationContractData={implIsVerified ? implSourcifyData : null}
           />
         </div>
       </div>

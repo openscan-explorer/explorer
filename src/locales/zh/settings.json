@@ -65,6 +65,11 @@
       "getKey": "获取密钥",
       "placeholder": "输入您的 Alchemy API 密钥"
     },
+    "etherscan": {
+      "name": "Etherscan",
+      "getKey": "获取密钥",
+      "placeholder": "输入您的 Etherscan API 密钥"
+    },
     "toggleHide": "隐藏 API 密钥",
     "toggleShow": "显示 API 密钥",
     "aiTitle": "AI 分析密钥",

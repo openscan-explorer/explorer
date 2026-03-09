@@ -105,6 +105,7 @@ const Settings: React.FC = () => {
   const [localApiKeys, setLocalApiKeys] = useState({
     infura: settings.apiKeys?.infura || "",
     alchemy: settings.apiKeys?.alchemy || "",
+    etherscan: settings.apiKeys?.etherscan || "",
     groq: settings.apiKeys?.groq || "",
     openai: settings.apiKeys?.openai || "",
     anthropic: settings.apiKeys?.anthropic || "",
@@ -114,6 +115,7 @@ const Settings: React.FC = () => {
   const [showApiKeys, setShowApiKeys] = useState({
     infura: false,
     alchemy: false,
+    etherscan: false,
     groq: false,
     openai: false,
     anthropic: false,
@@ -493,6 +495,7 @@ const Settings: React.FC = () => {
       apiKeys: {
         infura: localApiKeys.infura || undefined,
         alchemy: localApiKeys.alchemy || undefined,
+        etherscan: localApiKeys.etherscan || undefined,
         groq: localApiKeys.groq || undefined,
         openai: localApiKeys.openai || undefined,
         anthropic: localApiKeys.anthropic || undefined,
@@ -776,6 +779,43 @@ const Settings: React.FC = () => {
                     title={showApiKeys.alchemy ? t("apiKeys.toggleHide") : t("apiKeys.toggleShow")}
                   >
                     {showApiKeys.alchemy ? "👁️" : "👁️‍🗨️"}
+                  </button>
+                </div>
+              </div>
+
+              <div className="settings-api-key-item">
+                <div className="settings-api-key-header">
+                  <span className="settings-api-key-name">{t("apiKeys.etherscan.name")}</span>
+                  <a
+                    href="https://etherscan.io/myapikey"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="settings-api-key-link"
+                  >
+                    {t("apiKeys.etherscan.getKey")} →
+                  </a>
+                </div>
+                <div className="settings-api-key-input-wrapper">
+                  <input
+                    type={showApiKeys.etherscan ? "text" : "password"}
+                    className="settings-rpc-input"
+                    value={localApiKeys.etherscan}
+                    onChange={(e) =>
+                      setLocalApiKeys((prev) => ({ ...prev, etherscan: e.target.value }))
+                    }
+                    placeholder={t("apiKeys.etherscan.placeholder")}
+                  />
+                  <button
+                    type="button"
+                    className="settings-api-key-toggle"
+                    onClick={() =>
+                      setShowApiKeys((prev) => ({ ...prev, etherscan: !prev.etherscan }))
+                    }
+                    title={
+                      showApiKeys.etherscan ? t("apiKeys.toggleHide") : t("apiKeys.toggleShow")
+                    }
+                  >
+                    {showApiKeys.etherscan ? "👁️" : "👁️‍🗨️"}
                   </button>
                 </div>
               </div>
