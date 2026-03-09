@@ -16,7 +16,11 @@ export function useProxyInfo(
 
     detectProxy(address, dataService.networkAdapter, bytecode)
       .then(setProxyInfo)
-      .catch(() => setProxyInfo(null));
+      .catch(() => {
+        // Keep the last known proxyInfo on failure (e.g. RPC error on re-fetch).
+        // Resetting to null would disable the implementation contract fetch and
+        // cause verified contract data to disappear from the UI.
+      });
   }, [address, networkId, bytecode, dataService]);
 
   return proxyInfo;

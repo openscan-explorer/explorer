@@ -12,6 +12,9 @@ interface ContractData {
   name?: string;
   compilerVersion?: string;
   evmVersion?: string;
+  language?: string;
+  optimizerEnabled?: boolean;
+  optimizerRuns?: number;
   match?: "perfect" | "partial" | null;
   abi?: ABI[];
   chainId?: string;
@@ -49,6 +52,8 @@ interface ContractInfoCardProps {
   proxyInfo?: ProxyInfo | null;
   implementationContractData?: SourcifyContractDetails | null;
   implIsVerified?: boolean;
+  /** Implementation contract name from Sourcify's proxyResolution — available immediately without a second fetch. */
+  sourcifyImplName?: string;
 }
 
 type AbiView = "implementation" | "proxy";
@@ -65,6 +70,7 @@ const ContractInfoCard: React.FC<ContractInfoCardProps> = ({
   proxyInfo,
   implementationContractData,
   implIsVerified = false,
+  sourcifyImplName,
 }) => {
   const { t } = useTranslation("address");
   const [showBytecode, setShowBytecode] = useState(false);
@@ -174,8 +180,10 @@ const ContractInfoCard: React.FC<ContractInfoCardProps> = ({
             >
               {proxyInfo.implementationAddress}
             </Link>
-            {implementationContractData?.name && (
-              <span className="contract-match-badge">{implementationContractData.name}</span>
+            {(implementationContractData?.name ?? sourcifyImplName) && (
+              <span className="contract-match-badge">
+                {implementationContractData?.name ?? sourcifyImplName}
+              </span>
             )}
           </span>
         </div>
@@ -191,12 +199,12 @@ const ContractInfoCard: React.FC<ContractInfoCardProps> = ({
         </div>
       )}
 
-      {/* Contract Name — fall back to implementation name for unverified proxies */}
-      {(contractData?.name || implementationContractData?.name) && (
+      {/* Contract Name — fall back to implementation name (from full fetch or Sourcify's proxyResolution) */}
+      {(contractData?.name || implementationContractData?.name || sourcifyImplName) && (
         <div className="account-card-row">
           <span className="account-card-label">{t("contractName")}:</span>
           <span className="account-card-value contract-name">
-            {contractData?.name ?? implementationContractData?.name}
+            {contractData?.name ?? implementationContractData?.name ?? sourcifyImplName}
           </span>
         </div>
       )}
@@ -216,6 +224,26 @@ const ContractInfoCard: React.FC<ContractInfoCardProps> = ({
         <div className="account-card-row">
           <span className="account-card-label">{t("evmVersion")}:</span>
           <span className="account-card-value">{contractData.evmVersion}</span>
+        </div>
+      )}
+
+      {/* Language */}
+      {contractData?.language && contractData.language !== "Solidity" && (
+        <div className="account-card-row">
+          <span className="account-card-label">{t("language")}:</span>
+          <span className="account-card-value">{contractData.language}</span>
+        </div>
+      )}
+
+      {/* Optimizer */}
+      {contractData?.optimizerEnabled !== undefined && (
+        <div className="account-card-row">
+          <span className="account-card-label">{t("optimizer")}:</span>
+          <span className="account-card-value">
+            {contractData.optimizerEnabled
+              ? t("optimizerEnabled", { runs: contractData.optimizerRuns ?? "?" })
+              : t("optimizerDisabled")}
+          </span>
         </div>
       )}
 

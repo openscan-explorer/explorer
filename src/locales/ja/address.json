@@ -198,5 +198,9 @@
   "implementationAddress": "実装",
   "implementationFunctions": "実装",
   "proxyFunctions": "プロキシ",
-  "implementationNotVerified": "実装はSourcifyで検証されていません"
+  "implementationNotVerified": "実装はSourcifyで検証されていません",
+  "language": "言語",
+  "optimizer": "オプティマイザ",
+  "optimizerEnabled": "有効 ({{runs}} 回)",
+  "optimizerDisabled": "無効"
 }

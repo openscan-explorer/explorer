@@ -57,7 +57,7 @@ const ERC20Display: React.FC<ERC20DisplayProps> = ({
 
   // Fetch verified contract data (Sourcify → Etherscan fallback)
   const {
-    data: sourcifyData,
+    data: contractVerifiedData,
     loading: sourcifyLoading,
     isVerified,
     source: verificationSource,
@@ -194,8 +194,8 @@ const ERC20Display: React.FC<ERC20DisplayProps> = ({
   }, [localArtifact, networkId, addressHash]);
 
   const contractData = useMemo(
-    () => (isVerified && sourcifyData ? sourcifyData : parsedLocalData),
-    [isVerified, sourcifyData, parsedLocalData],
+    () => (isVerified && contractVerifiedData ? contractVerifiedData : parsedLocalData),
+    [isVerified, contractVerifiedData, parsedLocalData],
   );
 
   const hasVerifiedContract = isVerified || !!parsedLocalData;

@@ -199,5 +199,9 @@
   "implementationAddress": "Implementation",
   "implementationFunctions": "Implementation",
   "proxyFunctions": "Proxy",
-  "implementationNotVerified": "Implementation not verified on Sourcify"
+  "implementationNotVerified": "Implementation not verified on Sourcify",
+  "language": "Language",
+  "optimizer": "Optimizer",
+  "optimizerEnabled": "Enabled ({{runs}} runs)",
+  "optimizerDisabled": "Disabled"
 }

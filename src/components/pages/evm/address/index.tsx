@@ -1,4 +1,4 @@
-import { useContext, useEffect, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation, useParams } from "react-router-dom";
 import { AppContext } from "../../../../context";
@@ -63,6 +63,11 @@ export default function Address() {
 
   const klerosTag = useKlerosTag(address, numericNetworkId);
 
+  // Track the last address for which type detection completed, so background
+  // re-fetches (e.g. dataService reference change) don't reset the type and
+  // unmount the active display component.
+  const prevAddressRef = useRef<string | undefined>(undefined);
+
   // Resolve ENS name to address
   useEffect(() => {
     if (!isEnsName || !addressParam) {
@@ -120,9 +125,17 @@ export default function Address() {
       return;
     }
 
+    // Reset display state only when navigating to a different address.
+    // Background re-fetches triggered by dataService reference changes must
+    // not reset the type — doing so unmounts the display component and clears
+    // all its child hook state (proxy detection, Sourcify data, etc.).
+    if (address !== prevAddressRef.current) {
+      prevAddressRef.current = address;
+      setAddressType(null);
+    }
+
     setLoading(true);
     setTypeLoading(true);
-    setAddressType(null);
     setError(null);
 
     // Use DataService to fetch address data with metadata support

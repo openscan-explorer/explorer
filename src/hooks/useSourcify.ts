@@ -10,10 +10,19 @@ export interface SourcifyMatch {
   verifiedAt?: string;
 }
 
+export interface SourcifyProxyResolution {
+  isProxy: boolean;
+  proxyType?: string;
+  implementations?: { address: string; name?: string }[];
+}
+
 export interface SourcifyContractDetails extends SourcifyMatch {
   name?: string;
   compilerVersion?: string;
   evmVersion?: string;
+  language?: string;
+  optimizerEnabled?: boolean;
+  optimizerRuns?: number;
   files?: {
     name: string;
     path: string;
@@ -29,9 +38,79 @@ export interface SourcifyContractDetails extends SourcifyMatch {
   metadata?: any;
   // biome-ignore lint/suspicious/noExplicitAny: <TODO>
   abi?: any[];
+  proxyResolution?: SourcifyProxyResolution;
 }
 
-const SOURCIFY_API_BASE = "https://repo.sourcify.dev/contracts";
+/** Raw shape returned by Sourcify V2 API (?fields=all). */
+interface SourcifyV2Raw {
+  match?: string;
+  creationMatch?: string;
+  runtimeMatch?: string;
+  chainId?: string;
+  address?: string;
+  verifiedAt?: string;
+  sources?: Record<string, { content: string }>;
+  // biome-ignore lint/suspicious/noExplicitAny: ABI items can be any shape
+  abi?: any[];
+  compilation?: {
+    name?: string;
+    compilerVersion?: string;
+    language?: string;
+    compilerSettings?: {
+      evmVersion?: string;
+      optimizer?: {
+        enabled?: boolean;
+        runs?: number;
+      };
+    };
+  };
+  proxyResolution?: {
+    isProxy: boolean;
+    proxyType?: string;
+    implementations?: { address: string; name?: string }[];
+  };
+}
+
+function normalizeMatch(raw?: string): "perfect" | "partial" | null {
+  if (!raw) return null;
+  if (raw === "exact_match" || raw === "perfect") return "perfect";
+  if (raw.includes("partial")) return "partial";
+  return null;
+}
+
+function mapV2Response(raw: SourcifyV2Raw): SourcifyContractDetails {
+  const compilation = raw.compilation;
+  const settings = compilation?.compilerSettings;
+
+  const sources = raw.sources ?? undefined;
+  const files = sources
+    ? Object.entries(sources).map(([path, src]) => ({
+        name: path.split("/").pop() ?? path,
+        path,
+        content: src.content ?? "",
+      }))
+    : undefined;
+
+  return {
+    name: compilation?.name,
+    compilerVersion: compilation?.compilerVersion,
+    evmVersion: settings?.evmVersion,
+    language: compilation?.language,
+    optimizerEnabled: settings?.optimizer?.enabled,
+    optimizerRuns: settings?.optimizer?.runs,
+    abi: raw.abi,
+    sources,
+    files,
+    match: normalizeMatch(raw.match),
+    creation_match: normalizeMatch(raw.creationMatch),
+    runtime_match: normalizeMatch(raw.runtimeMatch),
+    chainId: raw.chainId ?? "",
+    address: raw.address ?? "",
+    verifiedAt: raw.verifiedAt,
+    proxyResolution: raw.proxyResolution,
+  };
+}
+
 const SOURCIFY_API_V2_BASE = "https://sourcify.dev/server";
 
 /**
@@ -81,7 +160,8 @@ export const useSourcify = (
           return;
         }
 
-        const contractData: SourcifyContractDetails = await response.json();
+        const raw = (await response.json()) as SourcifyV2Raw;
+        const contractData = mapV2Response(raw);
         setData(contractData);
         setIsVerified(!!contractData.match);
       } catch (err) {
@@ -102,87 +182,6 @@ export const useSourcify = (
     loading,
     error,
     isVerified,
-  };
-};
-
-/**
- * Hook to fetch contract source files from Sourcify
- * @param networkId - The network ID
- * @param address - The contract address
- * @param matchType - Type of match to fetch: 'full_match' | 'partial_match'
- * @param enabled - Whether to fetch data (default: true)
- */
-export const useSourcifyFiles = (
-  networkId: number,
-  address: string | undefined,
-  matchType: "full_match" | "partial_match" = "full_match",
-  enabled: boolean = true,
-) => {
-  const [files, setFiles] = useState<{ name: string; content: string; path: string }[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!enabled || !address || !networkId) {
-      return;
-    }
-
-    const fetchFiles = async () => {
-      setLoading(true);
-      setError(null);
-
-      try {
-        // Fetch the file tree first (Sourcify API uses chainId in URL)
-        const treeUrl = `${SOURCIFY_API_BASE}/${matchType}/${networkId}/${address}/`;
-        const treeResponse = await fetch(treeUrl);
-
-        if (!treeResponse.ok) {
-          throw new Error("Files not found");
-        }
-
-        const treeText = await treeResponse.text();
-
-        // Parse the directory listing (this is a simplified parser)
-        // In production, you might want to use the API v2 files endpoint instead
-        const fileMatches = treeText.match(/href="([^"]+)"/g);
-
-        if (fileMatches) {
-          const fileList = fileMatches
-            .map((match) => match.match(/href="([^"]+)"/)?.[1])
-            .filter((file): file is string => !!file && !file.endsWith("/"));
-
-          // Fetch each file content
-          const fileContents = await Promise.all(
-            fileList.map(async (fileName) => {
-              const fileUrl = `${treeUrl}${fileName}`;
-              const fileResponse = await fetch(fileUrl);
-              const content = await fileResponse.text();
-              return {
-                name: fileName,
-                path: fileName,
-                content,
-              };
-            }),
-          );
-
-          setFiles(fileContents);
-        }
-      } catch (err) {
-        logger.error("Error fetching Sourcify files:", err);
-        setError(err instanceof Error ? err.message : "Unknown error occurred");
-        setFiles([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchFiles();
-  }, [networkId, address, matchType, enabled]);
-
-  return {
-    files,
-    loading,
-    error,
   };
 };
 

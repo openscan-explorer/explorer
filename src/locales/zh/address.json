@@ -198,5 +198,9 @@
   "implementationAddress": "实现合约",
   "implementationFunctions": "实现",
   "proxyFunctions": "代理",
-  "implementationNotVerified": "实现合约未在Sourcify上验证"
+  "implementationNotVerified": "实现合约未在Sourcify上验证",
+  "language": "语言",
+  "optimizer": "优化器",
+  "optimizerEnabled": "启用 ({{runs}} 次)",
+  "optimizerDisabled": "禁用"
 }

@@ -13,6 +13,21 @@ import ContractInfoCards from "../shared/ContractInfoCards";
 import { logger } from "../../../../../utils";
 import { compactContractDataForAI } from "../../../../common/AIAnalysis/aiContext";
 import { formatNativeFromWei } from "../../../../../utils/unitFormatters";
+import type { ProxyInfo, ProxyType } from "../../../../../utils/proxyDetection";
+
+/** Map Sourcify V2 proxyType string to our ProxyType enum. */
+function mapSourcifyProxyType(sourcifyType: string | undefined): ProxyType {
+  switch (sourcifyType) {
+    case "EIP1167Proxy":
+      return "EIP-1167";
+    case "ZeppelinOSProxy":
+      return "Transparent (Legacy)";
+    case "EIP1967Proxy":
+    default:
+      // RPC detection will refine Transparent vs UUPS; this is the safe default
+      return "EIP-1967 Transparent";
+  }
+}
 
 interface ContractDisplayProps {
   address: Address;
@@ -47,16 +62,35 @@ const ContractDisplay: React.FC<ContractDisplayProps> = ({
 
   // Fetch verified contract data (Sourcify → Etherscan fallback)
   const {
-    data: sourcifyData,
+    data: contractVerifiedData,
     loading: sourcifyLoading,
     isVerified,
     source: verificationSource,
   } = useContractVerification(Number(networkId), addressHash, true);
 
-  // Detect proxy pattern
-  const proxyInfo = useProxyInfo(addressHash, networkId, address.code ?? "");
+  // RPC-based proxy detection — provides accurate Transparent vs UUPS distinction
+  const rpcProxyInfo = useProxyInfo(addressHash, networkId, address.code ?? "");
 
-  // Fetch implementation contract data (Sourcify → Etherscan fallback)
+  // Merge Sourcify proxy resolution (reliable impl address + name) with RPC detection (accurate type).
+  // Sourcify is preferred for the implementation address; RPC is preferred for the proxy type.
+  // For unverified contracts Sourcify has no data, so RPC detection is the only source.
+  const proxyInfo = useMemo((): ProxyInfo | null => {
+    const sp = contractVerifiedData?.proxyResolution;
+    const implAddr = sp?.implementations?.[0]?.address;
+    if (sp?.isProxy && implAddr) {
+      return {
+        // If RPC also detected it, use its more accurate type; otherwise fall back to Sourcify's type
+        type: rpcProxyInfo?.type ?? mapSourcifyProxyType(sp.proxyType),
+        implementationAddress: implAddr,
+      };
+    }
+    return rpcProxyInfo;
+  }, [contractVerifiedData, rpcProxyInfo]);
+
+  // Implementation name from Sourcify's proxy resolution (available without a second fetch)
+  const sourcifyImplName = contractVerifiedData?.proxyResolution?.implementations?.[0]?.name;
+
+  // Fetch implementation contract data for ABI + source code (Sourcify → Etherscan fallback)
   const { data: implSourcifyData, isVerified: implIsVerified } = useContractVerification(
     Number(networkId),
     proxyInfo?.implementationAddress,
@@ -100,8 +134,8 @@ const ContractDisplay: React.FC<ContractDisplayProps> = ({
 
   // Use local artifact data if available and sourcify is not verified
   const contractData = useMemo(
-    () => (isVerified && sourcifyData ? sourcifyData : parsedLocalData),
-    [isVerified, sourcifyData, parsedLocalData],
+    () => (isVerified && contractVerifiedData ? contractVerifiedData : parsedLocalData),
+    [isVerified, contractVerifiedData, parsedLocalData],
   );
 
   const hasVerifiedContract = isVerified || !!parsedLocalData;
@@ -131,7 +165,8 @@ const ContractDisplay: React.FC<ContractDisplayProps> = ({
     ],
   );
 
-  logger.debug(contractData);
+  logger.debug("contract data", contractData);
+  logger.debug("implementation", implSourcifyData);
   return (
     <div className="page-with-analysis">
       <div className="block-display-card">
@@ -168,6 +203,7 @@ const ContractDisplay: React.FC<ContractDisplayProps> = ({
             proxyInfo={proxyInfo}
             implementationContractData={implSourcifyData}
             implIsVerified={implIsVerified}
+            sourcifyImplName={sourcifyImplName}
           />
         </div>
       </div>
