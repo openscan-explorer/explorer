@@ -5,7 +5,7 @@ import type { BitcoinNetworkStats, BitcoinTransaction } from "../../../types";
 import { formatBTC, formatTimeAgo, truncateHash } from "../../../utils/bitcoinFormatters";
 import { calculateTotalOutput } from "../../../utils/bitcoinUtils";
 import { logger } from "../../../utils/logger";
-import Loader from "../../common/Loader";
+import LoaderWithTimeout from "../../common/LoaderWithTimeout";
 
 const PAGE_SIZE = 100;
 const REFRESH_INTERVAL = 30000; // 30 seconds
@@ -90,7 +90,10 @@ export default function BitcoinMempoolPage() {
             <span className="block-label">Bitcoin Mempool</span>
           </div>
           <div className="card-content-loading">
-            <Loader text="Loading mempool data..." />
+            <LoaderWithTimeout
+              text="Loading mempool data..."
+              onRetry={() => window.location.reload()}
+            />
           </div>
         </div>
       </div>

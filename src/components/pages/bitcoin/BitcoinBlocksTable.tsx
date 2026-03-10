@@ -23,7 +23,43 @@ const BitcoinBlocksTable: React.FC<BitcoinBlocksTableProps> = ({ blocks, loading
       </div>
 
       {loading && blocks.length === 0 ? (
-        <div className="dashboard-table-loading">Loading blocks...</div>
+        <div className="dashboard-table-compact">
+          {Array.from({ length: 5 }).map((_, i) => (
+            // biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholder
+            <div key={i} className="dashboard-table-row">
+              <div className="dashboard-block-info">
+                <span className="dashboard-block-number" style={{ pointerEvents: "none" }}>
+                  <span
+                    className="skeleton-pulse"
+                    style={{ width: "70px", height: 14, display: "inline-block" }}
+                  />
+                </span>
+                <span className="dashboard-block-time">
+                  <span
+                    className="skeleton-pulse"
+                    style={{ width: "40px", height: 12, display: "inline-block" }}
+                  />
+                </span>
+              </div>
+              <div className="dashboard-block-details">
+                <span className="dashboard-block-txns">
+                  <span
+                    className="skeleton-pulse"
+                    style={{ width: "50px", height: 12, display: "inline-block" }}
+                  />
+                </span>
+              </div>
+              <div className="dashboard-block-meta">
+                <span className="dashboard-block-miner" style={{ pointerEvents: "none" }}>
+                  <span
+                    className="skeleton-pulse"
+                    style={{ width: "80px", height: 12, display: "inline-block" }}
+                  />
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
       ) : blocks.length === 0 ? (
         <div className="dashboard-table-empty">No blocks found</div>
       ) : (

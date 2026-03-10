@@ -244,7 +244,10 @@
     "invalidType": "Tipo de perfil inválido: {{type}}. Debe ser uno de: network, app, organization.",
     "notFoundMessage": "Perfil no encontrado: {{type}}/{{id}}",
     "fetchError": "No se pudo obtener el perfil",
-    "unknownType": "Tipo de perfil desconocido"
+    "unknownType": "Tipo de perfil desconocido",
+    "notFoundFriendly": "Este perfil no existe o no está disponible todavía. Los perfiles están disponibles para redes, apps y organizaciones.",
+    "goHome": "Ir al Inicio",
+    "browseSupporters": "Ver Supporters"
   },
   "rpcIndicator": {
     "clickToSeeDetails": "Hacé clic para ver los detalles del proveedor RPC",
@@ -293,7 +296,9 @@
     "badgeTxHash": "Hash de TX",
     "badgeBlock": "Bloque",
     "badgeEns": "ENS",
-    "badgeUnknown": "Desconocido"
+    "badgeUnknown": "Desconocido",
+    "noQueryHelp": "Buscá una dirección, hash de transacción, número de bloque o nombre ENS.",
+    "goHome": "Ir al Inicio"
   },
   "searchBox": {
     "placeholder": "Buscar por dirección / hash de tx / bloque / nombre ENS",

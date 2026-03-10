@@ -35,7 +35,10 @@
 /* Note: No display property set here to preserve natural element display (e.g., table-cell for td/th) */
 
 /* Show only on mobile (hide on tablet+) */
-.show-mobile {
+.show-mobile,
+.show-mobile-flex,
+.show-mobile-inline,
+.show-mobile-inline-flex {
   display: none;
 }
 

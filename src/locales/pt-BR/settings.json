@@ -65,6 +65,11 @@
       "getKey": "Obter Chave",
       "placeholder": "Insira sua chave de API do Alchemy"
     },
+    "etherscan": {
+      "name": "Etherscan",
+      "getKey": "Obter Chave",
+      "placeholder": "Insira sua chave de API do Etherscan"
+    },
     "toggleHide": "Ocultar chave de API",
     "toggleShow": "Mostrar chave de API",
     "aiTitle": "Chaves de Análise de IA",

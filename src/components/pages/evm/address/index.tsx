@@ -1,14 +1,18 @@
-import { useContext, useEffect, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation, useParams } from "react-router-dom";
+import { getNetworkById } from "../../../../config/networks";
 import { AppContext } from "../../../../context";
 import { useDataService } from "../../../../hooks/useDataService";
 import { useENS } from "../../../../hooks/useENS";
+import { useKlerosTag } from "../../../../hooks/useKlerosTag";
 import { useProviderSelection } from "../../../../hooks/useProviderSelection";
 import { ENSService } from "../../../../services/ENS/ENSService";
 import type { Address as AddressData, AddressType, DataWithMetadata } from "../../../../types";
-import { fetchAddressWithType } from "../../../../utils/addressTypeDetection";
-import Loader from "../../../common/Loader";
+import { fetchAddressWithType, hasContractCode } from "../../../../utils/addressTypeDetection";
+import { getChainIdFromNetwork } from "../../../../utils/networkResolver";
+import Breadcrumb from "../../../common/Breadcrumb";
+import LoaderWithTimeout from "../../../common/LoaderWithTimeout";
 import {
   AccountDisplay,
   ContractDisplay,
@@ -24,12 +28,14 @@ export default function Address() {
     address?: string;
   }>();
   const location = useLocation();
-  const numericNetworkId = Number(networkId) || 1;
+  const networkConfigData = getNetworkById(networkId ?? 1);
+  const numericNetworkId = getChainIdFromNetwork(networkConfigData) ?? 1;
+  const networkLabel =
+    networkConfigData?.shortName || networkConfigData?.name || `Chain ${networkId}`;
   const { rpcUrls } = useContext(AppContext);
   const [addressData, setAddressData] = useState<AddressData | null>(null);
-  const [addressType, setAddressType] = useState<AddressType>("account");
+  const [addressType, setAddressType] = useState<AddressType | null>(null);
   const [loading, setLoading] = useState(true);
-  const [typeLoading, setTypeLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   // ENS resolution state
@@ -59,6 +65,13 @@ export default function Address() {
   const [selectedProvider, setSelectedProvider] = useProviderSelection(
     `address_${numericNetworkId}_${address}`,
   );
+
+  const klerosTag = useKlerosTag(address, numericNetworkId);
+
+  // Track the last address for which type detection completed, so background
+  // re-fetches (e.g. dataService reference change) don't reset the type and
+  // unmount the active display component.
+  const prevAddressRef = useRef<string | undefined>(undefined);
 
   // Resolve ENS name to address
   useEffect(() => {
@@ -113,12 +126,19 @@ export default function Address() {
   useEffect(() => {
     if (!address || !dataService) {
       setLoading(false);
-      setTypeLoading(false);
       return;
     }
 
+    // Reset display state only when navigating to a different address.
+    // Background re-fetches triggered by dataService reference changes must
+    // not reset the type — doing so unmounts the display component and clears
+    // all its child hook state (proxy detection, Sourcify data, etc.).
+    if (address !== prevAddressRef.current) {
+      prevAddressRef.current = address;
+      setAddressType(null);
+    }
+
     setLoading(true);
-    setTypeLoading(true);
     setError(null);
 
     // Use DataService to fetch address data with metadata support
@@ -142,24 +162,26 @@ export default function Address() {
             addressHash: address,
             chainId: numericNetworkId,
             rpcUrl,
+            // Pass already-fetched address data to skip the redundant eth_getCode call.
+            // This prevents contracts from being misclassified as EOA when the
+            // secondary RPC fetch fails (rate-limit, L2 quirks, etc.).
+            preloadedAddress: addressData,
           })
             .then((typeResult) => {
               setAddressType(typeResult.addressType);
             })
             .catch(() => {
-              // Fallback to account if type detection fails
-              setAddressType("account");
-            })
-            .finally(() => {
-              setTypeLoading(false);
+              // Type detection failed — use the code we already have to distinguish
+              // contract from EOA rather than blindly defaulting to "account".
+              setAddressType(hasContractCode(addressData.code) ? "contract" : "account");
             });
         } else {
-          setTypeLoading(false);
+          // No RPC URL configured for type detection — derive type from pre-fetched code.
+          setAddressType(hasContractCode(addressData.code) ? "contract" : "account");
         }
       })
       .catch((err) => {
         setError(err.message || t("failedToFetchAddressData"));
-        setTypeLoading(false);
       })
       .finally(() => setLoading(false));
   }, [address, dataService, numericNetworkId, rpcUrls, t]);
@@ -170,7 +192,10 @@ export default function Address() {
       <div className="container-wide">
         <div className="block-display-card">
           <div className="card-content-loading">
-            <Loader text={t("resolvingEns", { name: addressParam })} />
+            <LoaderWithTimeout
+              text={t("resolvingEns", { name: addressParam })}
+              onRetry={() => window.location.reload()}
+            />
           </div>
         </div>
       </div>
@@ -192,12 +217,19 @@ export default function Address() {
     );
   }
 
-  if (loading || typeLoading) {
+  // Show loader only until both the address data *and* the type are determined for
+  // the first time. Background re-fetches (e.g. dataService reference change) must
+  // not unmount the display component — that would reset all child hook state
+  // (proxy detection, Sourcify data, etc.) and cause visible flicker.
+  if (!addressData || addressType === null) {
     return (
       <div className="container-wide">
         <div className="block-display-card">
           <div className="card-content-loading">
-            <Loader text={loading ? t("loadingAddressData") : t("detectingAddressType")} />
+            <LoaderWithTimeout
+              text={loading ? t("loadingAddressData") : t("detectingAddressType")}
+              onRetry={() => window.location.reload()}
+            />
           </div>
         </div>
       </div>
@@ -240,7 +272,7 @@ export default function Address() {
   const displayProps = {
     address: addressData,
     addressHash: address,
-    networkId: networkId || "1",
+    networkId: String(numericNetworkId),
     ensName,
     reverseResult,
     ensRecords,
@@ -250,11 +282,21 @@ export default function Address() {
     metadata: addressDataResult?.metadata,
     selectedProvider,
     onProviderSelect: setSelectedProvider,
+    klerosTag,
   };
 
   // Render appropriate display component based on detected type
+  const truncatedAddr = address ? `${address.slice(0, 10)}...${address.slice(-6)}` : "";
+
   return (
     <div className="container-wide">
+      <Breadcrumb
+        items={[
+          { label: "Home", to: "/" },
+          { label: networkLabel, to: `/${networkId}` },
+          { label: truncatedAddr },
+        ]}
+      />
       {addressType === "account" && <AccountDisplay {...displayProps} />}
       {addressType === "contract" && <ContractDisplay {...displayProps} />}
       {addressType === "erc20" && <ERC20Display {...displayProps} />}

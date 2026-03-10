@@ -111,7 +111,7 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
 
       // Check if Hardhat should be included (only when both conditions are met)
       const envNetworks = process.env.REACT_APP_OPENSCAN_NETWORKS;
-      const isDevelopment = process.env.REACT_APP_ENVIRONMENT === "development";
+      const isDevelopment = import.meta.env.VITE_ENVIRONMENT === "development";
       const hardhatInEnv = envNetworks?.split(",").some((id) => id.trim() === "31337");
 
       // Add Hardhat network if in development AND explicitly enabled

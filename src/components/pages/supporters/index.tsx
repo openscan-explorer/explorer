@@ -44,9 +44,14 @@ const Supporters: React.FC = () => {
         {!loading && !error && supporters.length === 0 && (
           <div className="text-center">
             <p className="supporters-empty">{t("supporters.noSupporters")}</p>
-            <Link to="/subscriptions" className="button-primary-inline">
+            <a
+              href="https://openscan-explorer.github.io/docs/subscriptions"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="button-primary-inline"
+            >
               {t("supporters.becomeSupporterTitle")}
-            </Link>
+            </a>
           </div>
         )}
 
@@ -95,9 +100,14 @@ const Supporters: React.FC = () => {
 
         <div className="text-center supporters-cta">
           <p>{t("supporters.becomeSupporterDescription")}</p>
-          <Link to="/subscriptions" className="button-primary-inline">
+          <a
+            href="https://openscan-explorer.github.io/docs/subscriptions"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="button-primary-inline"
+          >
             {t("supporters.viewPlans")}
-          </Link>
+          </a>
         </div>
       </div>
     </div>

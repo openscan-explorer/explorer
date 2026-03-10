@@ -5,6 +5,7 @@ import { getEnabledNetworks, getNetworkLogoUrlById } from "../../../config/netwo
 import { ENSService } from "../../../services/ENS/ENSService";
 import type { NetworkConfig } from "../../../types";
 import { getChainIdFromNetwork } from "../../../utils/networkResolver";
+import SearchBox from "../../common/SearchBox";
 
 type SearchType = "address" | "transaction" | "block" | "ens" | "unknown";
 
@@ -150,11 +151,43 @@ export default function Search() {
     return (
       <div className="container-wide search-page-wrapper">
         <div className="block-display-card search-results-card">
-          <div className="search-results-container">
-            <div className="search-results-header">
-              <h1 className="search-results-title">{t("search.title")}</h1>
+          <div
+            className="search-results-container"
+            style={{ textAlign: "center", padding: "40px 20px" }}
+          >
+            <svg
+              width="48"
+              height="48"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              style={{ opacity: 0.4, marginBottom: 16 }}
+              aria-hidden="true"
+            >
+              <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="1.5" />
+              <path
+                d="M21 21l-4.35-4.35"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+              />
+              <path
+                d="M11 8v6M8 11h6"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+              />
+            </svg>
+            <h1 className="search-results-title">{t("search.title")}</h1>
+            <p className="text-muted" style={{ marginBottom: 24 }}>
+              {t("search.noQueryHelp")}
+            </p>
+            <SearchBox />
+            <div style={{ marginTop: 20 }}>
+              <Link to="/" className="button-secondary-inline">
+                {t("search.goHome")}
+              </Link>
             </div>
-            <p className="text-muted margin-0">{t("search.noQuery")}</p>
           </div>
         </div>
       </div>

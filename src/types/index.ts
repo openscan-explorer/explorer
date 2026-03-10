@@ -421,6 +421,7 @@ export type RpcUrlsContextType = Record<string, RPCUrls>;
 export interface ApiKeys {
   infura?: string;
   alchemy?: string;
+  etherscan?: string;
   groq?: string;
   openai?: string;
   anthropic?: string;
@@ -484,6 +485,7 @@ export interface UserSettings {
   isSuperUser?: boolean;
   promptVersion?: PromptVersion;
   persistentCacheSizeMB?: number;
+  rpcsSynced?: boolean;
 }
 
 /**

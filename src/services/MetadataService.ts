@@ -663,6 +663,40 @@ export function getAssetUrl(assetPath: string): string {
 }
 
 /**
+ * Address metadata from addresses/evm/{chainId}/{address}.json
+ */
+export interface AddressMetadata {
+  address: string;
+  chainId: number;
+  supporter: string;
+  label?: string;
+  source?: [string, string];
+}
+
+/**
+ * Fetch address metadata from addresses/evm/{chainId}/{address}.json
+ */
+export async function fetchAddress(
+  chainId: number,
+  address: string,
+): Promise<AddressMetadata | null> {
+  try {
+    const response = await fetch(
+      `${METADATA_BASE_URL}/addresses/evm/${chainId}/${address.toLowerCase()}.json`,
+    );
+
+    if (!response.ok) {
+      return null;
+    }
+
+    return await response.json();
+  } catch (error) {
+    logger.error("Error fetching address metadata:", error);
+    return null;
+  }
+}
+
+/**
  * Fetch token metadata from tokens/{chainId}/{address}.json
  */
 export async function fetchToken(chainId: number, address: string): Promise<TokenMetadata | null> {

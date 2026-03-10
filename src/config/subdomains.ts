@@ -14,7 +14,7 @@ export interface SubdomainConfig {
 const WEENUS_SEPOLIA_ADDRESS = "0x7E0987E5b3a30e3f2828572Bb659A548460a3003";
 
 // Check if we're in development mode
-const isDevelopment = process.env.REACT_APP_ENVIRONMENT === "development";
+const isDevelopment = import.meta.env.VITE_ENVIRONMENT === "development";
 
 export const subdomainConfig: SubdomainConfig[] = [
   // Network subdomains

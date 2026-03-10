@@ -6,11 +6,8 @@ import Loading from "./common/Loading";
 const Home = lazy(() => import("./pages/home"));
 const Settings = lazy(() => import("./pages/settings"));
 const DevTools = lazy(() => import("./pages/devtools"));
-const About = lazy(() => import("./pages/about"));
-const Subscriptions = lazy(() => import("./pages/subscriptions"));
 const Profile = lazy(() => import("./pages/profile"));
 const Supporters = lazy(() => import("./pages/supporters"));
-const Contact = lazy(() => import("./pages/contact"));
 const Search = lazy(() => import("./pages/search"));
 const Rpcs = lazy(() => import("./pages/rpcs"));
 
@@ -66,11 +63,8 @@ export const LazyTokenDetails = withSuspense(TokenDetails);
 export const LazyMempool = withSuspense(Mempool);
 export const LazySettings = withSuspense(Settings);
 export const LazyDevTools = withSuspense(DevTools);
-export const LazyAbout = withSuspense(About);
-export const LazySubscriptions = withSuspense(Subscriptions);
 export const LazyProfile = withSuspense(Profile);
 export const LazySupporters = withSuspense(Supporters);
-export const LazyContact = withSuspense(Contact);
 export const LazySearch = withSuspense(Search);
 export const LazyRpcs = withSuspense(Rpcs);
 export const LazyGasTracker = withSuspense(GasTracker);
@@ -85,11 +79,8 @@ export function preloadAllRoutes() {
   import("./pages/home");
   import("./pages/settings");
   import("./pages/devtools");
-  import("./pages/about");
-  import("./pages/subscriptions");
   import("./pages/profile");
   import("./pages/supporters");
-  import("./pages/contact");
   import("./pages/search");
   import("./pages/rpcs");
   // Bitcoin pages

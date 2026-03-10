@@ -2,12 +2,12 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { RPCIndicator } from "../../../../components/common/RPCIndicator";
+import Breadcrumb from "../../../../components/common/Breadcrumb";
 import { getNetworkById } from "../../../../config/networks";
 import { useDataService } from "../../../../hooks/useDataService";
 import { useProviderSelection } from "../../../../hooks/useProviderSelection";
 import type { Block, DataWithMetadata, Transaction } from "../../../../types";
 import { logger } from "../../../../utils/logger";
-import Loader from "../../../common/Loader";
 
 export default function Txs() {
   const { networkId } = useParams<{ networkId?: string }>();
@@ -15,7 +15,9 @@ export default function Txs() {
   const navigate = useNavigate();
   const numericNetworkId = Number(networkId) || 1;
   const dataService = useDataService(numericNetworkId);
-  const networkName = getNetworkById(networkId ?? numericNetworkId)?.name ?? String(networkId);
+  const networkConfig = getNetworkById(networkId ?? numericNetworkId);
+  const networkName = networkConfig?.name ?? String(networkId);
+  const networkLabel = networkConfig?.shortName || networkConfig?.name || `Chain ${networkId}`;
   const [blockResult, setBlockResult] = useState<DataWithMetadata<Block> | null>(null);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
@@ -127,16 +129,104 @@ export default function Txs() {
   const canGoOlder = currentBlock !== null && currentBlock > 0;
   const isAtLatest = requestedBlock === null;
 
+  const Pagination = () => {
+    return (
+      <div className="pagination-container no-margin-top">
+        {/** biome-ignore lint/a11y/useButtonType: <TODO> */}
+        <button
+          onClick={goToLatest}
+          disabled={isAtLatest || loading}
+          className="pagination-btn"
+          title={t("txs.pagination.latestTitle")}
+          aria-label={t("txs.pagination.latestTitle")}
+        >
+          {t("txs.pagination.latest")}
+        </button>
+
+        {/** biome-ignore lint/a11y/useButtonType: <TODO> */}
+        <button
+          onClick={goToNewerBlock}
+          disabled={!canGoNewer || loading}
+          className="pagination-btn"
+          title={t("txs.pagination.newerTitle")}
+          aria-label={t("txs.pagination.newerTitle")}
+        >
+          {t("txs.pagination.newer")}
+        </button>
+
+        {/** biome-ignore lint/a11y/useButtonType: <TODO> */}
+        <button
+          onClick={goToOlderBlock}
+          disabled={!canGoOlder || loading}
+          className="pagination-btn"
+          title={t("txs.pagination.olderTitle")}
+          aria-label={t("txs.pagination.olderTitle")}
+        >
+          {t("txs.pagination.older")}
+        </button>
+      </div>
+    );
+  };
+
   if (loading) {
     return (
       <div className="container-wide">
+        <Breadcrumb
+          items={[
+            { label: "Home", to: "/" },
+            { label: networkLabel, to: `/${networkId}` },
+            { label: "Transactions" },
+          ]}
+        />
         <div className="block-display-card">
           <div className="blocks-header">
             <span className="block-label">{t("txs.latests", { network: networkName })}</span>
           </div>
-          <div className="card-content-loading">
-            <Loader text={t("txs.loading")} />
+          <Pagination />
+          <div className="table-wrapper">
+            <table className="dash-table">
+              <thead>
+                <tr>
+                  <th>Tx Hash</th>
+                  <th>{t("txs.block")}</th>
+                  <th>{t("txs.from")}</th>
+                  <th>{t("txs.to")}</th>
+                  <th>{t("txs.value")}</th>
+                  <th className="hide-mobile">{t("txs.gasPrice")}</th>
+                  <th className="hide-mobile">{t("txs.gas")}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {Array.from({ length: 20 }).map((_, i) => (
+                  // biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholder
+                  <tr key={i}>
+                    <td>
+                      <span className="skeleton-pulse" style={{ width: "120px", height: 14 }} />
+                    </td>
+                    <td>
+                      <span className="skeleton-pulse" style={{ width: "70px", height: 14 }} />
+                    </td>
+                    <td>
+                      <span className="skeleton-pulse" style={{ width: "120px", height: 14 }} />
+                    </td>
+                    <td>
+                      <span className="skeleton-pulse" style={{ width: "120px", height: 14 }} />
+                    </td>
+                    <td>
+                      <span className="skeleton-pulse" style={{ width: "80px", height: 14 }} />
+                    </td>
+                    <td className="hide-mobile">
+                      <span className="skeleton-pulse" style={{ width: "70px", height: 14 }} />
+                    </td>
+                    <td className="hide-mobile">
+                      <span className="skeleton-pulse" style={{ width: "60px", height: 14 }} />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
+          <Pagination />
         </div>
       </div>
     );
@@ -145,6 +235,13 @@ export default function Txs() {
   if (error) {
     return (
       <div className="container-wide">
+        <Breadcrumb
+          items={[
+            { label: "Home", to: "/" },
+            { label: networkLabel, to: `/${networkId}` },
+            { label: "Transactions" },
+          ]}
+        />
         <div className="block-display-card">
           <div className="blocks-header">
             <span className="block-label">{t("txs.latests", { network: networkName })}</span>
@@ -156,45 +253,6 @@ export default function Txs() {
       </div>
     );
   }
-
-  const Pagination = () => {
-    return (
-      <div className="pagination-container no-margin-top">
-        {/** biome-ignore lint/a11y/useButtonType: <TODO> */}
-        <button
-          onClick={goToLatest}
-          disabled={isAtLatest}
-          className="pagination-btn"
-          title={t("txs.pagination.latestTitle")}
-          aria-label={t("txs.pagination.latestTitle")}
-        >
-          {t("txs.pagination.latest")}
-        </button>
-
-        {/** biome-ignore lint/a11y/useButtonType: <TODO> */}
-        <button
-          onClick={goToNewerBlock}
-          disabled={!canGoNewer}
-          className="pagination-btn"
-          title={t("txs.pagination.newerTitle")}
-          aria-label={t("txs.pagination.newerTitle")}
-        >
-          {t("txs.pagination.newer")}
-        </button>
-
-        {/** biome-ignore lint/a11y/useButtonType: <TODO> */}
-        <button
-          onClick={goToOlderBlock}
-          disabled={!canGoOlder}
-          className="pagination-btn"
-          title={t("txs.pagination.olderTitle")}
-          aria-label={t("txs.pagination.olderTitle")}
-        >
-          {t("txs.pagination.older")}
-        </button>
-      </div>
-    );
-  };
 
   // Get metadata from block result if available
   const metadata = blockResult?.metadata;
@@ -211,6 +269,13 @@ export default function Txs() {
 
   return (
     <div className="container-wide">
+      <Breadcrumb
+        items={[
+          { label: "Home", to: "/" },
+          { label: networkLabel, to: `/${networkId}` },
+          { label: "Transactions" },
+        ]}
+      />
       <div className="block-display-card">
         <div className="blocks-header">
           <div className="blocks-header-main">

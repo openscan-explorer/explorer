@@ -222,7 +222,7 @@
     "error": "Error: {{error}}",
     "noSupporters": "No supporters yet. Be the first!",
     "becomeSupporterTitle": "Become a Supporter",
-    "becomeSupporterDescription": "Support OpenScan's development by subscribing a network.",
+    "becomeSupporterDescription": "Support OpenScan's development by becoming a subscriber.",
     "viewPlans": "View Subscription Plans",
     "allies": "Allies",
     "partners": "Partners",
@@ -235,7 +235,10 @@
     "invalidType": "Invalid profile type: {{type}}. Must be one of: network, app, organization.",
     "notFoundMessage": "Profile not found: {{type}}/{{id}}",
     "fetchError": "Failed to fetch profile",
-    "unknownType": "Unknown profile type"
+    "unknownType": "Unknown profile type",
+    "notFoundFriendly": "This profile doesn't exist or isn't available yet. Profiles are available for networks, apps, and organizations.",
+    "goHome": "Go to Homepage",
+    "browseSupporters": "Browse Supporters"
   },
   "extraData": {
     "showDecoded": "Show decoded",
@@ -301,6 +304,8 @@
     "badgeTxHash": "TX Hash",
     "badgeBlock": "Block",
     "badgeEns": "ENS",
-    "badgeUnknown": "Unknown"
+    "badgeUnknown": "Unknown",
+    "noQueryHelp": "Search for an address, transaction hash, block number, or ENS name.",
+    "goHome": "Go Home"
   }
 }

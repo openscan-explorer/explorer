@@ -23,6 +23,7 @@ import { logger } from "../../../utils/logger";
 import { getChainIdFromNetwork } from "../../../utils/networkResolver";
 import { clearPersistentCache, getPersistentCacheSize } from "../../../utils/persistentCache";
 import { clearMetadataRpcCache, getMetadataEndpointMap } from "../../../utils/rpcStorage";
+import { sortRpcsByQuality } from "../../../utils/rpcAutoSync";
 import { type RpcTestResult, testRpcEndpoint } from "../rpcs/useRpcLatencyTest";
 
 // Infura network slugs by chain ID
@@ -58,34 +59,6 @@ const getAlchemyUrl = (chainId: number, apiKey: string): string | null => {
 const isInfuraUrl = (url: string): boolean => url.includes("infura.io");
 const isAlchemyUrl = (url: string): boolean => url.includes("alchemy.com");
 
-function getPrivacyTier(url: string, metadata: Map<string, MetadataRpcEndpoint>): number {
-  const ep = metadata.get(url);
-  if (!ep) return 1;
-  if (ep.tracking !== "none") return 2;
-  if (ep.isOpenSource) return 0;
-  return 1;
-}
-
-function sortRpcsByQuality(
-  urls: string[],
-  results: Map<string, RpcTestResult>,
-  metadata: Map<string, MetadataRpcEndpoint>,
-): string[] {
-  return [...urls].sort((a, b) => {
-    const rA = results.get(a);
-    const rB = results.get(b);
-    const aOnline = rA?.status === "online" && rA.latency != null;
-    const bOnline = rB?.status === "online" && rB.latency != null;
-    if (!aOnline && !bOnline) return 0;
-    if (!aOnline) return 1;
-    if (!bOnline) return -1;
-    const tierA = getPrivacyTier(a, metadata);
-    const tierB = getPrivacyTier(b, metadata);
-    if (tierA !== tierB) return tierA - tierB;
-    return (rA.latency as number) - (rB.latency as number);
-  });
-}
-
 const Settings: React.FC = () => {
   const { t, i18n } = useTranslation("settings");
   const { rpcUrls, setRpcUrls } = useContext(AppContext);
@@ -105,6 +78,7 @@ const Settings: React.FC = () => {
   const [localApiKeys, setLocalApiKeys] = useState({
     infura: settings.apiKeys?.infura || "",
     alchemy: settings.apiKeys?.alchemy || "",
+    etherscan: settings.apiKeys?.etherscan || "",
     groq: settings.apiKeys?.groq || "",
     openai: settings.apiKeys?.openai || "",
     anthropic: settings.apiKeys?.anthropic || "",
@@ -114,6 +88,7 @@ const Settings: React.FC = () => {
   const [showApiKeys, setShowApiKeys] = useState({
     infura: false,
     alchemy: false,
+    etherscan: false,
     groq: false,
     openai: false,
     anthropic: false,
@@ -164,7 +139,9 @@ const Settings: React.FC = () => {
     setPersistentCacheBytes(0);
     setCacheCleared(true);
     setTimeout(() => setCacheCleared(false), 3000);
-  }, []);
+    // Reset sync flag so RPCs are re-sorted on next load
+    updateSettings({ rpcsSynced: false });
+  }, [updateSettings]);
 
   // Clear all site data (like browser dev tools)
   const clearSiteData = useCallback(async () => {
@@ -493,6 +470,7 @@ const Settings: React.FC = () => {
       apiKeys: {
         infura: localApiKeys.infura || undefined,
         alchemy: localApiKeys.alchemy || undefined,
+        etherscan: localApiKeys.etherscan || undefined,
         groq: localApiKeys.groq || undefined,
         openai: localApiKeys.openai || undefined,
         anthropic: localApiKeys.anthropic || undefined,
@@ -776,6 +754,43 @@ const Settings: React.FC = () => {
                     title={showApiKeys.alchemy ? t("apiKeys.toggleHide") : t("apiKeys.toggleShow")}
                   >
                     {showApiKeys.alchemy ? "👁️" : "👁️‍🗨️"}
+                  </button>
+                </div>
+              </div>
+
+              <div className="settings-api-key-item">
+                <div className="settings-api-key-header">
+                  <span className="settings-api-key-name">{t("apiKeys.etherscan.name")}</span>
+                  <a
+                    href="https://etherscan.io/myapikey"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="settings-api-key-link"
+                  >
+                    {t("apiKeys.etherscan.getKey")} →
+                  </a>
+                </div>
+                <div className="settings-api-key-input-wrapper">
+                  <input
+                    type={showApiKeys.etherscan ? "text" : "password"}
+                    className="settings-rpc-input"
+                    value={localApiKeys.etherscan}
+                    onChange={(e) =>
+                      setLocalApiKeys((prev) => ({ ...prev, etherscan: e.target.value }))
+                    }
+                    placeholder={t("apiKeys.etherscan.placeholder")}
+                  />
+                  <button
+                    type="button"
+                    className="settings-api-key-toggle"
+                    onClick={() =>
+                      setShowApiKeys((prev) => ({ ...prev, etherscan: !prev.etherscan }))
+                    }
+                    title={
+                      showApiKeys.etherscan ? t("apiKeys.toggleHide") : t("apiKeys.toggleShow")
+                    }
+                  >
+                    {showApiKeys.etherscan ? "👁️" : "👁️‍🗨️"}
                   </button>
                 </div>
               </div>

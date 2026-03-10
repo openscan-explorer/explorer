@@ -22,7 +22,6 @@ import "./styles/rpcs.css";
 
 import Loading from "./components/common/Loading";
 import {
-  LazyAbout,
   LazyAddress,
   LazyBitcoinAddress,
   LazyBitcoinBlock,
@@ -34,7 +33,6 @@ import {
   LazyBlock,
   LazyBlocks,
   LazyChain,
-  LazyContact,
   LazyDevTools,
   LazyGasTracker,
   LazyHome,
@@ -43,7 +41,6 @@ import {
   LazyRpcs,
   LazySearch,
   LazySettings,
-  LazySubscriptions,
   LazySupporters,
   LazyTokenDetails,
   LazyTx,
@@ -52,6 +49,7 @@ import {
 } from "./components/LazyComponents";
 import { SettingsProvider, useSettings, useTheme } from "./context/SettingsContext";
 import { useAppReady, useOnAppReady } from "./hooks/useAppReady";
+import { useRpcAutoSync } from "./hooks/useRpcAutoSync";
 
 // Component that handles subdomain redirects
 function SubdomainRedirect() {
@@ -85,6 +83,8 @@ function SubdomainRedirect() {
 
 // Separate component that uses the theme context
 function AppContent() {
+  useRpcAutoSync();
+
   const onAppReadyCallback = useCallback(async () => {}, []);
 
   useOnAppReady(onAppReadyCallback);
@@ -126,11 +126,8 @@ function AppContent() {
               <Route path="/" element={<LazyHome />} />
               <Route path="search" element={<LazySearch />} />
               <Route path="settings" element={<LazySettings />} />
-              <Route path="about" element={<LazyAbout />} />
-              <Route path="contact" element={<LazyContact />} />
               <Route path="devtools" element={<LazyDevTools />} />
               <Route path="rpcs" element={<LazyRpcs />} />
-              <Route path="subscriptions" element={<LazySubscriptions />} />
               <Route path="profile/:profileType/:profileId" element={<LazyProfile />} />
               <Route path="supporters" element={<LazySupporters />} />
               {/* Bitcoin Mainnet routes (must come before :networkId catch-all) */}
