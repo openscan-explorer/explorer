@@ -10,6 +10,7 @@ import { useProviderSelection } from "../../../../hooks/useProviderSelection";
 import { ENSService } from "../../../../services/ENS/ENSService";
 import type { Address as AddressData, AddressType, DataWithMetadata } from "../../../../types";
 import { fetchAddressWithType, hasContractCode } from "../../../../utils/addressTypeDetection";
+import { getChainIdFromNetwork } from "../../../../utils/networkResolver";
 import Breadcrumb from "../../../common/Breadcrumb";
 import LoaderWithTimeout from "../../../common/LoaderWithTimeout";
 import {
@@ -27,8 +28,8 @@ export default function Address() {
     address?: string;
   }>();
   const location = useLocation();
-  const numericNetworkId = Number(networkId) || 1;
-  const networkConfigData = getNetworkById(networkId ?? numericNetworkId);
+  const networkConfigData = getNetworkById(networkId ?? 1);
+  const numericNetworkId = getChainIdFromNetwork(networkConfigData) ?? 1;
   const networkLabel =
     networkConfigData?.shortName || networkConfigData?.name || `Chain ${networkId}`;
   const { rpcUrls } = useContext(AppContext);
@@ -271,7 +272,7 @@ export default function Address() {
   const displayProps = {
     address: addressData,
     addressHash: address,
-    networkId: networkId || "1",
+    networkId: String(numericNetworkId),
     ensName,
     reverseResult,
     ensRecords,
