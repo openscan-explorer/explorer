@@ -15,11 +15,27 @@ import {
 import {
   calculateTotalInput,
   calculateTotalOutput,
+  decodeOpReturnData,
   hasWitness,
   isCoinbaseTransaction,
   isRBFEnabled,
 } from "../../../utils/bitcoinUtils";
 import AIAnalysisPanel from "../../common/AIAnalysis/AIAnalysisPanel";
+
+const OpReturnDisplay: React.FC<{ hex: string }> = ({ hex }) => {
+  const decoded = useMemo(() => decodeOpReturnData(hex), [hex]);
+  return (
+    <div className="btc-op-return">
+      <span className="btc-op-return-label">OP_RETURN</span>
+      {decoded.text ? (
+        <span className="btc-op-return-text">{decoded.text}</span>
+      ) : (
+        <span className="btc-op-return-hex tx-mono">{decoded.hex}</span>
+      )}
+      <CopyButton value={decoded.text || decoded.hex} />
+    </div>
+  );
+};
 
 interface BitcoinTransactionDisplayProps {
   transaction: BitcoinTransaction;
@@ -422,12 +438,10 @@ const BitcoinTransactionDisplay: React.FC<BitcoinTransactionDisplayProps> = Reac
                             )}
                             <CopyButton value={output.scriptPubKey.address} />
                           </>
+                        ) : output.scriptPubKey.type === "nulldata" ? (
+                          <OpReturnDisplay hex={output.scriptPubKey.hex} />
                         ) : (
-                          <span className="tx-mono text-muted">
-                            {output.scriptPubKey.type === "nulldata"
-                              ? "OP_RETURN (Data)"
-                              : output.scriptPubKey.type}
-                          </span>
+                          <span className="tx-mono text-muted">{output.scriptPubKey.type}</span>
                         )}
                       </div>
                       <div className="btc-io-details">

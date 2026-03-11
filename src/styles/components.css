@@ -7132,6 +7132,33 @@ button.tx-section-header-toggle {
 	font-style: italic;
 }
 
+.btc-op-return {
+	display: flex;
+	align-items: baseline;
+	gap: 8px;
+	flex-wrap: wrap;
+	word-break: break-all;
+}
+
+.btc-op-return-label {
+	font-weight: 600;
+	font-size: 0.8rem;
+	color: var(--text-secondary);
+	background: var(--overlay-light-5);
+	padding: 2px 6px;
+	border-radius: 4px;
+	white-space: nowrap;
+}
+
+.btc-op-return-text {
+	color: var(--text-primary);
+}
+
+.btc-op-return-hex {
+	color: var(--text-secondary);
+	font-size: 0.85rem;
+}
+
 .btc-io-details {
 	display: flex;
 	flex-wrap: wrap;
