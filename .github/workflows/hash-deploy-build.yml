@@ -23,28 +23,20 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
-      - name: Install IPFS CLI
-        run: |
-          wget https://dist.ipfs.io/kubo/v0.37.0/kubo_v0.37.0_linux-amd64.tar.gz
-          tar -xzf kubo_v0.37.0_linux-amd64.tar.gz
-          sudo cp kubo/ipfs /usr/local/bin/
-          sudo chmod +x /usr/local/bin/ipfs
-          ipfs version
-          ipfs init
-
       - name: Build Production
         run: ./scripts/build-production.sh
 
-      - name: Get IPFS Hash
-        id: ipfs-hash
-        run: |
-          HASH=$(ipfs add -r -Q --chunker=size-262144 --raw-leaves=false ./dist)
-          echo "IPFS Hash (v0): $HASH"
-          echo "hash=$HASH" >> $GITHUB_OUTPUT
+      - name: Upload to Storacha
+        id: upload
+        uses: storacha/add-to-web3@v4
+        with:
+          path_to_add: './dist'
+          secret_key: ${{ secrets.STORACHA_PRINCIPAL }}
+          proof: ${{ secrets.STORACHA_PROOF }}
 
       - name: Update IPFS Hash in Repo
         run: |
-          HASH="${{ steps.ipfs-hash.outputs.hash }}"
+          HASH="${{ steps.upload.outputs.cid }}"
 
           # Create shields.io endpoint format JSON
           mkdir -p /tmp/ipfs-meta
@@ -74,20 +66,3 @@ jobs:
           git checkout main
 
           echo "Updated meta branch with IPFS hash: $HASH"
-
-      - name: Setup Node.js for deploy action
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Install action dependencies
-        run: |
-          cd .github/actions/deploy-ipfs
-          npm install
-
-      - name: Deploy to IPFS via Pinata
-        uses: ./.github/actions/deploy-ipfs
-        with:
-          pinata-jwt: ${{ secrets.PINATA_JWT }}
-          source-dir: './dist'
-          pin-name: 'openscan - ${{ github.sha }}'

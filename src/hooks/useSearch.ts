@@ -2,7 +2,7 @@ import { useCallback, useContext, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { AppContext, useNetworks } from "../context";
 import { ENSService } from "../services/ENS/ENSService";
-import { resolveNetwork } from "../utils/networkResolver";
+import { isEVMNetwork, resolveNetwork } from "../utils/networkResolver";
 
 interface UseSearchResult {
   searchTerm: string;
@@ -58,6 +58,12 @@ export function useSearch(): UseSearchResult {
 
       // Check if it's an ENS name
       if (ENSService.isENSName(term)) {
+        // ENS is only available on EVM networks
+        if (resolvedNetwork && !isEVMNetwork(resolvedNetwork)) {
+          setError("ENS names are only supported on EVM networks.");
+          return;
+        }
+
         setIsResolving(true);
         try {
           if (!ensService) {
@@ -68,7 +74,7 @@ export function useSearch(): UseSearchResult {
           const resolvedAddress = await ensService.resolve(term);
 
           if (resolvedAddress) {
-            const targetChainId = networkId || "1";
+            const targetChainId = networkId || "eth";
             navigate(`/${targetChainId}/address/${resolvedAddress}`, {
               state: { ensName: term },
             });
@@ -118,7 +124,7 @@ export function useSearch(): UseSearchResult {
         setSearchTerm("");
       }
     },
-    [searchTerm, networkId, navigate, ensService],
+    [searchTerm, networkId, resolvedNetwork, navigate, ensService],
   );
 
   return {
