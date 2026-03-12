@@ -246,7 +246,7 @@ const Settings: React.FC = () => {
       });
 
       setRpcUrls(parsedRpc);
-      lastSavedDraftRef.current = serializeDraft(draftRpc, draftApiKeys);
+      lastSavedDraftRef.current = serializeDraft(parsedRpc, draftApiKeys);
 
       if (!options?.silent) {
         setAutoSaveState("saved");
@@ -856,15 +856,12 @@ const Settings: React.FC = () => {
                 role="tabpanel"
                 aria-labelledby="settings-tab-providers"
               >
-                <div className="settings-autosave-row">
+                <div className="settings-providers-save-row">
                   <span
                     className={`settings-autosave-pill ${!hasUnsavedChanges ? "saved" : autoSaveState}`}
                   >
                     {providersSaveMessage}
                   </span>
-                </div>
-
-                <div className="settings-save-section">
                   <button
                     type="button"
                     className="settings-save-button"

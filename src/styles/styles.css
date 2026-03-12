@@ -4776,6 +4776,14 @@ code {
   margin-bottom: 10px;
 }
 
+.settings-providers-save-row {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
 .settings-autosave-pill {
   display: inline-flex;
   align-items: center;
@@ -5232,6 +5240,10 @@ code {
   opacity: 0.6;
   transform: none;
   box-shadow: none;
+}
+
+.settings-providers-save-row .settings-save-button {
+  margin: 0;
 }
 
 /* Sticky Save Button Container */
