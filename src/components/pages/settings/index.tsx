@@ -1349,10 +1349,13 @@ const Settings: React.FC = () => {
                                     </span>
                                     <div className="flex-start settings-rpc-tags">
                                       {rpcArray.map((url, idx) => (
+                                        // biome-ignore lint/a11y/useSemanticElements: Tag container needs drag/drop behavior and contains a dedicated delete button.
                                         <div
                                           key={url}
                                           className={`settings-rpc-tag ${getRpcTagClass(url)} ${draggedItem?.networkId === chain.id && draggedItem?.index === idx ? "dragging" : ""}`}
                                           title={url}
+                                          role="button"
+                                          tabIndex={0}
                                           draggable
                                           onDragStart={() => handleDragStart(chain.id, idx)}
                                           onDragOver={handleDragOver}
