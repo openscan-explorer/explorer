@@ -48,7 +48,10 @@
     "goHome": "Go Home",
     "errorDetailsSummary": "Error Details (Development Mode)",
     "errorLabel": "Error:",
-    "componentStackLabel": "Component Stack:"
+    "componentStackLabel": "Component Stack:",
+    "networkNotFound": "Network Not Found",
+    "networkNotFoundMessage": "The network \"{{network}}\" is not recognized. Please check the URL or select a valid network.",
+    "viewNetworks": "View Networks"
   },
   "notifications": {
     "closeAriaLabel": "Close notification"

@@ -48,7 +48,10 @@
     "goHome": "Ir al inicio",
     "errorDetailsSummary": "Detalles del error (modo desarrollo)",
     "errorLabel": "Error:",
-    "componentStackLabel": "Stack del componente:"
+    "componentStackLabel": "Stack del componente:",
+    "networkNotFound": "Red no encontrada",
+    "networkNotFoundMessage": "La red \"{{network}}\" no es reconocida. Revisá la URL o seleccioná una red válida.",
+    "viewNetworks": "Ver redes"
   },
   "notifications": {
     "closeAriaLabel": "Cerrar notificación"

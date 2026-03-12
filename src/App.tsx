@@ -8,6 +8,7 @@ import ErrorBoundary from "./components/common/ErrorBoundary";
 import Footer from "./components/common/Footer";
 import { IsometricBlocks } from "./components/common/IsometricBlocks";
 import NotificationDisplay from "./components/common/NotificationDisplay";
+import ValidateNetwork from "./components/common/ValidateNetwork";
 import Navbar from "./components/navbar";
 import "./styles/base.css";
 import "./styles/styles.css";
@@ -148,17 +149,19 @@ function AppContent() {
               <Route path="tbtc/address/:address" element={<LazyBitcoinAddress />} />
               <Route path="tbtc/mempool" element={<LazyBitcoinMempool />} />
               <Route path="tbtc/mempool/:filter" element={<LazyBitcoinTx />} />
-              {/* EVM network routes */}
-              <Route path=":networkId" element={<LazyChain />} />
-              <Route path=":networkId/gastracker" element={<LazyGasTracker />} />
-              <Route path=":networkId/blocks" element={<LazyBlocks />} />
-              <Route path=":networkId/block/:filter" element={<LazyBlock />} />
-              <Route path=":networkId/txs" element={<LazyTxs />} />
-              <Route path=":networkId/tx/:filter" element={<LazyTx />} />
-              <Route path=":networkId/address/:address" element={<LazyAddress />} />
-              <Route path=":networkId/address/:address/:tokenId" element={<LazyTokenDetails />} />
-              <Route path=":networkId/mempool" element={<LazyMempool />} />
-              <Route path=":networkId/mempool/:filter" element={<LazyTx />} />
+              {/* EVM network routes — validated */}
+              <Route path=":networkId" element={<ValidateNetwork />}>
+                <Route index element={<LazyChain />} />
+                <Route path="gastracker" element={<LazyGasTracker />} />
+                <Route path="blocks" element={<LazyBlocks />} />
+                <Route path="block/:filter" element={<LazyBlock />} />
+                <Route path="txs" element={<LazyTxs />} />
+                <Route path="tx/:filter" element={<LazyTx />} />
+                <Route path="address/:address" element={<LazyAddress />} />
+                <Route path="address/:address/:tokenId" element={<LazyTokenDetails />} />
+                <Route path="mempool" element={<LazyMempool />} />
+                <Route path="mempool/:filter" element={<LazyTx />} />
+              </Route>
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
             <Footer />
