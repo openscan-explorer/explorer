@@ -485,7 +485,6 @@ export interface UserSettings {
   isSuperUser?: boolean;
   promptVersion?: PromptVersion;
   persistentCacheSizeMB?: number;
-  rpcsSynced?: boolean;
 }
 
 /**

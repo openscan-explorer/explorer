@@ -46,6 +46,12 @@ const ALCHEMY_NETWORKS: Record<number, string> = {
   8453: "base-mainnet",
 };
 
+// Alchemy Bitcoin networks keyed by CAIP-2 networkId
+const ALCHEMY_BTC_NETWORKS: Record<string, string> = {
+  "bip122:000000000019d6689c085ae165831e93": "btc-mainnet",
+  "bip122:00000000da84f2bafbbc53dee25a72ae": "btc-testnet",
+};
+
 const getInfuraUrl = (chainId: number, apiKey: string): string | null => {
   const slug = INFURA_NETWORKS[chainId];
   return slug ? `https://${slug}.infura.io/v3/${apiKey}` : null;
@@ -53,6 +59,11 @@ const getInfuraUrl = (chainId: number, apiKey: string): string | null => {
 
 const getAlchemyUrl = (chainId: number, apiKey: string): string | null => {
   const slug = ALCHEMY_NETWORKS[chainId];
+  return slug ? `https://${slug}.g.alchemy.com/v2/${apiKey}` : null;
+};
+
+const getAlchemyBtcUrl = (networkId: string, apiKey: string): string | null => {
+  const slug = ALCHEMY_BTC_NETWORKS[networkId];
   return slug ? `https://${slug}.g.alchemy.com/v2/${apiKey}` : null;
 };
 
@@ -139,9 +150,9 @@ const Settings: React.FC = () => {
     setPersistentCacheBytes(0);
     setCacheCleared(true);
     setTimeout(() => setCacheCleared(false), 3000);
-    // Reset sync flag so RPCs are re-sorted on next load
-    updateSettings({ rpcsSynced: false });
-  }, [updateSettings]);
+    // Clear RPC sync timestamp so RPCs are re-sorted on next load
+    localStorage.removeItem("openScan_lastRpcSyncTime");
+  }, []);
 
   // Clear all site data (like browser dev tools)
   const clearSiteData = useCallback(async () => {
@@ -463,6 +474,27 @@ const Settings: React.FC = () => {
       }
 
       parsed[networkId] = urls;
+    }
+
+    // Handle Alchemy Bitcoin endpoints
+    for (const btcNetworkId of Object.keys(ALCHEMY_BTC_NETWORKS)) {
+      let urls: string[] = (parsed[btcNetworkId] as string[]) || [];
+
+      const oldAlchemyBtcUrl = prevAlchemyKey
+        ? getAlchemyBtcUrl(btcNetworkId, prevAlchemyKey)
+        : null;
+      const newAlchemyBtcUrl = localApiKeys.alchemy
+        ? getAlchemyBtcUrl(btcNetworkId, localApiKeys.alchemy)
+        : null;
+
+      if (oldAlchemyBtcUrl && oldAlchemyBtcUrl !== newAlchemyBtcUrl) {
+        urls = urls.filter((u) => u !== oldAlchemyBtcUrl);
+      }
+      if (newAlchemyBtcUrl && !urls.includes(newAlchemyBtcUrl)) {
+        urls = [newAlchemyBtcUrl, ...urls];
+      }
+
+      parsed[btcNetworkId] = urls;
     }
 
     // Save API keys to settings
