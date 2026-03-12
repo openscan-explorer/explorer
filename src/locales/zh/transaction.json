@@ -159,6 +159,7 @@
     "gasProfiler": "Gas 分析",
     "gasBreakdownTitle": "分项明细",
     "gasBreakdownHint": "点击任意条形以放大并查看其明细",
-    "gasResetView": "重置缩放"
+    "gasResetView": "重置缩放",
+    "events": "事件"
   }
 }

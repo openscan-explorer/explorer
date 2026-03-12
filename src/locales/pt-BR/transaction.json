@@ -159,6 +159,7 @@
     "gasProfiler": "Perfil de Gás",
     "gasBreakdownTitle": "Detalhamento",
     "gasBreakdownHint": "Clique em qualquer barra para ampliar e ver seu detalhamento",
-    "gasResetView": "Redefinir zoom"
+    "gasResetView": "Redefinir zoom",
+    "events": "Eventos"
   }
 }

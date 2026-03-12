@@ -2,6 +2,7 @@ import type React from "react";
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
+import type { EthLog } from "@openscan/network-connectors";
 import type { DataService } from "../../../../services/DataService";
 import type {
   CallNode,
@@ -11,7 +12,17 @@ import type {
 import { useCallTreeEnrichment } from "../../../../hooks/useCallTreeEnrichment";
 import { countByType, countCalls, countReverts, hexToGas } from "../../../../utils/callTreeUtils";
 import type { ContractInfo } from "../../../../utils/contractLookup";
-import { decodeFunctionCall } from "../../../../utils/inputDecoder";
+import {
+  type DecodedEvent,
+  decodeEventLog,
+  formatDecodedValue,
+  getEventTypeColor,
+} from "../../../../utils/eventDecoder";
+import {
+  type DecodedInput,
+  decodeEventWithAbi,
+  decodeFunctionCall,
+} from "../../../../utils/inputDecoder";
 import { formatNativeFromWei } from "../../../../utils/unitFormatters";
 import { logger } from "../../../../utils/logger";
 import LongString from "../../../common/LongString";
@@ -21,9 +32,13 @@ interface TxAnalyserProps {
   networkId: string;
   networkCurrency: string;
   dataService: DataService;
+  logs?: EthLog[];
+  txToAddress?: string;
+  // biome-ignore lint/suspicious/noExplicitAny: ABI types are dynamic
+  contractAbi?: any[];
 }
 
-type AnalyserTab = "callTree" | "gasProfiler" | "stateChanges";
+type AnalyserTab = "callTree" | "gasProfiler" | "stateChanges" | "events";
 
 // ─── Call type color mapping ───────────────────────────────────────────────
 
@@ -605,6 +620,176 @@ const GasProfilerTab: React.FC<{
   );
 };
 
+// ─── Event Logs Tab ──────────────────────────────────────────────────────
+
+const EventLogsTab: React.FC<{
+  logs: EthLog[];
+  networkId: string;
+  txToAddress?: string;
+  // biome-ignore lint/suspicious/noExplicitAny: ABI types are dynamic
+  contractAbi?: any[];
+  contracts: Record<string, ContractInfo>;
+}> = ({ logs, networkId, txToAddress, contractAbi, contracts }) => {
+  const { t } = useTranslation("transaction");
+
+  return (
+    <div className="analyser-tab-content">
+      <div className="analyser-summary">
+        <span>
+          {t("analyser.events")} ({logs.length})
+        </span>
+      </div>
+      <div className="tx-logs">
+        {logs.map((log, index) => {
+          let decoded: DecodedEvent | null = null;
+          let abiDecoded: DecodedInput | null = null;
+
+          // Try enriched ABI first (from call tree enrichment)
+          const enrichedContract = log.address ? contracts[log.address.toLowerCase()] : undefined;
+
+          if (enrichedContract?.abi && log.topics) {
+            abiDecoded = decodeEventWithAbi(log.topics, log.data || "0x", enrichedContract.abi);
+          }
+
+          // Try tx recipient ABI
+          if (
+            !abiDecoded &&
+            txToAddress &&
+            log.address?.toLowerCase() === txToAddress.toLowerCase() &&
+            contractAbi &&
+            log.topics
+          ) {
+            abiDecoded = decodeEventWithAbi(log.topics, log.data || "0x", contractAbi);
+          }
+
+          // Fallback to standard event lookup
+          if (!abiDecoded && log.topics) {
+            decoded = decodeEventLog(log.topics, log.data || "0x");
+          }
+
+          const hasDecoded = abiDecoded || decoded;
+          const displayName = abiDecoded?.functionName || decoded?.name;
+          const displaySignature = abiDecoded?.signature || decoded?.fullSignature;
+          const displayParams = abiDecoded?.params || decoded?.params || [];
+
+          return (
+            // biome-ignore lint/suspicious/noArrayIndexKey: log index is stable
+            <div key={index} className="tx-log">
+              <div className="tx-log-index">{index}</div>
+              <div className="tx-log-content">
+                {hasDecoded && (
+                  <div className="tx-log-decoded">
+                    <span
+                      className="tx-event-badge"
+                      style={
+                        {
+                          "--event-color": abiDecoded
+                            ? "#10b981"
+                            : getEventTypeColor(decoded?.type || ""),
+                        } as React.CSSProperties
+                      }
+                    >
+                      {displayName}
+                    </span>
+                    <span
+                      className="tx-event-signature"
+                      title={decoded?.description || displaySignature}
+                    >
+                      {displaySignature}
+                    </span>
+                    {abiDecoded && (
+                      <span className="tx-abi-badge" title="Decoded using contract ABI">
+                        {t("logsAbi")}
+                      </span>
+                    )}
+                  </div>
+                )}
+
+                <div className="tx-log-row">
+                  <span className="tx-log-label">{t("logsAddress")}</span>
+                  <span className="tx-log-value tx-mono">
+                    <Link to={`/${networkId}/address/${log.address}`} className="link-accent">
+                      {enrichedContract?.name ? (
+                        <>
+                          {enrichedContract.name}{" "}
+                          <span className="tx-log-address-hex">
+                            (<LongString value={log.address} start={6} end={4} />)
+                          </span>
+                        </>
+                      ) : (
+                        log.address
+                      )}
+                    </Link>
+                  </span>
+                </div>
+
+                {displayParams.length > 0 && (
+                  <div className="tx-log-row tx-log-params">
+                    <span className="tx-log-label">{t("logsDecoded")}</span>
+                    <div className="tx-log-value">
+                      {displayParams.map((param, i) => (
+                        // biome-ignore lint/suspicious/noArrayIndexKey: param index is stable
+                        <div key={i} className="tx-decoded-param">
+                          <span className="tx-param-name">{param.name}</span>
+                          <span className="tx-param-type">({param.type})</span>
+                          <span
+                            className={`tx-param-value ${param.type === "address" ? "tx-mono" : ""}`}
+                          >
+                            {param.type === "address" ? (
+                              <Link
+                                to={`/${networkId}/address/${param.value}`}
+                                className="link-accent"
+                              >
+                                {param.value}
+                              </Link>
+                            ) : (
+                              formatDecodedValue(param.value, param.type)
+                            )}
+                          </span>
+                          {param.indexed && (
+                            <span className="tx-param-indexed">{t("logsIndexed")}</span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {log.topics && log.topics.length > 0 && (
+                  <div className="tx-log-row tx-log-topics">
+                    <span className="tx-log-label">
+                      {hasDecoded ? t("logsRawTopics") : t("logsTopics")}
+                    </span>
+                    <div className="tx-log-value">
+                      {log.topics.map((topic: string, i: number) => (
+                        <div key={topic} className="tx-topic">
+                          <span className="tx-topic-index">[{i}]</span>
+                          <code className="tx-topic-value">{topic}</code>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {log.data && log.data !== "0x" && (
+                  <div className="tx-log-row">
+                    <span className="tx-log-label">
+                      {hasDecoded ? t("logsRawData") : t("logsData")}
+                    </span>
+                    <div className="tx-log-value">
+                      <code className="tx-log-data">{log.data}</code>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
 // ─── Main TxAnalyser ───────────────────────────────────────────────────────
 
 const TxAnalyser: React.FC<TxAnalyserProps> = ({
@@ -612,6 +797,9 @@ const TxAnalyser: React.FC<TxAnalyserProps> = ({
   networkId,
   networkCurrency,
   dataService,
+  logs,
+  txToAddress,
+  contractAbi,
 }) => {
   const { t } = useTranslation("transaction");
   const [activeTab, setActiveTab] = useState<AnalyserTab>("callTree");
@@ -711,6 +899,15 @@ const TxAnalyser: React.FC<TxAnalyserProps> = ({
         >
           {t("analyser.stateChanges")}
         </button>
+        {logs && logs.length > 0 && (
+          <button
+            type="button"
+            className={`tx-analyser-tab${activeTab === "events" ? " tx-analyser-tab--active" : ""}`}
+            onClick={() => setActiveTab("events")}
+          >
+            {t("analyser.events")} ({logs.length})
+          </button>
+        )}
       </div>
 
       {/* Tab content */}
@@ -787,6 +984,16 @@ const TxAnalyser: React.FC<TxAnalyserProps> = ({
               />
             )}
           </>
+        )}
+
+        {activeTab === "events" && logs && logs.length > 0 && (
+          <EventLogsTab
+            logs={logs}
+            networkId={networkId}
+            txToAddress={txToAddress}
+            contractAbi={contractAbi}
+            contracts={contracts}
+          />
         )}
       </div>
     </div>

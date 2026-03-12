@@ -782,8 +782,8 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
               </div>
             )}
 
-            {/* Event Logs Section - Collapsible, closed by default */}
-            {transaction.receipt && transaction.receipt.logs.length > 0 && (
+            {/* Event Logs Section - Hidden in super user mode (moved to TX Analyser) */}
+            {!isSuperUser && transaction.receipt && transaction.receipt.logs.length > 0 && (
               <div className="tx-section event-logs-section">
                 <button
                   type="button"
@@ -1017,6 +1017,9 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
                     networkId={networkId}
                     networkCurrency={networkCurrency}
                     dataService={dataService}
+                    logs={transaction.receipt?.logs}
+                    txToAddress={transaction.to}
+                    contractAbi={contractData?.abi}
                   />
                 </div>
               )}

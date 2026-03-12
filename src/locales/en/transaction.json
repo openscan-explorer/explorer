@@ -159,6 +159,7 @@
     "gasProfiler": "Gas Profiler",
     "gasBreakdownTitle": "Breakdown",
     "gasBreakdownHint": "Click any bar to zoom in and see its breakdown",
-    "gasResetView": "Reset zoom"
+    "gasResetView": "Reset zoom",
+    "events": "Events"
   }
 }

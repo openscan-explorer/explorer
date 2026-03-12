@@ -159,6 +159,7 @@
     "gasProfiler": "ガスプロファイラー",
     "gasBreakdownTitle": "内訳",
     "gasBreakdownHint": "任意のバーをクリックしてズームインし、内訳を表示します",
-    "gasResetView": "ズームをリセット"
+    "gasResetView": "ズームをリセット",
+    "events": "イベント"
   }
 }
