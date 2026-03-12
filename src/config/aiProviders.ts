@@ -3,8 +3,18 @@ import type { AIProvider, AIProviderConfig } from "../types";
 /**
  * Static configuration for supported AI providers.
  * No API keys stored here - users provide their own keys via Settings.
+ * "openscan-groq" is a free proxy — no key required.
  */
 export const AI_PROVIDERS: Record<AIProvider, AIProviderConfig> = {
+  "openscan-groq": {
+    id: "openscan-groq",
+    name: "OpenScan Groq",
+    baseUrl:
+      process.env.REACT_APP_OPENSCAN_GROQ_AI_URL ??
+      "https://openscan-groq-ai-proxy.openscan.workers.dev",
+    defaultModel: "groq/compound",
+    keyUrl: "",
+  },
   groq: {
     id: "groq",
     name: "Groq",
@@ -48,6 +58,7 @@ export const AI_PROVIDERS: Record<AIProvider, AIProviderConfig> = {
  * When resolving which provider to use, the first provider with a configured key wins.
  */
 export const AI_PROVIDER_ORDER: AIProvider[] = [
+  "openscan-groq",
   "groq",
   "gemini",
   "perplexity",

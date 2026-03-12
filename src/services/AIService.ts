@@ -61,7 +61,7 @@ export class AIService {
     });
 
     try {
-      const content = await this.callAPI(system, user);
+      const content = await this.callAPI(system, user, request.type);
       return {
         summary: content,
         timestamp: Date.now(),
@@ -78,7 +78,14 @@ export class AIService {
     }
   }
 
-  private async callAPI(system: string, user: string): Promise<string> {
+  private async callAPI(
+    system: string,
+    user: string,
+    analysisType: AIAnalysisType,
+  ): Promise<string> {
+    if (this.provider.id === "openscan-groq") {
+      return this.callOpenScanProxy(system, user, analysisType);
+    }
     if (this.provider.id === "anthropic") {
       return this.callAnthropic(system, user);
     }
@@ -86,6 +93,35 @@ export class AIService {
       return this.callGemini(system, user);
     }
     return this.callOpenAICompatible(system, user);
+  }
+
+  private async callOpenScanProxy(
+    system: string,
+    user: string,
+    analysisType: AIAnalysisType,
+  ): Promise<string> {
+    const url = `${this.provider.baseUrl}/ai/analyze`;
+    const body = {
+      type: analysisType,
+      messages: [
+        { role: "system", content: system },
+        { role: "user", content: user },
+      ],
+    };
+
+    const response = await this.fetchWithRetry(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+
+    const data = await response.json();
+    const content = data?.choices?.[0]?.message?.content;
+    if (typeof content !== "string") {
+      logger.error("Unexpected OpenScan proxy response format:", data);
+      throw new AIServiceError("Failed to parse AI response", "parse_error");
+    }
+    return content;
   }
 
   private async callOpenAICompatible(system: string, user: string): Promise<string> {

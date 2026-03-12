@@ -45,10 +45,13 @@ export function useAIAnalysis(
     provider: (typeof AI_PROVIDERS)[AIProvider];
     apiKey: string;
   } | null => {
-    const apiKeys = settings.apiKeys;
-    if (!apiKeys) return null;
+    const apiKeys = settings.apiKeys ?? {};
 
     for (const id of AI_PROVIDER_ORDER) {
+      // openscan-groq is a free proxy — no API key needed
+      if (id === "openscan-groq") {
+        return { provider: AI_PROVIDERS[id], apiKey: "" };
+      }
       const key = apiKeys[id];
       if (key) {
         return { provider: AI_PROVIDERS[id], apiKey: key };

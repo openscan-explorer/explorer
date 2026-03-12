@@ -498,8 +498,13 @@ const Settings: React.FC = () => {
     });
   }, []);
 
-  const primaryAIProviderId = AI_PROVIDER_ORDER[0] ?? ("groq" as AIProvider);
-  const otherAIProviderIds = AI_PROVIDER_ORDER.filter(
+  // Filter out keyless providers (openscan-groq) — they don't need user-configured keys
+  type KeyRequiredProvider = Exclude<AIProvider, "openscan-groq">;
+  const keyRequiredProviders = AI_PROVIDER_ORDER.filter(
+    (id): id is KeyRequiredProvider => AI_PROVIDERS[id].keyUrl !== "",
+  );
+  const primaryAIProviderId = keyRequiredProviders[0] ?? ("groq" as KeyRequiredProvider);
+  const otherAIProviderIds = keyRequiredProviders.filter(
     (providerId) => providerId !== primaryAIProviderId,
   );
 

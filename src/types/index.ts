@@ -432,7 +432,13 @@ export interface ApiKeys {
 /**
  * Supported AI providers for blockchain analysis
  */
-export type AIProvider = "groq" | "openai" | "anthropic" | "perplexity" | "gemini";
+export type AIProvider =
+  | "openscan-groq"
+  | "groq"
+  | "openai"
+  | "anthropic"
+  | "perplexity"
+  | "gemini";
 
 /**
  * Configuration for an AI provider
