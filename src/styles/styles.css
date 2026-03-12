@@ -4777,11 +4777,20 @@ code {
 }
 
 .settings-providers-save-row {
-  display: flex;
-  justify-content: flex-end;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  gap: 12px;
   margin-bottom: 12px;
+}
+
+.settings-providers-save-row .settings-save-button {
+  grid-column: 2;
+  justify-self: center;
+}
+
+.settings-providers-save-row .settings-autosave-pill {
+  grid-column: 3;
+  justify-self: end;
 }
 
 .settings-autosave-pill {
@@ -5347,6 +5356,10 @@ code {
 
 .settings-ai-other-providers {
   margin-top: 12px;
+}
+
+.settings-prompt-version-item {
+  margin-top: 20px;
 }
 
 /* Toast Notifications */

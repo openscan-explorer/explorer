@@ -1410,12 +1410,19 @@
   }
 
   .settings-providers-save-row {
-    flex-wrap: wrap;
-    justify-content: flex-start;
+    grid-template-columns: 1fr;
+    gap: 10px;
   }
 
   .settings-providers-save-row .settings-save-button {
+    grid-column: 1;
     width: auto;
+    justify-self: center;
+  }
+
+  .settings-providers-save-row .settings-autosave-pill {
+    grid-column: 1;
+    justify-self: end;
   }
 }
 
