@@ -1,4 +1,5 @@
 {
+  "klerosVerifiedTooltip": "Verificado por el registro curado de Kleros",
   "balance": "Balance",
   "contractName": "Nombre del contrato",
   "compiler": "Compilador",
@@ -193,5 +194,14 @@
     "missingParam": "Por favor ingrese un valor para {{paramName}}",
     "invalidEthValue": "Valor de ETH inválido",
     "error": "Error: {{message}}"
-  }
+  },
+  "proxyType": "Tipo de Proxy",
+  "implementationAddress": "Implementación",
+  "implementationFunctions": "Implementación",
+  "proxyFunctions": "Proxy",
+  "implementationNotVerified": "Implementación no verificada en Sourcify",
+  "language": "Lenguaje",
+  "optimizer": "Optimizador",
+  "optimizerEnabled": "Activado ({{runs}} iteraciones)",
+  "optimizerDisabled": "Desactivado"
 }

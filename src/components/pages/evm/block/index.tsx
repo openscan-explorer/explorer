@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
+import { getNetworkById } from "../../../../config/networks";
 import { useDataService } from "../../../../hooks/useDataService";
 import { usePersistentCache } from "../../../../hooks/usePersistentCache";
 import { useProviderSelection } from "../../../../hooks/useProviderSelection";
 import { useSelectedData } from "../../../../hooks/useSelectedData";
 import type { Block, DataWithMetadata } from "../../../../types";
-import Loader from "../../../common/Loader";
+import Breadcrumb from "../../../common/Breadcrumb";
+import LoaderWithTimeout from "../../../common/LoaderWithTimeout";
 import BlockDisplay from "./BlockDisplay";
 
 export default function BlockPage() {
@@ -18,6 +20,8 @@ export default function BlockPage() {
 
   const blockNumber = filter === "latest" ? "latest" : Number(filter);
   const numericNetworkId = Number(networkId) || 1;
+  const networkConfig = getNetworkById(networkId ?? numericNetworkId);
+  const networkLabel = networkConfig?.shortName || networkConfig?.name || `Chain ${networkId}`;
 
   const dataService = useDataService(numericNetworkId);
   const { getCached, setCached } = usePersistentCache();
@@ -76,7 +80,10 @@ export default function BlockPage() {
             <span className="tx-mono header-subtitle">#{filter}</span>
           </div>
           <div className="card-content-loading">
-            <Loader text={t("loadingBlockData")} />
+            <LoaderWithTimeout
+              text={t("loadingBlockData")}
+              onRetry={() => window.location.reload()}
+            />
           </div>
         </div>
       </div>
@@ -101,6 +108,14 @@ export default function BlockPage() {
 
   return (
     <div className="container-wide">
+      <Breadcrumb
+        items={[
+          { label: "Home", to: "/" },
+          { label: networkLabel, to: `/${networkId}` },
+          { label: "Blocks", to: `/${networkId}/blocks` },
+          { label: `Block #${filter}` },
+        ]}
+      />
       {block ? (
         <BlockDisplay
           block={block}

@@ -7,6 +7,7 @@ import {
   type ProfileData,
   type ProfileType,
 } from "../../../services/MetadataService";
+import { Link } from "react-router-dom";
 import Loader from "../../common/Loader";
 import ProfileAppDisplay from "./ProfileAppDisplay";
 import ProfileNetworkDisplay from "./ProfileNetworkDisplay";
@@ -78,9 +79,41 @@ const Profile: React.FC = () => {
         {loading && <Loader text={t("profile.loading")} />}
 
         {error && (
-          <div className="text-center">
-            <h1 className="page-heading">{t("profile.notFound")}</h1>
-            <p className="error-text-center">{error}</p>
+          <div className="text-center" style={{ padding: "40px 20px" }}>
+            <svg
+              width="48"
+              height="48"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              style={{ opacity: 0.4, marginBottom: 16 }}
+              aria-hidden="true"
+            >
+              <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5" />
+              <path d="M12 8v4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+              <circle
+                cx="12"
+                cy="16"
+                r="0.5"
+                fill="currentColor"
+                stroke="currentColor"
+                strokeWidth="1"
+              />
+            </svg>
+            <h1 className="page-heading" style={{ color: "var(--text-color, #fff)" }}>
+              {t("profile.notFound")}
+            </h1>
+            <p className="text-muted" style={{ marginBottom: 24 }} role="alert">
+              {t("profile.notFoundFriendly")}
+            </p>
+            <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
+              <Link to="/" className="button-primary-inline">
+                {t("profile.goHome")}
+              </Link>
+              <Link to="/supporters" className="button-secondary-inline">
+                {t("profile.browseSupporters")}
+              </Link>
+            </div>
           </div>
         )}
 

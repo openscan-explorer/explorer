@@ -13,7 +13,7 @@ import {
   getImageUrl,
 } from "../../../../utils/erc721Metadata";
 import { logger } from "../../../../utils/logger";
-import Loader from "../../../common/Loader";
+import LoaderWithTimeout from "../../../common/LoaderWithTimeout";
 
 const ERC721TokenDisplay: React.FC = () => {
   const {
@@ -90,7 +90,10 @@ const ERC721TokenDisplay: React.FC = () => {
             <span className="tx-mono header-subtitle">: {tokenId}</span>
           </div>
           <div className="card-content-loading">
-            <Loader text="Loading NFT metadata..." />
+            <LoaderWithTimeout
+              text="Loading NFT metadata..."
+              onRetry={() => window.location.reload()}
+            />
           </div>
         </div>
       </div>

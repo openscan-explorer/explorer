@@ -6,7 +6,7 @@ import { useDataService } from "../../../../hooks/useDataService";
 import { getNativeTokenPrice } from "../../../../services/PriceService";
 import type { GasPrices } from "../../../../types";
 import { formatGasPrice } from "../../../../utils/formatUtils";
-import Loader from "../../../common/Loader";
+import LoaderWithTimeout from "../../../common/LoaderWithTimeout";
 
 const REFRESH_INTERVAL = 15000; // 15 seconds
 
@@ -162,7 +162,12 @@ export default function GasTracker() {
           <h1 className="page-title-small">{t("gasTracker.title")}</h1>
         </div>
 
-        {loading && !gasPrices && <Loader text={t("gasTracker.loadingGasPrices")} />}
+        {loading && !gasPrices && (
+          <LoaderWithTimeout
+            text={t("gasTracker.loadingGasPrices")}
+            onRetry={() => window.location.reload()}
+          />
+        )}
 
         {error && <p className="error-text-center">{t("gasTracker.errorLoadingGas", { error })}</p>}
 

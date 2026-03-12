@@ -193,5 +193,14 @@
     "missingParam": "Por favor, forneça um valor para {{paramName}}",
     "invalidEthValue": "Valor de ETH inválido",
     "error": "Erro: {{message}}"
-  }
+  },
+  "proxyType": "Tipo de Proxy",
+  "implementationAddress": "Implementação",
+  "implementationFunctions": "Implementação",
+  "proxyFunctions": "Proxy",
+  "implementationNotVerified": "Implementação não verificada no Sourcify",
+  "language": "Linguagem",
+  "optimizer": "Otimizador",
+  "optimizerEnabled": "Ativado ({{runs}} execuções)",
+  "optimizerDisabled": "Desativado"
 }

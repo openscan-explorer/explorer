@@ -100,8 +100,8 @@ export function getEnabledNetworks(): NetworkConfig[] {
   const envNetworks = process.env.REACT_APP_OPENSCAN_NETWORKS;
   const localhostChainId = 31337;
 
-  // REACT_APP_ENVIRONMENT is set by webpack DefinePlugin based on NODE_ENV
-  const isDevelopment = process.env.REACT_APP_ENVIRONMENT === "development";
+  // VITE_ENVIRONMENT is injected via vite.config.ts define block based on NODE_ENV
+  const isDevelopment = import.meta.env.VITE_ENVIRONMENT === "development";
 
   // Check if localhost is explicitly enabled in REACT_APP_OPENSCAN_NETWORKS
   const isLocalhostExplicitlyEnabled = envNetworks

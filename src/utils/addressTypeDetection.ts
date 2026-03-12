@@ -208,6 +208,9 @@ export interface FetchAddressWithTypeOptions {
   addressHash: string;
   chainId: number;
   rpcUrl: string;
+  /** Pre-fetched address data. When provided, skips the initial eth_getCode/eth_getBalance
+   *  RPC calls and uses this data directly for the EOA/contract check. */
+  preloadedAddress?: Address;
 }
 
 export interface AddressWithType {
@@ -265,10 +268,12 @@ export function hasContractCode(code: string | null | undefined): boolean {
 export async function fetchAddressWithType(
   options: FetchAddressWithTypeOptions,
 ): Promise<AddressWithType> {
-  const { addressHash, chainId, rpcUrl } = options;
+  const { addressHash, chainId, rpcUrl, preloadedAddress } = options;
 
-  // Step 1: Fetch basic address data (balance, code, txCount)
-  const address = await fetchAddressData(addressHash, rpcUrl);
+  // Step 1: Use pre-fetched address data if available, otherwise fetch it.
+  // Using pre-loaded data avoids a redundant eth_getCode call and prevents
+  // contracts from being misclassified as EOA when the secondary RPC call fails.
+  const address = preloadedAddress ?? (await fetchAddressData(addressHash, rpcUrl));
 
   // Step 2: Check for EIP-7702 delegation (EOA with delegated code)
   if (isEIP7702Delegation(address.code)) {

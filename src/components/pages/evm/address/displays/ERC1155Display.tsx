@@ -2,12 +2,14 @@ import type React from "react";
 import { useContext, useEffect, useMemo, useState } from "react";
 import { getNetworkById } from "../../../../../config/networks";
 import { AppContext } from "../../../../../context";
-import { useSourcify } from "../../../../../hooks/useSourcify";
+import { useContractVerification } from "../../../../../hooks/useContractVerification";
+import { useProxyInfo } from "../../../../../hooks/useProxyInfo";
 import {
   fetchToken,
   getAssetUrl,
   type TokenMetadata,
 } from "../../../../../services/MetadataService";
+import type { KlerosTag } from "../../../../../services/KlerosService";
 import type { Address, ENSReverseResult, RPCMetadata } from "../../../../../types";
 import { decodeAbiString } from "../../../../../utils/hexUtils";
 import { logger } from "../../../../../utils/logger";
@@ -29,6 +31,7 @@ interface ERC1155DisplayProps {
   ensName?: string | null;
   reverseResult?: ENSReverseResult | null;
   isMainnet?: boolean;
+  klerosTag?: KlerosTag | null;
 }
 
 const ERC1155Display: React.FC<ERC1155DisplayProps> = ({
@@ -41,6 +44,7 @@ const ERC1155Display: React.FC<ERC1155DisplayProps> = ({
   ensName,
   reverseResult,
   isMainnet = true,
+  klerosTag,
 }) => {
   const { jsonFiles, rpcUrls } = useContext(AppContext);
   const [tokenMetadata, setTokenMetadata] = useState<TokenMetadata | null>(null);
@@ -50,12 +54,21 @@ const ERC1155Display: React.FC<ERC1155DisplayProps> = ({
     symbol?: string;
   } | null>(null);
 
-  // Fetch Sourcify data
+  // Fetch verified contract data (Sourcify → Etherscan fallback)
   const {
-    data: sourcifyData,
+    data: contractVerifiedData,
     loading: sourcifyLoading,
     isVerified,
-  } = useSourcify(Number(networkId), addressHash, true);
+    source: verificationSource,
+  } = useContractVerification(Number(networkId), addressHash, true);
+
+  // Detect proxy pattern and fetch implementation contract data
+  const proxyInfo = useProxyInfo(addressHash, networkId, address.code ?? "");
+  const { data: implSourcifyData, isVerified: implIsVerified } = useContractVerification(
+    Number(networkId),
+    proxyInfo?.implementationAddress,
+    !!proxyInfo,
+  );
 
   // Fetch token metadata from explorer-metadata
   useEffect(() => {
@@ -177,8 +190,8 @@ const ERC1155Display: React.FC<ERC1155DisplayProps> = ({
   }, [localArtifact, networkId, addressHash]);
 
   const contractData = useMemo(
-    () => (isVerified && sourcifyData ? sourcifyData : parsedLocalData),
-    [isVerified, sourcifyData, parsedLocalData],
+    () => (isVerified && contractVerifiedData ? contractVerifiedData : parsedLocalData),
+    [isVerified, contractVerifiedData, parsedLocalData],
   );
 
   const hasVerifiedContract = isVerified || !!parsedLocalData;
@@ -234,6 +247,7 @@ const ERC1155Display: React.FC<ERC1155DisplayProps> = ({
           onProviderSelect={onProviderSelect}
           tokenSymbol={collectionSymbol}
           tokenName={collectionName}
+          klerosTag={klerosTag}
         />
 
         <div className="address-section-content">
@@ -267,11 +281,9 @@ const ERC1155Display: React.FC<ERC1155DisplayProps> = ({
             hasVerifiedContract={hasVerifiedContract}
             sourcifyLoading={sourcifyLoading}
             isLocalArtifact={!!parsedLocalData && !isVerified}
-            sourcifyUrl={
-              sourcifyData
-                ? `https://repo.sourcify.dev/contracts/full_match/${networkId}/${addressHash}/`
-                : undefined
-            }
+            verificationSource={verificationSource}
+            proxyInfo={proxyInfo}
+            implementationContractData={implIsVerified ? implSourcifyData : null}
           />
         </div>
       </div>

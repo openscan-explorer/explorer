@@ -2,12 +2,12 @@ import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { RPCIndicator } from "../../../common/RPCIndicator";
+import Breadcrumb from "../../../common/Breadcrumb";
 import { getNetworkById } from "../../../../config/networks";
 import { useDataService } from "../../../../hooks/useDataService";
 import { useProviderSelection } from "../../../../hooks/useProviderSelection";
 import type { Block, DataWithMetadata } from "../../../../types";
 import { logger } from "../../../../utils/logger";
-import Loader from "../../../common/Loader";
 
 const BLOCKS_PER_PAGE = 10;
 
@@ -18,7 +18,9 @@ export default function Blocks() {
   const navigate = useNavigate();
   const numericNetworkId = Number(networkId) || 1;
   const dataService = useDataService(numericNetworkId);
-  const networkName = getNetworkById(networkId ?? numericNetworkId)?.name ?? String(networkId);
+  const networkConfig = getNetworkById(networkId ?? numericNetworkId);
+  const networkName = networkConfig?.name ?? String(networkId);
+  const networkLabel = networkConfig?.shortName || networkConfig?.name || `Chain ${networkId}`;
   const [blocksResult, setBlocksResult] = useState<DataWithMetadata<Block>[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -163,12 +165,59 @@ export default function Blocks() {
   if (loading) {
     return (
       <div className="container-wide">
+        <Breadcrumb
+          items={[
+            { label: "Home", to: "/" },
+            { label: networkLabel, to: `/${networkId}` },
+            { label: "Blocks" },
+          ]}
+        />
         <div className="block-display-card">
           <div className="blocks-header">
             <span className="block-label">{t("latestBlocks", { network: networkName })}</span>
           </div>
-          <div className="card-content-loading">
-            <Loader text={t("loadingBlocks")} />
+          <div className="table-wrapper">
+            <table className="dash-table blocks-table">
+              <thead>
+                <tr>
+                  <th>{t("tableBlock")}</th>
+                  <th>{t("tableTimestamp")}</th>
+                  <th>{t("tableTxns")}</th>
+                  <th className="hide-mobile">{t("tableMiner")}</th>
+                  <th>{t("tableGasUsed")}</th>
+                  <th className="hide-mobile">{t("tableGasLimit")}</th>
+                  <th className="hide-mobile">{t("tableSize")}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {Array.from({ length: BLOCKS_PER_PAGE }).map((_, i) => (
+                  // biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholder
+                  <tr key={i}>
+                    <td>
+                      <span className="skeleton-pulse" style={{ width: "72px", height: 18 }} />
+                    </td>
+                    <td>
+                      <span className="skeleton-pulse" style={{ width: "165px", height: 18 }} />
+                    </td>
+                    <td>
+                      <span className="skeleton-pulse" style={{ width: "28px", height: 18 }} />
+                    </td>
+                    <td className="hide-mobile">
+                      <span className="skeleton-pulse" style={{ width: "95px", height: 18 }} />
+                    </td>
+                    <td>
+                      <span className="skeleton-pulse" style={{ width: "85px", height: 18 }} />
+                    </td>
+                    <td className="hide-mobile">
+                      <span className="skeleton-pulse" style={{ width: "85px", height: 18 }} />
+                    </td>
+                    <td className="hide-mobile">
+                      <span className="skeleton-pulse" style={{ width: "55px", height: 18 }} />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
@@ -178,6 +227,13 @@ export default function Blocks() {
   if (error) {
     return (
       <div className="container-wide">
+        <Breadcrumb
+          items={[
+            { label: "Home", to: "/" },
+            { label: networkLabel, to: `/${networkId}` },
+            { label: "Blocks" },
+          ]}
+        />
         <div className="block-display-card">
           <div className="blocks-header">
             <span className="block-label">{t("latestBlocks", { network: networkName })}</span>
@@ -195,6 +251,13 @@ export default function Blocks() {
 
   return (
     <div className="container-wide">
+      <Breadcrumb
+        items={[
+          { label: "Home", to: "/" },
+          { label: networkLabel, to: `/${networkId}` },
+          { label: "Blocks" },
+        ]}
+      />
       <div className="block-display-card">
         <div className="blocks-header">
           <div className="blocks-header-main">
@@ -219,7 +282,7 @@ export default function Blocks() {
         </div>
 
         <div className="table-wrapper">
-          <table className="dash-table">
+          <table className="dash-table blocks-table">
             <thead>
               <tr>
                 <th>{t("tableBlock")}</th>

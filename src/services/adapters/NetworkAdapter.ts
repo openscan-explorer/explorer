@@ -240,6 +240,32 @@ export abstract class NetworkAdapter {
   abstract getNetworkStats(): Promise<DataWithMetadata<NetworkStats>>;
 
   /**
+   * Get storage value at a given slot for an address.
+   * Used for proxy detection (EIP-1967, EIP-1822, etc.)
+   */
+  async getStorageAt(address: string, slot: string): Promise<string> {
+    const result = await this.getClient().getStorageAt(address, slot, "latest");
+    return result.data ?? "0x";
+  }
+
+  /**
+   * Fetch the deployed bytecode (eth_getCode) for any address.
+   */
+  async getCode(address: string): Promise<string> {
+    const result = await this.getClient().getCode(address, "latest");
+    return result.data ?? "0x";
+  }
+
+  /**
+   * Execute a low-level eth_call.
+   * Used for beacon proxy implementation() calls during proxy detection.
+   */
+  async callContract(to: string, data: string): Promise<string> {
+    const result = await this.getClient().execute<string>("eth_call", [{ to, data }, "latest"]);
+    return result.data ?? "0x";
+  }
+
+  /**
    * Get gas prices with tiers (Low/Average/High) using eth_feeHistory
    * @returns Gas price tiers and base fee
    */

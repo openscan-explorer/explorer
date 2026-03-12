@@ -4,6 +4,8 @@ import { useNavigate } from "react-router";
 import { useSettings } from "../../context/SettingsContext";
 import { ENVIRONMENT } from "../../utils/constants";
 
+const DOCS_URL = "https://openscan-explorer.github.io/docs";
+
 interface FooterProps {
   className?: string;
 }
@@ -33,10 +35,6 @@ const Footer: React.FC<FooterProps> = ({ className = "" }) => {
     return "";
   };
 
-  const goToSubscriptions = () => {
-    navigate("/subscriptions");
-  };
-
   const goToSupporters = () => {
     navigate("/supporters");
   };
@@ -46,19 +44,25 @@ const Footer: React.FC<FooterProps> = ({ className = "" }) => {
         <div className="footer-left">
           <button
             type="button"
-            onClick={() => navigate("/about")}
+            onClick={() => window.open(`${DOCS_URL}/introduction`, "_blank", "noopener,noreferrer")}
             className="footer-link btn-reset"
           >
             {t("footer.about")}
           </button>
           <span className="footer-separator hide-mobile">|</span>
-          <button type="button" onClick={goToSubscriptions} className="footer-link btn-reset">
+          <button
+            type="button"
+            onClick={() =>
+              window.open(`${DOCS_URL}/subscriptions`, "_blank", "noopener,noreferrer")
+            }
+            className="footer-link btn-reset"
+          >
             {t("footer.subscribe")}
           </button>
           <span className="footer-separator hide-mobile">|</span>
           <button
             type="button"
-            onClick={() => navigate("/contact")}
+            onClick={() => window.open(`${DOCS_URL}/contact`, "_blank", "noopener,noreferrer")}
             className="footer-link btn-reset"
           >
             {t("footer.contact")}

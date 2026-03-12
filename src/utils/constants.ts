@@ -1,1 +1,1 @@
-export const ENVIRONMENT = process.env.REACT_APP_ENVIRONMENT || "development";
+export const ENVIRONMENT = import.meta.env.VITE_ENVIRONMENT || "development";

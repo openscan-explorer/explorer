@@ -2,7 +2,7 @@ import type React from "react";
 import { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { AppContext } from "../../../../context";
-import Loader from "../../../common/Loader";
+import LoaderWithTimeout from "../../../common/LoaderWithTimeout";
 import { useTranslation } from "react-i18next";
 import ERC721TokenDetails from "./ERC721TokenDisplay";
 import ERC1155TokenDetails from "./ERC1155TokenDisplay";
@@ -125,7 +125,10 @@ const NFTTokenDetails: React.FC = () => {
             <span className="block-label">NFT Token</span>
           </div>
           <div className="card-content-loading">
-            <Loader text={t("detectingTokenType")} />
+            <LoaderWithTimeout
+              text={t("detectingTokenType")}
+              onRetry={() => window.location.reload()}
+            />
           </div>
         </div>
       </div>

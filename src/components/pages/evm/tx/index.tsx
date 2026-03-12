@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
+import { getNetworkById } from "../../../../config/networks";
 import { useDataService } from "../../../../hooks/useDataService";
 import { usePersistentCache } from "../../../../hooks/usePersistentCache";
 import { useProviderSelection } from "../../../../hooks/useProviderSelection";
 import { useSelectedData } from "../../../../hooks/useSelectedData";
 import type { DataWithMetadata, Transaction } from "../../../../types";
 import { logger } from "../../../../utils/logger";
-import Loader from "../../../common/Loader";
+import Breadcrumb from "../../../common/Breadcrumb";
+import LoaderWithTimeout from "../../../common/LoaderWithTimeout";
 import TransactionDisplay from "./TransactionDisplay";
 
 export default function Tx() {
@@ -19,6 +21,8 @@ export default function Tx() {
 
   const txHash = filter;
   const numericNetworkId = Number(networkId) || 1;
+  const networkConfig = getNetworkById(networkId ?? numericNetworkId);
+  const networkLabel = networkConfig?.shortName || networkConfig?.name || `Chain ${networkId}`;
 
   const dataService = useDataService(numericNetworkId);
   const { getCached, setCached } = usePersistentCache();
@@ -92,7 +96,10 @@ export default function Tx() {
             <span className="tx-mono header-subtitle">{txHash}</span>
           </div>
           <div className="card-content-loading">
-            <Loader text={t("loadingTransaction")} />
+            <LoaderWithTimeout
+              text={t("loadingTransaction")}
+              onRetry={() => window.location.reload()}
+            />
           </div>
         </div>
       </div>
@@ -115,8 +122,18 @@ export default function Tx() {
     );
   }
 
+  const truncatedHash = filter ? `${filter.slice(0, 10)}...${filter.slice(-6)}` : "";
+
   return (
     <div className="container-wide">
+      <Breadcrumb
+        items={[
+          { label: "Home", to: "/" },
+          { label: networkLabel, to: `/${networkId}` },
+          { label: "Transactions", to: `/${networkId}/txs` },
+          { label: truncatedHash },
+        ]}
+      />
       {transaction ? (
         <TransactionDisplay
           transaction={transaction}

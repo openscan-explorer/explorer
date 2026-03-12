@@ -58,7 +58,7 @@ export default defineConfig({
     "process.env.REACT_APP_OPENSCAN_NETWORKS": JSON.stringify(
       process.env.REACT_APP_OPENSCAN_NETWORKS || ""
     ),
-    "process.env.REACT_APP_ENVIRONMENT": JSON.stringify(
+    "import.meta.env.VITE_ENVIRONMENT": JSON.stringify(
       process.env.NODE_ENV || "development"
     ),
   },

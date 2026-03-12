@@ -60,6 +60,15 @@
 	font-weight: 500;
 }
 
+/* Blocks tables: keep stable row height between skeleton and loaded states */
+.blocks-table tbody tr {
+	height: 44px;
+}
+
+.blocks-table td {
+	vertical-align: middle;
+}
+
 .dash-table td.text-right {
 	text-align: right;
 }
