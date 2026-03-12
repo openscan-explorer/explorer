@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { Navigate, Outlet, useParams } from "react-router-dom";
 import { isNetworkEnabled } from "../../config/networks";
@@ -9,9 +9,11 @@ export default function ValidateNetwork() {
   const { addNotification } = useNotifications();
   const { t } = useTranslation();
   const isValid = !!networkId && isNetworkEnabled(networkId);
+  const notifiedRef = useRef(false);
 
   useEffect(() => {
-    if (!isValid) {
+    if (!isValid && !notifiedRef.current) {
+      notifiedRef.current = true;
       addNotification(
         t("errors.networkNotFoundMessage", { network: networkId || "" }),
         "warning",

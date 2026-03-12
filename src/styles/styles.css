@@ -2466,18 +2466,19 @@ a.navbar-logo-dropdown-item:hover {
 
 /* Notifications */
 .notification-container {
-  position: sticky;
-  top: 0;
+  position: fixed;
+  top: 70px;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 10px;
   z-index: 1000;
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 0 24px;
 }
 
 .notification {
+  width: clamp(240px, 90vw, 520px);
   padding: 14px 18px;
   border-radius: 12px;
   box-shadow: 0 4px 14px -2px rgba(0, 0, 0, 0.2);
