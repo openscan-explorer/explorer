@@ -1,6 +1,6 @@
 import type React from "react";
-import { useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { MetaMaskIcon } from "../../common/MetaMaskIcon";
 import { getEnabledNetworks } from "../../../config/networks";
@@ -46,6 +46,20 @@ const ALCHEMY_NETWORKS: Record<number, string> = {
   8453: "base-mainnet",
 };
 
+const SETTINGS_ACTIVE_TAB_KEY = "openscan_settings_active_tab";
+
+type SettingsTab = "network" | "providers" | "display" | "advanced";
+
+const SETTINGS_TABS: Array<{ id: SettingsTab; label: string }> = [
+  { id: "network", label: "🌐 Network" },
+  { id: "providers", label: "🔑 Providers" },
+  { id: "display", label: "🎨 Display" },
+  { id: "advanced", label: "🧪 Advanced" },
+];
+
+const isValidSettingsTab = (value: string | null): value is SettingsTab =>
+  value === "network" || value === "providers" || value === "display" || value === "advanced";
+
 const getInfuraUrl = (chainId: number, apiKey: string): string | null => {
   const slug = INFURA_NETWORKS[chainId];
   return slug ? `https://${slug}.infura.io/v3/${apiKey}` : null;
@@ -61,14 +75,16 @@ const isAlchemyUrl = (url: string): boolean => url.includes("alchemy.com");
 
 const Settings: React.FC = () => {
   const { t, i18n } = useTranslation("settings");
+  const location = useLocation();
+  const navigate = useNavigate();
   const { rpcUrls, setRpcUrls } = useContext(AppContext);
   const { settings, updateSettings, isSuperUser } = useSettings();
   const { enabledNetworks } = useNetworks();
   const { isMetaMaskAvailable, isSupported, setAsDefaultExplorer } = useMetaMaskExplorer();
+  const [activeTab, setActiveTab] = useState<SettingsTab>("network");
   const [localRpc, setLocalRpc] = useState<Record<string, string | RPCUrls>>({
     ...rpcUrls,
   });
-  const [saveSuccess, setSaveSuccess] = useState(false);
   const [cacheCleared, setCacheCleared] = useState(false);
   const [draggedItem, setDraggedItem] = useState<{
     networkId: string;
@@ -101,11 +117,288 @@ const Settings: React.FC = () => {
   >({});
   const [persistentCacheBytes, setPersistentCacheBytes] = useState(() => getPersistentCacheSize());
   const [syncingChain, setSyncingChain] = useState<string | null>(null);
+  const [autoSaveState, setAutoSaveState] = useState<"idle" | "saving" | "saved">("idle");
 
-  // Sync localRpc when context rpcUrls changes (e.g., after save)
+  const initialRenderRef = useRef(true);
+  const saveTimerRef = useRef<number | null>(null);
+  const savedHintTimerRef = useRef<number | null>(null);
+  const lastSavedDraftRef = useRef<string>("");
+
+  const normalizeRpcConfig = useCallback(
+    (draft: Record<string, string | RPCUrls>): RpcUrlsContextType => {
+      const normalized = Object.keys(draft)
+        .sort()
+        .reduce((acc, networkId) => {
+          const value = draft[networkId];
+          if (typeof value === "string") {
+            acc[networkId] = value
+              .split(",")
+              .map((item) => item.trim())
+              .filter(Boolean);
+            return acc;
+          }
+
+          if (Array.isArray(value)) {
+            acc[networkId] = value.map((item) => item.trim()).filter(Boolean);
+            return acc;
+          }
+
+          return acc;
+        }, {} as RpcUrlsContextType);
+
+      return normalized;
+    },
+    [],
+  );
+
+  const serializeDraft = useCallback(
+    (draftRpc: Record<string, string | RPCUrls>, draftApiKeys: typeof localApiKeys): string => {
+      const normalizedRpc = normalizeRpcConfig(draftRpc);
+      const sortedRpcEntries = Object.keys(normalizedRpc)
+        .sort()
+        .map((networkId) => [networkId, normalizedRpc[networkId]]);
+
+      const sortedApiEntries = Object.keys(draftApiKeys)
+        .sort()
+        .map((key) => [key, draftApiKeys[key as keyof typeof draftApiKeys]]);
+
+      return JSON.stringify({ rpc: sortedRpcEntries, apiKeys: sortedApiEntries });
+    },
+    [normalizeRpcConfig],
+  );
+
+  const applyProviderUrlsToRpcs = useCallback(
+    (
+      parsedRpc: RpcUrlsContextType,
+      previousApiKeys: { infura?: string; alchemy?: string },
+      nextApiKeys: { infura: string; alchemy: string },
+    ) => {
+      const prevInfuraKey = previousApiKeys.infura || "";
+      const prevAlchemyKey = previousApiKeys.alchemy || "";
+
+      for (const chainId of Object.keys(INFURA_NETWORKS).map(Number)) {
+        const networkId = `eip155:${chainId}`;
+        let urls: string[] = (parsedRpc[networkId] as string[]) || [];
+
+        const oldInfuraUrl = prevInfuraKey ? getInfuraUrl(chainId, prevInfuraKey) : null;
+        const newInfuraUrl = nextApiKeys.infura ? getInfuraUrl(chainId, nextApiKeys.infura) : null;
+
+        if (oldInfuraUrl && oldInfuraUrl !== newInfuraUrl) {
+          urls = urls.filter((url) => url !== oldInfuraUrl);
+        }
+
+        if (newInfuraUrl && !urls.includes(newInfuraUrl)) {
+          urls = [newInfuraUrl, ...urls];
+        }
+
+        parsedRpc[networkId] = urls;
+      }
+
+      for (const chainId of Object.keys(ALCHEMY_NETWORKS).map(Number)) {
+        const networkId = `eip155:${chainId}`;
+        let urls: string[] = (parsedRpc[networkId] as string[]) || [];
+
+        const oldAlchemyUrl = prevAlchemyKey ? getAlchemyUrl(chainId, prevAlchemyKey) : null;
+        const newAlchemyUrl = nextApiKeys.alchemy
+          ? getAlchemyUrl(chainId, nextApiKeys.alchemy)
+          : null;
+
+        if (oldAlchemyUrl && oldAlchemyUrl !== newAlchemyUrl) {
+          urls = urls.filter((url) => url !== oldAlchemyUrl);
+        }
+
+        if (newAlchemyUrl && !urls.includes(newAlchemyUrl)) {
+          urls = [newAlchemyUrl, ...urls];
+        }
+
+        parsedRpc[networkId] = urls;
+      }
+    },
+    [],
+  );
+
+  const persistConfiguration = useCallback(
+    (
+      draftRpc: Record<string, string | RPCUrls>,
+      draftApiKeys: typeof localApiKeys,
+      options?: { silent?: boolean },
+    ) => {
+      const parsedRpc = normalizeRpcConfig(draftRpc);
+
+      const nextApiKeys = {
+        infura: draftApiKeys.infura,
+        alchemy: draftApiKeys.alchemy,
+      };
+
+      applyProviderUrlsToRpcs(parsedRpc, settings.apiKeys || {}, nextApiKeys);
+
+      updateSettings({
+        apiKeys: {
+          infura: draftApiKeys.infura || undefined,
+          alchemy: draftApiKeys.alchemy || undefined,
+          etherscan: draftApiKeys.etherscan || undefined,
+          groq: draftApiKeys.groq || undefined,
+          openai: draftApiKeys.openai || undefined,
+          anthropic: draftApiKeys.anthropic || undefined,
+          perplexity: draftApiKeys.perplexity || undefined,
+          gemini: draftApiKeys.gemini || undefined,
+        },
+      });
+
+      setRpcUrls(parsedRpc);
+      lastSavedDraftRef.current = serializeDraft(draftRpc, draftApiKeys);
+
+      if (!options?.silent) {
+        setAutoSaveState("saved");
+        if (savedHintTimerRef.current) {
+          window.clearTimeout(savedHintTimerRef.current);
+        }
+        savedHintTimerRef.current = window.setTimeout(() => {
+          setAutoSaveState("idle");
+        }, 1800);
+      }
+    },
+    [
+      applyProviderUrlsToRpcs,
+      normalizeRpcConfig,
+      serializeDraft,
+      setRpcUrls,
+      settings.apiKeys,
+      updateSettings,
+    ],
+  );
+
+  // Keep local inputs in sync when context values are updated from elsewhere.
   useEffect(() => {
     setLocalRpc({ ...rpcUrls });
   }, [rpcUrls]);
+
+  useEffect(() => {
+    setLocalApiKeys({
+      infura: settings.apiKeys?.infura || "",
+      alchemy: settings.apiKeys?.alchemy || "",
+      etherscan: settings.apiKeys?.etherscan || "",
+      groq: settings.apiKeys?.groq || "",
+      openai: settings.apiKeys?.openai || "",
+      anthropic: settings.apiKeys?.anthropic || "",
+      perplexity: settings.apiKeys?.perplexity || "",
+      gemini: settings.apiKeys?.gemini || "",
+    });
+  }, [settings.apiKeys]);
+
+  // Hydrate active tab from URL (query/hash) or previous session.
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const tabFromQuery = params.get("tab");
+    const tabFromHash = location.hash ? location.hash.replace(/^#/, "") : null;
+
+    let nextTab: SettingsTab | null = null;
+
+    if (isValidSettingsTab(tabFromQuery)) {
+      nextTab = tabFromQuery;
+    } else if (isValidSettingsTab(tabFromHash)) {
+      nextTab = tabFromHash;
+    } else {
+      const stored = localStorage.getItem(SETTINGS_ACTIVE_TAB_KEY);
+      if (isValidSettingsTab(stored)) {
+        nextTab = stored;
+      }
+    }
+
+    if (!nextTab) {
+      return;
+    }
+
+    if (nextTab !== activeTab) {
+      setActiveTab(nextTab);
+    }
+
+    localStorage.setItem(SETTINGS_ACTIVE_TAB_KEY, nextTab);
+
+    if (!isValidSettingsTab(tabFromQuery) || tabFromQuery !== nextTab) {
+      const updatedParams = new URLSearchParams(location.search);
+      updatedParams.set("tab", nextTab);
+      navigate(
+        {
+          pathname: location.pathname,
+          search: `?${updatedParams.toString()}`,
+          hash: `#${nextTab}`,
+        },
+        { replace: true },
+      );
+    }
+  }, [activeTab, location.hash, location.pathname, location.search, navigate]);
+
+  const handleTabChange = useCallback(
+    (tab: SettingsTab) => {
+      if (tab === activeTab) {
+        return;
+      }
+
+      setActiveTab(tab);
+      localStorage.setItem(SETTINGS_ACTIVE_TAB_KEY, tab);
+
+      const updatedParams = new URLSearchParams(location.search);
+      updatedParams.set("tab", tab);
+
+      navigate(
+        {
+          pathname: location.pathname,
+          search: `?${updatedParams.toString()}`,
+          hash: `#${tab}`,
+        },
+        { replace: true },
+      );
+    },
+    [activeTab, location.pathname, location.search, navigate],
+  );
+
+  useEffect(() => {
+    const currentDraft = serializeDraft(localRpc, localApiKeys);
+
+    if (initialRenderRef.current) {
+      initialRenderRef.current = false;
+      lastSavedDraftRef.current = currentDraft;
+      return;
+    }
+
+    if (currentDraft === lastSavedDraftRef.current) {
+      return;
+    }
+
+    setAutoSaveState("saving");
+
+    if (saveTimerRef.current) {
+      window.clearTimeout(saveTimerRef.current);
+    }
+
+    saveTimerRef.current = window.setTimeout(() => {
+      persistConfiguration(localRpc, localApiKeys);
+      saveTimerRef.current = null;
+    }, 450);
+
+    return () => {
+      if (saveTimerRef.current) {
+        window.clearTimeout(saveTimerRef.current);
+      }
+    };
+  }, [localApiKeys, localRpc, persistConfiguration, serializeDraft]);
+
+  useEffect(() => {
+    return () => {
+      if (saveTimerRef.current) {
+        window.clearTimeout(saveTimerRef.current);
+        const currentDraft = serializeDraft(localRpc, localApiKeys);
+        if (currentDraft !== lastSavedDraftRef.current) {
+          persistConfiguration(localRpc, localApiKeys, { silent: true });
+        }
+      }
+
+      if (savedHintTimerRef.current) {
+        window.clearTimeout(savedHintTimerRef.current);
+      }
+    };
+  }, [localApiKeys, localRpc, persistConfiguration, serializeDraft]);
 
   const updateField = useCallback((networkId: string, value: string) => {
     setLocalRpc((prev) => ({ ...prev, [networkId]: value }));
@@ -126,15 +419,10 @@ const Settings: React.FC = () => {
 
   // Clear all caches
   const clearAllCaches = useCallback(() => {
-    // Clear metadata service caches
     clearSupportersCache();
-    // Clear metadata RPC cache
     clearMetadataRpcCache();
-    // Clear localStorage caches if any
     localStorage.removeItem("openscan_cache");
-    // Clear AI analysis cache
     clearAICache();
-    // Clear persistent cache (super user)
     clearPersistentCache();
     setPersistentCacheBytes(0);
     setCacheCleared(true);
@@ -149,11 +437,9 @@ const Settings: React.FC = () => {
       return;
     }
 
-    // Clear localStorage and sessionStorage
     localStorage.clear();
     sessionStorage.clear();
 
-    // Clear all cookies for this site
     for (const cookie of document.cookie.split(";")) {
       const name = cookie.split("=")[0]?.trim();
       if (name) {
@@ -162,7 +448,6 @@ const Settings: React.FC = () => {
       }
     }
 
-    // Clear IndexedDB databases
     if (window.indexedDB?.databases) {
       try {
         const databases = await window.indexedDB.databases();
@@ -176,7 +461,6 @@ const Settings: React.FC = () => {
       }
     }
 
-    // Clear Cache Storage (Service Worker caches)
     if ("caches" in window) {
       try {
         const cacheNames = await caches.keys();
@@ -186,7 +470,6 @@ const Settings: React.FC = () => {
       }
     }
 
-    // Unregister service workers
     if ("serviceWorker" in navigator) {
       try {
         const registrations = await navigator.serviceWorker.getRegistrations();
@@ -235,16 +518,8 @@ const Settings: React.FC = () => {
     return urlMap;
   }, []);
 
-  /**
-   * Get CSS class for an RPC tag based on metadata endpoint properties
-   * - rpc-tracking: has tracking (tracking !== "none") → yellow
-   * - rpc-opensource: no tracking + open source → green
-   * - rpc-private: no tracking + not open source → light green
-   * - no class: URL not found in metadata (user-added)
-   */
   const getRpcTagClass = useCallback(
     (url: string): string => {
-      // Personal API key URLs have tracking enabled
       if (isInfuraUrl(url) || isAlchemyUrl(url)) return "rpc-tracking";
       const ep = metadataUrlMap.get(url);
       if (!ep) return "";
@@ -255,10 +530,6 @@ const Settings: React.FC = () => {
     [metadataUrlMap],
   );
 
-  /**
-   * Get display label for an RPC tag.
-   * Priority: Infura/Alchemy personal → metadata provider name → hostname from URL
-   */
   const getRpcTagLabel = useCallback(
     (url: string): string => {
       if (isInfuraUrl(url)) return "Infura Personal";
@@ -278,17 +549,13 @@ const Settings: React.FC = () => {
     navigator.clipboard.writeText(url);
   }, []);
 
-  // Handle setting OpenScan as MetaMask default explorer
-  // networkId: CAIP-2 format, chainId: numeric for MetaMask API
   const handleSetMetaMaskExplorer = useCallback(
     async (networkId: string, chainId: number | undefined) => {
-      // MetaMask only supports EVM networks with numeric chainId
       if (chainId === undefined) return;
 
       const network = enabledNetworks.find((n) => n.networkId === networkId);
       if (!network) return;
 
-      // Get the RPC URLs for this network from context (now keyed by networkId)
       const networkRpcUrls = rpcUrls[networkId] || [];
 
       setMetamaskStatus((prev) => ({ ...prev, [networkId]: "loading" }));
@@ -395,103 +662,17 @@ const Settings: React.FC = () => {
       }
       const sorted = sortRpcsByQuality(urls, resultsMap, metadataUrlMap);
       updateField(chainId, sorted.join(","));
-      setRpcUrls({ ...rpcUrls, [chainId]: sorted });
       setSyncingChain(null);
     },
-    [getLocalRpcArray, metadataUrlMap, updateField, setRpcUrls, rpcUrls],
+    [getLocalRpcArray, metadataUrlMap, updateField],
   );
 
-  const save = () => {
-    // Convert comma-separated strings into arrays for each networkId
-    const parsed: RpcUrlsContextType = Object.keys(localRpc).reduce((acc, networkId) => {
-      const val = localRpc[networkId];
-      if (typeof val === "string") {
-        const arr = val
-          .split(",")
-          .map((s) => s.trim())
-          .filter(Boolean);
-        acc[networkId] = arr;
-      } else if (val !== undefined) {
-        acc[networkId] = val;
-      }
-      return acc;
-    }, {} as RpcUrlsContextType);
-
-    // Get previous API keys from settings
-    const prevInfuraKey = settings.apiKeys?.infura || "";
-    const prevAlchemyKey = settings.apiKeys?.alchemy || "";
-
-    // Process each EVM chain to add/remove provider URLs (Infura/Alchemy only support EVM)
-    // Map chainId to networkId (CAIP-2 format: "eip155:<chainId>")
-    for (const chainId of Object.keys(INFURA_NETWORKS).map(Number)) {
-      const networkId = `eip155:${chainId}`;
-      let urls: string[] = (parsed[networkId] as string[]) || [];
-
-      // Handle Infura
-      const oldInfuraUrl = prevInfuraKey ? getInfuraUrl(chainId, prevInfuraKey) : null;
-      const newInfuraUrl = localApiKeys.infura ? getInfuraUrl(chainId, localApiKeys.infura) : null;
-
-      // Remove old Infura URL if key changed or removed
-      if (oldInfuraUrl && oldInfuraUrl !== newInfuraUrl) {
-        urls = urls.filter((u) => u !== oldInfuraUrl);
-      }
-      // Add new Infura URL if key added and not already present
-      if (newInfuraUrl && !urls.includes(newInfuraUrl)) {
-        urls = [newInfuraUrl, ...urls];
-      }
-
-      parsed[networkId] = urls;
-    }
-
-    for (const chainId of Object.keys(ALCHEMY_NETWORKS).map(Number)) {
-      const networkId = `eip155:${chainId}`;
-      let urls: string[] = (parsed[networkId] as string[]) || [];
-
-      // Handle Alchemy
-      const oldAlchemyUrl = prevAlchemyKey ? getAlchemyUrl(chainId, prevAlchemyKey) : null;
-      const newAlchemyUrl = localApiKeys.alchemy
-        ? getAlchemyUrl(chainId, localApiKeys.alchemy)
-        : null;
-
-      // Remove old Alchemy URL if key changed or removed
-      if (oldAlchemyUrl && oldAlchemyUrl !== newAlchemyUrl) {
-        urls = urls.filter((u) => u !== oldAlchemyUrl);
-      }
-      // Add new Alchemy URL if key added and not already present
-      if (newAlchemyUrl && !urls.includes(newAlchemyUrl)) {
-        urls = [newAlchemyUrl, ...urls];
-      }
-
-      parsed[networkId] = urls;
-    }
-
-    // Save API keys to settings
-    updateSettings({
-      apiKeys: {
-        infura: localApiKeys.infura || undefined,
-        alchemy: localApiKeys.alchemy || undefined,
-        etherscan: localApiKeys.etherscan || undefined,
-        groq: localApiKeys.groq || undefined,
-        openai: localApiKeys.openai || undefined,
-        anthropic: localApiKeys.anthropic || undefined,
-        perplexity: localApiKeys.perplexity || undefined,
-        gemini: localApiKeys.gemini || undefined,
-      },
-    });
-
-    setRpcUrls(parsed);
-    setSaveSuccess(true);
-    setTimeout(() => setSaveSuccess(false), 3000);
-  };
-
-  // Get enabled networks from config
-  // Use networkId as primary key for RPC storage, keep chainId for EVM-specific features
   const chainConfigs = useMemo(() => {
     return getEnabledNetworks().map((network) => {
       const chainId = getChainIdFromNetwork(network);
       return {
-        id: network.networkId, // Primary key for RPC storage (CAIP-2 format)
-        chainId: chainId, // Keep chainId separate for EVM-specific features (Infura, Alchemy, MetaMask)
+        id: network.networkId,
+        chainId: chainId,
         name: network.name,
         type: network.type,
       };
@@ -503,21 +684,18 @@ const Settings: React.FC = () => {
     (providerId) => providerId !== primaryAIProviderId,
   );
 
+  const autoSaveMessage =
+    autoSaveState === "saving"
+      ? "Saving…"
+      : autoSaveState === "saved"
+        ? "Saved"
+        : "Auto-save enabled";
+
   return (
     <>
-      {/* Fixed Toast Notifications */}
-      {(saveSuccess || cacheCleared) && (
+      {cacheCleared && (
         <div className="settings-toast-container">
-          {saveSuccess && (
-            <div className="settings-toast settings-toast-success">
-              ✓ {t("toasts.settingsSaved")}
-            </div>
-          )}
-          {cacheCleared && (
-            <div className="settings-toast settings-toast-success">
-              ✓ {t("toasts.cacheCleared")}
-            </div>
-          )}
+          <div className="settings-toast settings-toast-success">✓ {t("toasts.cacheCleared")}</div>
         </div>
       )}
 
@@ -525,649 +703,738 @@ const Settings: React.FC = () => {
         <div className="page-card settings-container">
           <h1 className="page-title-small">{t("pageTitle")}</h1>
 
-          {/* Settings Grid: 2x2 layout */}
-          <div className="settings-grid">
-            {/* Appearance Settings Section */}
-            <div className="settings-section no-margin">
-              <h2 className="settings-section-title">🎨 {t("appearance.title")}</h2>
-              <p className="settings-section-description">{t("appearance.description")}</p>
-
-              <div className="settings-item">
-                <div>
-                  <div className="settings-item-label">
-                    {t("appearance.backgroundBlocks.label")}
-                  </div>
-                  <div className="settings-item-description">
-                    {t("appearance.backgroundBlocks.description")}
-                  </div>
-                </div>
-                <label className="settings-toggle">
-                  <input
-                    type="checkbox"
-                    checked={settings.showBackgroundBlocks ?? true}
-                    onChange={(e) => updateSettings({ showBackgroundBlocks: e.target.checked })}
-                    className="settings-toggle-input"
-                  />
-                  <span
-                    className={`settings-toggle-slider ${settings.showBackgroundBlocks ? "active" : ""}`}
-                  >
-                    <span
-                      className={`settings-toggle-knob ${settings.showBackgroundBlocks ? "active" : ""}`}
-                    />
-                  </span>
-                </label>
-              </div>
-            </div>
-
-            {/* Language Settings Section */}
-            <div className="settings-section no-margin">
-              <h2 className="settings-section-title">🌐 {t("language.title")}</h2>
-              <p className="settings-section-description">{t("language.description")}</p>
-
-              <div className="settings-item">
-                <div>
-                  <div className="settings-item-label">{t("language.label")}</div>
-                  <div className="settings-item-description">{t("language.selectDescription")}</div>
-                </div>
-                <select
-                  value={i18n.language}
-                  onChange={(e) => i18n.changeLanguage(e.target.value)}
-                  className="settings-select"
-                >
-                  {SUPPORTED_LANGUAGES.map((lang) => (
-                    <option key={lang.code} value={lang.code}>
-                      {lang.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            {/* Cache & Data Section */}
-            <div className="settings-section no-margin">
-              <h2 className="settings-section-title">🗑️ {t("cacheData.title")}</h2>
-              <p className="settings-section-description">{t("cacheData.description")}</p>
-
-              <div className="settings-item">
-                <div>
-                  <div className="settings-item-label">{t("cacheData.clearCache.label")}</div>
-                  <div className="settings-item-description">
-                    {t("cacheData.clearCache.description")}
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  className="settings-clear-cache-button"
-                  onClick={clearAllCaches}
-                >
-                  🗑️ {t("cacheData.clearCache.button")}
-                </button>
-              </div>
-              <br />
-              <div className="settings-item">
-                <div>
-                  <div className="settings-item-label">{t("cacheData.clearSiteData.label")}</div>
-                  <div className="settings-item-description">
-                    {t("cacheData.clearSiteData.description")}
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  className="settings-clear-site-data-button"
-                  onClick={clearSiteData}
-                >
-                  ⚠️ {t("cacheData.clearSiteData.button")}
-                </button>
-              </div>
-            </div>
-
-            {/* RPC Strategy Section */}
-            <div className="settings-section no-margin">
-              <h2 className="settings-section-title">⚡ {t("rpcStrategy.title")}</h2>
-              <p className="settings-section-description">{t("rpcStrategy.description")}</p>
-
-              <div className="settings-item">
-                <div>
-                  <div className="settings-item-label">
-                    {t("rpcStrategy.requestStrategy.label")}
-                  </div>
-                  <div className="settings-item-description">
-                    <strong>Fallback:</strong> {t("rpcStrategy.requestStrategy.fallbackDesc")}
-                    <br />
-                    <strong>Parallel:</strong> {t("rpcStrategy.requestStrategy.parallelDesc")}
-                    <br />
-                    <strong>Race:</strong> {t("rpcStrategy.requestStrategy.raceDesc")}
-                  </div>
-                </div>
-                <select
-                  value={settings.rpcStrategy || "fallback"}
-                  onChange={(e) =>
-                    updateSettings({
-                      rpcStrategy: e.target.value as "fallback" | "parallel" | "race",
-                    })
-                  }
-                  className="settings-select"
-                >
-                  <option value="fallback">{t("rpcStrategy.requestStrategy.fallback")}</option>
-                  <option value="parallel">{t("rpcStrategy.requestStrategy.parallel")}</option>
-                  <option value="race">{t("rpcStrategy.requestStrategy.race")}</option>
-                </select>
-              </div>
-
-              {/* Max Parallel Requests - Only show when parallel mode is active */}
-              {(settings.rpcStrategy === "parallel" || settings.rpcStrategy === "race") && (
-                <div className="settings-item">
-                  <div>
-                    <div className="settings-item-label">
-                      {t("rpcStrategy.maxParallelRequests.label")}
-                    </div>
-                    <div className="settings-item-description">
-                      {t("rpcStrategy.maxParallelRequests.description")}
-                    </div>
-                  </div>
-                  <select
-                    value={settings.maxParallelRequests ?? 3}
-                    onChange={(e) =>
-                      updateSettings({
-                        maxParallelRequests: Number(e.target.value),
-                      })
-                    }
-                    className="settings-select"
-                  >
-                    <option value={1}>{t("rpcStrategy.maxParallelRequests.option1")}</option>
-                    <option value={2}>{t("rpcStrategy.maxParallelRequests.option2")}</option>
-                    <option value={3}>{t("rpcStrategy.maxParallelRequests.option3")}</option>
-                    <option value={5}>{t("rpcStrategy.maxParallelRequests.option5")}</option>
-                    <option value={10}>{t("rpcStrategy.maxParallelRequests.option10")}</option>
-                    <option value={0}>
-                      {t("rpcStrategy.maxParallelRequests.optionUnlimited")}
-                    </option>
-                  </select>
-                </div>
-              )}
-            </div>
-
-            {/* API Keys Section */}
-            <div className="settings-section no-margin">
-              <h2 className="settings-section-title">🔑 {t("apiKeys.title")}</h2>
-              <p className="settings-section-description">{t("apiKeys.description")}</p>
-
-              <div className="settings-api-key-item">
-                <div className="settings-api-key-header">
-                  <span className="settings-api-key-name">{t("apiKeys.infura.name")}</span>
-                  <a
-                    href="https://app.infura.io/dashboard"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="settings-api-key-link"
-                  >
-                    {t("apiKeys.infura.getKey")} →
-                  </a>
-                </div>
-                <div className="settings-api-key-input-wrapper">
-                  <input
-                    type={showApiKeys.infura ? "text" : "password"}
-                    className="settings-rpc-input"
-                    value={localApiKeys.infura}
-                    onChange={(e) =>
-                      setLocalApiKeys((prev) => ({ ...prev, infura: e.target.value }))
-                    }
-                    placeholder={t("apiKeys.infura.placeholder")}
-                  />
-                  <button
-                    type="button"
-                    className="settings-api-key-toggle"
-                    onClick={() => setShowApiKeys((prev) => ({ ...prev, infura: !prev.infura }))}
-                    title={showApiKeys.infura ? t("apiKeys.toggleHide") : t("apiKeys.toggleShow")}
-                  >
-                    {showApiKeys.infura ? "👁️" : "👁️‍🗨️"}
-                  </button>
-                </div>
-              </div>
-
-              <div className="settings-api-key-item">
-                <div className="settings-api-key-header">
-                  <span className="settings-api-key-name">{t("apiKeys.alchemy.name")}</span>
-                  <a
-                    href="https://dashboard.alchemy.com/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="settings-api-key-link"
-                  >
-                    {t("apiKeys.alchemy.getKey")} →
-                  </a>
-                </div>
-                <div className="settings-api-key-input-wrapper">
-                  <input
-                    type={showApiKeys.alchemy ? "text" : "password"}
-                    className="settings-rpc-input"
-                    value={localApiKeys.alchemy}
-                    onChange={(e) =>
-                      setLocalApiKeys((prev) => ({ ...prev, alchemy: e.target.value }))
-                    }
-                    placeholder={t("apiKeys.alchemy.placeholder")}
-                  />
-                  <button
-                    type="button"
-                    className="settings-api-key-toggle"
-                    onClick={() => setShowApiKeys((prev) => ({ ...prev, alchemy: !prev.alchemy }))}
-                    title={showApiKeys.alchemy ? t("apiKeys.toggleHide") : t("apiKeys.toggleShow")}
-                  >
-                    {showApiKeys.alchemy ? "👁️" : "👁️‍🗨️"}
-                  </button>
-                </div>
-              </div>
-
-              <div className="settings-api-key-item">
-                <div className="settings-api-key-header">
-                  <span className="settings-api-key-name">{t("apiKeys.etherscan.name")}</span>
-                  <a
-                    href="https://etherscan.io/myapikey"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="settings-api-key-link"
-                  >
-                    {t("apiKeys.etherscan.getKey")} →
-                  </a>
-                </div>
-                <div className="settings-api-key-input-wrapper">
-                  <input
-                    type={showApiKeys.etherscan ? "text" : "password"}
-                    className="settings-rpc-input"
-                    value={localApiKeys.etherscan}
-                    onChange={(e) =>
-                      setLocalApiKeys((prev) => ({ ...prev, etherscan: e.target.value }))
-                    }
-                    placeholder={t("apiKeys.etherscan.placeholder")}
-                  />
-                  <button
-                    type="button"
-                    className="settings-api-key-toggle"
-                    onClick={() =>
-                      setShowApiKeys((prev) => ({ ...prev, etherscan: !prev.etherscan }))
-                    }
-                    title={
-                      showApiKeys.etherscan ? t("apiKeys.toggleHide") : t("apiKeys.toggleShow")
-                    }
-                  >
-                    {showApiKeys.etherscan ? "👁️" : "👁️‍🗨️"}
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* AI Provider API Keys */}
-            <div className="settings-section no-margin">
-              <h2 className="settings-section-title">🤖 {t("apiKeys.aiTitle")}</h2>
-              <p className="settings-section-description">{t("apiKeys.aiDescription")}</p>
-
-              <div className="settings-api-key-item">
-                <div className="settings-api-key-header">
-                  <span className="settings-api-key-name">
-                    {t(`apiKeys.${primaryAIProviderId}.name`)}
-                  </span>
-                  <a
-                    href={AI_PROVIDERS[primaryAIProviderId].keyUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="settings-api-key-link"
-                  >
-                    {t(`apiKeys.${primaryAIProviderId}.getKey`)} →
-                  </a>
-                </div>
-                <div className="settings-api-key-input-wrapper">
-                  <input
-                    type={showApiKeys[primaryAIProviderId] ? "text" : "password"}
-                    className="settings-rpc-input"
-                    value={localApiKeys[primaryAIProviderId]}
-                    onChange={(e) =>
-                      setLocalApiKeys((prev) => ({
-                        ...prev,
-                        [primaryAIProviderId]: e.target.value,
-                      }))
-                    }
-                    placeholder={t(`apiKeys.${primaryAIProviderId}.placeholder`)}
-                  />
-                  <button
-                    type="button"
-                    className="settings-api-key-toggle"
-                    onClick={() =>
-                      setShowApiKeys((prev) => ({
-                        ...prev,
-                        [primaryAIProviderId]: !prev[primaryAIProviderId],
-                      }))
-                    }
-                    title={
-                      showApiKeys[primaryAIProviderId]
-                        ? t("apiKeys.toggleHide")
-                        : t("apiKeys.toggleShow")
-                    }
-                  >
-                    {showApiKeys[primaryAIProviderId] ? "👁️" : "👁️‍🗨️"}
-                  </button>
-                </div>
-              </div>
-
-              <button
-                type="button"
-                className="settings-section-collapse-button"
-                onClick={() => setAiKeysExpanded((prev) => !prev)}
-                aria-expanded={aiKeysExpanded}
-                aria-controls="settings-ai-other-providers"
+          <div className="settings-tabs-shell">
+            <div className="settings-tabs-mobile">
+              <select
+                value={activeTab}
+                onChange={(e) => handleTabChange(e.target.value as SettingsTab)}
+                className="settings-tabs-mobile-select"
               >
-                {aiKeysExpanded ? t("apiKeys.aiProvidersHide") : t("apiKeys.aiProvidersShow")}{" "}
-                <span aria-hidden="true">{aiKeysExpanded ? "▲" : "▼"}</span>
-              </button>
+                {SETTINGS_TABS.map((tab) => (
+                  <option key={tab.id} value={tab.id}>
+                    {tab.label}
+                  </option>
+                ))}
+              </select>
+              <span className="settings-tabs-mobile-arrow">▼</span>
+            </div>
 
-              {aiKeysExpanded && (
-                <div id="settings-ai-other-providers" className="settings-ai-other-providers">
-                  {otherAIProviderIds.map((providerId) => {
-                    const provider = AI_PROVIDERS[providerId];
-                    return (
-                      <div key={providerId} className="settings-api-key-item">
-                        <div className="settings-api-key-header">
-                          <span className="settings-api-key-name">
-                            {t(`apiKeys.${providerId}.name`)}
-                          </span>
-                          <a
-                            href={provider.keyUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="settings-api-key-link"
-                          >
-                            {t(`apiKeys.${providerId}.getKey`)} →
-                          </a>
+            <div className="settings-tabs" role="tablist" aria-label="Settings tabs">
+              {SETTINGS_TABS.map((tab) => (
+                <button
+                  key={tab.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={activeTab === tab.id}
+                  aria-controls={`settings-panel-${tab.id}`}
+                  id={`settings-tab-${tab.id}`}
+                  className={`settings-tab ${activeTab === tab.id ? "active" : ""}`}
+                  onClick={() => handleTabChange(tab.id)}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="settings-tab-panel-wrap">
+            {activeTab === "display" && (
+              <div
+                id="settings-panel-display"
+                className="settings-tab-panel"
+                role="tabpanel"
+                aria-labelledby="settings-tab-display"
+              >
+                <div className="settings-grid settings-tab-grid">
+                  <div className="settings-section no-margin">
+                    <h2 className="settings-section-title">🎨 {t("appearance.title")}</h2>
+                    <p className="settings-section-description">{t("appearance.description")}</p>
+
+                    <div className="settings-item">
+                      <div>
+                        <div className="settings-item-label">
+                          {t("appearance.backgroundBlocks.label")}
                         </div>
-                        <div className="settings-api-key-input-wrapper">
-                          <input
-                            type={showApiKeys[providerId] ? "text" : "password"}
-                            className="settings-rpc-input"
-                            value={localApiKeys[providerId]}
-                            onChange={(e) =>
-                              setLocalApiKeys((prev) => ({
-                                ...prev,
-                                [providerId]: e.target.value,
-                              }))
-                            }
-                            placeholder={t(`apiKeys.${providerId}.placeholder`)}
-                          />
-                          <button
-                            type="button"
-                            className="settings-api-key-toggle"
-                            onClick={() =>
-                              setShowApiKeys((prev) => ({
-                                ...prev,
-                                [providerId]: !prev[providerId],
-                              }))
-                            }
-                            title={
-                              showApiKeys[providerId]
-                                ? t("apiKeys.toggleHide")
-                                : t("apiKeys.toggleShow")
-                            }
-                          >
-                            {showApiKeys[providerId] ? "👁️" : "👁️‍🗨️"}
-                          </button>
+                        <div className="settings-item-description">
+                          {t("appearance.backgroundBlocks.description")}
                         </div>
                       </div>
-                    );
-                  })}
-                </div>
-              )}
-
-              <div className="settings-item">
-                <div>
-                  <div className="settings-item-label">{t("apiKeys.promptVersion.label")}</div>
-                  <div className="settings-item-description">
-                    {t("apiKeys.promptVersion.description")}
-                  </div>
-                </div>
-                <select
-                  value={settings.promptVersion || "stable"}
-                  onChange={(e) =>
-                    updateSettings({ promptVersion: e.target.value as PromptVersion })
-                  }
-                  className="settings-select"
-                >
-                  <option value="stable">{t("apiKeys.promptVersion.stable")}</option>
-                  <option value="latest">{t("apiKeys.promptVersion.latest")}</option>
-                </select>
-              </div>
-            </div>
-            {/* Super User Section - only visible in super user mode */}
-            {isSuperUser && (
-              <div className="settings-section no-margin">
-                <h2 className="settings-section-title">{t("superUser.title")}</h2>
-                <p className="settings-section-description">{t("superUser.description")}</p>
-
-                <div className="settings-item">
-                  <div>
-                    <div className="settings-item-label">
-                      {t("superUser.persistentCache.sizeLimit.label")}
-                    </div>
-                    <div className="settings-item-description">
-                      {t("superUser.persistentCache.sizeLimit.description")}
+                      <label className="settings-toggle">
+                        <input
+                          type="checkbox"
+                          checked={settings.showBackgroundBlocks ?? true}
+                          onChange={(e) =>
+                            updateSettings({ showBackgroundBlocks: e.target.checked })
+                          }
+                          className="settings-toggle-input"
+                        />
+                        <span
+                          className={`settings-toggle-slider ${settings.showBackgroundBlocks ? "active" : ""}`}
+                        >
+                          <span
+                            className={`settings-toggle-knob ${settings.showBackgroundBlocks ? "active" : ""}`}
+                          />
+                        </span>
+                      </label>
                     </div>
                   </div>
-                  <select
-                    value={settings.persistentCacheSizeMB ?? 10}
-                    onChange={(e) =>
-                      updateSettings({ persistentCacheSizeMB: Number(e.target.value) })
-                    }
-                    className="settings-select"
-                  >
-                    <option value={5}>5 MB</option>
-                    <option value={10}>10 MB</option>
-                    <option value={25}>25 MB</option>
-                    <option value={50}>50 MB</option>
-                    <option value={100}>100 MB</option>
-                  </select>
-                </div>
 
-                <div className="settings-item">
-                  <div>
-                    <div className="settings-item-label">
-                      {t("superUser.persistentCache.label")}
-                    </div>
-                    <div className="settings-item-description">
-                      {t("superUser.persistentCache.usage", {
-                        used: `${(persistentCacheBytes / (1024 * 1024)).toFixed(2)} MB`,
-                        limit: `${settings.persistentCacheSizeMB ?? 10} MB`,
-                      })}
+                  <div className="settings-section no-margin">
+                    <h2 className="settings-section-title">🌐 {t("language.title")}</h2>
+                    <p className="settings-section-description">{t("language.description")}</p>
+
+                    <div className="settings-item">
+                      <div>
+                        <div className="settings-item-label">{t("language.label")}</div>
+                        <div className="settings-item-description">
+                          {t("language.selectDescription")}
+                        </div>
+                      </div>
+                      <select
+                        value={i18n.language}
+                        onChange={(e) => i18n.changeLanguage(e.target.value)}
+                        className="settings-select"
+                      >
+                        {SUPPORTED_LANGUAGES.map((lang) => (
+                          <option key={lang.code} value={lang.code}>
+                            {lang.name}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                   </div>
-                  <button
-                    type="button"
-                    className="settings-clear-cache-button"
-                    onClick={() => {
-                      clearPersistentCache();
-                      setPersistentCacheBytes(0);
-                    }}
-                  >
-                    {t("superUser.persistentCache.clear.button")}
-                  </button>
                 </div>
               </div>
             )}
-          </div>
 
-          {/* Save Button - positioned after general settings */}
-          <div className="settings-save-section">
-            <button type="button" onClick={save} className="settings-save-button">
-              💾 {t("saveConfiguration")}
-            </button>
-          </div>
+            {activeTab === "providers" && (
+              <div
+                id="settings-panel-providers"
+                className="settings-tab-panel"
+                role="tabpanel"
+                aria-labelledby="settings-tab-providers"
+              >
+                <div className="settings-autosave-row">
+                  <span className={`settings-autosave-pill ${autoSaveState}`}>
+                    {autoSaveMessage}
+                  </span>
+                </div>
 
-          {/* RPC Configuration Section */}
-          <div className="settings-section">
-            <div className="settings-section-title-row">
-              <h2 className="settings-section-title">🔗 {t("rpcEndpoints.title")}</h2>
-              <Link to="/rpcs" className="settings-section-link">
-                {t("rpcEndpoints.testEndpoints")} →
-              </Link>
-            </div>
-            <p className="settings-section-description">{t("rpcEndpoints.description")}</p>
+                <div className="settings-grid settings-tab-grid">
+                  <div className="settings-section no-margin">
+                    <h2 className="settings-section-title">🔑 {t("apiKeys.title")}</h2>
+                    <p className="settings-section-description">{t("apiKeys.description")}</p>
 
-            <div className="flex-start settings-rpc-legend">
-              <span className="settings-rpc-tag rpc-opensource">
-                {t("rpcEndpoints.legendOpensource")}
-              </span>
-              <span className="settings-rpc-tag rpc-private">
-                {t("rpcEndpoints.legendPrivate")}
-              </span>
-              <span className="settings-rpc-tag rpc-tracking">
-                {t("rpcEndpoints.legendTracking")}
-              </span>
-            </div>
-
-            <div className="flex-column settings-chain-list">
-              {chainConfigs.map((chain) => {
-                const isExpanded = expandedChains.has(chain.id);
-                const rpcCount = getLocalRpcArray(chain.id).length;
-
-                return (
-                  <div key={chain.id} className="settings-chain-item">
-                    {/* Collapsible Header */}
-                    <div className="settings-chain-header">
-                      <button
-                        type="button"
-                        className="settings-chain-header-toggle"
-                        onClick={() => toggleChainExpanded(chain.id)}
-                      >
-                        <span className={`settings-chain-chevron ${isExpanded ? "expanded" : ""}`}>
-                          ▶
-                        </span>
-                        <span className="settings-chain-name-text">{chain.name}</span>
-                        <span className="settings-chain-id-badge">
-                          {chain.chainId !== undefined ? `Chain ${chain.chainId}` : chain.id}
-                        </span>
-                      </button>
-                      {isMetaMaskAvailable && chain.chainId !== undefined && (
+                    <div className="settings-api-key-item">
+                      <div className="settings-api-key-header">
+                        <span className="settings-api-key-name">{t("apiKeys.infura.name")}</span>
+                        <a
+                          href="https://app.infura.io/dashboard"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="settings-api-key-link"
+                        >
+                          {t("apiKeys.infura.getKey")} →
+                        </a>
+                      </div>
+                      <div className="settings-api-key-input-wrapper">
+                        <input
+                          type={showApiKeys.infura ? "text" : "password"}
+                          className="settings-rpc-input"
+                          value={localApiKeys.infura}
+                          onChange={(e) =>
+                            setLocalApiKeys((prev) => ({ ...prev, infura: e.target.value }))
+                          }
+                          placeholder={t("apiKeys.infura.placeholder")}
+                        />
                         <button
                           type="button"
-                          className={`settings-metamask-button ${metamaskStatus[chain.id] === "success" ? "success" : ""} ${metamaskStatus[chain.id] === "loading" ? "loading" : ""}`}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleSetMetaMaskExplorer(chain.id, chain.chainId);
-                          }}
-                          disabled={
-                            !isSupported(chain.chainId) || metamaskStatus[chain.id] === "loading"
+                          className="settings-api-key-toggle"
+                          onClick={() =>
+                            setShowApiKeys((prev) => ({ ...prev, infura: !prev.infura }))
                           }
                           title={
-                            !isSupported(chain.chainId)
-                              ? t("rpcEndpoints.metamask.notSupported")
-                              : metamaskStatus[chain.id] === "success"
-                                ? t("rpcEndpoints.metamask.configured")
-                                : t("rpcEndpoints.metamask.setDefault")
+                            showApiKeys.infura ? t("apiKeys.toggleHide") : t("apiKeys.toggleShow")
                           }
                         >
-                          <MetaMaskIcon size={16} />
-                          <span>
-                            {metamaskStatus[chain.id] === "loading"
-                              ? t("rpcEndpoints.metamask.configuring")
-                              : metamaskStatus[chain.id] === "success"
-                                ? t("rpcEndpoints.metamask.configuredText")
-                                : t("rpcEndpoints.metamask.useAsDefault")}
-                          </span>
+                          {showApiKeys.infura ? "👁️" : "👁️‍🗨️"}
                         </button>
-                      )}
-                      <button
-                        type="button"
-                        className={`settings-sync-button ${syncingChain === chain.id ? "loading" : ""}`}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleSyncRpcs(chain.id, chain.type);
-                        }}
-                        disabled={syncingChain !== null || rpcCount < 2}
-                        title={t("rpcEndpoints.syncRpcs")}
-                      >
-                        {syncingChain === chain.id
-                          ? t("rpcEndpoints.syncing")
-                          : t("rpcEndpoints.syncRpcs")}
-                      </button>
-                      <span className="settings-chain-rpc-count">
-                        {rpcCount} RPC{rpcCount !== 1 ? "s" : ""}
-                      </span>
+                      </div>
                     </div>
 
-                    {/* Collapsible Content */}
-                    {isExpanded && (
-                      <div className="settings-chain-content">
+                    <div className="settings-api-key-item">
+                      <div className="settings-api-key-header">
+                        <span className="settings-api-key-name">{t("apiKeys.alchemy.name")}</span>
+                        <a
+                          href="https://dashboard.alchemy.com/"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="settings-api-key-link"
+                        >
+                          {t("apiKeys.alchemy.getKey")} →
+                        </a>
+                      </div>
+                      <div className="settings-api-key-input-wrapper">
                         <input
+                          type={showApiKeys.alchemy ? "text" : "password"}
                           className="settings-rpc-input"
-                          value={getLocalRpcString(chain.id)}
-                          onChange={(e) => updateField(chain.id, e.target.value)}
-                          placeholder="https://eth-mainnet.g.alchemy.com/v2/YOUR-API-KEY"
+                          value={localApiKeys.alchemy}
+                          onChange={(e) =>
+                            setLocalApiKeys((prev) => ({ ...prev, alchemy: e.target.value }))
+                          }
+                          placeholder={t("apiKeys.alchemy.placeholder")}
                         />
+                        <button
+                          type="button"
+                          className="settings-api-key-toggle"
+                          onClick={() =>
+                            setShowApiKeys((prev) => ({ ...prev, alchemy: !prev.alchemy }))
+                          }
+                          title={
+                            showApiKeys.alchemy ? t("apiKeys.toggleHide") : t("apiKeys.toggleShow")
+                          }
+                        >
+                          {showApiKeys.alchemy ? "👁️" : "👁️‍🗨️"}
+                        </button>
+                      </div>
+                    </div>
 
-                        {/* Help text for localhost network */}
-                        {chain.chainId === 31337 && (
-                          <div className="settings-help-text">
-                            💡 {t("rpcEndpoints.localhostHelp")}{" "}
-                            <a
-                              href="https://dashboard.ngrok.com/get-started/setup"
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="settings-link"
-                            >
-                              {t("rpcEndpoints.localhostHelpLink")}
-                            </a>
-                          </div>
-                        )}
+                    <div className="settings-api-key-item">
+                      <div className="settings-api-key-header">
+                        <span className="settings-api-key-name">{t("apiKeys.etherscan.name")}</span>
+                        <a
+                          href="https://etherscan.io/myapikey"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="settings-api-key-link"
+                        >
+                          {t("apiKeys.etherscan.getKey")} →
+                        </a>
+                      </div>
+                      <div className="settings-api-key-input-wrapper">
+                        <input
+                          type={showApiKeys.etherscan ? "text" : "password"}
+                          className="settings-rpc-input"
+                          value={localApiKeys.etherscan}
+                          onChange={(e) =>
+                            setLocalApiKeys((prev) => ({ ...prev, etherscan: e.target.value }))
+                          }
+                          placeholder={t("apiKeys.etherscan.placeholder")}
+                        />
+                        <button
+                          type="button"
+                          className="settings-api-key-toggle"
+                          onClick={() =>
+                            setShowApiKeys((prev) => ({ ...prev, etherscan: !prev.etherscan }))
+                          }
+                          title={
+                            showApiKeys.etherscan
+                              ? t("apiKeys.toggleHide")
+                              : t("apiKeys.toggleShow")
+                          }
+                        >
+                          {showApiKeys.etherscan ? "👁️" : "👁️‍🗨️"}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
 
-                        {/* Display current RPC list as tags */}
-                        {(() => {
-                          const rpcArray = getLocalRpcArray(chain.id);
-                          if (rpcArray.length === 0) return null;
+                  <div className="settings-section no-margin">
+                    <h2 className="settings-section-title">🤖 {t("apiKeys.aiTitle")}</h2>
+                    <p className="settings-section-description">{t("apiKeys.aiDescription")}</p>
+
+                    <div className="settings-api-key-item">
+                      <div className="settings-api-key-header">
+                        <span className="settings-api-key-name">
+                          {t(`apiKeys.${primaryAIProviderId}.name`)}
+                        </span>
+                        <a
+                          href={AI_PROVIDERS[primaryAIProviderId].keyUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="settings-api-key-link"
+                        >
+                          {t(`apiKeys.${primaryAIProviderId}.getKey`)} →
+                        </a>
+                      </div>
+                      <div className="settings-api-key-input-wrapper">
+                        <input
+                          type={showApiKeys[primaryAIProviderId] ? "text" : "password"}
+                          className="settings-rpc-input"
+                          value={localApiKeys[primaryAIProviderId]}
+                          onChange={(e) =>
+                            setLocalApiKeys((prev) => ({
+                              ...prev,
+                              [primaryAIProviderId]: e.target.value,
+                            }))
+                          }
+                          placeholder={t(`apiKeys.${primaryAIProviderId}.placeholder`)}
+                        />
+                        <button
+                          type="button"
+                          className="settings-api-key-toggle"
+                          onClick={() =>
+                            setShowApiKeys((prev) => ({
+                              ...prev,
+                              [primaryAIProviderId]: !prev[primaryAIProviderId],
+                            }))
+                          }
+                          title={
+                            showApiKeys[primaryAIProviderId]
+                              ? t("apiKeys.toggleHide")
+                              : t("apiKeys.toggleShow")
+                          }
+                        >
+                          {showApiKeys[primaryAIProviderId] ? "👁️" : "👁️‍🗨️"}
+                        </button>
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      className="settings-section-collapse-button"
+                      onClick={() => setAiKeysExpanded((prev) => !prev)}
+                      aria-expanded={aiKeysExpanded}
+                      aria-controls="settings-ai-other-providers"
+                    >
+                      {aiKeysExpanded ? t("apiKeys.aiProvidersHide") : t("apiKeys.aiProvidersShow")}{" "}
+                      <span aria-hidden="true">{aiKeysExpanded ? "▲" : "▼"}</span>
+                    </button>
+
+                    {aiKeysExpanded && (
+                      <div id="settings-ai-other-providers" className="settings-ai-other-providers">
+                        {otherAIProviderIds.map((providerId) => {
+                          const provider = AI_PROVIDERS[providerId];
                           return (
-                            <div className="flex-column settings-rpc-list">
-                              <span className="settings-rpc-list-label">
-                                {t("rpcEndpoints.currentRPCs")}
-                              </span>
-                              <div className="flex-start settings-rpc-tags">
-                                {rpcArray.map((url, idx) => (
-                                  // biome-ignore lint/a11y/noStaticElementInteractions: Drag-and-drop requires these handlers
-                                  <div
-                                    key={url}
-                                    className={`settings-rpc-tag ${getRpcTagClass(url)} ${draggedItem?.networkId === chain.id && draggedItem?.index === idx ? "dragging" : ""}`}
-                                    title={url}
-                                    draggable
-                                    onDragStart={() => handleDragStart(chain.id, idx)}
-                                    onDragOver={handleDragOver}
-                                    onDrop={() => handleDrop(chain.id, idx)}
-                                    onDragEnd={() => setDraggedItem(null)}
-                                    onClick={() => copyToClipboard(url)}
-                                    onKeyDown={(e) => {
-                                      if (e.key === "Enter" || e.key === " ") copyToClipboard(url);
-                                    }}
-                                  >
-                                    <span className="settings-rpc-tag-index">{idx + 1}</span>
-                                    <span className="settings-rpc-tag-provider">
-                                      {getRpcTagLabel(url)}
-                                    </span>
-                                    <button
-                                      type="button"
-                                      className="settings-rpc-tag-delete"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        deleteRpc(chain.id, idx);
-                                      }}
-                                      title={t("rpcEndpoints.removeRpc")}
-                                    >
-                                      ×
-                                    </button>
-                                  </div>
-                                ))}
+                            <div key={providerId} className="settings-api-key-item">
+                              <div className="settings-api-key-header">
+                                <span className="settings-api-key-name">
+                                  {t(`apiKeys.${providerId}.name`)}
+                                </span>
+                                <a
+                                  href={provider.keyUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="settings-api-key-link"
+                                >
+                                  {t(`apiKeys.${providerId}.getKey`)} →
+                                </a>
+                              </div>
+                              <div className="settings-api-key-input-wrapper">
+                                <input
+                                  type={showApiKeys[providerId] ? "text" : "password"}
+                                  className="settings-rpc-input"
+                                  value={localApiKeys[providerId]}
+                                  onChange={(e) =>
+                                    setLocalApiKeys((prev) => ({
+                                      ...prev,
+                                      [providerId]: e.target.value,
+                                    }))
+                                  }
+                                  placeholder={t(`apiKeys.${providerId}.placeholder`)}
+                                />
+                                <button
+                                  type="button"
+                                  className="settings-api-key-toggle"
+                                  onClick={() =>
+                                    setShowApiKeys((prev) => ({
+                                      ...prev,
+                                      [providerId]: !prev[providerId],
+                                    }))
+                                  }
+                                  title={
+                                    showApiKeys[providerId]
+                                      ? t("apiKeys.toggleHide")
+                                      : t("apiKeys.toggleShow")
+                                  }
+                                >
+                                  {showApiKeys[providerId] ? "👁️" : "👁️‍🗨️"}
+                                </button>
                               </div>
                             </div>
                           );
-                        })()}
+                        })}
                       </div>
                     )}
+
+                    <div className="settings-item">
+                      <div>
+                        <div className="settings-item-label">
+                          {t("apiKeys.promptVersion.label")}
+                        </div>
+                        <div className="settings-item-description">
+                          {t("apiKeys.promptVersion.description")}
+                        </div>
+                      </div>
+                      <select
+                        value={settings.promptVersion || "stable"}
+                        onChange={(e) =>
+                          updateSettings({ promptVersion: e.target.value as PromptVersion })
+                        }
+                        className="settings-select"
+                      >
+                        <option value="stable">{t("apiKeys.promptVersion.stable")}</option>
+                        <option value="latest">{t("apiKeys.promptVersion.latest")}</option>
+                      </select>
+                    </div>
                   </div>
-                );
-              })}
-            </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === "network" && (
+              <div
+                id="settings-panel-network"
+                className="settings-tab-panel"
+                role="tabpanel"
+                aria-labelledby="settings-tab-network"
+              >
+                <div className="settings-autosave-row">
+                  <span className={`settings-autosave-pill ${autoSaveState}`}>
+                    {autoSaveMessage}
+                  </span>
+                </div>
+
+                <div className="settings-section no-margin-bottom">
+                  <h2 className="settings-section-title">⚡ {t("rpcStrategy.title")}</h2>
+                  <p className="settings-section-description">{t("rpcStrategy.description")}</p>
+
+                  <div className="settings-item">
+                    <div>
+                      <div className="settings-item-label">
+                        {t("rpcStrategy.requestStrategy.label")}
+                      </div>
+                      <div className="settings-item-description">
+                        <strong>Fallback:</strong> {t("rpcStrategy.requestStrategy.fallbackDesc")}
+                        <br />
+                        <strong>Parallel:</strong> {t("rpcStrategy.requestStrategy.parallelDesc")}
+                        <br />
+                        <strong>Race:</strong> {t("rpcStrategy.requestStrategy.raceDesc")}
+                      </div>
+                    </div>
+                    <select
+                      value={settings.rpcStrategy || "fallback"}
+                      onChange={(e) =>
+                        updateSettings({
+                          rpcStrategy: e.target.value as "fallback" | "parallel" | "race",
+                        })
+                      }
+                      className="settings-select"
+                    >
+                      <option value="fallback">{t("rpcStrategy.requestStrategy.fallback")}</option>
+                      <option value="parallel">{t("rpcStrategy.requestStrategy.parallel")}</option>
+                      <option value="race">{t("rpcStrategy.requestStrategy.race")}</option>
+                    </select>
+                  </div>
+
+                  {(settings.rpcStrategy === "parallel" || settings.rpcStrategy === "race") && (
+                    <div className="settings-item">
+                      <div>
+                        <div className="settings-item-label">
+                          {t("rpcStrategy.maxParallelRequests.label")}
+                        </div>
+                        <div className="settings-item-description">
+                          {t("rpcStrategy.maxParallelRequests.description")}
+                        </div>
+                      </div>
+                      <select
+                        value={settings.maxParallelRequests ?? 3}
+                        onChange={(e) =>
+                          updateSettings({ maxParallelRequests: Number(e.target.value) })
+                        }
+                        className="settings-select"
+                      >
+                        <option value={1}>{t("rpcStrategy.maxParallelRequests.option1")}</option>
+                        <option value={2}>{t("rpcStrategy.maxParallelRequests.option2")}</option>
+                        <option value={3}>{t("rpcStrategy.maxParallelRequests.option3")}</option>
+                        <option value={5}>{t("rpcStrategy.maxParallelRequests.option5")}</option>
+                        <option value={10}>{t("rpcStrategy.maxParallelRequests.option10")}</option>
+                        <option value={0}>
+                          {t("rpcStrategy.maxParallelRequests.optionUnlimited")}
+                        </option>
+                      </select>
+                    </div>
+                  )}
+                </div>
+
+                <div className="settings-section">
+                  <div className="settings-section-title-row">
+                    <h2 className="settings-section-title">🔗 {t("rpcEndpoints.title")}</h2>
+                    <Link to="/rpcs" className="settings-section-link">
+                      {t("rpcEndpoints.testEndpoints")} →
+                    </Link>
+                  </div>
+                  <p className="settings-section-description">{t("rpcEndpoints.description")}</p>
+
+                  <div className="flex-start settings-rpc-legend">
+                    <span className="settings-rpc-tag rpc-opensource">
+                      {t("rpcEndpoints.legendOpensource")}
+                    </span>
+                    <span className="settings-rpc-tag rpc-private">
+                      {t("rpcEndpoints.legendPrivate")}
+                    </span>
+                    <span className="settings-rpc-tag rpc-tracking">
+                      {t("rpcEndpoints.legendTracking")}
+                    </span>
+                  </div>
+
+                  <div className="flex-column settings-chain-list">
+                    {chainConfigs.map((chain) => {
+                      const isExpanded = expandedChains.has(chain.id);
+                      const rpcCount = getLocalRpcArray(chain.id).length;
+
+                      return (
+                        <div key={chain.id} className="settings-chain-item">
+                          <div className="settings-chain-header">
+                            <button
+                              type="button"
+                              className="settings-chain-header-toggle"
+                              onClick={() => toggleChainExpanded(chain.id)}
+                            >
+                              <span
+                                className={`settings-chain-chevron ${isExpanded ? "expanded" : ""}`}
+                              >
+                                ▶
+                              </span>
+                              <span className="settings-chain-name-text">{chain.name}</span>
+                              <span className="settings-chain-id-badge">
+                                {chain.chainId !== undefined ? `Chain ${chain.chainId}` : chain.id}
+                              </span>
+                            </button>
+                            {isMetaMaskAvailable && chain.chainId !== undefined && (
+                              <button
+                                type="button"
+                                className={`settings-metamask-button ${metamaskStatus[chain.id] === "success" ? "success" : ""} ${metamaskStatus[chain.id] === "loading" ? "loading" : ""}`}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleSetMetaMaskExplorer(chain.id, chain.chainId);
+                                }}
+                                disabled={
+                                  !isSupported(chain.chainId) ||
+                                  metamaskStatus[chain.id] === "loading"
+                                }
+                                title={
+                                  !isSupported(chain.chainId)
+                                    ? t("rpcEndpoints.metamask.notSupported")
+                                    : metamaskStatus[chain.id] === "success"
+                                      ? t("rpcEndpoints.metamask.configured")
+                                      : t("rpcEndpoints.metamask.setDefault")
+                                }
+                              >
+                                <MetaMaskIcon size={16} />
+                                <span>
+                                  {metamaskStatus[chain.id] === "loading"
+                                    ? t("rpcEndpoints.metamask.configuring")
+                                    : metamaskStatus[chain.id] === "success"
+                                      ? t("rpcEndpoints.metamask.configuredText")
+                                      : t("rpcEndpoints.metamask.useAsDefault")}
+                                </span>
+                              </button>
+                            )}
+                            <button
+                              type="button"
+                              className={`settings-sync-button ${syncingChain === chain.id ? "loading" : ""}`}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleSyncRpcs(chain.id, chain.type);
+                              }}
+                              disabled={syncingChain !== null || rpcCount < 2}
+                              title={t("rpcEndpoints.syncRpcs")}
+                            >
+                              {syncingChain === chain.id
+                                ? t("rpcEndpoints.syncing")
+                                : t("rpcEndpoints.syncRpcs")}
+                            </button>
+                            <span className="settings-chain-rpc-count">
+                              {rpcCount} RPC{rpcCount !== 1 ? "s" : ""}
+                            </span>
+                          </div>
+
+                          {isExpanded && (
+                            <div className="settings-chain-content">
+                              <input
+                                className="settings-rpc-input"
+                                value={getLocalRpcString(chain.id)}
+                                onChange={(e) => updateField(chain.id, e.target.value)}
+                                placeholder="https://eth-mainnet.g.alchemy.com/v2/YOUR-API-KEY"
+                              />
+
+                              {chain.chainId === 31337 && (
+                                <div className="settings-help-text">
+                                  💡 {t("rpcEndpoints.localhostHelp")}{" "}
+                                  <a
+                                    href="https://dashboard.ngrok.com/get-started/setup"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="settings-link"
+                                  >
+                                    {t("rpcEndpoints.localhostHelpLink")}
+                                  </a>
+                                </div>
+                              )}
+
+                              {(() => {
+                                const rpcArray = getLocalRpcArray(chain.id);
+                                if (rpcArray.length === 0) return null;
+                                return (
+                                  <div className="flex-column settings-rpc-list">
+                                    <span className="settings-rpc-list-label">
+                                      {t("rpcEndpoints.currentRPCs")}
+                                    </span>
+                                    <div className="flex-start settings-rpc-tags">
+                                      {rpcArray.map((url, idx) => (
+                                        <div
+                                          key={url}
+                                          className={`settings-rpc-tag ${getRpcTagClass(url)} ${draggedItem?.networkId === chain.id && draggedItem?.index === idx ? "dragging" : ""}`}
+                                          title={url}
+                                          draggable
+                                          onDragStart={() => handleDragStart(chain.id, idx)}
+                                          onDragOver={handleDragOver}
+                                          onDrop={() => handleDrop(chain.id, idx)}
+                                          onDragEnd={() => setDraggedItem(null)}
+                                          onClick={() => copyToClipboard(url)}
+                                          onKeyDown={(e) => {
+                                            if (e.key === "Enter" || e.key === " ")
+                                              copyToClipboard(url);
+                                          }}
+                                        >
+                                          <span className="settings-rpc-tag-index">{idx + 1}</span>
+                                          <span className="settings-rpc-tag-provider">
+                                            {getRpcTagLabel(url)}
+                                          </span>
+                                          <button
+                                            type="button"
+                                            className="settings-rpc-tag-delete"
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              deleteRpc(chain.id, idx);
+                                            }}
+                                            title={t("rpcEndpoints.removeRpc")}
+                                          >
+                                            ×
+                                          </button>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
+                                );
+                              })()}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === "advanced" && (
+              <div
+                id="settings-panel-advanced"
+                className="settings-tab-panel"
+                role="tabpanel"
+                aria-labelledby="settings-tab-advanced"
+              >
+                <div className="settings-grid settings-tab-grid">
+                  <div className="settings-section no-margin">
+                    <h2 className="settings-section-title">🗑️ {t("cacheData.title")}</h2>
+                    <p className="settings-section-description">{t("cacheData.description")}</p>
+
+                    <div className="settings-item">
+                      <div>
+                        <div className="settings-item-label">{t("cacheData.clearCache.label")}</div>
+                        <div className="settings-item-description">
+                          {t("cacheData.clearCache.description")}
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        className="settings-clear-cache-button"
+                        onClick={clearAllCaches}
+                      >
+                        🗑️ {t("cacheData.clearCache.button")}
+                      </button>
+                    </div>
+
+                    <br />
+
+                    <div className="settings-item">
+                      <div>
+                        <div className="settings-item-label">
+                          {t("cacheData.clearSiteData.label")}
+                        </div>
+                        <div className="settings-item-description">
+                          {t("cacheData.clearSiteData.description")}
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        className="settings-clear-site-data-button"
+                        onClick={clearSiteData}
+                      >
+                        ⚠️ {t("cacheData.clearSiteData.button")}
+                      </button>
+                    </div>
+                  </div>
+
+                  {isSuperUser && (
+                    <div className="settings-section no-margin">
+                      <h2 className="settings-section-title">{t("superUser.title")}</h2>
+                      <p className="settings-section-description">{t("superUser.description")}</p>
+
+                      <div className="settings-item">
+                        <div>
+                          <div className="settings-item-label">
+                            {t("superUser.persistentCache.sizeLimit.label")}
+                          </div>
+                          <div className="settings-item-description">
+                            {t("superUser.persistentCache.sizeLimit.description")}
+                          </div>
+                        </div>
+                        <select
+                          value={settings.persistentCacheSizeMB ?? 10}
+                          onChange={(e) =>
+                            updateSettings({ persistentCacheSizeMB: Number(e.target.value) })
+                          }
+                          className="settings-select"
+                        >
+                          <option value={5}>5 MB</option>
+                          <option value={10}>10 MB</option>
+                          <option value={25}>25 MB</option>
+                          <option value={50}>50 MB</option>
+                          <option value={100}>100 MB</option>
+                        </select>
+                      </div>
+
+                      <div className="settings-item">
+                        <div>
+                          <div className="settings-item-label">
+                            {t("superUser.persistentCache.label")}
+                          </div>
+                          <div className="settings-item-description">
+                            {t("superUser.persistentCache.usage", {
+                              used: `${(persistentCacheBytes / (1024 * 1024)).toFixed(2)} MB`,
+                              limit: `${settings.persistentCacheSizeMB ?? 10} MB`,
+                            })}
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          className="settings-clear-cache-button"
+                          onClick={() => {
+                            clearPersistentCache();
+                            setPersistentCacheBytes(0);
+                          }}
+                        >
+                          {t("superUser.persistentCache.clear.button")}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
