@@ -392,6 +392,9 @@ const Settings: React.FC = () => {
         window.clearTimeout(saveTimerRef.current);
         saveTimerRef.current = null;
       }
+      if (autoSaveState === "saving") {
+        setAutoSaveState("idle");
+      }
       return;
     }
 
@@ -411,7 +414,7 @@ const Settings: React.FC = () => {
         window.clearTimeout(saveTimerRef.current);
       }
     };
-  }, [activeTab, currentDraft, localApiKeys, localRpc, persistConfiguration]);
+  }, [activeTab, autoSaveState, currentDraft, localApiKeys, localRpc, persistConfiguration]);
 
   useEffect(() => {
     return () => {
@@ -721,12 +724,7 @@ const Settings: React.FC = () => {
         : "Auto-save enabled";
 
   const hasUnsavedChanges = currentDraft !== lastSavedDraftRef.current;
-  const providersSaveMessage =
-    autoSaveState === "saving"
-      ? "Saving…"
-      : hasUnsavedChanges
-        ? "Unsaved changes"
-        : "All changes saved";
+  const providersSaveMessage = hasUnsavedChanges ? "Unsaved changes" : "All changes saved";
 
   const handleSaveProviders = useCallback(() => {
     setAutoSaveState("saving");
@@ -858,7 +856,7 @@ const Settings: React.FC = () => {
               >
                 <div className="settings-providers-save-row">
                   <span
-                    className={`settings-autosave-pill ${!hasUnsavedChanges ? "saved" : autoSaveState}`}
+                    className={`settings-autosave-pill ${hasUnsavedChanges ? "idle" : "saved"}`}
                   >
                     {providersSaveMessage}
                   </span>
@@ -866,7 +864,7 @@ const Settings: React.FC = () => {
                     type="button"
                     className="settings-save-button"
                     onClick={handleSaveProviders}
-                    disabled={!hasUnsavedChanges || autoSaveState === "saving"}
+                    disabled={!hasUnsavedChanges}
                   >
                     {t("saveConfiguration")}
                   </button>
