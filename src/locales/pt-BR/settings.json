@@ -27,6 +27,20 @@
       "description": "Limpar todos os dados incluindo configurações, configurações RPC e chaves de API.",
       "button": "Limpar Dados do Site",
       "confirmMessage": "Isso vai limpar todas as configurações, configurações RPC, chaves de API e dados em cache. A página será recarregada. Continuar?"
+    },
+    "exportConfig": {
+      "label": "Exportar Configuração",
+      "description": "Baixar todas as configurações, configurações RPC e chaves de API como arquivo JSON.",
+      "button": "Exportar",
+      "sensitiveWarning": "O arquivo exportado contém dados sensíveis (chaves de API). Armazene-o com segurança. Continuar?"
+    },
+    "importConfig": {
+      "label": "Importar Configuração",
+      "description": "Restaurar configurações de um arquivo JSON exportado anteriormente.",
+      "button": "Importar",
+      "confirmMessage": "Isso vai sobrescrever todas as configurações atuais, configurações RPC e chaves de API. Continuar?",
+      "invalidFile": "Arquivo de configuração inválido. Selecione um JSON de configuração OpenScan válido.",
+      "success": "Configuração importada com sucesso!"
     }
   },
   "rpcStrategy": {
