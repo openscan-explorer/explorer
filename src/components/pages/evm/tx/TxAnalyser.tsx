@@ -951,6 +951,15 @@ const TxAnalyser: React.FC<TxAnalyserProps> = ({
   const defaultTab: AnalyserTab = hasEvents ? "events" : hasInputData ? "inputData" : "callTree";
   const [activeTab, setActiveTab] = useState<AnalyserTab>(defaultTab);
 
+  // Reset to a base tab when leaving super user mode
+  // biome-ignore lint/correctness/useExhaustiveDependencies: only react to isSuperUser changes
+  useEffect(() => {
+    if (!isSuperUser) {
+      const superTabs: AnalyserTab[] = ["callTree", "gasProfiler", "stateChanges"];
+      setActiveTab((prev) => (superTabs.includes(prev) ? defaultTab : prev));
+    }
+  }, [isSuperUser]);
+
   const [callTree, setCallTree] = useState<CallNode | null>(null);
   const [prestateTrace, setPrestateTrace] = useState<PrestateTrace | null>(null);
   const [loadingCallTree, setLoadingCallTree] = useState(false);
