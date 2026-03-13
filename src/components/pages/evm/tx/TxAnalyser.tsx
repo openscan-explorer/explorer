@@ -1,5 +1,5 @@
 import type React from "react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import type { EthLog } from "@openscan/network-connectors";
@@ -11,7 +11,8 @@ import type {
 } from "../../../../services/adapters/NetworkAdapter";
 import { useCallTreeEnrichment } from "../../../../hooks/useCallTreeEnrichment";
 import { countByType, countCalls, countReverts, hexToGas } from "../../../../utils/callTreeUtils";
-import type { ContractInfo } from "../../../../utils/contractLookup";
+import { type ContractInfo, fetchContractInfoBatch } from "../../../../utils/contractLookup";
+import { useSettings } from "../../../../context/SettingsContext";
 import {
   type DecodedEvent,
   decodeEventLog,
@@ -958,7 +959,52 @@ const TxAnalyser: React.FC<TxAnalyserProps> = ({
   const [prestateError, setPrestateError] = useState<string | null>(null);
 
   // Contract name + ABI enrichment for the call tree
-  const { contracts, enrichmentLoading } = useCallTreeEnrichment(callTree, networkId);
+  const { contracts: treeContracts, enrichmentLoading } = useCallTreeEnrichment(
+    callTree,
+    networkId,
+  );
+
+  // Enrich log addresses independently (works for all users, not just super)
+  const { settings } = useSettings();
+  const [logContracts, setLogContracts] = useState<Record<string, ContractInfo>>({});
+  const [logEnrichmentDone, setLogEnrichmentDone] = useState(false);
+  const logAbortRef = useRef<AbortController | null>(null);
+
+  // Stable key: sorted unique addresses from logs
+  const logAddresses = logs
+    ? Array.from(new Set(logs.map((l) => l.address?.toLowerCase()).filter(Boolean) as string[]))
+    : [];
+  const logAddressKey = logAddresses.join(",");
+
+  useEffect(() => {
+    if (!logAddressKey || !networkId) {
+      setLogEnrichmentDone(true);
+      return;
+    }
+
+    const addresses = logAddressKey.split(",");
+
+    logAbortRef.current?.abort();
+    const controller = new AbortController();
+    logAbortRef.current = controller;
+
+    setLogEnrichmentDone(false);
+
+    const chainId = Number(networkId);
+    fetchContractInfoBatch(addresses, chainId, controller.signal, settings.apiKeys?.etherscan)
+      .then((map) => {
+        if (!controller.signal.aborted) setLogContracts(map);
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setLogEnrichmentDone(true);
+      });
+
+    return () => controller.abort();
+  }, [logAddressKey, networkId, settings.apiKeys?.etherscan]);
+
+  // Merge tree + log contracts (tree contracts take priority since they include call tree addresses)
+  const contracts = { ...logContracts, ...treeContracts };
+  const logEnrichmentLoading = !!(logs && logs.length > 0) && !logEnrichmentDone;
 
   const isUnsupported = useCallback((msg: string) => {
     return /method not found|not supported|unsupported|does not exist/i.test(msg);
@@ -1158,13 +1204,20 @@ const TxAnalyser: React.FC<TxAnalyserProps> = ({
         )}
 
         {activeTab === "events" && logs && logs.length > 0 && (
-          <EventLogsTab
-            logs={logs}
-            networkId={networkId}
-            txToAddress={txToAddress}
-            contractAbi={contractAbi}
-            contracts={contracts}
-          />
+          <>
+            {logEnrichmentLoading && (
+              <div className="analyser-loading">{t("analyser.enriching")}</div>
+            )}
+            {!logEnrichmentLoading && (
+              <EventLogsTab
+                logs={logs}
+                networkId={networkId}
+                txToAddress={txToAddress}
+                contractAbi={contractAbi}
+                contracts={contracts}
+              />
+            )}
+          </>
         )}
 
         {activeTab === "inputData" && inputData && inputData !== "0x" && (

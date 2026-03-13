@@ -26,13 +26,23 @@ export async function fetchContractInfo(
   // ── Sourcify V2 ──────────────────────────────────────────────────────────
   try {
     const res = await fetch(
-      `https://sourcify.dev/server/v2/contract/${chainId}/${address}?fields=abi,compilation`,
+      `https://sourcify.dev/server/v2/contract/${chainId}/${address}?fields=abi,compilation,proxyResolution`,
       { signal },
     );
     if (res.ok) {
       const data = await res.json();
       const name = data?.compilation?.name;
-      const abi = data?.abi;
+      let abi = data?.abi;
+
+      // If this is a proxy, fetch the implementation ABI and merge it
+      const implAddr = data?.proxyResolution?.implementations?.[0]?.address;
+      if (implAddr) {
+        const implInfo = await fetchContractInfo(implAddr, chainId, signal, etherscanKey);
+        if (implInfo?.abi) {
+          abi = abi ? [...abi, ...implInfo.abi] : implInfo.abi;
+        }
+      }
+
       if (abi || name) {
         const info: ContractInfo = { name, abi };
         cache.set(cacheKey, info);
