@@ -27,6 +27,20 @@
       "description": "設定、RPC設定、APIキーを含むすべてのデータをクリアします。",
       "button": "サイトデータをクリア",
       "confirmMessage": "これにより、すべての設定、RPC設定、APIキー、キャッシュデータがクリアされます。ページが再読み込みされます。続行しますか？"
+    },
+    "exportConfig": {
+      "label": "設定をエクスポート",
+      "description": "すべての設定、RPC設定、APIキーをJSONファイルとしてダウンロードします。",
+      "button": "エクスポート",
+      "sensitiveWarning": "エクスポートされたファイルには機密データ（APIキー）が含まれています。安全に保管してください。続行しますか？"
+    },
+    "importConfig": {
+      "label": "設定をインポート",
+      "description": "以前エクスポートしたJSONファイルから設定を復元します。",
+      "button": "インポート",
+      "confirmMessage": "現在のすべての設定、RPC設定、APIキーが上書きされます。続行しますか？",
+      "invalidFile": "無効な設定ファイルです。有効なOpenScan設定JSONを選択してください。",
+      "success": "設定が正常にインポートされました！"
     }
   },
   "rpcStrategy": {

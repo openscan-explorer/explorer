@@ -27,6 +27,20 @@
       "description": "Clear all data including settings, RPC configs, and API keys.",
       "button": "Clear Site Data",
       "confirmMessage": "This will clear all settings, RPC configurations, API keys, and cached data. The page will reload. Continue?"
+    },
+    "exportConfig": {
+      "label": "Export Configuration",
+      "description": "Download all settings, RPC configs, and API keys as a JSON file.",
+      "button": "Export",
+      "sensitiveWarning": "The exported file contains sensitive data (API keys). Store it securely. Continue?"
+    },
+    "importConfig": {
+      "label": "Import Configuration",
+      "description": "Restore settings from a previously exported JSON file.",
+      "button": "Import",
+      "confirmMessage": "This will overwrite all current settings, RPC configurations, and API keys. Continue?",
+      "invalidFile": "Invalid configuration file. Please select a valid OpenScan config JSON.",
+      "success": "Configuration imported successfully!"
     }
   },
   "rpcStrategy": {

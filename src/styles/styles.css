@@ -5217,6 +5217,11 @@ code {
   color: white;
 }
 
+.settings-toast-error {
+  background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+  color: white;
+}
+
 @keyframes slideDown {
   from {
     opacity: 0;
