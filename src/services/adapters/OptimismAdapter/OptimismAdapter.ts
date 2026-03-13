@@ -1,4 +1,6 @@
 import { type BlockNumberOrTag, NetworkAdapter, type TraceResult } from "../NetworkAdapter";
+import type { CallNode, PrestateTrace } from "../NetworkAdapter";
+import { normalizeGethCallTrace } from "../../../utils/callTreeUtils";
 import type { Block, Transaction, Address, NetworkStats, DataWithMetadata } from "../../../types";
 import { logger } from "../../../utils/logger";
 import {
@@ -288,6 +290,28 @@ export class OptimismAdapter extends NetworkAdapter {
       return result.data;
     } catch (error) {
       logger.error("Error getting block trace:", error);
+      return null;
+    }
+  }
+  async getAnalyserCallTrace(txHash: string): Promise<CallNode | null> {
+    try {
+      const result = await this.client.debugTraceTransaction(txHash, { tracer: "callTracer" });
+      return result.data ? normalizeGethCallTrace(result.data) : null;
+    } catch (error) {
+      logger.error("Error getting analyser call trace:", error);
+      return null;
+    }
+  }
+
+  async getAnalyserPrestateTrace(txHash: string): Promise<PrestateTrace | null> {
+    try {
+      const result = await this.client.debugTraceTransaction(txHash, {
+        tracer: "prestateTracer",
+        tracerConfig: { diffMode: true },
+      });
+      return (result.data as PrestateTrace) ?? null;
+    } catch (error) {
+      logger.error("Error getting analyser prestate trace:", error);
       return null;
     }
   }

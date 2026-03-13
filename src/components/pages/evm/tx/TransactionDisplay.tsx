@@ -9,6 +9,8 @@ import { getNetworkById } from "../../../../config/networks";
 import { AppContext } from "../../../../context";
 import { useSourcify } from "../../../../hooks/useSourcify";
 import { useTransactionPreAnalysis } from "../../../../hooks/useTransactionPreAnalysis";
+import { useSettings } from "../../../../context/SettingsContext";
+import TxAnalyser from "./TxAnalyser";
 import type { DataService } from "../../../../services/DataService";
 import {
   fetchToken,
@@ -30,12 +32,7 @@ import type {
   TransactionReceiptArbitrum,
   TransactionReceiptOptimism,
 } from "../../../../types";
-import {
-  type DecodedEvent,
-  decodeEventLog,
-  formatDecodedValue,
-  getEventTypeColor,
-} from "../../../../utils/eventDecoder";
+import { type DecodedEvent, decodeEventLog } from "../../../../utils/eventDecoder";
 import {
   type DecodedInput,
   decodeEventWithAbi,
@@ -63,6 +60,7 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
     onProviderSelect,
   }) => {
     const { t } = useTranslation("transaction");
+    const { isSuperUser } = useSettings();
     const network = networkId ? getNetworkById(networkId) : undefined;
     const networkName = network?.name ?? "Unknown Network";
     const networkCurrency = network?.currency ?? "ETH";
@@ -73,7 +71,6 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
     const [callTargetTokenListMatch, setCallTargetTokenListMatch] = useState<TokenListItem | null>(
       null,
     );
-    const [showEventLogs, setShowEventLogs] = useState(false);
     const [showTrace, setShowTrace] = useState(false);
     const [traceData, setTraceData] = useState<TraceResult | null>(null);
     // biome-ignore lint/suspicious/noExplicitAny: <TODO>
@@ -778,223 +775,24 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
               </div>
             )}
 
-            {/* Event Logs Section - Collapsible, closed by default */}
-            {transaction.receipt && transaction.receipt.logs.length > 0 && (
-              <div className="tx-section event-logs-section">
-                <button
-                  type="button"
-                  className="tx-section-header tx-section-header-toggle"
-                  onClick={() => setShowEventLogs(!showEventLogs)}
-                >
-                  <span className="tx-section-title">
-                    {t("eventLogs")} ({transaction.receipt.logs.length})
-                  </span>
-                  <span className="tx-section-chevron">{showEventLogs ? "▲" : "▼"}</span>
-                </button>
-                {showEventLogs && (
-                  <div className="tx-logs">
-                    {/** biome-ignore lint/suspicious/noExplicitAny: <TODO> */}
-                    {transaction.receipt.logs.map((log: any, index: number) => {
-                      // Try ABI-based decoding first if log is from tx.to and we have contract data
-                      let decoded: DecodedEvent | null = null;
-                      let abiDecoded: DecodedInput | null = null;
-
-                      const isFromTxRecipient =
-                        transaction.to &&
-                        log.address &&
-                        log.address.toLowerCase() === transaction.to.toLowerCase();
-
-                      if (isFromTxRecipient && contractData?.abi && log.topics) {
-                        abiDecoded = decodeEventWithAbi(
-                          log.topics,
-                          log.data || "0x",
-                          contractData.abi,
-                        );
-                      }
-
-                      // Fallback to standard event lookup
-                      if (!abiDecoded && log.topics) {
-                        decoded = decodeEventLog(log.topics, log.data || "0x");
-                      }
-
-                      // Determine which decoded data to display
-                      const hasDecoded = abiDecoded || decoded;
-                      const displayName = abiDecoded?.functionName || decoded?.name;
-                      const displaySignature = abiDecoded?.signature || decoded?.fullSignature;
-                      const displayParams = abiDecoded?.params || decoded?.params || [];
-
-                      return (
-                        // biome-ignore lint/suspicious/noArrayIndexKey: <TODO>
-                        <div key={index} className="tx-log">
-                          <div className="tx-log-index">{index}</div>
-                          <div className="tx-log-content">
-                            {/* Decoded Event Header */}
-                            {hasDecoded && (
-                              <div className="tx-log-decoded">
-                                <span
-                                  className="tx-event-badge"
-                                  style={
-                                    {
-                                      "--event-color": abiDecoded
-                                        ? "#10b981"
-                                        : getEventTypeColor(decoded?.type || ""),
-                                    } as React.CSSProperties
-                                  }
-                                >
-                                  {displayName}
-                                </span>
-                                <span
-                                  className="tx-event-signature"
-                                  title={decoded?.description || displaySignature}
-                                >
-                                  {displaySignature}
-                                </span>
-                                {abiDecoded && (
-                                  <span className="tx-abi-badge" title="Decoded using contract ABI">
-                                    {t("logsAbi")}
-                                  </span>
-                                )}
-                              </div>
-                            )}
-
-                            {/* Address */}
-                            <div className="tx-log-row">
-                              <span className="tx-log-label">{t("logsAddress")}</span>
-                              <span className="tx-log-value tx-mono">
-                                {networkId ? (
-                                  <Link
-                                    to={`/${networkId}/address/${log.address}`}
-                                    className="link-accent"
-                                  >
-                                    {log.address}
-                                  </Link>
-                                ) : (
-                                  log.address
-                                )}
-                              </span>
-                            </div>
-
-                            {/* Decoded Parameters */}
-                            {displayParams.length > 0 && (
-                              <div className="tx-log-row tx-log-params">
-                                <span className="tx-log-label">{t("logsDecoded")}</span>
-                                <div className="tx-log-value">
-                                  {displayParams.map((param, i) => (
-                                    // biome-ignore lint/suspicious/noArrayIndexKey: <TODO>
-                                    <div key={i} className="tx-decoded-param">
-                                      <span className="tx-param-name">{param.name}</span>
-                                      <span className="tx-param-type">({param.type})</span>
-                                      <span
-                                        className={`tx-param-value ${param.type === "address" ? "tx-mono" : ""}`}
-                                      >
-                                        {param.type === "address" && networkId ? (
-                                          <Link
-                                            to={`/${networkId}/address/${param.value}`}
-                                            className="link-accent"
-                                          >
-                                            {param.value}
-                                          </Link>
-                                        ) : (
-                                          formatDecodedValue(param.value, param.type)
-                                        )}
-                                      </span>
-                                      {param.indexed && (
-                                        <span className="tx-param-indexed">{t("logsIndexed")}</span>
-                                      )}
-                                    </div>
-                                  ))}
-                                </div>
-                              </div>
-                            )}
-
-                            {/* Raw Topics (collapsed if decoded) */}
-                            {log.topics && log.topics.length > 0 && (
-                              <div className="tx-log-row tx-log-topics">
-                                <span className="tx-log-label">
-                                  {hasDecoded ? t("logsRawTopics") : t("logsTopics")}
-                                </span>
-                                <div className="tx-log-value">
-                                  {log.topics.map((topic: string, i: number) => (
-                                    <div key={topic} className="tx-topic">
-                                      <span className="tx-topic-index">[{i}]</span>
-                                      <code className="tx-topic-value">{topic}</code>
-                                    </div>
-                                  ))}
-                                </div>
-                              </div>
-                            )}
-
-                            {/* Raw Data */}
-                            {log.data && log.data !== "0x" && (
-                              <div className="tx-log-row">
-                                <span className="tx-log-label">
-                                  {hasDecoded ? t("logsRawData") : t("logsData")}
-                                </span>
-                                <div className="tx-log-value">
-                                  <code className="tx-log-data">{log.data}</code>
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Full-width rows: long content */}
-            {/* Input Data */}
-            <div className="tx-row tx-row-vertical">
-              <span className="tx-label">{t("inputData")}</span>
-              {transaction.data && transaction.data !== "0x" ? (
-                <div className="tx-input-data">
-                  <code>{transaction.data}</code>
-                </div>
-              ) : (
-                <span className="tx-empty">0x</span>
-              )}
-            </div>
-
-            {/* Decoded Input Data */}
-            {decodedInput && (
-              <div className="tx-row tx-row-vertical">
-                <span className="tx-label">{t("decodedInput")}</span>
-                <div className="tx-decoded-input">
-                  <div className="tx-decoded-function">
-                    <span className="tx-function-badge">{decodedInput.functionName}</span>
-                    <span className="tx-function-signature">{decodedInput.signature}</span>
-                  </div>
-                  {decodedInput.params.length > 0 && (
-                    <div className="tx-decoded-params">
-                      {decodedInput.params.map((param, i) => (
-                        // biome-ignore lint/suspicious/noArrayIndexKey: params have stable order
-                        <div key={i} className="tx-decoded-param">
-                          <span className="tx-param-name">{param.name}</span>
-                          <span className="tx-param-type">({param.type})</span>
-                          <span
-                            className={`tx-param-value ${param.type === "address" ? "tx-mono" : ""}`}
-                          >
-                            {param.type === "address" && networkId ? (
-                              <Link
-                                to={`/${networkId}/address/${param.value}`}
-                                className="link-accent"
-                              >
-                                {param.value}
-                              </Link>
-                            ) : (
-                              formatDecodedValue(param.value, param.type)
-                            )}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
+            {/* Event Logs + Input Data are now always in TX Analyser */}
           </div>
+
+          {/* TX Analyser — always shown; super user mode unlocks advanced tabs */}
+          {dataService && networkId && (
+            <TxAnalyser
+              txHash={transaction.hash}
+              networkId={networkId}
+              networkCurrency={networkCurrency}
+              dataService={dataService}
+              logs={transaction.receipt?.logs}
+              txToAddress={transaction.to}
+              contractAbi={contractData?.abi}
+              inputData={transaction.data}
+              decodedInputData={decodedInput}
+              isSuperUser={isSuperUser}
+            />
+          )}
 
           {/* Debug Trace Section (Localhost Only) */}
           {isTraceAvailable && (
