@@ -107,10 +107,11 @@ export function countByType(node: CallNode): Record<string, number> {
   return counts;
 }
 
-/** Collect all unique `to` addresses from a call tree (lowercased) */
+/** Collect all unique addresses from a call tree (lowercased) */
 export function collectAddresses(node: CallNode): string[] {
   const addrs = new Set<string>();
   function traverse(n: CallNode) {
+    if (n.from) addrs.add(n.from.toLowerCase());
     if (n.to) addrs.add(n.to.toLowerCase());
     n.calls?.forEach(traverse);
   }

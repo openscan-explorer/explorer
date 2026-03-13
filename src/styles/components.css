@@ -1022,14 +1022,14 @@ button.tx-section-header-toggle {
 	color: var(--color-primary);
 	font-weight: 600;
 	text-decoration: none;
-	font-family: "monospace";
+	font-family: monospace;
 	font-size: 0.85rem;
 	word-break: break-all;
 	flex: 1;
 }
 
 .list-item-hash-plain {
-	font-family: "monospace";
+	font-family: monospace;
 	font-size: 0.85rem;
 	word-break: break-all;
 	flex: 1;
@@ -1247,7 +1247,7 @@ button.tx-section-header-toggle {
 	font-size: 1.2rem;
 	color: var(--color-primary);
 	font-weight: 600;
-	font-family: "monospace";
+	font-family: monospace;
 }
 
 /* Network Cards (for About page) */
@@ -1295,7 +1295,7 @@ button.tx-section-header-toggle {
 
 .network-chain-id {
 	font-size: 0.85rem;
-	font-family: "monospace";
+	font-family: monospace;
 	color: var(--text-secondary);
 }
 
@@ -1546,7 +1546,7 @@ button.tx-section-header-toggle {
 	background: var(--color-primary-alpha-10);
 	border: 1px solid var(--color-primary-alpha-30);
 	border-radius: 8px;
-	font-family: "monospace";
+	font-family: monospace;
 	font-size: 0.85rem;
 	word-break: break-all;
 	color: var(--color-primary);
@@ -1559,7 +1559,7 @@ button.tx-section-header-toggle {
 	background: var(--overlay-light-3);
 	border: 1px solid var(--overlay-light-10);
 	border-radius: 8px;
-	font-family: "monospace";
+	font-family: monospace;
 	font-size: 0.75rem;
 	word-break: break-all;
 	max-height: 200px;
@@ -1571,7 +1571,7 @@ button.tx-section-header-toggle {
 	background: var(--color-primary-alpha-8);
 	border: 1px solid var(--color-primary-alpha-20);
 	border-radius: 6px 6px 0 0;
-	font-family: "monospace";
+	font-family: monospace;
 	font-size: 0.85rem;
 	color: var(--color-primary);
 	font-weight: 600;
@@ -1584,7 +1584,7 @@ button.tx-section-header-toggle {
 	border: 1px solid var(--color-primary-alpha-20);
 	border-top: none;
 	border-radius: 0 0 6px 6px;
-	font-family: "monospace";
+	font-family: monospace;
 	font-size: 0.75rem;
 	color: var(--text-primary);
 	max-height: 400px;
@@ -1607,7 +1607,7 @@ button.tx-section-header-toggle {
 	color: var(--color-info);
 	border-radius: 6px;
 	font-size: 0.8rem;
-	font-family: "monospace";
+	font-family: monospace;
 }
 
 .abi-badge-event {
@@ -1616,7 +1616,7 @@ button.tx-section-header-toggle {
 	color: var(--color-accent);
 	border-radius: 6px;
 	font-size: 0.8rem;
-	font-family: "monospace";
+	font-family: monospace;
 }
 
 .abi-badge-constructor {
@@ -1625,7 +1625,7 @@ button.tx-section-header-toggle {
 	color: var(--color-warning);
 	border-radius: 6px;
 	font-size: 0.8rem;
-	font-family: "monospace";
+	font-family: monospace;
 	display: inline-block;
 }
 
@@ -1723,13 +1723,13 @@ button.tx-section-header-toggle {
 }
 
 .log-value {
-	font-family: "monospace";
+	font-family: monospace;
 	color: var(--text-primary);
 	font-weight: 500;
 }
 
 .log-topic-item {
-	font-family: "monospace";
+	font-family: monospace;
 	font-size: 0.85rem;
 	margin-left: 10px;
 	color: var(--text-primary);
@@ -1756,7 +1756,7 @@ button.tx-section-header-toggle {
 	display: grid;
 	gap: 8px;
 	font-size: 0.85rem;
-	font-family: "monospace";
+	font-family: monospace;
 	color: var(--text-primary); 
 }
 
@@ -1790,7 +1790,7 @@ button.tx-section-header-toggle {
 	background: rgba(0, 0, 0, 0.02);
 	padding: 10px;
 	border-radius: 6px;
-	font-family: "monospace";
+	font-family: monospace;
 	font-size: 0.75rem;
 }
 
@@ -1949,7 +1949,7 @@ button.tx-section-header-toggle {
 
 .call-tree-node {
 	font-size: 0.82rem;
-	font-family: "monospace";
+	font-family: monospace;
 }
 
 .call-tree-node + .call-tree-node {
@@ -2056,7 +2056,7 @@ button.tx-section-header-toggle {
 	background: var(--bg-tertiary);
 	border-bottom: 1px solid var(--border-primary);
 	font-size: 0.85rem;
-	font-family: "monospace";
+	font-family: monospace;
 	font-weight: 600;
 }
 
@@ -2121,7 +2121,7 @@ button.tx-section-header-toggle {
 	gap: 8px;
 	padding: 7px 12px;
 	font-size: 0.8rem;
-	font-family: "monospace";
+	font-family: monospace;
 	border-bottom: 1px solid var(--border-primary);
 	flex-wrap: wrap;
 }
@@ -2408,7 +2408,7 @@ button.tx-section-header-toggle {
 	padding: 15px;
 	border-radius: 8px;
 	border: 1px solid var(--border-primary);
-	font-family: "monospace";
+	font-family: monospace;
 	font-size: 0.85rem;
 	word-break: break-all;
 	max-height: 300px;
@@ -2551,7 +2551,7 @@ button.tx-section-header-toggle {
 
 /* Address Display Specific */
 .address-block-number {
-	font-family: "monospace";
+	font-family: monospace;
 	font-size: 1.1rem;
 }
 
