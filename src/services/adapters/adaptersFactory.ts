@@ -15,8 +15,8 @@ import type {
   EthereumClient,
   OptimismClient,
   PolygonClient,
-  SupportedChainId,
 } from "@openscan/network-connectors";
+import type { AppChainId } from "../../types";
 
 // biome-ignore lint/complexity/noStaticOnlyClass: <TODO>
 export class AdapterFactory {
@@ -24,7 +24,7 @@ export class AdapterFactory {
    * Create an EVM network adapter
    */
   static createAdapter(
-    networkId: SupportedChainId | 11155111 | 97 | 31337,
+    networkId: AppChainId,
     client:
       | EthereumClient
       | OptimismClient
@@ -38,6 +38,7 @@ export class AdapterFactory {
       case 1:
       case 11155111:
       case 31337:
+      case 43114:
         return new EVMAdapter(networkId, client as EthereumClient);
       case 10:
         return new OptimismAdapter(networkId, client as OptimismClient);

@@ -187,6 +187,35 @@
     },
     {
       "type": "evm",
+      "networkId": "eip155:43114",
+      "slug": "avax",
+      "name": "Avalanche C-Chain",
+      "shortName": "Avalanche",
+      "description": "EVM-compatible smart contract platform with high throughput",
+      "currency": "AVAX",
+      "color": "#E84142",
+      "isTestnet": false,
+      "logo": "assets/networks/43114.svg",
+      "links": [
+        {
+          "name": "Website",
+          "url": "https://www.avax.network",
+          "description": "Official Avalanche website"
+        },
+        {
+          "name": "Docs",
+          "url": "https://docs.avax.network",
+          "description": "Developer documentation"
+        },
+        {
+          "name": "Bridge",
+          "url": "https://core.app/bridge",
+          "description": "Bridge assets to Avalanche"
+        }
+      ]
+    },
+    {
+      "type": "evm",
       "networkId": "eip155:11155111",
       "slug": "sepolia",
       "name": "Ethereum Sepolia",
