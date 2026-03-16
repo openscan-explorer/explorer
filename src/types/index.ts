@@ -74,6 +74,8 @@ export interface Transaction {
   gasPrice: string;
   maxFeePerGas?: string;
   maxPriorityFeePerGas?: string;
+  maxFeePerBlobGas?: string;
+  blobVersionedHashes?: string[];
   hash: string;
   nonce: string;
   to: string;
@@ -108,6 +110,8 @@ export interface TransactionReceipt {
   transactionHash: string;
   transactionIndex: string;
   type: string;
+  blobGasUsed?: string;
+  blobGasPrice?: string;
 }
 
 export interface TransactionReceiptArbitrum extends TransactionReceipt {

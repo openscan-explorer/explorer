@@ -42,8 +42,14 @@ export function transformBaseBlockToBlock(rpcBlock: BaseBlock): Block {
     totalDifficulty: rpcBlock.totalDifficulty
       ? BigInt(rpcBlock.totalDifficulty).toString()
       : BigInt(rpcBlock.difficulty).toString(),
-    blobGasUsed: "",
-    excessBlobGas: "",
+    blobGasUsed: (() => {
+      const val = (rpcBlock as unknown as Record<string, unknown>).blobGasUsed;
+      return typeof val === "string" && val !== "0x0" && val !== "0x" ? BigInt(val).toString() : "";
+    })(),
+    excessBlobGas: (() => {
+      const val = (rpcBlock as unknown as Record<string, unknown>).excessBlobGas;
+      return typeof val === "string" && val !== "0x0" && val !== "0x" ? BigInt(val).toString() : "";
+    })(),
     withdrawalsRoot: rpcBlock.withdrawalsRoot || "",
     withdrawals: rpcBlock.withdrawals
       ? rpcBlock.withdrawals.map((w) => ({
@@ -75,6 +81,10 @@ export function transformBaseTransactionToTransaction(
     maxPriorityFeePerGas: rpcTx.maxPriorityFeePerGas
       ? BigInt(rpcTx.maxPriorityFeePerGas).toString()
       : undefined,
+    maxFeePerBlobGas: rpcTx.maxFeePerBlobGas
+      ? BigInt(rpcTx.maxFeePerBlobGas).toString()
+      : undefined,
+    blobVersionedHashes: rpcTx.blobVersionedHashes,
     nonce: rpcTx.nonce ? parseInt(rpcTx.nonce, 16).toString() : "0",
     data: rpcTx.input,
     blockNumber: rpcTx.blockNumber ? parseInt(rpcTx.blockNumber, 16).toString() : "0",
@@ -106,6 +116,8 @@ export function transformBaseTransactionToTransaction(
       transactionHash: receipt.transactionHash,
       transactionIndex: parseInt(receipt.transactionIndex, 16).toString(),
       type: receipt.type,
+      blobGasUsed: receipt.blobGasUsed ? BigInt(receipt.blobGasUsed).toString() : undefined,
+      blobGasPrice: receipt.blobGasPrice ? BigInt(receipt.blobGasPrice).toString() : undefined,
       // Base-specific L1 fee fields (OP Stack compatible)
       l1Fee: receipt.l1Fee || "0",
       l1GasPrice: receipt.l1GasPrice || "0",

@@ -775,6 +775,62 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
               </div>
             )}
 
+            {/* EIP-4844 Blob Transaction fields */}
+            {transaction.type === "0x3" && (
+              <div className="tx-details-grid">
+                <div className="tx-details-column">
+                  {transaction.maxFeePerBlobGas && (
+                    <div className="tx-row tx-row-blob">
+                      <span className="tx-label">{t("maxFeePerBlobGas")}</span>
+                      <span className="tx-value">{formatGwei(transaction.maxFeePerBlobGas)}</span>
+                    </div>
+                  )}
+                  {transaction.receipt?.blobGasPrice && (
+                    <div className="tx-row tx-row-blob">
+                      <span className="tx-label">{t("blobGasPrice")}</span>
+                      <span className="tx-value">
+                        {formatGwei(transaction.receipt.blobGasPrice)}
+                      </span>
+                    </div>
+                  )}
+                </div>
+                <div className="tx-details-column">
+                  {transaction.receipt?.blobGasUsed && (
+                    <div className="tx-row tx-row-blob">
+                      <span className="tx-label">{t("blobGasUsed")}</span>
+                      <span className="tx-value">
+                        {Number(transaction.receipt.blobGasUsed).toLocaleString()}
+                      </span>
+                    </div>
+                  )}
+                  {transaction.blobVersionedHashes &&
+                    transaction.blobVersionedHashes.length > 0 && (
+                      <div className="tx-row tx-row-blob">
+                        <span className="tx-label">{t("blobCount")}</span>
+                        <span className="tx-value">{transaction.blobVersionedHashes.length}</span>
+                      </div>
+                    )}
+                </div>
+              </div>
+            )}
+
+            {/* Blob Versioned Hashes */}
+            {transaction.type === "0x3" &&
+              transaction.blobVersionedHashes &&
+              transaction.blobVersionedHashes.length > 0 && (
+                <div className="tx-row tx-row-blob">
+                  <span className="tx-label">{t("blobVersionedHashes")}</span>
+                  <span className="tx-value">
+                    {transaction.blobVersionedHashes.map((hash) => (
+                      <div key={hash} className="tx-mono" style={{ marginBottom: "4px" }}>
+                        <LongString value={hash} start={20} end={16} />
+                        <CopyButton value={hash} />
+                      </div>
+                    ))}
+                  </span>
+                </div>
+              )}
+
             {/* Event Logs + Input Data are now always in TX Analyser */}
           </div>
 

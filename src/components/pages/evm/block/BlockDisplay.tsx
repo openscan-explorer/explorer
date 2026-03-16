@@ -250,6 +250,14 @@ const BlockDisplay: React.FC<BlockDisplayProps> = React.memo(
                     </span>
                   </div>
                 )}
+
+                {/* Blob Gas Used (EIP-4844) */}
+                {block.blobGasUsed && Number(block.blobGasUsed) > 0 && (
+                  <div className="tx-row tx-row-blob">
+                    <span className="tx-label">{t("blobGasUsed")}</span>
+                    <span className="tx-value">{Number(block.blobGasUsed).toLocaleString()}</span>
+                  </div>
+                )}
               </div>
 
               {/* Right Column */}
@@ -285,6 +293,24 @@ const BlockDisplay: React.FC<BlockDisplayProps> = React.memo(
                       <span className="burnt-fees">🔥 {formatNative(burntFees)}</span>
                     </span>
                   </div>
+                )}
+
+                {/* Blob fields continued (EIP-4844) */}
+                {block.blobGasUsed && Number(block.blobGasUsed) > 0 && (
+                  <>
+                    <div className="tx-row tx-row-blob">
+                      <span className="tx-label">{t("excessBlobGas")}</span>
+                      <span className="tx-value">
+                        {Number(block.excessBlobGas).toLocaleString()}
+                      </span>
+                    </div>
+                    <div className="tx-row tx-row-blob">
+                      <span className="tx-label">{t("blobCount")}</span>
+                      <span className="tx-value">
+                        {Math.floor(Number(block.blobGasUsed) / 131072)}
+                      </span>
+                    </div>
+                  </>
                 )}
 
                 {/* Arbitrum-specific fields */}
