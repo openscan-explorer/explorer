@@ -164,6 +164,15 @@
 	color: #0052ff;
 }
 
+.tx-row-blob {
+	background: rgba(139, 92, 246, 0.1);
+	border-left: 3px solid #8b5cf6;
+}
+
+.tx-row-blob .tx-label {
+	color: #8b5cf6;
+}
+
 /* Block Display - Block navigation and details */
 .block-height-value {
 	font-weight: 600;

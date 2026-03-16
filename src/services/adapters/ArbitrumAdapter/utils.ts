@@ -65,6 +65,12 @@ export function transformArbitrumTransactionToTransaction(
     gasPrice: rpcTx.gasPrice ? BigInt(rpcTx.gasPrice).toString() : "0",
     maxFeePerGas: undefined,
     maxPriorityFeePerGas: undefined,
+    maxFeePerBlobGas: (rpcTx as unknown as Record<string, unknown>).maxFeePerBlobGas
+      ? BigInt((rpcTx as unknown as Record<string, unknown>).maxFeePerBlobGas as string).toString()
+      : undefined,
+    blobVersionedHashes: (rpcTx as unknown as Record<string, unknown>).blobVersionedHashes as
+      | string[]
+      | undefined,
     nonce: rpcTx.nonce ? parseInt(rpcTx.nonce, 16).toString() : "0",
     data: rpcTx.input,
     blockNumber: rpcTx.blockNumber ? parseInt(rpcTx.blockNumber, 16).toString() : "0",
@@ -96,6 +102,12 @@ export function transformArbitrumTransactionToTransaction(
       transactionHash: receipt.transactionHash,
       transactionIndex: parseInt(receipt.transactionIndex, 16).toString(),
       type: receipt.type,
+      blobGasUsed: (receipt as unknown as Record<string, unknown>).blobGasUsed
+        ? BigInt((receipt as unknown as Record<string, unknown>).blobGasUsed as string).toString()
+        : undefined,
+      blobGasPrice: (receipt as unknown as Record<string, unknown>).blobGasPrice
+        ? BigInt((receipt as unknown as Record<string, unknown>).blobGasPrice as string).toString()
+        : undefined,
     };
     transaction.receipt = arbitrumReceipt;
   }
