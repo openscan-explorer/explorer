@@ -169,6 +169,7 @@
     "events": "Eventos",
     "inputDataTab": "Datos de Entrada",
     "rawInputData": "Datos de Entrada sin Procesar",
+    "utf8Text": "Texto Decodificado UTF-8",
     "expandAll": "Expandir Todo",
     "collapseAll": "Colapsar Todo",
     "expand": "Expandir",

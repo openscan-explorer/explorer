@@ -169,6 +169,7 @@
     "events": "Events",
     "inputDataTab": "Input Data",
     "rawInputData": "Raw Input Data",
+    "utf8Text": "UTF-8 Decoded Text",
     "expandAll": "Expand All",
     "collapseAll": "Collapse All",
     "expand": "Expand",

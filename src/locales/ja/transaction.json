@@ -169,6 +169,7 @@
     "events": "イベント",
     "inputDataTab": "入力データ",
     "rawInputData": "生の入力データ",
+    "utf8Text": "UTF-8 デコードテキスト",
     "expandAll": "すべて展開",
     "collapseAll": "すべて折りたたむ",
     "expand": "展開",

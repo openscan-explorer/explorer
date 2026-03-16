@@ -387,6 +387,24 @@
 	color: var(--text-primary);
 }
 
+.tx-input-utf8 {
+	background: var(--overlay-light-5);
+	border: 1px solid var(--overlay-light-10);
+	border-radius: 6px;
+	padding: 12px;
+	max-height: 400px;
+	overflow: auto;
+}
+
+.tx-input-utf8 pre {
+	font-family: "JetBrains Mono", "Fira Code", monospace;
+	font-size: 0.8rem;
+	white-space: pre-wrap;
+	word-wrap: break-word;
+	color: var(--text-primary);
+	margin: 0;
+}
+
 .tx-empty {
 	color: var(--text-secondary);
 	font-style: italic;

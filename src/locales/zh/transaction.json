@@ -169,6 +169,7 @@
     "events": "事件",
     "inputDataTab": "输入数据",
     "rawInputData": "原始输入数据",
+    "utf8Text": "UTF-8 解码文本",
     "expandAll": "全部展开",
     "collapseAll": "全部折叠",
     "expand": "展开",

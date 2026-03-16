@@ -227,3 +227,41 @@ export function decodeEventWithAbi(
     };
   }
 }
+
+/**
+ * Try to decode hex input data as UTF-8 text.
+ * Returns the decoded string if ≥80% of characters are printable, null otherwise.
+ */
+export function tryDecodeUtf8(hex: string): string | null {
+  if (!hex || hex === "0x" || hex.length < 4) return null;
+
+  const cleaned = hex.startsWith("0x") ? hex.slice(2) : hex;
+  if (cleaned.length === 0 || cleaned.length % 2 !== 0) return null;
+
+  const bytes = new Uint8Array(cleaned.length / 2);
+  for (let i = 0; i < cleaned.length; i += 2) {
+    bytes[i / 2] = Number.parseInt(cleaned.substring(i, i + 2), 16);
+  }
+
+  const decoded = new TextDecoder("utf-8", { fatal: false }).decode(bytes);
+
+  // Check if mostly printable (letters, digits, punctuation, whitespace)
+  let printable = 0;
+  for (let i = 0; i < decoded.length; i++) {
+    const code = decoded.charCodeAt(i);
+    if (
+      (code >= 0x20 && code <= 0x7e) || // ASCII printable
+      code === 0x09 || // tab
+      code === 0x0a || // newline
+      code === 0x0d || // carriage return
+      code >= 0x80 // multibyte (accented chars, CJK, emoji, etc.)
+    ) {
+      printable++;
+    }
+  }
+
+  const ratio = printable / decoded.length;
+  if (ratio < 0.8) return null;
+
+  return decoded;
+}

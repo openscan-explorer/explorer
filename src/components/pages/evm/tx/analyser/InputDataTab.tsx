@@ -3,7 +3,11 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import type { ContractInfo } from "../../../../../utils/contractLookup";
 import { formatDecodedValue } from "../../../../../utils/eventDecoder";
-import { type DecodedInput, decodeFunctionCall } from "../../../../../utils/inputDecoder";
+import {
+  type DecodedInput,
+  decodeFunctionCall,
+  tryDecodeUtf8,
+} from "../../../../../utils/inputDecoder";
 
 const InputDataTab: React.FC<{
   inputData: string;
@@ -23,6 +27,9 @@ const InputDataTab: React.FC<{
       if (!enriched?.abi) return null;
       return decodeFunctionCall(inputData, enriched.abi);
     })();
+
+  // If no ABI decode, try UTF-8 text decode
+  const utf8Text = !resolved ? tryDecodeUtf8(inputData) : null;
 
   return (
     <div className="analyser-tab-content">
@@ -55,6 +62,16 @@ const InputDataTab: React.FC<{
                 ))}
               </div>
             )}
+          </div>
+        </div>
+      )}
+      {utf8Text && (
+        <div className="analyser-input-decoded">
+          <div className="analyser-summary">
+            <span>{t("analyser.utf8Text")}</span>
+          </div>
+          <div className="tx-input-utf8">
+            <pre>{utf8Text}</pre>
           </div>
         </div>
       )}
