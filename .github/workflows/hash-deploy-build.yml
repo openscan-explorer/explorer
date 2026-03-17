@@ -26,17 +26,29 @@ jobs:
       - name: Build Production
         run: ./scripts/build-production.sh
 
-      - name: Upload to Storacha
-        id: upload
-        uses: storacha/add-to-web3@v4
-        with:
-          path_to_add: './dist'
-          secret_key: ${{ secrets.STORACHA_PRINCIPAL }}
-          proof: ${{ secrets.STORACHA_PROOF }}
+      - name: Install Kubo (IPFS CLI)
+        run: |
+          wget -q https://dist.ipfs.tech/kubo/v0.34.1/kubo_v0.34.1_linux-amd64.tar.gz
+          tar -xzf kubo_v0.34.1_linux-amd64.tar.gz
+          sudo cp kubo/ipfs /usr/local/bin/
+          ipfs init --profile=badgerds
+          ipfs version
+
+      - name: Generate IPFS Hash
+        id: ipfs
+        run: |
+          HASH=$(ipfs add -r -Q --chunker=size-262144 --raw-leaves=false ./dist)
+          HASH_V1=$(ipfs cid format -v 1 -b base32 $HASH)
+
+          echo "hash_v0=$HASH" >> $GITHUB_OUTPUT
+          echo "hash_v1=$HASH_V1" >> $GITHUB_OUTPUT
+
+          echo "IPFS Hash (v0): $HASH"
+          echo "IPFS Hash (v1): $HASH_V1"
 
       - name: Update IPFS Hash in Repo
         run: |
-          HASH="${{ steps.upload.outputs.cid }}"
+          HASH="${{ steps.ipfs.outputs.hash_v0 }}"
 
           # Create shields.io endpoint format JSON
           mkdir -p /tmp/ipfs-meta
