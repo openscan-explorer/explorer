@@ -19,7 +19,6 @@ import type { IAppContext, NetworkConfig, RpcUrlsContextType } from "../types";
 import { fetchAllRpcs } from "../services/MetadataService";
 import { loadJsonFilesFromStorage, saveJsonFilesToStorage } from "../utils/artifactsStorage";
 import { logger } from "../utils/logger";
-import { getChainIdFromNetwork } from "../utils/networkResolver";
 import {
   getEffectiveRpcUrls,
   isMetadataRpcCacheFresh,
@@ -84,23 +83,6 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
-  // Hardhat network config for local development
-  const hardhatNetwork: NetworkConfig = useMemo(
-    () => ({
-      type: "evm" as const,
-      networkId: "eip155:31337",
-      chainId: 31337,
-      slug: "localhost",
-      name: "Hardhat",
-      shortName: "hardhat",
-      description: "Local development network",
-      color: "#FFF100",
-      currency: "ETH",
-      isTestnet: true,
-    }),
-    [],
-  );
-
   // Load networks from metadata
   const loadNetworkData = useCallback(async () => {
     setNetworksLoading(true);
@@ -108,21 +90,6 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
 
     try {
       const loadedNetworks = await loadNetworks();
-
-      // Check if Hardhat should be included (only when both conditions are met)
-      const envNetworks = process.env.REACT_APP_OPENSCAN_NETWORKS;
-      const isDevelopment = import.meta.env.VITE_ENVIRONMENT === "development";
-      const hardhatInEnv = envNetworks?.split(",").some((id) => id.trim() === "31337");
-
-      // Add Hardhat network if in development AND explicitly enabled
-      if (
-        isDevelopment &&
-        hardhatInEnv &&
-        !loadedNetworks.some((n) => getChainIdFromNetwork(n) === 31337)
-      ) {
-        loadedNetworks.push(hardhatNetwork);
-      }
-
       setNetworks(loadedNetworks);
 
       // Fetch metadata RPCs if cache is stale or missing, then update RPC state
@@ -142,7 +109,7 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
     } finally {
       setNetworksLoading(false);
     }
-  }, [hardhatNetwork]);
+  }, []);
 
   const _account = useAccount();
   const { isFullyConnected, address } = useWagmiConnection();

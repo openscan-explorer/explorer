@@ -18,7 +18,6 @@ import {
   type TokenListItem,
   type TokenMetadata,
 } from "../../../../services/MetadataService";
-import type { TraceResult } from "../../../../services/adapters/NetworkAdapter";
 import { logger } from "../../../../utils/logger";
 import {
   formatGweiFromWei,
@@ -71,11 +70,6 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
     const [callTargetTokenListMatch, setCallTargetTokenListMatch] = useState<TokenListItem | null>(
       null,
     );
-    const [showTrace, setShowTrace] = useState(false);
-    const [traceData, setTraceData] = useState<TraceResult | null>(null);
-    // biome-ignore lint/suspicious/noExplicitAny: <TODO>
-    const [callTrace, setCallTrace] = useState<any>(null);
-    const [loadingTrace, setLoadingTrace] = useState(false);
     const [_copiedField, _setCopiedField] = useState<string | null>(null);
     const copyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -361,26 +355,6 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
       callTargetToken,
       callTargetTokenListMatch,
     ]);
-
-    // Check if trace is available (localhost only)
-    const isTraceAvailable = dataService?.networkAdapter.isTraceAvailable() || false;
-
-    // Load trace data when trace section is expanded
-    useEffect(() => {
-      if (showTrace && isTraceAvailable && dataService && !traceData && !callTrace) {
-        setLoadingTrace(true);
-        Promise.all([
-          dataService.networkAdapter.getTransactionTrace(transaction.hash),
-          dataService.networkAdapter.getCallTrace(transaction.hash),
-        ])
-          .then(([trace, call]) => {
-            setTraceData(trace);
-            setCallTrace(call);
-          })
-          .catch((err) => logger.error("Error loading trace:", err))
-          .finally(() => setLoadingTrace(false));
-      }
-    }, [showTrace, isTraceAvailable, dataService, transaction.hash, traceData, callTrace]);
 
     useEffect(() => {
       return () => {
@@ -848,124 +822,6 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
               decodedInputData={decodedInput}
               isSuperUser={isSuperUser}
             />
-          )}
-
-          {/* Debug Trace Section (Localhost Only) */}
-          {isTraceAvailable && (
-            <div className="collapsible-container">
-              {/** biome-ignore lint/a11y/useButtonType: <TODO> */}
-              <button
-                className="collapsible-button-purple"
-                onClick={() => setShowTrace(!showTrace)}
-              >
-                {showTrace ? t("hideDebugTrace") : t("showDebugTrace")}
-              </button>
-
-              {showTrace && (
-                <div className="collapsible-content">
-                  {loadingTrace && <div className="trace-loading">{t("loadingTrace")}</div>}
-
-                  {/* Call Trace */}
-                  {callTrace && (
-                    <div className="trace-container">
-                      <div className="trace-title">{t("callTrace")}</div>
-                      <div className="trace-details">
-                        <div>
-                          <span className="log-label">{t("traceType")}</span> {callTrace.type}
-                        </div>
-                        <div>
-                          <span className="log-label">{t("traceFrom")}</span>{" "}
-                          <LongString value={callTrace.from} start={10} end={8} />
-                        </div>
-                        <div>
-                          <span className="log-label">{t("traceTo")}</span>{" "}
-                          <LongString value={callTrace.to} start={10} end={8} />
-                        </div>
-                        <div>
-                          <span className="log-label">{t("traceValue")}</span> {callTrace.value}
-                        </div>
-                        <div>
-                          <span className="log-label">{t("traceGas")}</span> {callTrace.gas}
-                        </div>
-                        <div>
-                          <span className="log-label">{t("traceGasUsed")}</span> {callTrace.gasUsed}
-                        </div>
-                        {callTrace.error && (
-                          <div className="trace-error">
-                            <span className="log-label">{t("traceError")}</span> {callTrace.error}
-                          </div>
-                        )}
-                        {callTrace.calls && callTrace.calls.length > 0 && (
-                          <div className="margin-top-10">
-                            <div className="trace-calls-header">
-                              {t("internalCalls")} ({callTrace.calls.length}):
-                            </div>
-                            <div className="trace-calls-container">
-                              {JSON.stringify(callTrace.calls, null, 2)}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Opcode Trace */}
-                  {traceData && (
-                    <div className="trace-container">
-                      <div className="trace-title">{t("executionTrace")}</div>
-                      <div className="trace-details margin-bottom-15">
-                        <div>
-                          <span className="log-label">{t("opcodeTrace.totalGasUsed")}:</span>{" "}
-                          {traceData.gas}
-                        </div>
-                        <div>
-                          <span className="log-label">{t("opcodeTrace.failed")}:</span>{" "}
-                          {traceData.failed ? t("opcodeTrace.yes") : t("opcodeTrace.no")}
-                        </div>
-                        <div>
-                          <span className="log-label">{t("opcodeTrace.returnValue")}:</span>{" "}
-                          <LongString value={traceData.returnValue || "0x"} start={20} end={20} />
-                        </div>
-                        <div>
-                          <span className="log-label">{t("opcodeTrace.executed")}</span>{" "}
-                          {traceData.structLogs.length}
-                        </div>
-                      </div>
-
-                      <div className="trace-opcode-header">{t("opcodeTrace.executionLog")}</div>
-                      <div className="trace-opcode-container">
-                        {traceData.structLogs.slice(0, 100).map((log, index) => (
-                          // biome-ignore lint/suspicious/noArrayIndexKey: <TODO>
-                          <div key={index} className="trace-opcode-step">
-                            <div className="trace-opcode-name">
-                              {t("opcodeTrace.step")} {index}: {log.op}
-                            </div>
-                            <div className="trace-opcode-info">
-                              {t("opcodeTrace.PC")}: {log.pc} | {t("opcodeTrace.gas")}: {log.gas} |{" "}
-                              {t("opcodeTrace.cost")}: {log.gasCost} | {t("opcodeTrace.depth")}:{" "}
-                              {log.depth}
-                            </div>
-                            {log.stack && log.stack.length > 0 && (
-                              <div className="trace-opcode-stack">
-                                {t("opcodeTrace.stack")}: [{log.stack.slice(0, 3).join(", ")}
-                                {log.stack.length > 3 ? "..." : ""}]
-                              </div>
-                            )}
-                          </div>
-                        ))}
-                        {traceData.structLogs.length > 100 && (
-                          <div className="trace-more-text">
-                            {t("opcodeTrace.showingFirst100", {
-                              total: traceData.structLogs.length,
-                            })}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
           )}
         </div>
         <AIAnalysisPanel

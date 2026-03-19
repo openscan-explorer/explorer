@@ -263,6 +263,29 @@
       ]
     },
     {
+      "type": "evm",
+      "networkId": "eip155:31337",
+      "slug": "localhost",
+      "name": "Hardhat",
+      "shortName": "Hardhat",
+      "description": "Local development network (Hardhat/Anvil)",
+      "currency": "ETH",
+      "color": "#FFF100",
+      "isTestnet": true,
+      "links": [
+        {
+          "name": "Docs",
+          "url": "https://hardhat.org/docs",
+          "description": "Hardhat documentation"
+        },
+        {
+          "name": "GitHub",
+          "url": "https://github.com/NomicFoundation/hardhat",
+          "description": "Hardhat GitHub repository"
+        }
+      ]
+    },
+    {
       "type": "bitcoin",
       "networkId": "bip122:000000000019d6689c085ae165831e93",
       "slug": "btc",

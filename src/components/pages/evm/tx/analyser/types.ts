@@ -1,7 +1,13 @@
 import type { DecodedInput } from "../../../../../utils/inputDecoder";
 import type { DataService } from "../../../../../services/DataService";
 
-export type AnalyserTab = "callTree" | "gasProfiler" | "stateChanges" | "events" | "inputData";
+export type AnalyserTab =
+  | "callTree"
+  | "gasProfiler"
+  | "stateChanges"
+  | "rawTrace"
+  | "events"
+  | "inputData";
 
 export interface TxAnalyserProps {
   txHash: string;
