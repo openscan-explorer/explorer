@@ -4,6 +4,10 @@ import { logger } from "../utils/logger";
 import type { SourcifyContractDetails } from "./useSourcify";
 
 const ETHERSCAN_V2_API = "https://api.etherscan.io/v2/api";
+const OPENSCAN_WORKER_URL =
+  // biome-ignore lint/complexity/useLiteralKeys: env var access
+  process.env["REACT_APP_OPENSCAN_WORKER_URL"] ??
+  "https://openscan-groq-ai-proxy.openscan.workers.dev";
 
 interface EtherscanSourceResult {
   SourceCode: string;
@@ -81,7 +85,7 @@ export function useEtherscan(
   const [isVerified, setIsVerified] = useState(false);
 
   useEffect(() => {
-    if (!enabled || !address || !networkId || !apiKey) {
+    if (!enabled || !address || !networkId) {
       setData(null);
       setIsVerified(false);
       setLoading(false);
@@ -93,15 +97,29 @@ export function useEtherscan(
     const fetchData = async () => {
       setLoading(true);
       try {
-        const params = new URLSearchParams({
-          chainid: String(networkId),
-          module: "contract",
-          action: "getsourcecode",
-          address,
-          apikey: apiKey,
-        });
-        const url = `${ETHERSCAN_V2_API}?${params.toString()}`;
-        const response = await fetch(url, { signal: controller.signal });
+        let response: Response;
+
+        if (apiKey) {
+          // Direct Etherscan call with user's key
+          const params = new URLSearchParams({
+            chainid: String(networkId),
+            module: "contract",
+            action: "getsourcecode",
+            address,
+            apikey: apiKey,
+          });
+          response = await fetch(`${ETHERSCAN_V2_API}?${params.toString()}`, {
+            signal: controller.signal,
+          });
+        } else {
+          // Proxy through OpenScan Worker (free, no key needed)
+          response = await fetch(`${OPENSCAN_WORKER_URL}/etherscan/verify`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ chainId: networkId, address }),
+            signal: controller.signal,
+          });
+        }
 
         if (!response.ok) {
           setData(null);
