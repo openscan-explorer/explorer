@@ -2478,7 +2478,8 @@ a.navbar-logo-dropdown-item:hover {
 }
 
 .notification {
-  width: clamp(240px, 90vw, 520px);
+  width: fit-content;
+  max-width: clamp(240px, 90vw, 520px);
   padding: 14px 18px;
   border-radius: 12px;
   box-shadow: 0 4px 14px -2px rgba(0, 0, 0, 0.2);

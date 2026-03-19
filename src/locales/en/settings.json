@@ -155,6 +155,21 @@
     "endpointLabel": "{{network}} Beacon API",
     "endpointPlaceholder": "https://your-beacon-node.example.com"
   },
+  "helperTooltips": {
+    "title": "Helper Tooltips",
+    "description": "Show contextual help for blockchain data fields.",
+    "enabled": {
+      "label": "Show Helper Tooltips",
+      "description": "Display helper icons next to field labels with brief explanations."
+    },
+    "knowledgeLevel": {
+      "label": "Knowledge Level",
+      "description": "Controls how many helper tooltips are shown. Beginner shows all tooltips. Intermediate hides basic fields. Advanced shows only complex and chain-specific tooltips.",
+      "beginner": "Beginner",
+      "intermediate": "Intermediate",
+      "advanced": "Advanced"
+    }
+  },
   "rpcEndpoints": {
     "title": "RPC Endpoints",
     "description": "Configure RPC URLs for each network. Click on a network to expand and configure its endpoints.",

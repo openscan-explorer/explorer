@@ -1,6 +1,7 @@
 import type React from "react";
 import type { ENSReverseResult } from "../../../../../types";
 import { useTranslation } from "react-i18next";
+import FieldLabel from "../../../../common/FieldLabel";
 import TokenHoldings from "./TokenHoldings";
 
 interface ContractMoreInfoCardProps {
@@ -28,7 +29,12 @@ const ContractMoreInfoCard: React.FC<ContractMoreInfoCardProps> = ({
       {/* ENS Name Row */}
       {isMainnet && (
         <div className="account-card-row">
-          <span className="account-card-label">ENS Name:</span>
+          <FieldLabel
+            label="ENS Name:"
+            tooltipKey="address.ensName"
+            visibleFor={["beginner", "intermediate", "advanced"]}
+            className="account-card-label"
+          />
           <span className="account-card-value">
             {displayName ? (
               <span className="ens-name-wrapper">
@@ -51,7 +57,12 @@ const ContractMoreInfoCard: React.FC<ContractMoreInfoCardProps> = ({
       {/* ENS App Link */}
       {isMainnet && displayName && (
         <div className="account-card-row">
-          <span className="account-card-label">ENS App:</span>
+          <FieldLabel
+            label="ENS App:"
+            tooltipKey="address.ensApp"
+            visibleFor={["beginner", "intermediate", "advanced"]}
+            className="account-card-label"
+          />
           <span className="account-card-value">
             <a
               href={`https://app.ens.domains/name/${displayName}`}

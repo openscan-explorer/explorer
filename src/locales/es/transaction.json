@@ -187,6 +187,11 @@
     "expandAll": "Expandir Todo",
     "collapseAll": "Colapsar Todo",
     "expand": "Expandir",
-    "collapse": "Colapsar"
+    "collapse": "Colapsar",
+    "rawTrace": "Traza Cruda",
+    "rawTraceSteps": "{{count}} pasos de opcode",
+    "rawTracePrev": "Anterior",
+    "rawTraceNext": "Siguiente",
+    "rawTracePage": "Página {{current}}/{{total}} ({{from}}–{{to}} de {{totalSteps}})"
   }
 }

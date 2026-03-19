@@ -6,7 +6,9 @@ import { Link } from "react-router-dom";
 import { encodeFunctionData, parseEther } from "viem";
 import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import { AppContext } from "../../../../../context";
+import { useSettings } from "../../../../../context/SettingsContext";
 import { useNotify } from "../../../../../hooks/useNotify";
+import HelperTooltip from "../../../../common/HelperTooltip";
 import type { ABI, ABIParameter, EventABI, FunctionABI } from "../../../../../types";
 import { logger } from "../../../../../utils/logger";
 
@@ -104,6 +106,8 @@ const ContractInteraction: React.FC<ContractInteractionProps> = ({
   abi,
 }) => {
   const { t } = useTranslation("address");
+  const { t: tTooltips } = useTranslation("tooltips");
+  const { settings } = useSettings();
   const notify = useNotify();
   const [selectedWriteFunction, setSelectedWriteFunction] = useState<FunctionABI | null>(null);
   const [selectedReadFunction, setSelectedReadFunction] = useState<FunctionABI | null>(null);
@@ -256,7 +260,12 @@ const ContractInteraction: React.FC<ContractInteractionProps> = ({
   return (
     <div className="tx-row-vertical">
       <div className="contract-functions-header">
-        <span className="tx-label">{t("functions")}</span>
+        <span className="tx-label">
+          {t("functions")}
+          {settings.showHelperTooltips !== false && (
+            <HelperTooltip content={tTooltips("address.functions")} />
+          )}
+        </span>
         <ConnectButton.Custom>
           {({
             account,
@@ -331,6 +340,9 @@ const ContractInteraction: React.FC<ContractInteractionProps> = ({
           <div className="functions-section">
             <div className="functions-section-title functions-section-title-read">
               {t("readFunctionsCount", { count: readFunctions.length })}
+              {settings.showHelperTooltips !== false && settings.knowledgeLevel === "beginner" && (
+                <HelperTooltip content={tTooltips("address.readContract")} />
+              )}
             </div>
             <div className="functions-list">
               {readFunctions.map((func: FunctionABI) => (
@@ -357,6 +369,9 @@ const ContractInteraction: React.FC<ContractInteractionProps> = ({
           <div className="functions-section">
             <div className="functions-section-title functions-section-title-write">
               {t("writeFunctionsCount", { count: writeFunctions.length })}
+              {settings.showHelperTooltips !== false && settings.knowledgeLevel === "beginner" && (
+                <HelperTooltip content={tTooltips("address.writeContract")} />
+              )}
             </div>
             <div className="functions-list">
               {writeFunctions.map((func: FunctionABI) => (

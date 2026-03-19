@@ -8,6 +8,7 @@ import type settings from "./locales/en/settings.json";
 import type transaction from "./locales/en/transaction.json";
 import type tokenDetails from "./locales/en/tokenDetails.json";
 import type rpcs from "./locales/en/rpcs.json";
+import type tooltips from "./locales/en/tooltips.json";
 declare module "i18next" {
   interface CustomTypeOptions {
     defaultNS: "common";
@@ -22,6 +23,7 @@ declare module "i18next" {
       network: typeof network;
       tokenDetails: typeof tokenDetails;
       rpcs: typeof rpcs;
+      tooltips: typeof tooltips;
     };
   }
 }

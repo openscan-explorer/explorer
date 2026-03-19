@@ -2,6 +2,7 @@ import type React from "react";
 import { useState } from "react";
 import type { ABI } from "../../../../../types";
 import { useTranslation } from "react-i18next";
+import FieldLabel from "../../../../common/FieldLabel";
 import ContractInteraction from "./ContractInteraction";
 
 interface ContractData {
@@ -157,7 +158,11 @@ const ContractDetails: React.FC<ContractDetailsProps> = ({
                 }
               }}
             >
-              <span className="tx-label">{t("contractBytecode")}</span>
+              <FieldLabel
+                label={t("contractBytecode")}
+                tooltipKey="address.contractBytecode"
+                visibleFor={["beginner", "intermediate", "advanced"]}
+              />
               <span id="bytecode-icon" className="source-toggle-icon">
                 ▶
               </span>
@@ -183,7 +188,11 @@ const ContractDetails: React.FC<ContractDetailsProps> = ({
                   }
                 }}
               >
-                <span className="tx-label">{t("sourceCode")}</span>
+                <FieldLabel
+                  label={t("sourceCode")}
+                  tooltipKey="address.sourceCode"
+                  visibleFor={["beginner", "intermediate", "advanced"]}
+                />
                 <span id="source-code-icon" className="source-toggle-icon">
                   ▶
                 </span>
@@ -215,7 +224,11 @@ const ContractDetails: React.FC<ContractDetailsProps> = ({
                   }
                 }}
               >
-                <span className="tx-label">{t("rawAbi")}</span>
+                <FieldLabel
+                  label={t("rawAbi")}
+                  tooltipKey="address.rawAbi"
+                  visibleFor={["beginner", "intermediate", "advanced"]}
+                />
                 <span id="raw-abi-icon" className="source-toggle-icon">
                   ▶
                 </span>

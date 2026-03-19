@@ -5,6 +5,7 @@ export type AnalyserTab =
   | "callTree"
   | "gasProfiler"
   | "stateChanges"
+  | "rawTrace"
   | "events"
   | "inputData"
   | "blobData";

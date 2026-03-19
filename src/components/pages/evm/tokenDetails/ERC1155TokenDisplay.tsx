@@ -12,6 +12,7 @@ import {
   getImageUrl,
 } from "../../../../utils/erc1155Metadata";
 import { logger } from "../../../../utils/logger";
+import FieldLabel from "../../../common/FieldLabel";
 import LoaderWithTimeout from "../../../common/LoaderWithTimeout";
 
 const ERC1155TokenDetails: React.FC = () => {
@@ -229,13 +230,21 @@ const ERC1155TokenDetails: React.FC = () => {
 
               {/* Token ID */}
               <div className="tx-row">
-                <span className="tx-label">{t("tokenID")}:</span>
+                <FieldLabel
+                  label={`${t("tokenID")}:`}
+                  tooltipKey="token.tokenId"
+                  visibleFor={["beginner"]}
+                />
                 <span className="tx-value tx-mono">{tokenId}</span>
               </div>
 
               {/* Token Standard */}
               <div className="tx-row">
-                <span className="tx-label">{t("tokenStandard")}:</span>
+                <FieldLabel
+                  label={`${t("tokenStandard")}:`}
+                  tooltipKey="token.tokenStandard"
+                  visibleFor={["beginner", "intermediate"]}
+                />
                 <span className="tx-value">
                   <span className="token-standard-badge token-standard-erc1155">ERC-1155</span>
                 </span>

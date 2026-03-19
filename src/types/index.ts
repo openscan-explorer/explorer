@@ -1,4 +1,4 @@
-import type { EthLog } from "@openscan/network-connectors";
+import type { EthLog, SupportedChainId } from "@openscan/network-connectors";
 import type React from "react";
 
 // ==================== NETWORK TYPES ====================
@@ -7,6 +7,13 @@ import type React from "react";
  * Network type - EVM or Bitcoin
  */
 export type NetworkType = "evm" | "bitcoin";
+
+/**
+ * All EVM chain IDs supported by the app.
+ * Maps directly to the connector library's SupportedChainId.
+ * When adding a new EVM network, add its chain ID to network-connectors first.
+ */
+export type AppChainId = SupportedChainId;
 
 // ==================== CORE DOMAIN TYPES ====================
 
@@ -228,6 +235,7 @@ export interface BitcoinTransaction {
   vin: BitcoinTransactionInput[];
   vout: BitcoinTransactionOutput[];
   blockhash?: string;
+  blockheight?: number;
   confirmations?: number;
   blocktime?: number;
   time?: number;
@@ -484,6 +492,11 @@ export type AIAnalysisType =
 export type PromptVersion = "stable" | "latest";
 
 /**
+ * Knowledge level for helper tooltip visibility
+ */
+export type KnowledgeLevel = "beginner" | "intermediate" | "advanced";
+
+/**
  * User settings for the application
  */
 export interface UserSettings {
@@ -496,6 +509,8 @@ export interface UserSettings {
   promptVersion?: PromptVersion;
   persistentCacheSizeMB?: number;
   beaconUrls?: Record<string, string>;
+  knowledgeLevel?: KnowledgeLevel;
+  showHelperTooltips?: boolean;
 }
 
 // ==================== BEACON/BLOB TYPES ====================
@@ -523,6 +538,8 @@ export const DEFAULT_SETTINGS: UserSettings = {
   isSuperUser: false,
   promptVersion: "stable",
   persistentCacheSizeMB: 10,
+  knowledgeLevel: "beginner",
+  showHelperTooltips: true,
 };
 
 /**

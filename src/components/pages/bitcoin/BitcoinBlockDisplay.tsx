@@ -1,7 +1,9 @@
 import React, { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import type { BitcoinBlock } from "../../../types";
 import { getNetworkById } from "../../../config/networks";
+import { useSettings } from "../../../context/SettingsContext";
 import {
   formatBTC,
   formatDifficulty,
@@ -12,6 +14,8 @@ import {
 } from "../../../utils/bitcoinFormatters";
 import AIAnalysisPanel from "../../common/AIAnalysis/AIAnalysisPanel";
 import CopyButton from "../../common/CopyButton";
+import FieldLabel from "../../common/FieldLabel";
+import HelperTooltip from "../../common/HelperTooltip";
 
 interface BitcoinBlockDisplayProps {
   block: BitcoinBlock;
@@ -22,6 +26,8 @@ const BitcoinBlockDisplay: React.FC<BitcoinBlockDisplayProps> = React.memo(
   ({ block, networkId }) => {
     const [showMoreDetails, setShowMoreDetails] = useState(false);
     const [showTransactions, setShowTransactions] = useState(false);
+    const { t: tTooltips } = useTranslation("tooltips");
+    const { settings } = useSettings();
 
     const network = networkId ? getNetworkById(networkId) : undefined;
     const networkName = network?.name ?? "Bitcoin Network";
@@ -86,6 +92,12 @@ const BitcoinBlockDisplay: React.FC<BitcoinBlockDisplayProps> = React.memo(
             {block.confirmations !== undefined && (
               <span className="block-status-badge block-status-finalized">
                 {block.confirmations.toLocaleString()} Confirmations
+                {settings.showHelperTooltips !== false && (
+                  <HelperTooltip
+                    content={tTooltips("bitcoin.blockConfirmations")}
+                    placement="left"
+                  />
+                )}
               </span>
             )}
           </div>
@@ -93,7 +105,11 @@ const BitcoinBlockDisplay: React.FC<BitcoinBlockDisplayProps> = React.memo(
           <div className="tx-details">
             {/* Block Hash */}
             <div className="tx-row">
-              <span className="tx-label">Block Hash:</span>
+              <FieldLabel
+                label="Block Hash:"
+                tooltipKey="bitcoin.blockHash"
+                visibleFor={["beginner"]}
+              />
               <span
                 className="tx-value tx-mono"
                 style={{ display: "inline-flex", alignItems: "center" }}
@@ -106,7 +122,11 @@ const BitcoinBlockDisplay: React.FC<BitcoinBlockDisplayProps> = React.memo(
             {/* Miner */}
             {block.miner && (
               <div className="tx-row">
-                <span className="tx-label">Mined by:</span>
+                <FieldLabel
+                  label="Mined by:"
+                  tooltipKey="bitcoin.minedBy"
+                  visibleFor={["beginner"]}
+                />
                 <span className="tx-value">{block.miner}</span>
               </div>
             )}
@@ -117,7 +137,11 @@ const BitcoinBlockDisplay: React.FC<BitcoinBlockDisplayProps> = React.memo(
                 {/* Block Reward */}
                 {block.blockReward !== undefined && (
                   <div className="tx-row">
-                    <span className="tx-label">Block Reward:</span>
+                    <FieldLabel
+                      label="Block Reward:"
+                      tooltipKey="bitcoin.blockReward"
+                      visibleFor={["beginner", "intermediate"]}
+                    />
                     <span className="tx-value tx-value-highlight">
                       {formatBTC(block.blockReward)}
                     </span>
@@ -127,7 +151,11 @@ const BitcoinBlockDisplay: React.FC<BitcoinBlockDisplayProps> = React.memo(
                 {/* Total Fees */}
                 {block.totalFees !== undefined && (
                   <div className="tx-row">
-                    <span className="tx-label">Total Fees:</span>
+                    <FieldLabel
+                      label="Total Fees:"
+                      tooltipKey="bitcoin.totalFees"
+                      visibleFor={["beginner", "intermediate"]}
+                    />
                     <span className="tx-value">{formatBTC(block.totalFees)}</span>
                   </div>
                 )}
@@ -135,7 +163,11 @@ const BitcoinBlockDisplay: React.FC<BitcoinBlockDisplayProps> = React.memo(
                 {/* Fee Rate Stats */}
                 {block.feeRateAvg !== undefined && block.feeRateMedian !== undefined && (
                   <div className="tx-row">
-                    <span className="tx-label">Fee Rate:</span>
+                    <FieldLabel
+                      label="Fee Rate:"
+                      tooltipKey="bitcoin.feeRate"
+                      visibleFor={["beginner", "intermediate"]}
+                    />
                     <span className="tx-value">
                       Avg: {block.feeRateAvg.toFixed(2)} sat/vB | Median:{" "}
                       {block.feeRateMedian.toFixed(2)} sat/vB
@@ -145,7 +177,11 @@ const BitcoinBlockDisplay: React.FC<BitcoinBlockDisplayProps> = React.memo(
 
                 {/* Transactions */}
                 <div className="tx-row">
-                  <span className="tx-label">Transactions:</span>
+                  <FieldLabel
+                    label="Transactions:"
+                    tooltipKey="bitcoin.transactions"
+                    visibleFor={["beginner"]}
+                  />
                   <span className="tx-value">
                     <span className="tx-value-highlight">{block.nTx.toLocaleString()}</span>{" "}
                     transactions
@@ -162,7 +198,11 @@ const BitcoinBlockDisplay: React.FC<BitcoinBlockDisplayProps> = React.memo(
                 {/* Total Output Value */}
                 {block.totalOutputValue !== undefined && (
                   <div className="tx-row">
-                    <span className="tx-label">Total Output:</span>
+                    <FieldLabel
+                      label="Total Output:"
+                      tooltipKey="bitcoin.totalOutput"
+                      visibleFor={["beginner"]}
+                    />
                     <span className="tx-value">{formatBTC(block.totalOutputValue)}</span>
                   </div>
                 )}
@@ -172,27 +212,43 @@ const BitcoinBlockDisplay: React.FC<BitcoinBlockDisplayProps> = React.memo(
                 {/* Difficulty */}
                 {block.difficulty !== undefined && (
                   <div className="tx-row">
-                    <span className="tx-label">Difficulty:</span>
+                    <FieldLabel
+                      label="Difficulty:"
+                      tooltipKey="bitcoin.difficulty"
+                      visibleFor={["beginner", "intermediate"]}
+                    />
                     <span className="tx-value">{formatDifficulty(block.difficulty)}</span>
                   </div>
                 )}
 
                 {/* Size */}
                 <div className="tx-row">
-                  <span className="tx-label">Size:</span>
+                  <FieldLabel
+                    label="Size:"
+                    tooltipKey="bitcoin.blockSize"
+                    visibleFor={["beginner"]}
+                  />
                   <span className="tx-value">{formatSize(block.size)}</span>
                 </div>
 
                 {/* Weight */}
                 <div className="tx-row">
-                  <span className="tx-label">Weight:</span>
+                  <FieldLabel
+                    label="Weight:"
+                    tooltipKey="bitcoin.blockWeight"
+                    visibleFor={["beginner", "intermediate", "advanced"]}
+                  />
                   <span className="tx-value">{block.weight.toLocaleString()} WU</span>
                 </div>
 
                 {/* Previous Block */}
                 {block.previousBlockHash && (
                   <div className="tx-row">
-                    <span className="tx-label">Previous Block:</span>
+                    <FieldLabel
+                      label="Previous Block:"
+                      tooltipKey="bitcoin.previousBlock"
+                      visibleFor={["beginner"]}
+                    />
                     <span className="tx-value tx-mono">
                       {networkId ? (
                         <Link
@@ -211,7 +267,11 @@ const BitcoinBlockDisplay: React.FC<BitcoinBlockDisplayProps> = React.memo(
                 {/* Next Block */}
                 {block.nextBlockHash && (
                   <div className="tx-row">
-                    <span className="tx-label">Next Block:</span>
+                    <FieldLabel
+                      label="Next Block:"
+                      tooltipKey="bitcoin.nextBlock"
+                      visibleFor={["beginner"]}
+                    />
                     <span className="tx-value tx-mono">
                       {networkId ? (
                         <Link
@@ -232,7 +292,11 @@ const BitcoinBlockDisplay: React.FC<BitcoinBlockDisplayProps> = React.memo(
             {/* Coinbase Message */}
             {block.coinbaseMessage && (
               <div className="tx-row">
-                <span className="tx-label">Coinbase Message:</span>
+                <FieldLabel
+                  label="Coinbase Message:"
+                  tooltipKey="bitcoin.coinbaseMessage"
+                  visibleFor={["beginner", "intermediate"]}
+                />
                 <span className="tx-value">
                   <span className="btc-coinbase-message">{block.coinbaseMessage}</span>
                 </span>
@@ -252,24 +316,49 @@ const BitcoinBlockDisplay: React.FC<BitcoinBlockDisplayProps> = React.memo(
               {showMoreDetails && (
                 <div className="more-details-content">
                   <div className="detail-row">
-                    <span className="detail-label">Merkle Root:</span>
+                    <span className="detail-label">
+                      Merkle Root:
+                      {settings.showHelperTooltips !== false && (
+                        <HelperTooltip content={tTooltips("bitcoin.merkleRoot")} />
+                      )}
+                    </span>
                     <span className="detail-value tx-mono">{block.merkleRoot}</span>
                   </div>
                   <div className="detail-row">
-                    <span className="detail-label">Version:</span>
+                    <span className="detail-label">
+                      Version:
+                      {settings.showHelperTooltips !== false && (
+                        <HelperTooltip content={tTooltips("bitcoin.blockVersion")} />
+                      )}
+                    </span>
                     <span className="detail-value">0x{block.version.toString(16)}</span>
                   </div>
                   <div className="detail-row">
-                    <span className="detail-label">Bits:</span>
+                    <span className="detail-label">
+                      Bits:
+                      {settings.showHelperTooltips !== false && (
+                        <HelperTooltip content={tTooltips("bitcoin.bits")} />
+                      )}
+                    </span>
                     <span className="detail-value tx-mono">{block.bits}</span>
                   </div>
                   <div className="detail-row">
-                    <span className="detail-label">Nonce:</span>
+                    <span className="detail-label">
+                      Nonce:
+                      {settings.showHelperTooltips !== false && (
+                        <HelperTooltip content={tTooltips("bitcoin.blockNonce")} />
+                      )}
+                    </span>
                     <span className="detail-value">{block.nonce.toLocaleString()}</span>
                   </div>
                   {block.coinbaseHex && (
                     <div className="detail-row">
-                      <span className="detail-label">Coinbase (hex):</span>
+                      <span className="detail-label">
+                        Coinbase (hex):
+                        {settings.showHelperTooltips !== false && (
+                          <HelperTooltip content={tTooltips("bitcoin.coinbaseHex")} />
+                        )}
+                      </span>
                       <span className="detail-value tx-mono btc-coinbase-hex">
                         {block.coinbaseHex}
                       </span>

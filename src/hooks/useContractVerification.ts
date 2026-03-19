@@ -1,4 +1,3 @@
-import { useSettings } from "../context/SettingsContext";
 import { useEtherscan } from "./useEtherscan";
 import type { SourcifyContractDetails } from "./useSourcify";
 import { useSourcify } from "./useSourcify";
@@ -23,21 +22,18 @@ export function useContractVerification(
   address: string | undefined,
   enabled: boolean = true,
 ): ContractVerificationResult {
-  const { settings } = useSettings();
-  const hasEtherscanKey = !!settings.apiKeys?.etherscan;
-
   const {
     data: sourcifyData,
     loading: sourcifyLoading,
     isVerified: sourcifyVerified,
   } = useSourcify(networkId, address, enabled);
 
-  // Run Etherscan in parallel whenever a key is configured
+  // Run Etherscan in parallel (uses worker proxy when no user key is configured)
   const {
     data: etherscanData,
     loading: etherscanLoading,
     isVerified: etherscanVerified,
-  } = useEtherscan(networkId, address, enabled && hasEtherscanKey);
+  } = useEtherscan(networkId, address, enabled);
 
   const loading = sourcifyLoading || etherscanLoading;
   const source: VerificationSource = [

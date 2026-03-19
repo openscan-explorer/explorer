@@ -1,45 +1,48 @@
-import { type BlockNumberOrTag, NetworkAdapter } from "../NetworkAdapter";
+import { type BlockNumberOrTag, NetworkAdapter, type TraceResult } from "../NetworkAdapter";
 import type { Block, Transaction, Address, NetworkStats, DataWithMetadata } from "../../../types";
-import type { CallNode, PrestateTrace, TraceResult } from "../NetworkAdapter";
-import { normalizeGethCallTrace } from "../../../utils/callTreeUtils";
+import type { CallNode, PrestateTrace } from "../NetworkAdapter";
+import {
+  buildCallTreeFromStructLogs,
+  buildPrestateFromStructLogs,
+} from "../../../utils/structLogConverter";
 import { logger } from "../../../utils/logger";
 import {
   transformRPCBlockToBlock,
   transformRPCTransactionToTransaction,
   createAddressFromBalance,
   hexToNumber,
-} from "./utils";
+} from "../EVMAdapter/utils";
 
 import { normalizeBlockNumber } from "../shared/normalizeBlockNumber";
 import { mergeMetadata } from "../shared/mergeMetadata";
-import type { EthereumClient } from "@openscan/network-connectors";
-import type { AppChainId } from "../../../types";
-import { getRethClient, NONCE_LOOKUP_CHAIN_ID } from "../../../config/rethProviders";
-import { NonceLookupService } from "../../NonceLookupService";
+import type { EthereumClient, HardhatClient } from "@openscan/network-connectors";
 
 /**
- * EVM-compatible blockchain service
- * Supports Ethereum, Arbitrum, Optimism, Base, BSC, Polygon
+ * Hardhat local development network adapter
+ * Chain ID: 31337
+ * Uses HardhatClient which supports standard Ethereum methods
+ * plus Hardhat-specific methods (hardhat_*, evm_*, debug_*, trace_*)
  */
-export class EVMAdapter extends NetworkAdapter {
-  private client: EthereumClient;
+export class HardhatAdapter extends NetworkAdapter {
+  private client: HardhatClient;
 
-  constructor(networkId: AppChainId, client: EthereumClient) {
-    super(networkId);
+  constructor(client: HardhatClient) {
+    super(31337);
     this.client = client;
-
-    if (networkId === NONCE_LOOKUP_CHAIN_ID) {
-      const rethClient = getRethClient();
-      const nonceLookup = new NonceLookupService(rethClient);
-      this.initTxSearch(client, nonceLookup);
-    } else {
-      this.initTxSearch(client);
-    }
+    this.initTxSearch(client as unknown as EthereumClient);
   }
 
   protected getClient(): EthereumClient {
+    return this.client as unknown as EthereumClient;
+  }
+
+  /**
+   * Get the typed HardhatClient for Hardhat-specific operations
+   */
+  getHardhatClient(): HardhatClient {
     return this.client;
   }
+
   async getBlock(blockNumber: BlockNumberOrTag): Promise<DataWithMetadata<Block>> {
     const normalizedBlockNumber = normalizeBlockNumber(blockNumber);
     const result = await this.client.getBlockByNumber(normalizedBlockNumber);
@@ -70,7 +73,6 @@ export class EVMAdapter extends NetworkAdapter {
 
     const block = transformRPCBlockToBlock(blockData);
 
-    // Extract transaction details
     const transactionDetails: Transaction[] = [];
     if (Array.isArray(blockData.transactions)) {
       for (const tx of blockData.transactions) {
@@ -100,7 +102,6 @@ export class EVMAdapter extends NetworkAdapter {
     const receiptData = receiptResult.data;
     const transaction = transformRPCTransactionToTransaction(txData, receiptData);
 
-    // Get timestamp and baseFeePerGas from block if available
     if (txData.blockNumber) {
       try {
         const blockResult = await this.getBlock(txData.blockNumber);
@@ -218,7 +219,6 @@ export class EVMAdapter extends NetworkAdapter {
         const blockResult = await this.getBlock(blockNum);
         const blockWithTxs = await this.getBlockWithTransactions(blockNum);
 
-        // Collect metadata from block fetch
         metadataList.push(blockResult.metadata);
 
         for (const tx of blockWithTxs.transactionDetails) {
@@ -232,7 +232,6 @@ export class EVMAdapter extends NetworkAdapter {
       }
     }
 
-    // Merge metadata from all block fetches
     const mergedMetadata =
       mergeMetadata<Array<Transaction & { blockNumber: string }>>(metadataList);
 
@@ -247,15 +246,10 @@ export class EVMAdapter extends NetworkAdapter {
   }
 
   isTraceAvailable(): boolean {
-    return this.isLocalHost;
+    return true;
   }
 
   async getTransactionTrace(txHash: string): Promise<TraceResult | null> {
-    if (!this.isLocalHost) {
-      logger.warn("Trace methods are only available on localhost networks");
-      return null;
-    }
-
     try {
       const result = await this.client.debugTraceTransaction(txHash, {});
       return result.data;
@@ -267,11 +261,6 @@ export class EVMAdapter extends NetworkAdapter {
 
   // biome-ignore lint/suspicious/noExplicitAny: Generic trace result
   async getCallTrace(txHash: string): Promise<any> {
-    if (!this.isLocalHost) {
-      logger.warn("Trace methods are only available on localhost networks");
-      return null;
-    }
-
     try {
       const result = await this.client.traceTransaction(txHash);
       return result.data;
@@ -282,13 +271,7 @@ export class EVMAdapter extends NetworkAdapter {
   }
 
   async getBlockTrace(blockHash: string): Promise<TraceResult[] | null> {
-    if (!this.isLocalHost) {
-      logger.warn("Trace methods are only available on localhost networks");
-      return null;
-    }
-
     try {
-      // Convert block hash to block number first
       const blockResult = await this.client.getBlockByHash(blockHash, false);
       const blockData = blockResult.data;
       if (!blockData) return null;
@@ -304,8 +287,24 @@ export class EVMAdapter extends NetworkAdapter {
 
   async getAnalyserCallTrace(txHash: string): Promise<CallNode | null> {
     try {
-      const result = await this.client.debugTraceTransaction(txHash, { tracer: "callTracer" });
-      return result.data ? normalizeGethCallTrace(result.data) : null;
+      // Hardhat v3 does not support callTracer — use default struct log tracer
+      // and convert the opcode trace into a call tree.
+      const [traceResult, txResult] = await Promise.all([
+        this.client.debugTraceTransaction(txHash, {}),
+        this.client.getTransactionByHash(txHash),
+      ]);
+
+      const trace = traceResult.data as TraceResult | undefined;
+      const txData = txResult.data;
+      if (!trace?.structLogs || !txData) return null;
+
+      return buildCallTreeFromStructLogs(trace, {
+        from: txData.from ?? "",
+        to: txData.to ?? "",
+        value: txData.value ?? "0x0",
+        gas: txData.gas ?? "0x0",
+        input: txData.input ?? "0x",
+      });
     } catch (error) {
       logger.error("Error getting analyser call trace:", error);
       return null;
@@ -314,11 +313,24 @@ export class EVMAdapter extends NetworkAdapter {
 
   async getAnalyserPrestateTrace(txHash: string): Promise<PrestateTrace | null> {
     try {
-      const result = await this.client.debugTraceTransaction(txHash, {
-        tracer: "prestateTracer",
-        tracerConfig: { diffMode: true },
+      // Hardhat v3 does not support prestateTracer — use default struct log tracer
+      // and extract storage changes from SLOAD/SSTORE operations.
+      const [traceResult, txResult] = await Promise.all([
+        this.client.debugTraceTransaction(txHash, {}),
+        this.client.getTransactionByHash(txHash),
+      ]);
+
+      const trace = traceResult.data as TraceResult | undefined;
+      const txData = txResult.data;
+      if (!trace?.structLogs || !txData) return null;
+
+      return buildPrestateFromStructLogs(trace, {
+        from: txData.from ?? "",
+        to: txData.to ?? "",
+        value: txData.value ?? "0x0",
+        gas: txData.gas ?? "0x0",
+        input: txData.input ?? "0x",
       });
-      return (result.data as PrestateTrace) ?? null;
     } catch (error) {
       logger.error("Error getting analyser prestate trace:", error);
       return null;

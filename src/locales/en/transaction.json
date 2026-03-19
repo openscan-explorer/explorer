@@ -187,6 +187,11 @@
     "expandAll": "Expand All",
     "collapseAll": "Collapse All",
     "expand": "Expand",
-    "collapse": "Collapse"
+    "collapse": "Collapse",
+    "rawTrace": "Raw Trace",
+    "rawTraceSteps": "{{count}} opcode steps",
+    "rawTracePrev": "Prev",
+    "rawTraceNext": "Next",
+    "rawTracePage": "Page {{current}}/{{total}} ({{from}}–{{to}} of {{totalSteps}})"
   }
 }

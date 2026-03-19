@@ -12,6 +12,7 @@ import enSettings from "./locales/en/settings.json";
 import enTransaction from "./locales/en/transaction.json";
 import enTokenDetails from "./locales/en/tokenDetails.json";
 import enRpcs from "./locales/en/rpcs.json";
+import enTooltips from "./locales/en/tooltips.json";
 
 import esAddress from "./locales/es/address.json";
 import esBlock from "./locales/es/block.json";
@@ -23,6 +24,7 @@ import esSettings from "./locales/es/settings.json";
 import esTransaction from "./locales/es/transaction.json";
 import esTokenDetails from "./locales/es/tokenDetails.json";
 import esRpcs from "./locales/es/rpcs.json";
+import esTooltips from "./locales/es/tooltips.json";
 
 import zhAddress from "./locales/zh/address.json";
 import zhBlock from "./locales/zh/block.json";
@@ -33,6 +35,7 @@ import zhNetwork from "./locales/zh/network.json";
 import zhSettings from "./locales/zh/settings.json";
 import zhTransaction from "./locales/zh/transaction.json";
 import zhTokenDetails from "./locales/zh/tokenDetails.json";
+import zhTooltips from "./locales/zh/tooltips.json";
 
 import jaAddress from "./locales/ja/address.json";
 import jaBlock from "./locales/ja/block.json";
@@ -43,6 +46,7 @@ import jaNetwork from "./locales/ja/network.json";
 import jaSettings from "./locales/ja/settings.json";
 import jaTransaction from "./locales/ja/transaction.json";
 import jaTokenDetails from "./locales/ja/tokenDetails.json";
+import jaTooltips from "./locales/ja/tooltips.json";
 
 import ptBRAddress from "./locales/pt-BR/address.json";
 import ptBRBlock from "./locales/pt-BR/block.json";
@@ -53,6 +57,7 @@ import ptBRNetwork from "./locales/pt-BR/network.json";
 import ptBRSettings from "./locales/pt-BR/settings.json";
 import ptBRTransaction from "./locales/pt-BR/transaction.json";
 import ptBRTokenDetails from "./locales/pt-BR/tokenDetails.json";
+import ptBRTooltips from "./locales/pt-BR/tooltips.json";
 
 export const SUPPORTED_LANGUAGES = [
   { code: "en", name: "English" },
@@ -78,6 +83,7 @@ i18n
         network: enNetwork,
         tokenDetails: enTokenDetails,
         rpcs: enRpcs,
+        tooltips: enTooltips,
       },
       es: {
         common: esCommon,
@@ -90,6 +96,7 @@ i18n
         network: esNetwork,
         tokenDetails: esTokenDetails,
         rpcs: esRpcs,
+        tooltips: esTooltips,
       },
       zh: {
         common: zhCommon,
@@ -101,6 +108,7 @@ i18n
         devtools: zhDevtools,
         network: zhNetwork,
         tokenDetails: zhTokenDetails,
+        tooltips: zhTooltips,
       },
       ja: {
         common: jaCommon,
@@ -112,6 +120,7 @@ i18n
         devtools: jaDevtools,
         network: jaNetwork,
         tokenDetails: jaTokenDetails,
+        tooltips: jaTooltips,
       },
       "pt-BR": {
         common: ptBRCommon,
@@ -123,6 +132,7 @@ i18n
         devtools: ptBRDevtools,
         network: ptBRNetwork,
         tokenDetails: ptBRTokenDetails,
+        tooltips: ptBRTooltips,
       },
     },
     fallbackLng: "en",
@@ -137,6 +147,7 @@ i18n
       "devtools",
       "network",
       "rpcs",
+      "tooltips",
     ],
     interpolation: {
       escapeValue: false,

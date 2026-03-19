@@ -26,7 +26,14 @@
     "disableSuperUser": "Desativar Modo Super Usuário",
     "enableSuperUser": "Ativar Modo Super Usuário",
     "mempool": "Mempool",
-    "txs": "Transações"
+    "txs": "Transações",
+    "tooltipsBeginner": "Dicas: Iniciante",
+    "tooltipsIntermediate": "Dicas: Intermediário",
+    "tooltipsAdvanced": "Dicas: Avançado",
+    "tooltipsSwitched": "Nível de dicas alterado para {{level}}",
+    "tooltipsLevelBeginner": "Iniciante",
+    "tooltipsLevelIntermediate": "Intermediário",
+    "tooltipsLevelAdvanced": "Avançado"
   },
   "footer": {
     "about": "Sobre",

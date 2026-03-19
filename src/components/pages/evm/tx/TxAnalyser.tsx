@@ -1,17 +1,23 @@
 import type React from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import type { CallNode, PrestateTrace } from "../../../../services/adapters/NetworkAdapter";
+import type {
+  CallNode,
+  PrestateTrace,
+  TraceResult,
+} from "../../../../services/adapters/NetworkAdapter";
 import { useBeaconBlobs } from "../../../../hooks/useBeaconBlobs";
 import { useCallTreeEnrichment } from "../../../../hooks/useCallTreeEnrichment";
 import { type ContractInfo, fetchContractInfoBatch } from "../../../../utils/contractLookup";
 import { useSettings } from "../../../../context/SettingsContext";
+import HelperTooltip from "../../../common/HelperTooltip";
 import { logger } from "../../../../utils/logger";
 import BlobDataDisplay from "../../../common/BlobDataDisplay";
 import type { AnalyserTab, TxAnalyserProps } from "./analyser/types";
 import CallTreeTab from "./analyser/CallTreeTab";
 import StateChangesTab from "./analyser/StateChangesTab";
 import GasProfilerTab from "./analyser/GasProfilerTab";
+import RawTraceTab from "./analyser/RawTraceTab";
 import InputDataTab from "./analyser/InputDataTab";
 import EventLogsTab from "./analyser/EventLogsTab";
 
@@ -30,6 +36,7 @@ const TxAnalyser: React.FC<TxAnalyserProps> = ({
   blockTimestamp,
 }) => {
   const { t } = useTranslation("transaction");
+  const { t: tTooltips } = useTranslation("tooltips");
   const hasEvents = logs && logs.length > 0;
   const hasInputData = inputData && inputData !== "0x";
   const hasBlobData = blobVersionedHashes && blobVersionedHashes.length > 0;
@@ -55,17 +62,26 @@ const TxAnalyser: React.FC<TxAnalyserProps> = ({
     if (isSuperUser) {
       setCollapsed(false);
     } else {
-      const superTabs: AnalyserTab[] = ["callTree", "gasProfiler", "stateChanges", "blobData"];
+      const superTabs: AnalyserTab[] = [
+        "callTree",
+        "gasProfiler",
+        "stateChanges",
+        "rawTrace",
+        "blobData",
+      ];
       setActiveTab((prev) => (superTabs.includes(prev) ? defaultTab : prev));
     }
   }, [isSuperUser]);
 
   const [callTree, setCallTree] = useState<CallNode | null>(null);
   const [prestateTrace, setPrestateTrace] = useState<PrestateTrace | null>(null);
+  const [rawTrace, setRawTrace] = useState<TraceResult | null>(null);
   const [loadingCallTree, setLoadingCallTree] = useState(false);
   const [loadingPrestate, setLoadingPrestate] = useState(false);
+  const [loadingRawTrace, setLoadingRawTrace] = useState(false);
   const [callTreeError, setCallTreeError] = useState<string | null>(null);
   const [prestateError, setPrestateError] = useState<string | null>(null);
+  const [rawTraceError, setRawTraceError] = useState<string | null>(null);
 
   // Contract name + ABI enrichment for the call tree
   const { contracts: treeContracts, enrichmentLoading } = useCallTreeEnrichment(
@@ -187,6 +203,41 @@ const TxAnalyser: React.FC<TxAnalyserProps> = ({
     isUnsupported,
   ]);
 
+  // Load raw trace when switching to that tab (super user only)
+  useEffect(() => {
+    if (!isSuperUser) return;
+    if (activeTab !== "rawTrace") return;
+    if (rawTrace || rawTraceError || loadingRawTrace) return;
+    setLoadingRawTrace(true);
+    dataService.networkAdapter
+      .getTransactionTrace(txHash)
+      .then((data) => {
+        if (data) {
+          setRawTrace(data);
+        } else {
+          setRawTraceError(t("analyser.notSupported"));
+        }
+      })
+      .catch((err) => {
+        const msg = err instanceof Error ? err.message : String(err);
+        logger.warn("TX Analyser raw trace error:", msg);
+        setRawTraceError(
+          isUnsupported(msg) ? t("analyser.notSupported") : `${t("analyser.error")}: ${msg}`,
+        );
+      })
+      .finally(() => setLoadingRawTrace(false));
+  }, [
+    isSuperUser,
+    activeTab,
+    txHash,
+    dataService,
+    rawTrace,
+    rawTraceError,
+    loadingRawTrace,
+    t,
+    isUnsupported,
+  ]);
+
   const [collapsed, setCollapsed] = useState(!isSuperUser);
 
   const handleTabClick = useCallback(
@@ -200,6 +251,9 @@ const TxAnalyser: React.FC<TxAnalyserProps> = ({
     },
     [activeTab],
   );
+
+  // Hide entirely if there's nothing to show
+  if (!isSuperUser && !hasEvents && !hasInputData) return null;
 
   return (
     <div className="detail-panel">
@@ -221,6 +275,9 @@ const TxAnalyser: React.FC<TxAnalyserProps> = ({
             onClick={() => handleTabClick("inputData")}
           >
             {t("analyser.inputDataTab")}
+            {settings.showHelperTooltips !== false && (
+              <HelperTooltip content={tTooltips("transaction.decodedInput")} />
+            )}
           </button>
         )}
         {isSuperUser && (
@@ -231,6 +288,9 @@ const TxAnalyser: React.FC<TxAnalyserProps> = ({
               onClick={() => handleTabClick("callTree")}
             >
               {t("analyser.callTree")}
+              {settings.showHelperTooltips !== false && (
+                <HelperTooltip content={tTooltips("transaction.callTree")} />
+              )}
             </button>
             <button
               type="button"
@@ -238,6 +298,9 @@ const TxAnalyser: React.FC<TxAnalyserProps> = ({
               onClick={() => handleTabClick("gasProfiler")}
             >
               {t("analyser.gasProfiler")}
+              {settings.showHelperTooltips !== false && (
+                <HelperTooltip content={tTooltips("transaction.gasProfiler")} />
+              )}
             </button>
             <button
               type="button"
@@ -245,6 +308,16 @@ const TxAnalyser: React.FC<TxAnalyserProps> = ({
               onClick={() => handleTabClick("stateChanges")}
             >
               {t("analyser.stateChanges")}
+              {settings.showHelperTooltips !== false && (
+                <HelperTooltip content={tTooltips("transaction.stateChanges")} />
+              )}
+            </button>
+            <button
+              type="button"
+              className={`detail-panel-tab${activeTab === "rawTrace" ? " detail-panel-tab--active" : ""}`}
+              onClick={() => handleTabClick("rawTrace")}
+            >
+              {t("analyser.rawTrace")}
             </button>
             {hasBlobData && beaconAvailable && (
               <button
@@ -341,6 +414,23 @@ const TxAnalyser: React.FC<TxAnalyserProps> = ({
                   contracts={contracts}
                 />
               )}
+            </>
+          )}
+
+          {activeTab === "rawTrace" && (
+            <>
+              {loadingRawTrace && (
+                <div className="detail-panel-loading">{t("analyser.loading")}</div>
+              )}
+              {rawTraceError && (
+                <div className="detail-panel-error">
+                  <div>{rawTraceError}</div>
+                  {rawTraceError === t("analyser.notSupported") && (
+                    <div className="detail-panel-hint">{t("analyser.traceHint")}</div>
+                  )}
+                </div>
+              )}
+              {rawTrace && <RawTraceTab trace={rawTrace} />}
             </>
           )}
 

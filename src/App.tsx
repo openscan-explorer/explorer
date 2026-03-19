@@ -20,6 +20,7 @@ import "./styles/rainbowkit.css";
 import "./styles/responsive.css";
 import "./styles/ai-analysis.css";
 import "./styles/rpcs.css";
+import "./styles/helper-tooltip.css";
 
 import Loading from "./components/common/Loading";
 import {

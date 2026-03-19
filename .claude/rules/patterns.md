@@ -32,10 +32,10 @@
 
 1. Add chain ID to `src/types/index.ts` if creating new domain types
 2. Add default RPC endpoints to `src/config/rpcConfig.ts`
-3. Determine if network needs custom fetchers/adapters (L1, Arbitrum-like, OP Stack-like)
-4. If custom: create `src/services/EVM/[Network]/fetchers/` and `adapters/`
-5. Update `DataService` constructor to detect chain ID and instantiate correct fetchers/adapters
-6. Add network config to `ALL_NETWORKS` in `src/config/networks.ts`
+3. Determine if network needs a custom adapter (L1, Arbitrum-like, OP Stack-like, Hardhat-like)
+4. If custom: create `src/services/adapters/[Network]Adapter/[Network]Adapter.ts`
+5. Register the adapter in `src/services/adapters/adaptersFactory.ts` with its chain ID
+6. Add network config to `src/config/networks.json`
 7. Add network logo to `public/` and update `logoType` in network config
 
 ## Testing with Local Networks
@@ -43,7 +43,8 @@
 OpenScan includes special support for localhost development:
 
 - **Hardhat 3 Ignition**: Import deployment artifacts via Settings → Import Ignition Deployment
-- **Trace Support**: `debug_traceTransaction`, `debug_traceBlockByHash`, `debug_traceCall` available on localhost (31337)
+- **Trace Support**: `debug_traceTransaction`, `debug_traceBlockByHash`, `debug_traceCall` available on Hardhat (31337) and localhost networks
+- **Hardhat Trace Conversion**: Hardhat v3 only supports the default struct log tracer (not `callTracer`/`prestateTracer`). The `HardhatAdapter` uses `buildCallTreeFromStructLogs()` and `buildPrestateFromStructLogs()` from `src/utils/structLogConverter.ts` to convert opcode traces into call trees and state diffs
 - **Auto-detection**: Port 8545 automatically recognized as localhost network
 
 ## Component Patterns

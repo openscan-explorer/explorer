@@ -2,6 +2,7 @@ import type React from "react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
+import FieldLabel from "../../../../common/FieldLabel";
 
 interface NFTCollectionInfoCardProps {
   collectionName?: string;
@@ -63,7 +64,12 @@ const NFTCollectionInfoCard: React.FC<NFTCollectionInfoCardProps> = ({
 
       {/* Token Standard */}
       <div className="account-card-row">
-        <span className="account-card-label">{t("tokenStandard")}:</span>
+        <FieldLabel
+          label={`${t("tokenStandard")}:`}
+          tooltipKey="token.tokenStandard"
+          visibleFor={["beginner", "intermediate"]}
+          className="account-card-label"
+        />
         <span className="account-card-value">
           <span className={`token-standard-badge ${standardClass}`}>{tokenStandard}</span>
         </span>
@@ -72,7 +78,12 @@ const NFTCollectionInfoCard: React.FC<NFTCollectionInfoCardProps> = ({
       {/* Total Supply (ERC721 only) */}
       {totalSupply && (
         <div className="account-card-row">
-          <span className="account-card-label">{t("totalMinted")}:</span>
+          <FieldLabel
+            label={`${t("totalMinted")}:`}
+            tooltipKey="token.totalSupply"
+            visibleFor={["beginner", "intermediate"]}
+            className="account-card-label"
+          />
           <span className="account-card-value">{Number(totalSupply).toLocaleString()} NFTs</span>
         </div>
       )}
@@ -80,7 +91,12 @@ const NFTCollectionInfoCard: React.FC<NFTCollectionInfoCardProps> = ({
       {/* Metadata URI (ERC1155 only) */}
       {metadataUri && (
         <div className="account-card-row">
-          <span className="account-card-label">{t("metadataURI")}:</span>
+          <FieldLabel
+            label={`${t("metadataURI")}:`}
+            tooltipKey="token.metadataUri"
+            visibleFor={["beginner", "intermediate"]}
+            className="account-card-label"
+          />
           <span className="account-card-value account-card-mono">
             {metadataUri.length > 50 ? `${metadataUri.slice(0, 50)}...` : metadataUri}
           </span>

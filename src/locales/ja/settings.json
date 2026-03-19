@@ -155,6 +155,21 @@
     "endpointLabel": "{{network}} Beacon API",
     "endpointPlaceholder": "https://your-beacon-node.example.com"
   },
+  "helperTooltips": {
+    "title": "ヘルパーツールチップ",
+    "description": "ブロックチェーンデータフィールドのコンテキストヘルプを表示します。",
+    "enabled": {
+      "label": "ヘルパーツールチップを表示",
+      "description": "フィールドラベルの横に簡単な説明付きのヘルプアイコンを表示します。"
+    },
+    "knowledgeLevel": {
+      "label": "知識レベル",
+      "description": "ヘルパーツールチップの表示数を制御します。初心者はすべて表示。中級者は基本フィールドを非表示。上級者は複雑なチェーン固有のツールチップのみ表示。",
+      "beginner": "初心者",
+      "intermediate": "中級者",
+      "advanced": "上級者"
+    }
+  },
   "rpcEndpoints": {
     "title": "RPCエンドポイント",
     "description": "各ネットワークのRPC URLを設定します。ネットワークをクリックして展開し、エンドポイントを設定してください。",
