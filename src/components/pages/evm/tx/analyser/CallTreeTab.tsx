@@ -142,8 +142,8 @@ const CallTreeTab: React.FC<{
   const typeCounts = countByType(root);
 
   return (
-    <div className="analyser-tab-content">
-      <div className="analyser-summary">
+    <div className="detail-panel-tab-content">
+      <div className="detail-panel-summary">
         {gasUsed !== undefined && (
           <span>{t("analyser.summaryGas", { gas: gasUsed.toLocaleString() })}</span>
         )}
@@ -154,19 +154,19 @@ const CallTreeTab: React.FC<{
           .map(([type, count]) => (
             <span
               key={type}
-              className="analyser-summary-type"
+              className="detail-panel-summary-type"
               style={{ color: getCallTypeColor(type) }}
             >
               {count}× {type}
             </span>
           ))}
         {totalReverts > 0 && (
-          <span className="analyser-summary-reverts">
+          <span className="detail-panel-summary-reverts">
             {t("analyser.summaryReverts", { reverts: totalReverts })}
           </span>
         )}
         {enrichmentLoading && (
-          <span className="analyser-summary-loading">{t("analyser.enriching")}</span>
+          <span className="detail-panel-summary-loading">{t("analyser.enriching")}</span>
         )}
       </div>
       <div className="call-tree-root">

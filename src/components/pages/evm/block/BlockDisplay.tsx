@@ -1,16 +1,15 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { getNetworkById } from "../../../../config/networks";
 import { useSettings } from "../../../../context/SettingsContext";
-import { useBeaconBlobs } from "../../../../hooks/useBeaconBlobs";
 import type { Block, BlockArbitrum, RPCMetadata } from "../../../../types";
 import AIAnalysisPanel from "../../../common/AIAnalysis/AIAnalysisPanel";
-import BlobDataDisplay from "../../../common/BlobDataDisplay";
 import ExtraDataDisplay from "../../../common/ExtraDataDisplay";
 import LongString from "../../../common/LongString";
 import { RPCIndicator } from "../../../common/RPCIndicator";
 import { formatGweiFromWei, formatNativeFromWei } from "../../../../utils/unitFormatters";
+import BlockAnalyser from "./BlockAnalyser";
 
 interface BlockDisplayProps {
   block: Block | BlockArbitrum;
@@ -27,22 +26,6 @@ const BlockDisplay: React.FC<BlockDisplayProps> = React.memo(
     const network = networkId ? getNetworkById(networkId) : undefined;
     const networkName = network?.name ?? "Unknown Network";
     const networkCurrency = network?.currency ?? "ETH";
-    const [showWithdrawals, setShowWithdrawals] = useState(false);
-    const [showTransactions, setShowTransactions] = useState(false);
-    const [showMoreDetails, setShowMoreDetails] = useState(false);
-    const [showBlobData, setShowBlobData] = useState(false);
-
-    const hasBlobGas = block.blobGasUsed && Number(block.blobGasUsed) > 0;
-    const caip2NetworkId = networkId ? `eip155:${networkId}` : undefined;
-    const {
-      blobs: blobSidecars,
-      loading: blobsLoading,
-      isPruned: blobsPruned,
-      isAvailable: beaconAvailable,
-    } = useBeaconBlobs(
-      isSuperUser && hasBlobGas ? caip2NetworkId : undefined,
-      isSuperUser && hasBlobGas && showBlobData ? Number(block.timestamp) : undefined,
-    );
 
     // Check if this is an Arbitrum block
     const isArbitrumBlock = (block: Block | BlockArbitrum): block is BlockArbitrum => {
@@ -351,198 +334,9 @@ const BlockDisplay: React.FC<BlockDisplayProps> = React.memo(
                 )}
               </div>
             </div>
-
-            {/* Full-width: More Details (collapsible) */}
-            <div className="tx-row tx-row-vertical">
-              {/** biome-ignore lint/a11y/useButtonType: <TODO> */}
-              <button
-                className="more-details-toggle"
-                onClick={() => setShowMoreDetails(!showMoreDetails)}
-              >
-                {showMoreDetails ? "− Hide" : "+ Show"} {t("moreDetails")}
-              </button>
-
-              {showMoreDetails && (
-                <div className="more-details-content">
-                  <div className="detail-row">
-                    <span className="detail-label">Parent Hash:</span>
-                    <span className="detail-value tx-mono">
-                      {networkId &&
-                      block.parentHash !==
-                        "0x0000000000000000000000000000000000000000000000000000000000000000" ? (
-                        <Link to={`/${networkId}/block/${blockNumber - 1}`} className="link-accent">
-                          {block.parentHash}
-                        </Link>
-                      ) : (
-                        block.parentHash
-                      )}
-                    </span>
-                  </div>
-                  <div className="detail-row">
-                    <span className="detail-label">State Root:</span>
-                    <span className="detail-value tx-mono">{block.stateRoot}</span>
-                  </div>
-                  <div className="detail-row">
-                    <span className="detail-label">Transactions Root:</span>
-                    <span className="detail-value tx-mono">{block.transactionsRoot}</span>
-                  </div>
-                  <div className="detail-row">
-                    <span className="detail-label">Receipts Root:</span>
-                    <span className="detail-value tx-mono">{block.receiptsRoot}</span>
-                  </div>
-                  {block.withdrawalsRoot && (
-                    <div className="detail-row">
-                      <span className="detail-label">Withdrawals Root:</span>
-                      <span className="detail-value tx-mono">{block.withdrawalsRoot}</span>
-                    </div>
-                  )}
-                  <div className="detail-row">
-                    <span className="detail-label">Logs Bloom:</span>
-                    <div className="detail-value">
-                      <code className="logs-bloom">{block.logsBloom}</code>
-                    </div>
-                  </div>
-                  <div className="detail-row">
-                    <span className="detail-label">Nonce:</span>
-                    <span className="detail-value">{block.nonce}</span>
-                  </div>
-                  <div className="detail-row">
-                    <span className="detail-label">Mix Hash:</span>
-                    <span className="detail-value tx-mono">{block.mixHash}</span>
-                  </div>
-                  <div className="detail-row">
-                    <span className="detail-label">Sha3 Uncles:</span>
-                    <span className="detail-value tx-mono">{block.sha3Uncles}</span>
-                  </div>
-                </div>
-              )}
-            </div>
           </div>
 
-          {/* Transactions List */}
-          {block.transactions && block.transactions.length > 0 && (
-            <div className="tx-section">
-              <div className="tx-section-header">
-                {/** biome-ignore lint/a11y/useButtonType: <TODO> */}
-                <button
-                  className="tx-section-toggle"
-                  onClick={() => setShowTransactions(!showTransactions)}
-                >
-                  <span className="tx-section-title">
-                    {t("transactions")} ({block.transactions.length})
-                  </span>
-                  <span className="tx-section-arrow">{showTransactions ? "▼" : "▶"}</span>
-                </button>
-              </div>
-              {showTransactions && (
-                <div className="tx-list">
-                  {block.transactions.map((txHash, index) => (
-                    <div key={txHash} className="tx-list-item">
-                      <span className="tx-list-index">{index}</span>
-                      <span className="tx-list-hash tx-mono">
-                        {networkId ? (
-                          <Link to={`/${networkId}/tx/${txHash}`} className="link-accent">
-                            {txHash}
-                          </Link>
-                        ) : (
-                          txHash
-                        )}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Withdrawals List */}
-          {block.withdrawals && block.withdrawals.length > 0 && (
-            <div className="tx-section">
-              <div className="tx-section-header">
-                {/** biome-ignore lint/a11y/useButtonType: <TODO> */}
-                <button
-                  className="tx-section-toggle"
-                  onClick={() => setShowWithdrawals(!showWithdrawals)}
-                >
-                  <span className="tx-section-title">Withdrawals ({block.withdrawals.length})</span>
-                  <span className="tx-section-arrow">{showWithdrawals ? "▼" : "▶"}</span>
-                </button>
-              </div>
-              {showWithdrawals && (
-                <div className="tx-logs">
-                  {block.withdrawals.map((withdrawal, index) => (
-                    // biome-ignore lint/suspicious/noArrayIndexKey: <TODO>
-                    <div key={index} className="tx-log">
-                      <div className="tx-log-index">{index}</div>
-                      <div className="tx-log-content">
-                        <div className="tx-log-row">
-                          <span className="tx-log-label">{t("index")}</span>
-                          <span className="tx-log-value">
-                            {Number(withdrawal.index).toLocaleString()}
-                          </span>
-                        </div>
-                        <div className="tx-log-row">
-                          <span className="tx-log-label">{t("validator")}</span>
-                          <span className="tx-log-value">
-                            {Number(withdrawal.validatorIndex).toLocaleString()}
-                          </span>
-                        </div>
-                        <div className="tx-log-row">
-                          <span className="tx-log-label">{t("address")}</span>
-                          <span className="tx-log-value tx-mono">
-                            {networkId ? (
-                              <Link
-                                to={`/${networkId}/address/${withdrawal.address}`}
-                                className="link-accent"
-                              >
-                                {withdrawal.address}
-                              </Link>
-                            ) : (
-                              withdrawal.address
-                            )}
-                          </span>
-                        </div>
-                        <div className="tx-log-row">
-                          <span className="tx-log-label">{t("amount")}</span>
-                          <span className="tx-log-value tx-value-highlight">
-                            {(Number(withdrawal.amount) / 1e9).toFixed(9)} ETH
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-          {/* Blob Data (Super User only) */}
-          {isSuperUser && hasBlobGas && beaconAvailable && (
-            <div className="tx-section">
-              <div className="tx-section-header">
-                {/** biome-ignore lint/a11y/useButtonType: <TODO> */}
-                <button
-                  className="tx-section-toggle"
-                  onClick={() => setShowBlobData(!showBlobData)}
-                >
-                  <span className="tx-section-title">
-                    {t("blobData.title", {
-                      count: Math.floor(Number(block.blobGasUsed) / 131072),
-                    })}
-                  </span>
-                  <span className="tx-section-arrow">{showBlobData ? "▼" : "▶"}</span>
-                </button>
-              </div>
-              {showBlobData && (
-                <div className="blob-section-list">
-                  {blobsLoading && <p className="blob-section-message">{t("blobData.loading")}</p>}
-                  {blobsPruned && <p className="blob-section-message">{t("blobData.pruned")}</p>}
-                  {blobSidecars?.map((blob) => (
-                    <BlobDataDisplay key={blob.index} blob={blob} index={Number(blob.index)} />
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
+          <BlockAnalyser block={block} networkId={networkId} isSuperUser={isSuperUser} />
         </div>
         <AIAnalysisPanel
           analysisType="block"

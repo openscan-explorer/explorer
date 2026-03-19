@@ -66,6 +66,23 @@
     "minute": "minuto",
     "minute_other": "minutos"
   },
+  "analyser": {
+    "moreDetails": "Más detalles",
+    "transactions": "Transacciones",
+    "withdrawals": "Retiros",
+    "blobData": "Datos de Blobs",
+    "expand": "Expandir",
+    "collapse": "Colapsar",
+    "parentHash": "Hash padre:",
+    "stateRoot": "Raíz de estado:",
+    "transactionsRoot": "Raíz de transacciones:",
+    "receiptsRoot": "Raíz de recibos:",
+    "withdrawalsRoot": "Raíz de retiros:",
+    "logsBloom": "Logs Bloom:",
+    "nonce": "Nonce:",
+    "mixHash": "Mix Hash:",
+    "sha3Uncles": "Sha3 Uncles:"
+  },
   "aiAnalysis": {
     "sectionTitle": "Análisis IA"
   },

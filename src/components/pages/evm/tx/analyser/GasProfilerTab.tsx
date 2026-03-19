@@ -154,8 +154,8 @@ const GasProfilerTab: React.FC<{
     : [];
 
   return (
-    <div className="analyser-tab-content">
-      <div className="analyser-summary">
+    <div className="detail-panel-tab-content">
+      <div className="detail-panel-summary">
         <span>{t("analyser.summaryGas", { gas: totalGas.toLocaleString() })}</span>
         {isZoomed && (
           <button type="button" className="gas-profiler-reset" onClick={resetZoom}>

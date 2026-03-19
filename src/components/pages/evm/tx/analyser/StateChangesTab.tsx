@@ -62,8 +62,8 @@ const StateChangesTab: React.FC<{
 
   if (changedAddresses.length === 0) {
     return (
-      <div className="analyser-tab-content">
-        <div className="analyser-empty">{t("analyser.noChanges")}</div>
+      <div className="detail-panel-tab-content">
+        <div className="detail-panel-empty">{t("analyser.noChanges")}</div>
       </div>
     );
   }
@@ -81,16 +81,16 @@ const StateChangesTab: React.FC<{
   const collapseAll = () => setExpandedSet(new Set());
 
   return (
-    <div className="analyser-tab-content">
-      <div className="analyser-summary">
+    <div className="detail-panel-tab-content">
+      <div className="detail-panel-summary">
         <span>
           {changedAddresses.length} {t("analyser.stateChanges").toLowerCase()}
         </span>
-        <span className="analyser-expand-controls">
-          <button type="button" className="analyser-expand-btn" onClick={expandAll}>
+        <span className="detail-panel-expand-controls">
+          <button type="button" className="detail-panel-expand-btn" onClick={expandAll}>
             {t("analyser.expandAll")}
           </button>
-          <button type="button" className="analyser-expand-btn" onClick={collapseAll}>
+          <button type="button" className="detail-panel-expand-btn" onClick={collapseAll}>
             {t("analyser.collapseAll")}
           </button>
         </span>

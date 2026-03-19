@@ -32,10 +32,10 @@ const InputDataTab: React.FC<{
   const utf8Text = !resolved ? tryDecodeUtf8(inputData) : null;
 
   return (
-    <div className="analyser-tab-content">
+    <div className="detail-panel-tab-content">
       {resolved && (
         <div className="analyser-input-decoded">
-          <div className="analyser-summary">
+          <div className="detail-panel-summary">
             <span>{t("decodedInput")}</span>
           </div>
           <div className="tx-decoded-input">
@@ -67,7 +67,7 @@ const InputDataTab: React.FC<{
       )}
       {utf8Text && (
         <div className="analyser-input-decoded">
-          <div className="analyser-summary">
+          <div className="detail-panel-summary">
             <span>{t("analyser.utf8Text")}</span>
           </div>
           <div className="tx-input-utf8">
@@ -76,7 +76,7 @@ const InputDataTab: React.FC<{
         </div>
       )}
       <div className="analyser-input-raw">
-        <div className="analyser-summary">
+        <div className="detail-panel-summary">
           <span>{t("analyser.rawInputData")}</span>
         </div>
         <div className="tx-input-data">

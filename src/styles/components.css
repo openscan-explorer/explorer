@@ -435,6 +435,75 @@
 	}
 }
 
+/* Withdrawal list (block analyser) */
+.withdrawal-list {
+	display: flex;
+	flex-direction: column;
+}
+
+.withdrawal-row {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+	padding: 10px 16px;
+	border-bottom: 1px solid var(--color-primary-alpha-10);
+	font-size: 0.85rem;
+}
+
+.withdrawal-row:last-child {
+	border-bottom: none;
+}
+
+.withdrawal-index {
+	flex: 0 0 40px;
+	height: 28px;
+	background: var(--color-primary-alpha-10);
+	border-radius: 4px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-family: "JetBrains Mono", monospace;
+	font-size: 0.75rem;
+	color: var(--text-secondary);
+}
+
+.withdrawal-field {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	min-width: 0;
+}
+
+.withdrawal-field-label {
+	font-size: 0.75rem;
+	color: var(--text-tertiary);
+	white-space: nowrap;
+}
+
+.withdrawal-address {
+	flex: 1;
+	min-width: 0;
+	word-break: break-all;
+}
+
+.withdrawal-amount {
+	flex: 0 0 auto;
+	font-weight: 600;
+	white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+	.withdrawal-row {
+		flex-wrap: wrap;
+		gap: 8px;
+	}
+
+	.withdrawal-address {
+		flex-basis: 100%;
+		order: 10;
+	}
+}
+
 .contract-creation-badge {
 	display: inline-block;
 	padding: 2px 8px;
@@ -1947,9 +2016,9 @@ button.tx-section-header-toggle {
 	padding: 10px;
 }
 
-/* ── TX Analyser ─────────────────────────────────────────────────────────── */
+/* ── Detail Panel (shared: TX Analyser, Block Analyser) ─────────────────── */
 
-.tx-analyser {
+.detail-panel {
 	margin-top: 16px;
 	border: 1px solid var(--border-primary);
 	border-radius: 10px;
@@ -1957,14 +2026,14 @@ button.tx-section-header-toggle {
 	background: var(--bg-secondary);
 }
 
-.tx-analyser-tabs {
+.detail-panel-tabs {
 	display: flex;
 	align-items: center;
 	border-bottom: 1px solid var(--border-primary);
 	background: var(--bg-tertiary);
 }
 
-.tx-analyser-collapse-btn {
+.detail-panel-collapse-btn {
 	margin-left: auto;
 	padding: 6px 12px;
 	background: none;
@@ -1974,11 +2043,11 @@ button.tx-section-header-toggle {
 	font-size: 0.85rem;
 }
 
-.tx-analyser-collapse-btn:hover {
+.detail-panel-collapse-btn:hover {
 	color: var(--text-primary);
 }
 
-.tx-analyser-tab {
+.detail-panel-tab {
 	padding: 10px 18px;
 	font-size: 0.875rem;
 	font-weight: 500;
@@ -1991,38 +2060,38 @@ button.tx-section-header-toggle {
 	margin-bottom: -1px;
 }
 
-.tx-analyser-tab:hover {
+.detail-panel-tab:hover {
 	color: var(--text-primary);
 }
 
-.tx-analyser-tab--active {
+.detail-panel-tab--active {
 	color: var(--color-accent);
 	border-bottom-color: var(--color-accent);
 }
 
-.tx-analyser-tab--active-base {
+.detail-panel-tab--active-base {
 	color: var(--text-primary);
 	border-bottom-color: var(--text-primary);
 }
 
-.tx-analyser-body {
+.detail-panel-body {
 	padding: 16px;
 	min-height: 80px;
 }
 
-.analyser-tab-content {
+.detail-panel-tab-content {
 	display: flex;
 	flex-direction: column;
 	gap: 12px;
 }
 
-.analyser-loading {
+.detail-panel-loading {
 	text-align: center;
 	padding: 32px;
 	color: var(--text-secondary);
 }
 
-.analyser-error {
+.detail-panel-error {
 	padding: 16px;
 	border-radius: 8px;
 	background: rgba(239, 68, 68, 0.08);
@@ -2031,20 +2100,20 @@ button.tx-section-header-toggle {
 	font-size: 0.875rem;
 }
 
-.analyser-hint {
+.detail-panel-hint {
 	margin-top: 8px;
 	color: var(--text-secondary);
 	font-size: 0.8rem;
 }
 
-.analyser-empty {
+.detail-panel-empty {
 	text-align: center;
 	padding: 32px;
 	color: var(--text-tertiary);
 	font-size: 0.875rem;
 }
 
-.analyser-summary {
+.detail-panel-summary {
 	display: flex;
 	gap: 16px;
 	flex-wrap: wrap;
@@ -2056,7 +2125,7 @@ button.tx-section-header-toggle {
 	border: 1px solid var(--border-primary);
 }
 
-.analyser-summary-reverts {
+.detail-panel-summary-reverts {
 	color: var(--color-error);
 }
 
@@ -2190,13 +2259,13 @@ button.tx-section-header-toggle {
 	background: var(--overlay-light-2);
 }
 
-.analyser-expand-controls {
+.detail-panel-expand-controls {
 	margin-left: auto;
 	display: flex;
 	gap: 8px;
 }
 
-.analyser-expand-btn {
+.detail-panel-expand-btn {
 	background: none;
 	border: 1px solid var(--border-primary);
 	border-radius: 4px;
@@ -2206,7 +2275,7 @@ button.tx-section-header-toggle {
 	cursor: pointer;
 }
 
-.analyser-expand-btn:hover {
+.detail-panel-expand-btn:hover {
 	color: var(--text-primary);
 	border-color: var(--text-tertiary);
 }
@@ -2319,12 +2388,12 @@ button.tx-section-header-toggle {
 	color: var(--text-secondary);
 }
 
-.analyser-summary-type {
+.detail-panel-summary-type {
 	font-size: 0.8rem;
 	font-weight: 500;
 }
 
-.analyser-summary-loading {
+.detail-panel-summary-loading {
 	color: var(--text-tertiary);
 	font-size: 0.8rem;
 	font-style: italic;

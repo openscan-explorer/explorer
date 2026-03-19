@@ -66,6 +66,23 @@
     "minute": "minute",
     "minute_other": "minutes"
   },
+  "analyser": {
+    "moreDetails": "More Details",
+    "transactions": "Transactions",
+    "withdrawals": "Withdrawals",
+    "blobData": "Blob Data",
+    "expand": "Expand",
+    "collapse": "Collapse",
+    "parentHash": "Parent Hash:",
+    "stateRoot": "State Root:",
+    "transactionsRoot": "Transactions Root:",
+    "receiptsRoot": "Receipts Root:",
+    "withdrawalsRoot": "Withdrawals Root:",
+    "logsBloom": "Logs Bloom:",
+    "nonce": "Nonce:",
+    "mixHash": "Mix Hash:",
+    "sha3Uncles": "Sha3 Uncles:"
+  },
   "aiAnalysis": {
     "sectionTitle": "AI Analysis"
   },
