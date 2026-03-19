@@ -55,6 +55,43 @@
   word-wrap: break-word;
 }
 
+/* Arrow pointing from bubble to trigger */
+.helper-tooltip-arrow {
+  position: absolute;
+  width: 0;
+  height: 0;
+  border: 5px solid transparent;
+  pointer-events: none;
+}
+
+/* Top placement: arrow at bottom, pointing down */
+.helper-tooltip-arrow-top {
+  bottom: -10px;
+  transform: translateX(-50%);
+  border-top-color: var(--bg-tooltip);
+}
+
+/* Bottom placement: arrow at top, pointing up */
+.helper-tooltip-arrow-bottom {
+  top: -10px;
+  transform: translateX(-50%);
+  border-bottom-color: var(--bg-tooltip);
+}
+
+/* Left placement: arrow at right, pointing right */
+.helper-tooltip-arrow-left {
+  right: -10px;
+  transform: translateY(-50%);
+  border-left-color: var(--bg-tooltip);
+}
+
+/* Right placement: arrow at left, pointing left */
+.helper-tooltip-arrow-right {
+  left: -10px;
+  transform: translateY(-50%);
+  border-right-color: var(--bg-tooltip);
+}
+
 /* Light theme text: keep tooltip text white since bg-tooltip is dark in both themes */
 .light-theme .helper-tooltip-bubble {
   color: #fff;

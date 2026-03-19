@@ -16,6 +16,7 @@ const HelperTooltip: React.FC<HelperTooltipProps> = ({ content, placement = "top
   const tooltipId = useId();
   const triggerRef = useRef<HTMLButtonElement>(null);
   const bubbleRef = useRef<HTMLDivElement>(null);
+  const arrowRef = useRef<HTMLSpanElement>(null);
   const hoverTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isPointerInsideRef = useRef(false);
 
@@ -118,10 +119,11 @@ const HelperTooltip: React.FC<HelperTooltipProps> = ({ content, placement = "top
     };
   }, []);
 
-  // Clamp bubble within viewport after render
+  // Clamp bubble within viewport and position arrow after render
   useLayoutEffect(() => {
-    if (!isVisible || !bubbleRef.current) return;
+    if (!isVisible || !bubbleRef.current || !triggerRect) return;
     const bubble = bubbleRef.current;
+    const arrow = arrowRef.current;
     const rect = bubble.getBoundingClientRect();
     const margin = 8;
     let needsClamp = false;
@@ -151,7 +153,29 @@ const HelperTooltip: React.FC<HelperTooltipProps> = ({ content, placement = "top
       bubble.style.top = `${top}px`;
       bubble.style.transform = "none";
     }
-  }, [isVisible, triggerRect]);
+
+    // Position arrow to point at trigger center
+    if (arrow) {
+      const bubbleRect = bubble.getBoundingClientRect();
+      const triggerCenterX = triggerRect.left + triggerRect.width / 2;
+      const triggerCenterY = triggerRect.top + triggerRect.height / 2;
+      const arrowSize = 5;
+
+      if (actualPlacement === "top" || actualPlacement === "bottom") {
+        const arrowLeft = Math.max(
+          arrowSize,
+          Math.min(triggerCenterX - bubbleRect.left, bubbleRect.width - arrowSize),
+        );
+        arrow.style.left = `${arrowLeft}px`;
+      } else {
+        const arrowTop = Math.max(
+          arrowSize,
+          Math.min(triggerCenterY - bubbleRect.top, bubbleRect.height - arrowSize),
+        );
+        arrow.style.top = `${arrowTop}px`;
+      }
+    }
+  }, [isVisible, triggerRect, actualPlacement]);
 
   const getBubbleStyle = (): React.CSSProperties => {
     if (!triggerRect) return {};
@@ -202,6 +226,11 @@ const HelperTooltip: React.FC<HelperTooltipProps> = ({ content, placement = "top
       onMouseLeave={handlePointerLeave}
     >
       {content}
+      <span
+        ref={arrowRef}
+        className={`helper-tooltip-arrow helper-tooltip-arrow-${actualPlacement}`}
+        aria-hidden="true"
+      />
     </div>
   ) : null;
 

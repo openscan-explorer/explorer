@@ -93,7 +93,10 @@ const BitcoinBlockDisplay: React.FC<BitcoinBlockDisplayProps> = React.memo(
               <span className="block-status-badge block-status-finalized">
                 {block.confirmations.toLocaleString()} Confirmations
                 {settings.showHelperTooltips !== false && (
-                  <HelperTooltip content={tTooltips("bitcoin.blockConfirmations")} placement="left" />
+                  <HelperTooltip
+                    content={tTooltips("bitcoin.blockConfirmations")}
+                    placement="left"
+                  />
                 )}
               </span>
             )}
