@@ -149,6 +149,12 @@
       }
     }
   },
+  "beaconApi": {
+    "title": "Beacon API",
+    "description": "配置 Beacon Chain API 端点以查看 EIP-4844 Blob 数据。默认提供公共端点。",
+    "endpointLabel": "{{network}} Beacon API",
+    "endpointPlaceholder": "https://your-beacon-node.example.com"
+  },
   "rpcEndpoints": {
     "title": "RPC 端点",
     "description": "为每个网络配置 RPC URL。点击网络展开并配置其端点。",

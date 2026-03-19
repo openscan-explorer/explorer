@@ -2,8 +2,11 @@ import React, { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { getNetworkById } from "../../../../config/networks";
+import { useSettings } from "../../../../context/SettingsContext";
+import { useBeaconBlobs } from "../../../../hooks/useBeaconBlobs";
 import type { Block, BlockArbitrum, RPCMetadata } from "../../../../types";
 import AIAnalysisPanel from "../../../common/AIAnalysis/AIAnalysisPanel";
+import BlobDataDisplay from "../../../common/BlobDataDisplay";
 import ExtraDataDisplay from "../../../common/ExtraDataDisplay";
 import LongString from "../../../common/LongString";
 import { RPCIndicator } from "../../../common/RPCIndicator";
@@ -20,12 +23,26 @@ interface BlockDisplayProps {
 const BlockDisplay: React.FC<BlockDisplayProps> = React.memo(
   ({ block, networkId, metadata, selectedProvider, onProviderSelect }) => {
     const { t } = useTranslation("block");
+    const { isSuperUser } = useSettings();
     const network = networkId ? getNetworkById(networkId) : undefined;
     const networkName = network?.name ?? "Unknown Network";
     const networkCurrency = network?.currency ?? "ETH";
     const [showWithdrawals, setShowWithdrawals] = useState(false);
     const [showTransactions, setShowTransactions] = useState(false);
     const [showMoreDetails, setShowMoreDetails] = useState(false);
+    const [showBlobData, setShowBlobData] = useState(false);
+
+    const hasBlobGas = block.blobGasUsed && Number(block.blobGasUsed) > 0;
+    const caip2NetworkId = networkId ? `eip155:${networkId}` : undefined;
+    const {
+      blobs: blobSidecars,
+      loading: blobsLoading,
+      isPruned: blobsPruned,
+      isAvailable: beaconAvailable,
+    } = useBeaconBlobs(
+      isSuperUser && hasBlobGas ? caip2NetworkId : undefined,
+      isSuperUser && hasBlobGas && showBlobData ? Number(block.timestamp) : undefined,
+    );
 
     // Check if this is an Arbitrum block
     const isArbitrumBlock = (block: Block | BlockArbitrum): block is BlockArbitrum => {
@@ -493,6 +510,34 @@ const BlockDisplay: React.FC<BlockDisplayProps> = React.memo(
                         </div>
                       </div>
                     </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+          {/* Blob Data (Super User only) */}
+          {isSuperUser && hasBlobGas && beaconAvailable && (
+            <div className="tx-section">
+              <div className="tx-section-header">
+                {/** biome-ignore lint/a11y/useButtonType: <TODO> */}
+                <button
+                  className="tx-section-toggle"
+                  onClick={() => setShowBlobData(!showBlobData)}
+                >
+                  <span className="tx-section-title">
+                    {t("blobData.title", {
+                      count: Math.floor(Number(block.blobGasUsed) / 131072),
+                    })}
+                  </span>
+                  <span className="tx-section-arrow">{showBlobData ? "▼" : "▶"}</span>
+                </button>
+              </div>
+              {showBlobData && (
+                <div className="blob-section-list">
+                  {blobsLoading && <p className="blob-section-message">{t("blobData.loading")}</p>}
+                  {blobsPruned && <p className="blob-section-message">{t("blobData.pruned")}</p>}
+                  {blobSidecars?.map((blob) => (
+                    <BlobDataDisplay key={blob.index} blob={blob} index={Number(blob.index)} />
                   ))}
                 </div>
               )}

@@ -847,6 +847,8 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
               inputData={transaction.data}
               decodedInputData={decodedInput}
               isSuperUser={isSuperUser}
+              blobVersionedHashes={transaction.blobVersionedHashes}
+              blockTimestamp={transaction.timestamp ? Number(transaction.timestamp) : undefined}
             />
           )}
 

@@ -2,10 +2,12 @@ import type React from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { CallNode, PrestateTrace } from "../../../../services/adapters/NetworkAdapter";
+import { useBeaconBlobs } from "../../../../hooks/useBeaconBlobs";
 import { useCallTreeEnrichment } from "../../../../hooks/useCallTreeEnrichment";
 import { type ContractInfo, fetchContractInfoBatch } from "../../../../utils/contractLookup";
 import { useSettings } from "../../../../context/SettingsContext";
 import { logger } from "../../../../utils/logger";
+import BlobDataDisplay from "../../../common/BlobDataDisplay";
 import type { AnalyserTab, TxAnalyserProps } from "./analyser/types";
 import CallTreeTab from "./analyser/CallTreeTab";
 import StateChangesTab from "./analyser/StateChangesTab";
@@ -24,12 +26,28 @@ const TxAnalyser: React.FC<TxAnalyserProps> = ({
   inputData,
   decodedInputData,
   isSuperUser,
+  blobVersionedHashes,
+  blockTimestamp,
 }) => {
   const { t } = useTranslation("transaction");
   const hasEvents = logs && logs.length > 0;
   const hasInputData = inputData && inputData !== "0x";
+  const hasBlobData = blobVersionedHashes && blobVersionedHashes.length > 0;
   const defaultTab: AnalyserTab = hasEvents ? "events" : hasInputData ? "inputData" : "callTree";
   const [activeTab, setActiveTab] = useState<AnalyserTab>(defaultTab);
+
+  // Beacon blob data
+  const caip2NetworkId = networkId ? `eip155:${networkId}` : undefined;
+  const {
+    blobs: blobSidecars,
+    loading: blobsLoading,
+    isPruned: blobsPruned,
+    isAvailable: beaconAvailable,
+  } = useBeaconBlobs(
+    isSuperUser && hasBlobData ? caip2NetworkId : undefined,
+    isSuperUser && hasBlobData && activeTab === "blobData" ? blockTimestamp : undefined,
+    blobVersionedHashes,
+  );
 
   // Reset to a base tab when leaving super user mode
   // biome-ignore lint/correctness/useExhaustiveDependencies: only react to isSuperUser changes
@@ -37,7 +55,7 @@ const TxAnalyser: React.FC<TxAnalyserProps> = ({
     if (isSuperUser) {
       setCollapsed(false);
     } else {
-      const superTabs: AnalyserTab[] = ["callTree", "gasProfiler", "stateChanges"];
+      const superTabs: AnalyserTab[] = ["callTree", "gasProfiler", "stateChanges", "blobData"];
       setActiveTab((prev) => (superTabs.includes(prev) ? defaultTab : prev));
     }
   }, [isSuperUser]);
@@ -228,6 +246,15 @@ const TxAnalyser: React.FC<TxAnalyserProps> = ({
             >
               {t("analyser.stateChanges")}
             </button>
+            {hasBlobData && beaconAvailable && (
+              <button
+                type="button"
+                className={`tx-analyser-tab${activeTab === "blobData" ? " tx-analyser-tab--active" : ""}`}
+                onClick={() => handleTabClick("blobData")}
+              >
+                {t("blobData.title")} ({blobVersionedHashes.length})
+              </button>
+            )}
           </>
         )}
         <button
@@ -342,6 +369,16 @@ const TxAnalyser: React.FC<TxAnalyserProps> = ({
               contracts={contracts}
               txToAddress={txToAddress}
             />
+          )}
+
+          {activeTab === "blobData" && hasBlobData && (
+            <div className="blob-section-list">
+              {blobsLoading && <div className="analyser-loading">{t("blobData.loading")}</div>}
+              {blobsPruned && <div className="analyser-error">{t("blobData.pruned")}</div>}
+              {blobSidecars?.map((blob) => (
+                <BlobDataDisplay key={blob.index} blob={blob} index={Number(blob.index)} />
+              ))}
+            </div>
           )}
         </div>
       )}

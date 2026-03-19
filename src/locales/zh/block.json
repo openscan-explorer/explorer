@@ -13,6 +13,12 @@
   "blobGasUsed": "Blob Gas 使用量：",
   "excessBlobGas": "超额 Blob Gas：",
   "blobCount": "Blob 数量：",
+  "blobData": {
+    "title": "Blob 数据 ({{count}})",
+    "loading": "正在从 Beacon API 加载 Blob 数据...",
+    "pruned": "Blob 数据已被修剪，不再可用。Blob 通常在约 18 天后被修剪。",
+    "noBeaconEndpoint": "请在设置中配置 Beacon API 端点以查看 Blob 数据。"
+  },
   "extraData": "额外数据",
   "difficulty": "难度",
   "totalDifficulty": "总难度",

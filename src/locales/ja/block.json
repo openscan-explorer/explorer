@@ -13,6 +13,12 @@
   "blobGasUsed": "Blob Gas 使用量：",
   "excessBlobGas": "超過 Blob Gas：",
   "blobCount": "Blob 数：",
+  "blobData": {
+    "title": "Blob データ ({{count}})",
+    "loading": "Beacon API から Blob データを読み込み中...",
+    "pruned": "Blob データは剪定されており、利用できません。Blob は通常約18日後に剪定されます。",
+    "noBeaconEndpoint": "Blob データを表示するには、設定で Beacon API エンドポイントを構成してください。"
+  },
   "extraData": "追加データ",
   "difficulty": "難易度",
   "totalDifficulty": "総難易度",

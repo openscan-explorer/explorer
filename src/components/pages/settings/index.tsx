@@ -3,6 +3,7 @@ import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "r
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { MetaMaskIcon } from "../../common/MetaMaskIcon";
+import { BEACON_SUPPORTED_NETWORKS, DEFAULT_BEACON_URLS } from "../../../config/beaconConfig";
 import { getEnabledNetworks } from "../../../config/networks";
 import { AppContext, useNetworks } from "../../../context/AppContext";
 import { useSettings } from "../../../context/SettingsContext";
@@ -1283,6 +1284,36 @@ const Settings: React.FC = () => {
                     </div>
                   )}
                 </div>
+
+                {isSuperUser && (
+                  <div className="settings-section">
+                    <h2 className="settings-section-title">🔮 {t("beaconApi.title")}</h2>
+                    <p className="settings-section-description">{t("beaconApi.description")}</p>
+                    {Object.entries(BEACON_SUPPORTED_NETWORKS).map(([caip2Id, networkName]) => (
+                      <div key={caip2Id} className="settings-item">
+                        <div>
+                          <div className="settings-item-label">
+                            {t("beaconApi.endpointLabel", { network: networkName })}
+                          </div>
+                        </div>
+                        <input
+                          type="text"
+                          value={
+                            settings.beaconUrls?.[caip2Id] ?? DEFAULT_BEACON_URLS[caip2Id] ?? ""
+                          }
+                          onChange={(e) => {
+                            const current = settings.beaconUrls ?? {};
+                            updateSettings({
+                              beaconUrls: { ...current, [caip2Id]: e.target.value },
+                            });
+                          }}
+                          placeholder={t("beaconApi.endpointPlaceholder")}
+                          className="settings-input"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
 
                 <div className="settings-section">
                   <div className="settings-section-title-row">

@@ -149,6 +149,12 @@
       }
     }
   },
+  "beaconApi": {
+    "title": "Beacon API",
+    "description": "EIP-4844 Blob データを表示するための Beacon Chain API エンドポイントを設定します。デフォルトで公開エンドポイントが提供されます。",
+    "endpointLabel": "{{network}} Beacon API",
+    "endpointPlaceholder": "https://your-beacon-node.example.com"
+  },
   "rpcEndpoints": {
     "title": "RPCエンドポイント",
     "description": "各ネットワークのRPC URLを設定します。ネットワークをクリックして展開し、エンドポイントを設定してください。",

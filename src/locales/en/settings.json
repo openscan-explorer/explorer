@@ -149,6 +149,12 @@
       }
     }
   },
+  "beaconApi": {
+    "title": "Beacon API",
+    "description": "Configure Beacon Chain API endpoints to view EIP-4844 blob data. Public endpoints are provided by default.",
+    "endpointLabel": "{{network}} Beacon API",
+    "endpointPlaceholder": "https://your-beacon-node.example.com"
+  },
   "rpcEndpoints": {
     "title": "RPC Endpoints",
     "description": "Configure RPC URLs for each network. Click on a network to expand and configure its endpoints.",
