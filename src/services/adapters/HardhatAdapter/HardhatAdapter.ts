@@ -1,7 +1,10 @@
 import { type BlockNumberOrTag, NetworkAdapter, type TraceResult } from "../NetworkAdapter";
 import type { Block, Transaction, Address, NetworkStats, DataWithMetadata } from "../../../types";
 import type { CallNode, PrestateTrace } from "../NetworkAdapter";
-import { normalizeGethCallTrace } from "../../../utils/callTreeUtils";
+import {
+  buildCallTreeFromStructLogs,
+  buildPrestateFromStructLogs,
+} from "../../../utils/structLogConverter";
 import { logger } from "../../../utils/logger";
 import {
   transformRPCBlockToBlock,
@@ -284,8 +287,24 @@ export class HardhatAdapter extends NetworkAdapter {
 
   async getAnalyserCallTrace(txHash: string): Promise<CallNode | null> {
     try {
-      const result = await this.client.debugTraceTransaction(txHash, { tracer: "callTracer" });
-      return result.data ? normalizeGethCallTrace(result.data) : null;
+      // Hardhat v3 does not support callTracer — use default struct log tracer
+      // and convert the opcode trace into a call tree.
+      const [traceResult, txResult] = await Promise.all([
+        this.client.debugTraceTransaction(txHash, {}),
+        this.client.getTransactionByHash(txHash),
+      ]);
+
+      const trace = traceResult.data as TraceResult | undefined;
+      const txData = txResult.data;
+      if (!trace?.structLogs || !txData) return null;
+
+      return buildCallTreeFromStructLogs(trace, {
+        from: txData.from ?? "",
+        to: txData.to ?? "",
+        value: txData.value ?? "0x0",
+        gas: txData.gas ?? "0x0",
+        input: txData.input ?? "0x",
+      });
     } catch (error) {
       logger.error("Error getting analyser call trace:", error);
       return null;
@@ -294,11 +313,24 @@ export class HardhatAdapter extends NetworkAdapter {
 
   async getAnalyserPrestateTrace(txHash: string): Promise<PrestateTrace | null> {
     try {
-      const result = await this.client.debugTraceTransaction(txHash, {
-        tracer: "prestateTracer",
-        tracerConfig: { diffMode: true },
+      // Hardhat v3 does not support prestateTracer — use default struct log tracer
+      // and extract storage changes from SLOAD/SSTORE operations.
+      const [traceResult, txResult] = await Promise.all([
+        this.client.debugTraceTransaction(txHash, {}),
+        this.client.getTransactionByHash(txHash),
+      ]);
+
+      const trace = traceResult.data as TraceResult | undefined;
+      const txData = txResult.data;
+      if (!trace?.structLogs || !txData) return null;
+
+      return buildPrestateFromStructLogs(trace, {
+        from: txData.from ?? "",
+        to: txData.to ?? "",
+        value: txData.value ?? "0x0",
+        gas: txData.gas ?? "0x0",
+        input: txData.input ?? "0x",
       });
-      return (result.data as PrestateTrace) ?? null;
     } catch (error) {
       logger.error("Error getting analyser prestate trace:", error);
       return null;
