@@ -2,17 +2,18 @@
 
 ## When Modifying Data Fetching
 
-- Always maintain the adapter pattern: Fetcher → Adapter → Service
+- Always maintain the adapter pattern: Client → Adapter → Service
+- All adapters extend the abstract `NetworkAdapter` class (`services/adapters/NetworkAdapter.ts`)
 - If adding parallel strategy support, ensure complete objects are built for each provider
-- Test both `fallback` and `parallel` strategies
+- Test `fallback`, `parallel`, and `race` strategies
 - Update TypeScript types in `src/types/index.ts` if adding new fields
 
 ## When Adding L2-Specific Features
 
 - Check if network is OP Stack-based (Optimism, Base) or Arbitrum
 - Add network-specific types (e.g., `TransactionOptimism extends Transaction`)
-- Create adapters that inherit base behavior and add L2 fields
-- Update `DataService` conditional logic in constructor and relevant methods
+- Create a new adapter extending `NetworkAdapter` in `services/adapters/[Network]/`
+- Register the adapter in `AdapterFactory` (`services/adapters/adaptersFactory.ts`)
 
 ## When Working with Cache
 
@@ -32,10 +33,10 @@
 
 1. Add chain ID to `src/types/index.ts` if creating new domain types
 2. Add default RPC endpoints to `src/config/rpcConfig.ts`
-3. Determine if network needs a custom adapter (L1, Arbitrum-like, OP Stack-like, Hardhat-like)
-4. If custom: create `src/services/adapters/[Network]Adapter/[Network]Adapter.ts`
-5. Register the adapter in `src/services/adapters/adaptersFactory.ts` with its chain ID
-6. Add network config to `src/config/networks.json`
+3. Determine if network needs a custom adapter (L1, Arbitrum-like, OP Stack-like, Bitcoin, Hardhat-like)
+4. If custom: create `src/services/adapters/[Network]/[Network]Adapter.ts` extending `NetworkAdapter`
+5. Register the adapter in `AdapterFactory` (`src/services/adapters/adaptersFactory.ts`)
+6. Add network config to `ALL_NETWORKS` in `src/config/networks.ts`
 7. Add network logo to `public/` and update `logoType` in network config
 
 ## Testing with Local Networks
@@ -51,7 +52,7 @@ OpenScan includes special support for localhost development:
 
 ### Address Page Components
 - Use display components for different address types: `AccountDisplay`, `ContractDisplay`, `ERC20Display`, `ERC721Display`, `ERC1155Display`
-- Shared components in `src/components/pages/address/shared/`
+- Shared components in `src/components/pages/evm/address/shared/`
 - Card-based layout with Overview and More Info sections
 
 ### Theming
