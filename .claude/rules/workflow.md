@@ -2,76 +2,107 @@
 
 ## Branch Strategy
 
-The project follows a structured branching workflow:
+The project uses two workflows depending on the scope of changes:
+
+### Patch Releases (default workflow)
+
+For incremental work (bug fixes, small features, improvements) that goes into the next patch version:
 
 ```
-feature/fix/refactor branches → release branch (vX.Y.Z) → dev (staging/QA) → main (production)
+feature/fix/refactor branches → dev (release candidate) → main (production)
 ```
 
-### Branch Types
+1. **Dev Branch**: Always holds the next release candidate (patch increment)
+   - Feature/fix PRs are created directly against `dev`
+   - Used for QA/staging before production
+   - Always represents the next patch version (e.g., if main is v1.2.0, dev is the v1.2.1 candidate)
 
-1. **Feature/Fix/Refactor Branches**: Created from the **release branch** for specific changes
+2. **Feature/Fix/Refactor Branches**: Created from `dev`
    - Naming: `feat/<description>`, `fix/<description>`, `refactor/<description>`
-   - Example: `feat/token-holdings`, `fix/light-theme-colors`, `refactor/address-layout`
-   - PRs are created against the release branch
+   - PRs are created against `dev`
 
-2. **Release Branches**: Created for each release cycle
-   - Naming: `release/vX.Y.Z` (e.g., `release/v1.1.1`)
-   - All feature branches are merged here
-   - When features are complete, merged to `dev` for QA/staging
-
-3. **Dev Branch**: Staging/QA environment
-   - Receives merges from release branches
-   - Used for QA testing before production
-   - If fixes are needed during QA, PRs can be created directly against `dev`
-
-4. **Main Branch**: Production-ready code
+3. **Main Branch**: Production-ready code
    - Only receives merges from `dev` after QA approval
-   - Always stable and deployable
+   - Tagged with the version on merge
 
-### Workflow Steps
+#### Patch Workflow Steps
 
-1. Create or checkout the release branch:
+1. Create feature branch from `dev`:
    ```bash
-   git checkout release/v1.1.1
-   git pull origin release/v1.1.1
-   ```
-
-2. Create feature branch from the release branch:
-   ```bash
+   git checkout dev
+   git pull origin dev
    git checkout -b feat/my-feature
    ```
 
-3. Work on feature, commit changes following conventional commits
+2. Work on feature, commit changes following conventional commits
 
-4. Push and create PR to the **release branch**:
+3. Push and create PR to `dev`:
    ```bash
    git push -u origin feat/my-feature
-   gh pr create --base release/v1.1.1
-   ```
-
-5. After PR approval and merge to release branch, delete feature branch
-
-6. When release is ready for QA, merge release branch to `dev`:
-   ```bash
-   git checkout dev
-   git merge release/v1.1.1
-   git push origin dev
-   ```
-
-7. **QA/Staging fixes**: If issues are found during QA, create PRs directly against `dev`:
-   ```bash
-   git checkout dev
-   git checkout -b fix/qa-issue
-   # ... fix the issue ...
    gh pr create --base dev
    ```
 
-8. After QA approval, merge `dev` to `main`:
+4. After PR approval and merge to `dev`, delete feature branch
+
+5. After QA approval, merge `dev` to `main`:
    ```bash
    git checkout main
    git merge dev
-   git tag v1.1.1
+   git tag v1.2.1
+   git push origin main --tags
+   ```
+
+### Minor/Major Releases (release branch workflow)
+
+For larger milestones with multiple coordinated changes (new features, breaking changes):
+
+```
+feature/fix/refactor branches → release branch (vX.Y.Z) → dev → main
+```
+
+1. **Release Branches**: Created from `dev` for each release cycle
+   - Naming: `release/vX.Y.Z` (e.g., `release/v1.3.0`)
+   - Feature branches are created from and merged into the release branch
+   - When features are complete, merged to `dev` for QA/staging
+
+2. **Feature Branches**: Created from the **release branch**
+   - PRs are created against the release branch
+
+#### Release Branch Workflow Steps
+
+1. Create the release branch from `dev`:
+   ```bash
+   git checkout dev
+   git checkout -b release/v1.3.0
+   git push -u origin release/v1.3.0
+   ```
+
+2. Create feature branches from the release branch:
+   ```bash
+   git checkout release/v1.3.0
+   git checkout -b feat/my-feature
+   ```
+
+3. Push and create PR to the **release branch**:
+   ```bash
+   git push -u origin feat/my-feature
+   gh pr create --base release/v1.3.0
+   ```
+
+4. When all features are merged, merge release branch to `dev` for QA:
+   ```bash
+   git checkout dev
+   git merge release/v1.3.0
+   git push origin dev
+   ```
+
+5. QA fixes go directly against `dev`
+
+6. After QA approval, merge `dev` to `main`:
+   ```bash
+   git checkout main
+   git merge dev
+   git tag v1.3.0
    git push origin main --tags
    ```
 
