@@ -3,7 +3,7 @@ import { createPortal } from "react-dom";
 
 interface HelperTooltipProps {
   content: string;
-  placement?: "top" | "bottom";
+  placement?: "top" | "bottom" | "left" | "right";
   className?: string;
 }
 
@@ -22,7 +22,12 @@ const HelperTooltip: React.FC<HelperTooltipProps> = ({ content, placement = "top
   const show = useCallback(() => {
     if (triggerRef.current) {
       const rect = triggerRef.current.getBoundingClientRect();
-      setActualPlacement(rect.top < 80 ? "bottom" : placement);
+      // Only auto-flip top↔bottom; left/right stay as requested
+      if (placement === "top" || placement === "bottom") {
+        setActualPlacement(rect.top < 80 ? "bottom" : placement);
+      } else {
+        setActualPlacement(placement);
+      }
       setTriggerRect(rect);
     }
     setIsVisible(true);
@@ -120,13 +125,20 @@ const HelperTooltip: React.FC<HelperTooltipProps> = ({ content, placement = "top
     const rect = bubble.getBoundingClientRect();
     const margin = 8;
 
+    // Horizontal clamping
     if (rect.right > window.innerWidth - margin) {
       bubble.style.left = `${window.innerWidth - margin - rect.width}px`;
       bubble.style.transform = "none";
-    }
-    if (rect.left < margin) {
+    } else if (rect.left < margin) {
       bubble.style.left = `${margin}px`;
       bubble.style.transform = "none";
+    }
+
+    // Vertical clamping
+    if (rect.bottom > window.innerHeight - margin) {
+      bubble.style.top = `${window.innerHeight - margin - rect.height}px`;
+    } else if (rect.top < margin) {
+      bubble.style.top = `${margin}px`;
     }
   }, [isVisible, triggerRect]);
 
@@ -134,21 +146,38 @@ const HelperTooltip: React.FC<HelperTooltipProps> = ({ content, placement = "top
     if (!triggerRect) return {};
     const gap = 6;
     const centerX = triggerRect.left + triggerRect.width / 2;
+    const centerY = triggerRect.top + triggerRect.height / 2;
 
-    if (actualPlacement === "bottom") {
-      return {
-        position: "fixed",
-        top: triggerRect.bottom + gap,
-        left: centerX,
-        transform: "translateX(-50%)",
-      };
+    switch (actualPlacement) {
+      case "bottom":
+        return {
+          position: "fixed",
+          top: triggerRect.bottom + gap,
+          left: centerX,
+          transform: "translateX(-50%)",
+        };
+      case "left":
+        return {
+          position: "fixed",
+          top: centerY,
+          left: triggerRect.left - gap,
+          transform: "translate(-100%, -50%)",
+        };
+      case "right":
+        return {
+          position: "fixed",
+          top: centerY,
+          left: triggerRect.right + gap,
+          transform: "translateY(-50%)",
+        };
+      default:
+        return {
+          position: "fixed",
+          top: triggerRect.top - gap,
+          left: centerX,
+          transform: "translate(-50%, -100%)",
+        };
     }
-    return {
-      position: "fixed",
-      top: triggerRect.top - gap,
-      left: centerX,
-      transform: "translate(-50%, -100%)",
-    };
   };
 
   const bubble = isVisible ? (

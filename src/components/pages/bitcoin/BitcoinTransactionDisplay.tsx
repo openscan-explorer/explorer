@@ -136,7 +136,7 @@ const BitcoinTransactionDisplay: React.FC<BitcoinTransactionDisplayProps> = Reac
                 <span className="block-status-badge block-status-finalized">
                   {transaction.confirmations.toLocaleString()} Confirmations
                   {settings.showHelperTooltips !== false && (
-                    <HelperTooltip content={tTooltips("bitcoin.confirmations")} />
+                    <HelperTooltip content={tTooltips("bitcoin.confirmations")} placement="left" />
                   )}
                 </span>
               )

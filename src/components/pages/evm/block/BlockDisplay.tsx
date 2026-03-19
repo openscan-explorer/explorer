@@ -164,7 +164,7 @@ const BlockDisplay: React.FC<BlockDisplayProps> = React.memo(
               <span className="block-status-badge block-status-finalized">
                 {t("finalized")}
                 {settings.showHelperTooltips !== false && (
-                  <HelperTooltip content={tTooltips("block.finalized")} />
+                  <HelperTooltip content={tTooltips("block.finalized")} placement="left" />
                 )}
               </span>
             </div>
