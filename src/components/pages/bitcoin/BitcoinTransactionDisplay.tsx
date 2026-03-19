@@ -300,6 +300,35 @@ const BitcoinTransactionDisplay: React.FC<BitcoinTransactionDisplayProps> = Reac
                   </div>
                 </>
               )}
+
+              <div className="tx-row">
+                <FieldLabel
+                  label="Coinbase:"
+                  tooltipKey="bitcoin.coinbase"
+                  visibleFor={["beginner"]}
+                />
+                <span className="tx-value">
+                  {isCoinbase ? (
+                    <span className="btc-flag-yes">Yes</span>
+                  ) : (
+                    <span className="btc-flag-no">No</span>
+                  )}
+                </span>
+              </div>
+              <div className="tx-row">
+                <FieldLabel
+                  label="Witness:"
+                  tooltipKey="bitcoin.witness"
+                  visibleFor={["beginner", "intermediate"]}
+                />
+                <span className="tx-value">
+                  {witnessEnabled ? (
+                    <span className="btc-flag-yes">Yes</span>
+                  ) : (
+                    <span className="btc-flag-no">No</span>
+                  )}
+                </span>
+              </div>
             </div>
 
             {/* Right Column */}
@@ -331,34 +360,6 @@ const BitcoinTransactionDisplay: React.FC<BitcoinTransactionDisplayProps> = Reac
                 <span className="tx-value">{transaction.weight.toLocaleString()} WU</span>
               </div>
 
-              <div className="tx-row">
-                <FieldLabel
-                  label="Coinbase:"
-                  tooltipKey="bitcoin.coinbase"
-                  visibleFor={["beginner"]}
-                />
-                <span className="tx-value">
-                  {isCoinbase ? (
-                    <span className="btc-flag-yes">Yes</span>
-                  ) : (
-                    <span className="btc-flag-no">No</span>
-                  )}
-                </span>
-              </div>
-              <div className="tx-row">
-                <FieldLabel
-                  label="Witness:"
-                  tooltipKey="bitcoin.witness"
-                  visibleFor={["beginner", "intermediate"]}
-                />
-                <span className="tx-value">
-                  {witnessEnabled ? (
-                    <span className="btc-flag-yes">Yes</span>
-                  ) : (
-                    <span className="btc-flag-no">No</span>
-                  )}
-                </span>
-              </div>
               <div className="tx-row">
                 <FieldLabel
                   label="RBF:"
