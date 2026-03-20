@@ -15,8 +15,14 @@ export interface AnalyzeRequestBody {
   messages: Array<{ role: "system" | "user"; content: string }>;
 }
 
+export interface EtherscanVerifyRequestBody {
+  chainId: number;
+  address: string;
+}
+
 export interface Env {
   GROQ_API_KEY: string;
+  ETHERSCAN_API_KEY: string;
   ALLOWED_ORIGINS: string;
   GROQ_MODEL: string;
 }

@@ -27,7 +27,14 @@
     "enableSuperUser": "Activar modo Super Usuario",
     "mempool": "Mempool",
     "txs": "Transacciones",
-    "superUserBadge": "Super Usuario"
+    "superUserBadge": "Super Usuario",
+    "tooltipsBeginner": "Tooltips: Principiante",
+    "tooltipsIntermediate": "Tooltips: Intermedio",
+    "tooltipsAdvanced": "Tooltips: Avanzado",
+    "tooltipsSwitched": "Nivel de tooltips cambiado a {{level}}",
+    "tooltipsLevelBeginner": "Principiante",
+    "tooltipsLevelIntermediate": "Intermedio",
+    "tooltipsLevelAdvanced": "Avanzado"
   },
   "footer": {
     "about": "Acerca de",

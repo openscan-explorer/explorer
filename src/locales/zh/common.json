@@ -26,7 +26,14 @@
     "disableSuperUser": "禁用超级用户模式",
     "enableSuperUser": "启用超级用户模式",
     "mempool": "内存池",
-    "txs": "交易"
+    "txs": "交易",
+    "tooltipsBeginner": "提示：初学者",
+    "tooltipsIntermediate": "提示：中级",
+    "tooltipsAdvanced": "提示：高级",
+    "tooltipsSwitched": "提示帮助级别已切换为{{level}}",
+    "tooltipsLevelBeginner": "初学者",
+    "tooltipsLevelIntermediate": "中级",
+    "tooltipsLevelAdvanced": "高级"
   },
   "footer": {
     "about": "关于",

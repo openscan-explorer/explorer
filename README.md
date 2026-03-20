@@ -31,7 +31,8 @@ A trustless, open-source blockchain explorer for Bitcoin, Ethereum, and Layer 2 
 - **BSC (BNB Chain)** - Binance Smart Chain mainnet
 - **BSC Testnet** - Binance Smart Chain testnet
 - **Polygon POS** - Polygon proof-of-stake mainnet
-- **Localhost** - Local development networks (Hardhat/Anvil)
+- **Hardhat** - Local development network (Chain ID 31337) with trace support
+- **Localhost** - Local development networks (Anvil/other)
 
 ### 🔍 Core Functionality
 
@@ -58,6 +59,13 @@ A trustless, open-source blockchain explorer for Bitcoin, Ethereum, and Layer 2 
 - **HH3 Ignition Support** – Import, inspect, and interact with Hardhat 3 Ignition deployments locally
 - **Multiple Fallback URLs** - Automatic failover to backup RPC providers
 - **Read/Write Operations** - Execute smart contract calls on verified smart contracts.
+
+### 🔬 Hardhat Development Support
+
+- **Dedicated Adapter** - Full `HardhatAdapter` for chain ID 31337 with typed `HardhatClient`
+- **Trace Methods** - Call Tree, Gas Profiler, and State Changes via struct log conversion (Hardhat does not support Geth's `callTracer`/`prestateTracer`, so opcode-level traces are converted)
+- **HH3 Ignition** - Import Hardhat 3 Ignition deployment artifacts to inspect and interact with contracts
+- **Auto-detection** - Port 8545 automatically recognized as Hardhat network
 
 ### ⚡ Layer 2 Support
 
@@ -276,13 +284,16 @@ src/
 ├── context/          # React context providers
 ├── hooks/            # Custom React hooks
 ├── services/         # Blockchain data services
-│   ├── adapters/     # General reusable adapters
-│   │   └── BitcoinAdapter/ # Bitcoin network adapter
-│   └── EVM/          # EVM-compatible chain adapters
-│       ├── Arbitrum/ # Arbitrum-specific adapters
-│       ├── common/   # EVM common resources
-│       ├── L1/       # EVM L1 resources
-│       └── Optimism/ # Optimism-specific adapters
+│   ├── adapters/     # Network adapters
+│   │   ├── BitcoinAdapter/  # Bitcoin network adapter
+│   │   ├── HardhatAdapter/  # Hardhat local dev adapter (31337)
+│   │   ├── EVMAdapter/      # Default EVM adapter (Ethereum, Sepolia, etc.)
+│   │   ├── ArbitrumAdapter/ # Arbitrum-specific adapter
+│   │   ├── OptimismAdapter/ # Optimism-specific adapter
+│   │   ├── BaseAdapter/     # Base-specific adapter
+│   │   ├── BNBAdapter/      # BNB Chain adapter
+│   │   └── PolygonAdapter/  # Polygon adapter
+│   └── EVM/          # EVM-compatible chain adapters (legacy)
 ├── types/            # TypeScript type definitions
 ├── utils/            # Utility functions
 └── styles/           # CSS stylesheets

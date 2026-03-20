@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useSettings } from "../../context/SettingsContext";
+import { useNotify } from "../../hooks/useNotify";
 import { useSearch } from "../../hooks/useSearch";
 import NavbarLogo from "./NavbarLogo";
 import { NetworkBlockIndicator } from "./NetworkBlockIndicator";
@@ -13,7 +14,9 @@ const Navbar = () => {
   const location = useLocation();
   const { searchTerm, setSearchTerm, isResolving, error, clearError, handleSearch, networkId } =
     useSearch();
-  const { isDarkMode, toggleTheme, isSuperUser, toggleSuperUserMode } = useSettings();
+  const { isDarkMode, toggleTheme, isSuperUser, toggleSuperUserMode, settings, updateSettings } =
+    useSettings();
+  const notify = useNotify();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Check if we should show the search box (on any network page including home)
@@ -41,6 +44,30 @@ const Navbar = () => {
       document.body.style.overflow = "";
     };
   }, [isMobileMenuOpen]);
+
+  const knowledgeLevel = settings.knowledgeLevel ?? "beginner";
+  const tooltipsEnabled = settings.showHelperTooltips !== false;
+
+  const cycleKnowledgeLevel = () => {
+    const levels = ["beginner", "intermediate", "advanced"] as const;
+    const currentIndex = levels.indexOf(knowledgeLevel);
+    const nextLevel = levels[(currentIndex + 1) % levels.length] ?? "beginner";
+    updateSettings({ knowledgeLevel: nextLevel });
+    const levelKey =
+      nextLevel === "beginner"
+        ? "nav.tooltipsLevelBeginner"
+        : nextLevel === "intermediate"
+          ? "nav.tooltipsLevelIntermediate"
+          : "nav.tooltipsLevelAdvanced";
+    notify.success(t("nav.tooltipsSwitched", { level: t(levelKey) }), 2000);
+  };
+
+  const knowledgeLevelLabel =
+    knowledgeLevel === "beginner"
+      ? t("nav.tooltipsBeginner")
+      : knowledgeLevel === "intermediate"
+        ? t("nav.tooltipsIntermediate")
+        : t("nav.tooltipsAdvanced");
 
   const goToSettings = () => {
     navigate("/settings");
@@ -133,6 +160,40 @@ const Navbar = () => {
                         strokeLinecap="round"
                         strokeLinejoin="round"
                       />
+                    </svg>
+                  </button>
+                </li>
+              )}
+              {tooltipsEnabled && (
+                <li>
+                  <button
+                    type="button"
+                    onClick={cycleKnowledgeLevel}
+                    className={`navbar-toggle-btn navbar-tooltip-level-${knowledgeLevel}`}
+                    aria-label={knowledgeLevelLabel}
+                    title={knowledgeLevelLabel}
+                  >
+                    <svg
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      aria-hidden="true"
+                    >
+                      <title>{knowledgeLevelLabel}</title>
+                      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
+                      <text
+                        x="12"
+                        y="17"
+                        textAnchor="middle"
+                        fill="currentColor"
+                        fontSize="14"
+                        fontWeight="700"
+                        fontFamily="inherit"
+                      >
+                        ?
+                      </text>
                     </svg>
                   </button>
                 </li>
@@ -578,6 +639,28 @@ const Navbar = () => {
             )}
             <span>{isDarkMode ? t("nav.lightMode") : t("nav.darkMode")}</span>
           </button>
+
+          {/* Tooltip Level toggle */}
+          {tooltipsEnabled && (
+            <button type="button" className="navbar-mobile-menu-item" onClick={cycleKnowledgeLevel}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <title>{knowledgeLevelLabel}</title>
+                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
+                <text
+                  x="12"
+                  y="17"
+                  textAnchor="middle"
+                  fill="currentColor"
+                  fontSize="14"
+                  fontWeight="700"
+                  fontFamily="inherit"
+                >
+                  ?
+                </text>
+              </svg>
+              <span>{knowledgeLevelLabel}</span>
+            </button>
+          )}
 
           {/* Super User Mode toggle */}
           <button

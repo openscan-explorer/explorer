@@ -593,8 +593,22 @@ export class BitcoinAdapter {
         }
       }
 
+      const tx = this.transformTransaction(txData);
+
+      // Fetch block height from block header when we have a blockhash
+      if (tx.blockhash) {
+        try {
+          const headerResult = await this.client.getBlockHeader(tx.blockhash, true);
+          if (headerResult.data?.height !== undefined) {
+            tx.blockheight = headerResult.data.height;
+          }
+        } catch {
+          // Block header not available, continue without height
+        }
+      }
+
       return {
-        data: this.transformTransaction(txData),
+        data: tx,
         metadata: metadata as DataWithMetadata<BitcoinTransaction>["metadata"],
       };
     }

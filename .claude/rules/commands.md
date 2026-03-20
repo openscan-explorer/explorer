@@ -93,4 +93,4 @@ REACT_APP_OPENSCAN_NETWORKS="1,31337" npm start
 npm start
 ```
 
-Supported chain IDs: 1 (Ethereum), 42161 (Arbitrum), 10 (Optimism), 8453 (Base), 56 (BSC), 137 (Polygon), 31337 (Localhost), 97 (BSC Testnet), 11155111 (Sepolia)
+Supported chain IDs: 1 (Ethereum), 42161 (Arbitrum), 10 (Optimism), 8453 (Base), 56 (BSC), 137 (Polygon), 31337 (Hardhat), 97 (BSC Testnet), 11155111 (Sepolia), 43114 (Avalanche)

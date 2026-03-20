@@ -1,6 +1,7 @@
 import type React from "react";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import FieldLabel from "../../../../common/FieldLabel";
 
 interface ERC20TokenInfoCardProps {
   tokenName?: string;
@@ -62,7 +63,12 @@ const ERC20TokenInfoCard: React.FC<ERC20TokenInfoCardProps> = ({
       {/* Decimals */}
       {tokenDecimals !== undefined && (
         <div className="account-card-row">
-          <span className="account-card-label">{t("decimals")}:</span>
+          <FieldLabel
+            label={`${t("decimals")}:`}
+            tooltipKey="token.decimals"
+            visibleFor={["beginner", "intermediate"]}
+            className="account-card-label"
+          />
           <span className="account-card-value">{tokenDecimals}</span>
         </div>
       )}
@@ -70,7 +76,12 @@ const ERC20TokenInfoCard: React.FC<ERC20TokenInfoCardProps> = ({
       {/* Total Supply */}
       {formattedTotalSupply && (
         <div className="account-card-row">
-          <span className="account-card-label">{t("totalSupply")}:</span>
+          <FieldLabel
+            label={`${t("totalSupply")}:`}
+            tooltipKey="token.totalSupply"
+            visibleFor={["beginner", "intermediate"]}
+            className="account-card-label"
+          />
           <span className="account-card-value">
             {formattedTotalSupply} {tokenSymbol}
           </span>

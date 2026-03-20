@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import type { Address, ABI } from "../../../../../types";
 import { useTranslation } from "react-i18next";
 import CodeBlock from "../../../../common/CodeBlock";
+import FieldLabel from "../../../../common/FieldLabel";
 import ContractInteraction from "./ContractInteraction";
 import type { VerificationSource } from "../../../../../hooks/useContractVerification";
 import type { SourcifyContractDetails } from "../../../../../hooks/useSourcify";
@@ -147,7 +148,12 @@ const ContractInfoCard: React.FC<ContractInfoCardProps> = ({
 
       {/* Verification Status */}
       <div className="account-card-row">
-        <span className="account-card-label">{t("status")}:</span>
+        <FieldLabel
+          label={`${t("status")}:`}
+          tooltipKey="address.verification"
+          visibleFor={["beginner", "intermediate"]}
+          className="account-card-label"
+        />
         <span className="account-card-value">
           {sourcifyLoading ? (
             <span className="contract-checking">{t("checkingSourcify")}</span>
@@ -186,7 +192,12 @@ const ContractInfoCard: React.FC<ContractInfoCardProps> = ({
       {/* Proxy Type */}
       {proxyInfo && (
         <div className="account-card-row">
-          <span className="account-card-label">{t("proxyType")}:</span>
+          <FieldLabel
+            label={`${t("proxyType")}:`}
+            tooltipKey="address.proxyType"
+            visibleFor={["beginner", "intermediate", "advanced"]}
+            className="account-card-label"
+          />
           <span className="account-card-value">{proxyInfo.type}</span>
         </div>
       )}
@@ -194,7 +205,12 @@ const ContractInfoCard: React.FC<ContractInfoCardProps> = ({
       {/* Implementation Address */}
       {proxyInfo?.implementationAddress && (
         <div className="account-card-row">
-          <span className="account-card-label">{t("implementationAddress")}:</span>
+          <FieldLabel
+            label={`${t("implementationAddress")}:`}
+            tooltipKey="address.implementationAddress"
+            visibleFor={["beginner", "intermediate", "advanced"]}
+            className="account-card-label"
+          />
           <span className="account-card-value">
             <Link
               to={`/${networkId}/address/${proxyInfo.implementationAddress}`}

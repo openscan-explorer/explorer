@@ -13,6 +13,7 @@ import {
   getImageUrl,
 } from "../../../../utils/erc721Metadata";
 import { logger } from "../../../../utils/logger";
+import FieldLabel from "../../../common/FieldLabel";
 import LoaderWithTimeout from "../../../common/LoaderWithTimeout";
 
 const ERC721TokenDisplay: React.FC = () => {
@@ -200,13 +201,21 @@ const ERC721TokenDisplay: React.FC = () => {
 
               {/* Token ID */}
               <div className="tx-row">
-                <span className="tx-label">{t("tokenID")}:</span>
+                <FieldLabel
+                  label={`${t("tokenID")}:`}
+                  tooltipKey="token.tokenId"
+                  visibleFor={["beginner"]}
+                />
                 <span className="tx-value tx-mono">{tokenId}</span>
               </div>
 
               {/* Token Standard */}
               <div className="tx-row">
-                <span className="tx-label">{t("tokenStandard")}:</span>
+                <FieldLabel
+                  label={`${t("tokenStandard")}:`}
+                  tooltipKey="token.tokenStandard"
+                  visibleFor={["beginner", "intermediate"]}
+                />
                 <span className="tx-value">
                   <span className="token-standard-badge token-standard-erc721">ERC-721</span>
                 </span>
@@ -215,7 +224,11 @@ const ERC721TokenDisplay: React.FC = () => {
               {/* Total Supply */}
               {collectionInfo?.totalSupply && (
                 <div className="tx-row">
-                  <span className="tx-label">{t("size")}</span>
+                  <FieldLabel
+                    label={t("size")}
+                    tooltipKey="token.totalSupply"
+                    visibleFor={["beginner", "intermediate"]}
+                  />
                   <span className="tx-value">
                     {Number(collectionInfo.totalSupply).toLocaleString()} NFTs
                   </span>
@@ -225,7 +238,11 @@ const ERC721TokenDisplay: React.FC = () => {
               {/* Owner */}
               {owner && (
                 <div className="tx-row">
-                  <span className="tx-label">{t("owner")}</span>
+                  <FieldLabel
+                    label={t("owner")}
+                    tooltipKey="token.owner"
+                    visibleFor={["beginner"]}
+                  />
                   <span className="tx-value">
                     <Link to={`/${networkId}/address/${owner}`} className="address-link">
                       {owner}
@@ -237,7 +254,11 @@ const ERC721TokenDisplay: React.FC = () => {
               {/* Approved Address */}
               {approval && (
                 <div className="tx-row">
-                  <span className="tx-label">{t("approved")}:</span>
+                  <FieldLabel
+                    label={`${t("approved")}:`}
+                    tooltipKey="token.approved"
+                    visibleFor={["beginner", "intermediate"]}
+                  />
                   <span className="tx-value">
                     <Link to={`/${networkId}/address/${approval}`} className="address-link">
                       {approval}

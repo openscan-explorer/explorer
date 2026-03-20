@@ -2,8 +2,10 @@ import type React from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import type { GasPrices } from "../../../../types";
+import { useSettings } from "../../../../context/SettingsContext";
 import { formatPrice } from "../../../../services/PriceService";
 import { formatGasPriceWithUnit } from "../../../../utils/formatUtils";
+import HelperTooltip from "../../../common/HelperTooltip";
 
 interface DashboardStatsProps {
   price: number | null;
@@ -35,13 +37,20 @@ const DashboardStats: React.FC<DashboardStatsProps> = ({
   networkId,
 }) => {
   const { t } = useTranslation("network");
+  const { t: tTooltips } = useTranslation("tooltips");
+  const { settings } = useSettings();
   // Use gas tiers if available, otherwise fall back to single gas price
   const hasGasTiers = gasPrices !== null;
 
   return (
     <div className="dashboard-stats-row">
       <div className="dashboard-stat-card">
-        <div className="dashboard-stat-label">{t("currencyPrice", { currency })}</div>
+        <div className="dashboard-stat-label">
+          {t("currencyPrice", { currency })}
+          {settings.showHelperTooltips !== false && (
+            <HelperTooltip content={tTooltips("network.currencyPrice")} />
+          )}
+        </div>
         <div className="dashboard-stat-value">
           {loading ? (
             <span
@@ -119,7 +128,12 @@ const DashboardStats: React.FC<DashboardStatsProps> = ({
       </div>
 
       <div className="dashboard-stat-card">
-        <div className="dashboard-stat-label">{t("latestBlock")}</div>
+        <div className="dashboard-stat-label">
+          {t("latestBlock")}
+          {settings.showHelperTooltips !== false && (
+            <HelperTooltip content={tTooltips("network.latestBlock")} />
+          )}
+        </div>
         <div className="dashboard-stat-value">
           {loading ? (
             <span

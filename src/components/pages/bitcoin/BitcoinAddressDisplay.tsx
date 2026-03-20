@@ -7,6 +7,7 @@ import { formatBTC, truncateHash } from "../../../utils/bitcoinFormatters";
 import { getAddressTypeLabel } from "../../../utils/bitcoinUtils";
 import AIAnalysisPanel from "../../common/AIAnalysis/AIAnalysisPanel";
 import CopyButton from "../../common/CopyButton";
+import FieldLabel from "../../common/FieldLabel";
 
 interface BitcoinAddressDisplayProps {
   address: BitcoinAddress;
@@ -69,7 +70,7 @@ const BitcoinAddressDisplay: React.FC<BitcoinAddressDisplayProps> = React.memo(
           <div className="tx-details">
             {/* Address */}
             <div className="tx-row">
-              <span className="tx-label">Address:</span>
+              <FieldLabel label="Address:" tooltipKey="bitcoin.address" visibleFor={["beginner"]} />
               <span
                 className="tx-value tx-mono"
                 style={{ display: "inline-flex", alignItems: "center" }}
@@ -81,7 +82,11 @@ const BitcoinAddressDisplay: React.FC<BitcoinAddressDisplayProps> = React.memo(
 
             {/* Balance */}
             <div className="tx-row">
-              <span className="tx-label">{isGenesisAddress ? "Total Balance:" : "Balance:"}</span>
+              <FieldLabel
+                label={isGenesisAddress ? "Total Balance:" : "Balance:"}
+                tooltipKey="bitcoin.balance"
+                visibleFor={["beginner"]}
+              />
               <span className="tx-value tx-value-highlight">{formatBTC(totalBalance)}</span>
             </div>
 
@@ -96,21 +101,33 @@ const BitcoinAddressDisplay: React.FC<BitcoinAddressDisplayProps> = React.memo(
             {/* Total Received */}
             {address.totalReceived !== undefined && (
               <div className="tx-row">
-                <span className="tx-label">Total Received:</span>
+                <FieldLabel
+                  label="Total Received:"
+                  tooltipKey="bitcoin.totalReceived"
+                  visibleFor={["beginner"]}
+                />
                 <span className="tx-value">{formatBTC(address.totalReceived)}</span>
               </div>
             )}
 
             {/* UTXO Count */}
             <div className="tx-row">
-              <span className="tx-label">UTXOs:</span>
+              <FieldLabel
+                label="UTXOs:"
+                tooltipKey="bitcoin.utxos"
+                visibleFor={["beginner", "intermediate", "advanced"]}
+              />
               <span className="tx-value">{address.utxoCount.toLocaleString()} unspent outputs</span>
             </div>
 
             {/* Transaction Count */}
             {address.txCount !== undefined && (
               <div className="tx-row">
-                <span className="tx-label">Transactions:</span>
+                <FieldLabel
+                  label="Transactions:"
+                  tooltipKey="bitcoin.txCount"
+                  visibleFor={["beginner"]}
+                />
                 <span className="tx-value">{address.txCount.toLocaleString()}</span>
               </div>
             )}

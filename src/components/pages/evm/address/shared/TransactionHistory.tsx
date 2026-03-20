@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { toFunctionSelector } from "viem";
 import { useTranslation } from "react-i18next";
+import { useSettings } from "../../../../../context/SettingsContext";
 import { useDataService } from "../../../../../hooks/useDataService";
 import type {
   ABI,
@@ -10,6 +11,7 @@ import type {
   FunctionABI,
   Transaction,
 } from "../../../../../types";
+import HelperTooltip from "../../../../common/HelperTooltip";
 
 // Transaction cache utilities
 const TX_CACHE_PREFIX = "tx_cache_";
@@ -127,6 +129,8 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
   const loadMoreDropdownRef = useRef<HTMLDivElement>(null);
 
   const { t } = useTranslation("address");
+  const { t: tTooltips } = useTranslation("tooltips");
+  const { settings } = useSettings();
 
   // Notify parent when transactions change
   useEffect(() => {
@@ -522,13 +526,50 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
       <table className="recent-transactions-table">
         <thead>
           <tr>
-            <th>TX Hash</th>
-            <th>Block</th>
-            {hasContractAbi && <th>Method</th>}
-            <th>From</th>
-            <th>To</th>
-            <th>Value</th>
-            <th>Status</th>
+            <th>
+              TX Hash
+              {settings.showHelperTooltips !== false && (
+                <HelperTooltip content={tTooltips("transaction.txHashColumn")} />
+              )}
+            </th>
+            <th>
+              Block
+              {settings.showHelperTooltips !== false && (
+                <HelperTooltip content={tTooltips("transaction.blockColumn")} />
+              )}
+            </th>
+            {hasContractAbi && (
+              <th>
+                Method
+                {settings.showHelperTooltips !== false && (
+                  <HelperTooltip content={tTooltips("transaction.methodColumn")} />
+                )}
+              </th>
+            )}
+            <th>
+              From
+              {settings.showHelperTooltips !== false && (
+                <HelperTooltip content={tTooltips("transaction.fromColumn")} />
+              )}
+            </th>
+            <th>
+              To
+              {settings.showHelperTooltips !== false && (
+                <HelperTooltip content={tTooltips("transaction.toColumn")} />
+              )}
+            </th>
+            <th>
+              Value
+              {settings.showHelperTooltips !== false && (
+                <HelperTooltip content={tTooltips("transaction.valueColumn")} />
+              )}
+            </th>
+            <th>
+              Status
+              {settings.showHelperTooltips !== false && (
+                <HelperTooltip content={tTooltips("transaction.statusColumn")} />
+              )}
+            </th>
           </tr>
         </thead>
         <tbody>

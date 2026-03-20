@@ -26,7 +26,14 @@
     "disableSuperUser": "スーパーユーザーモードを無効化",
     "enableSuperUser": "スーパーユーザーモードを有効化",
     "mempool": "メモリープール",
-    "txs": "トランザクション"
+    "txs": "トランザクション",
+    "tooltipsBeginner": "ツールチップ：初心者",
+    "tooltipsIntermediate": "ツールチップ：中級者",
+    "tooltipsAdvanced": "ツールチップ：上級者",
+    "tooltipsSwitched": "ツールチップヘルパーレベルが{{level}}に切り替わりました",
+    "tooltipsLevelBeginner": "初心者",
+    "tooltipsLevelIntermediate": "中級者",
+    "tooltipsLevelAdvanced": "上級者"
   },
   "footer": {
     "about": "概要",

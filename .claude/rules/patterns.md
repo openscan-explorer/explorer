@@ -2,17 +2,18 @@
 
 ## When Modifying Data Fetching
 
-- Always maintain the adapter pattern: Fetcher → Adapter → Service
+- Always maintain the adapter pattern: Client → Adapter → Service
+- All adapters extend the abstract `NetworkAdapter` class (`services/adapters/NetworkAdapter.ts`)
 - If adding parallel strategy support, ensure complete objects are built for each provider
-- Test both `fallback` and `parallel` strategies
+- Test `fallback`, `parallel`, and `race` strategies
 - Update TypeScript types in `src/types/index.ts` if adding new fields
 
 ## When Adding L2-Specific Features
 
 - Check if network is OP Stack-based (Optimism, Base) or Arbitrum
 - Add network-specific types (e.g., `TransactionOptimism extends Transaction`)
-- Create adapters that inherit base behavior and add L2 fields
-- Update `DataService` conditional logic in constructor and relevant methods
+- Create a new adapter extending `NetworkAdapter` in `services/adapters/[Network]/`
+- Register the adapter in `AdapterFactory` (`services/adapters/adaptersFactory.ts`)
 
 ## When Working with Cache
 
@@ -32,9 +33,9 @@
 
 1. Add chain ID to `src/types/index.ts` if creating new domain types
 2. Add default RPC endpoints to `src/config/rpcConfig.ts`
-3. Determine if network needs custom fetchers/adapters (L1, Arbitrum-like, OP Stack-like)
-4. If custom: create `src/services/EVM/[Network]/fetchers/` and `adapters/`
-5. Update `DataService` constructor to detect chain ID and instantiate correct fetchers/adapters
+3. Determine if network needs a custom adapter (L1, Arbitrum-like, OP Stack-like, Bitcoin, Hardhat-like)
+4. If custom: create `src/services/adapters/[Network]/[Network]Adapter.ts` extending `NetworkAdapter`
+5. Register the adapter in `AdapterFactory` (`src/services/adapters/adaptersFactory.ts`)
 6. Add network config to `ALL_NETWORKS` in `src/config/networks.ts`
 7. Add network logo to `public/` and update `logoType` in network config
 
@@ -43,14 +44,15 @@
 OpenScan includes special support for localhost development:
 
 - **Hardhat 3 Ignition**: Import deployment artifacts via Settings → Import Ignition Deployment
-- **Trace Support**: `debug_traceTransaction`, `debug_traceBlockByHash`, `debug_traceCall` available on localhost (31337)
+- **Trace Support**: `debug_traceTransaction`, `debug_traceBlockByHash`, `debug_traceCall` available on Hardhat (31337) and localhost networks
+- **Hardhat Trace Conversion**: Hardhat v3 only supports the default struct log tracer (not `callTracer`/`prestateTracer`). The `HardhatAdapter` uses `buildCallTreeFromStructLogs()` and `buildPrestateFromStructLogs()` from `src/utils/structLogConverter.ts` to convert opcode traces into call trees and state diffs
 - **Auto-detection**: Port 8545 automatically recognized as localhost network
 
 ## Component Patterns
 
 ### Address Page Components
 - Use display components for different address types: `AccountDisplay`, `ContractDisplay`, `ERC20Display`, `ERC721Display`, `ERC1155Display`
-- Shared components in `src/components/pages/address/shared/`
+- Shared components in `src/components/pages/evm/address/shared/`
 - Card-based layout with Overview and More Info sections
 
 ### Theming

@@ -5,14 +5,17 @@ import { BaseAdapter } from "./BaseAdapter/BaseAdapter";
 import { BNBAdapter } from "./BNBAdapter/BNBAdapter";
 import { PolygonAdapter } from "./PolygonAdapter/PolygonAdapter";
 import { ArbitrumAdapter } from "./ArbitrumAdapter/ArbitrumAdapter";
+import { HardhatAdapter } from "./HardhatAdapter/HardhatAdapter";
 import { BitcoinAdapter } from "./BitcoinAdapter/BitcoinAdapter";
 import type {
   ArbitrumClient,
+  AvalancheClient,
   AztecClient,
   BaseClient,
   BitcoinClient,
   BNBClient,
   EthereumClient,
+  HardhatClient,
   OptimismClient,
   PolygonClient,
   SupportedChainId,
@@ -24,7 +27,7 @@ export class AdapterFactory {
    * Create an EVM network adapter
    */
   static createAdapter(
-    networkId: SupportedChainId | 11155111 | 97 | 31337,
+    networkId: SupportedChainId,
     client:
       | EthereumClient
       | OptimismClient
@@ -32,13 +35,17 @@ export class AdapterFactory {
       | PolygonClient
       | BaseClient
       | ArbitrumClient
-      | AztecClient,
+      | AvalancheClient
+      | AztecClient
+      | HardhatClient,
   ): NetworkAdapter {
     switch (networkId) {
       case 1:
       case 11155111:
+      case 43114:
+        return new EVMAdapter(networkId, client as unknown as EthereumClient);
       case 31337:
-        return new EVMAdapter(networkId, client as EthereumClient);
+        return new HardhatAdapter(client as HardhatClient);
       case 10:
         return new OptimismAdapter(networkId, client as OptimismClient);
       case 56:

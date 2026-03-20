@@ -5,6 +5,8 @@ import type { AddressType, RPCMetadata } from "../../../../../types";
 import { getAddressTypeIcon, getAddressTypeLabel } from "../../../../../utils/addressTypeDetection";
 import { RPCIndicator } from "../../../../common/RPCIndicator";
 import CopyButton from "../../../../common/CopyButton";
+import HelperTooltip from "../../../../common/HelperTooltip";
+import { useSettings } from "../../../../../context/SettingsContext";
 
 interface AddressHeaderProps {
   addressHash: string;
@@ -38,6 +40,8 @@ const AddressHeader: React.FC<AddressHeaderProps> = ({
   klerosTag,
 }) => {
   const { t } = useTranslation("address");
+  const { settings } = useSettings();
+  const { t: tTooltips } = useTranslation("tooltips");
   const truncatedHash = truncateHash(addressHash, 4);
 
   return (
@@ -45,7 +49,12 @@ const AddressHeader: React.FC<AddressHeaderProps> = ({
       <div>
         <div className="address-type-indicator">
           <span className="address-type-icon">{getAddressTypeIcon(addressType)}</span>
-          <span className="address-type-label">{getAddressTypeLabel(addressType)}</span>
+          <span className="address-type-label">
+            {getAddressTypeLabel(addressType)}
+            {settings.showHelperTooltips !== false && (
+              <HelperTooltip content={tTooltips("address.accountType")} placement="bottom" />
+            )}
+          </span>
           {tokenSymbol && <span className="address-token-symbol">{tokenSymbol}</span>}
           {klerosTag && (
             <a

@@ -1,12 +1,12 @@
 {
   "lockfileVersion": 1,
-  "configVersion": 1,
+  "configVersion": 0,
   "workspaces": {
     "": {
       "name": "openscan",
       "dependencies": {
         "@erc7730/sdk": "^0.1.3",
-        "@openscan/network-connectors": "1.3.2",
+        "@openscan/network-connectors": "1.6.0",
         "@rainbow-me/rainbowkit": "^2.2.8",
         "@react-native-async-storage/async-storage": "^1.24.0",
         "@tanstack/react-query": "^5.90.21",
@@ -282,7 +282,7 @@
 
     "@noble/hashes": ["@noble/hashes@1.8.0", "", {}, "sha512-jCs9ldd7NwzpgXDIf6P3+NrHh9/sD6CQdxHyjQI+h/6rDNo88ypBxxz45UDuZHz9r3tNz7N/VInSVoVdtXEI4A=="],
 
-    "@openscan/network-connectors": ["@openscan/network-connectors@1.3.2", "", {}, "sha512-OdH+PqP/VNYkPrXBCaMhjNF2FQ5N5WH9wd9uGelgkCvbXXS0xXRC4PlPqWSSXqjZJUud0HAGDF5pbZfxIPFQnQ=="],
+    "@openscan/network-connectors": ["@openscan/network-connectors@1.6.0", "", {}, "sha512-f7Ox20+NIJ4DXzcbj0OyyuVjiHB0zjm1xv+yhzrYhh6TfW6bfHpq62+++oF6/5ud5VLptRXSkdaMrLcAOJL0vQ=="],
 
     "@paulmillr/qr": ["@paulmillr/qr@0.2.1", "", {}, "sha512-IHnV6A+zxU7XwmKFinmYjUcwlyK9+xkG3/s9KcQhI9BjQKycrJ1JRO+FbNYPwZiPKW3je/DR0k7w8/gLa5eaxQ=="],
 

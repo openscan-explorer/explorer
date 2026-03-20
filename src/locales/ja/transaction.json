@@ -173,6 +173,11 @@
     "expandAll": "すべて展開",
     "collapseAll": "すべて折りたたむ",
     "expand": "展開",
-    "collapse": "折りたたむ"
+    "collapse": "折りたたむ",
+    "rawTrace": "生トレース",
+    "rawTraceSteps": "{{count}} オペコードステップ",
+    "rawTracePrev": "前へ",
+    "rawTraceNext": "次へ",
+    "rawTracePage": "ページ {{current}}/{{total}} ({{from}}–{{to}} / {{totalSteps}})"
   }
 }

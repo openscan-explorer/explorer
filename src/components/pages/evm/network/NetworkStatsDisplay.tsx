@@ -2,6 +2,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import type { NetworkStats, RPCMetadata } from "../../../../types";
 import { logger } from "../../../../utils/logger";
+import FieldLabel from "../../../common/FieldLabel";
 import { RPCIndicator } from "../../../common/RPCIndicator";
 
 interface NetworkStatsDisplayProps {
@@ -127,19 +128,31 @@ const NetworkStatsDisplay: React.FC<NetworkStatsDisplayProps> = React.memo(
 
           <div className="data-grid-3">
             <div className="block-detail-item">
-              <span className="detail-label">{t("currentGasPrice")}</span>
+              <FieldLabel
+                label={t("currentGasPrice")}
+                tooltipKey="network.gasPrice"
+                className="detail-label"
+              />
               <span className="detail-value">{formatGasPrice(networkStats.currentGasPrice)}</span>
             </div>
 
             <div className="block-detail-item">
-              <span className="detail-label">{t("currentBlockNumber")}</span>
+              <FieldLabel
+                label={t("currentBlockNumber")}
+                tooltipKey="network.blockNumber"
+                className="detail-label"
+              />
               <span className="detail-value">
                 {formatBlockNumber(networkStats.currentBlockNumber)}
               </span>
             </div>
 
             <div className="block-detail-item">
-              <span className="detail-label">{t("syncStatus")}</span>
+              <FieldLabel
+                label={t("syncStatus")}
+                tooltipKey="network.syncStatus"
+                className="detail-label"
+              />
               <span className="detail-value">
                 <span className="sync-status-indicator">
                   <span
@@ -152,14 +165,22 @@ const NetworkStatsDisplay: React.FC<NetworkStatsDisplayProps> = React.memo(
 
             {networkStats.clientVersion && (
               <div className="block-detail-item">
-                <span className="detail-label">{t("clientVersion")}</span>
+                <FieldLabel
+                  label={t("clientVersion")}
+                  tooltipKey="network.clientVersion"
+                  className="detail-label"
+                />
                 <span className="detail-value tx-mono">{networkStats.clientVersion}</span>
               </div>
             )}
 
             {protocolVersion && (
               <div className="block-detail-item">
-                <span className="detail-label">{t("protocolVersion")}</span>
+                <FieldLabel
+                  label={t("protocolVersion")}
+                  tooltipKey="network.protocolVersion"
+                  className="detail-label"
+                />
                 <span className="detail-value">{protocolVersion}</span>
               </div>
             )}

@@ -61,7 +61,7 @@ npm run typecheck
 
 # 4. Verify i18n compliance
 # - Ensure no hardcoded user-facing strings
-# - Test in both English and Spanish if you added translations
+# - Test in multiple languages if you added translations (en, es, ja, pt-BR, zh)
 
 # 5. Run tests (if applicable)
 npm run test:run

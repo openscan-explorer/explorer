@@ -9,9 +9,51 @@ export interface ContractInfo {
 // Session-level cache keyed by "chainId:address"
 const cache = new Map<string, ContractInfo | null>();
 
+const OPENSCAN_WORKER_URL =
+  // biome-ignore lint/complexity/useLiteralKeys: env var access
+  process.env["REACT_APP_OPENSCAN_WORKER_URL"] ??
+  "https://openscan-groq-ai-proxy.openscan.workers.dev";
+
+/**
+ * Fetch contract verification from Etherscan V2 API.
+ * Uses user-provided key directly, or proxies through the OpenScan Worker.
+ */
+async function fetchEtherscanVerification(
+  address: string,
+  chainId: number,
+  signal?: AbortSignal,
+  etherscanKey?: string,
+  // biome-ignore lint/suspicious/noExplicitAny: Etherscan response shape varies
+): Promise<any | null> {
+  try {
+    let res: Response;
+
+    if (etherscanKey) {
+      // Direct Etherscan call with user's key
+      const url = `https://api.etherscan.io/v2/api?chainid=${chainId}&module=contract&action=getsourcecode&address=${address}&apikey=${etherscanKey}`;
+      res = await fetch(url, { signal });
+    } else {
+      // Proxy through OpenScan Worker (free, no key needed)
+      res = await fetch(`${OPENSCAN_WORKER_URL}/etherscan/verify`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ chainId, address }),
+        signal,
+      });
+    }
+
+    if (!res.ok) return null;
+    return await res.json();
+  } catch (err) {
+    if (err instanceof Error && err.name === "AbortError") throw err;
+    logger.debug("Etherscan lookup failed for", address, err);
+    return null;
+  }
+}
+
 /**
  * Fetch contract name + ABI for a single address.
- * Tries Sourcify first; falls back to Etherscan V2 API if a key is provided.
+ * Tries Sourcify first; falls back to Etherscan V2 API (via worker proxy or user key).
  * Results are cached in memory for the session.
  */
 export async function fetchContractInfo(
@@ -54,28 +96,24 @@ export async function fetchContractInfo(
     logger.debug("Sourcify lookup failed for", address, err);
   }
 
-  // ── Etherscan fallback ────────────────────────────────────────────────────
-  if (etherscanKey) {
-    try {
-      const url = `https://api.etherscan.io/v2/api?chainid=${chainId}&module=contract&action=getsourcecode&address=${address}&apikey=${etherscanKey}`;
-      const res = await fetch(url, { signal });
-      const json = await res.json();
-      if (
-        json.status === "1" &&
-        Array.isArray(json.result) &&
-        json.result[0]?.ABI &&
-        json.result[0].ABI !== "Contract source code not verified"
-      ) {
-        const r = json.result[0];
-        const abi = JSON.parse(r.ABI);
-        const info: ContractInfo = { name: r.ContractName || undefined, abi };
-        cache.set(cacheKey, info);
-        return info;
-      }
-    } catch (err) {
-      if (err instanceof Error && err.name === "AbortError") return null;
-      logger.debug("Etherscan lookup failed for", address, err);
+  // ── Etherscan fallback (worker proxy or user key) ─────────────────────────
+  try {
+    const json = await fetchEtherscanVerification(address, chainId, signal, etherscanKey);
+    if (
+      json?.status === "1" &&
+      Array.isArray(json.result) &&
+      json.result[0]?.ABI &&
+      json.result[0].ABI !== "Contract source code not verified"
+    ) {
+      const r = json.result[0];
+      const abi = JSON.parse(r.ABI);
+      const info: ContractInfo = { name: r.ContractName || undefined, abi };
+      cache.set(cacheKey, info);
+      return info;
     }
+  } catch (err) {
+    if (err instanceof Error && err.name === "AbortError") return null;
+    logger.debug("Etherscan lookup failed for", address, err);
   }
 
   cache.set(cacheKey, null);

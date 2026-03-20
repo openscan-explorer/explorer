@@ -149,6 +149,21 @@
       }
     }
   },
+  "helperTooltips": {
+    "title": "帮助提示",
+    "description": "为区块链数据字段显示上下文帮助。",
+    "enabled": {
+      "label": "显示帮助提示",
+      "description": "在字段标签旁显示帮助图标和简要说明。"
+    },
+    "knowledgeLevel": {
+      "label": "知识水平",
+      "description": "控制显示多少帮助提示。初学者显示所有提示。中级隐藏基本字段。高级仅显示复杂和链特定的提示。",
+      "beginner": "初学者",
+      "intermediate": "中级",
+      "advanced": "高级"
+    }
+  },
   "rpcEndpoints": {
     "title": "RPC 端点",
     "description": "为每个网络配置 RPC URL。点击网络展开并配置其端点。",

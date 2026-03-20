@@ -3,8 +3,10 @@ main = "src/index.ts"
 compatibility_date = "2024-12-01"
 
 [vars]
-ALLOWED_ORIGINS = "http://openscan.eth.link,https://openscan-explorer.github.io,https://openscan.netlify.app,*--openscan.netlify.app"
+ALLOWED_ORIGINS = "https://openscan.eth.link,https://openscan.eth.limo,https://openscan-explorer.github.io,https://openscan.netlify.app,*--openscan.netlify.app"
 GROQ_MODEL = "groq/compound"
 
-# Secret: GROQ_API_KEY — set via `wrangler secret put GROQ_API_KEY`
+# Secrets — set via `wrangler secret put <NAME>`
+# GROQ_API_KEY      — Groq AI API key for /ai/analyze
+# ETHERSCAN_API_KEY  — Etherscan V2 API key for /etherscan/verify
 

@@ -2,6 +2,7 @@ import type React from "react";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
+import FieldLabel from "../../../../common/FieldLabel";
 import {
   checkEIP7702Delegation,
   getEIP7702DelegateAddress,
@@ -84,14 +85,24 @@ const AccountOverviewCard: React.FC<AccountOverviewCardProps> = ({
       <div className="account-card-title">{t("overview")}</div>
 
       <div className="account-card-row">
-        <span className="account-card-label">{t("balance")}:</span>
+        <FieldLabel
+          label={`${t("balance")}:`}
+          tooltipKey="address.balance"
+          visibleFor={["beginner"]}
+          className="account-card-label"
+        />
         <span className="account-card-value">
           {formattedBalance} {currency}
         </span>
       </div>
 
       <div className="account-card-row">
-        <span className="account-card-label">{t("value")}:</span>
+        <FieldLabel
+          label={`${t("value")}:`}
+          tooltipKey="address.usdValue"
+          visibleFor={["beginner"]}
+          className="account-card-label"
+        />
         <span className="account-card-value">
           {priceLoading ? (
             <span className="account-card-loading">{t("loading")}</span>
@@ -112,14 +123,24 @@ const AccountOverviewCard: React.FC<AccountOverviewCardProps> = ({
 
       {txCount && (
         <div className="account-card-row">
-          <span className="account-card-label">{t("nonce")}:</span>
+          <FieldLabel
+            label={`${t("nonce")}:`}
+            tooltipKey="address.nonce"
+            visibleFor={["beginner"]}
+            className="account-card-label"
+          />
           <span className="account-card-value">{txCount.toLocaleString()}</span>
         </div>
       )}
 
       {eip7702Delegate && (
         <div className="account-card-row">
-          <span className="account-card-label">{t("eip7702Delegate")}:</span>
+          <FieldLabel
+            label={`${t("eip7702Delegate")}:`}
+            tooltipKey="address.eip7702Delegate"
+            visibleFor={["beginner", "intermediate", "advanced"]}
+            className="account-card-label"
+          />
           <span className="account-card-value">
             <Link to={`/${networkId}/address/${eip7702Delegate}`} className="account-card-link">
               {truncateAddress(eip7702Delegate)}

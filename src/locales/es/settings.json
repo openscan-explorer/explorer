@@ -149,6 +149,21 @@
       }
     }
   },
+  "helperTooltips": {
+    "title": "Tooltips de Ayuda",
+    "description": "Mostrar ayuda contextual para campos de datos de blockchain.",
+    "enabled": {
+      "label": "Mostrar Tooltips de Ayuda",
+      "description": "Mostrar íconos de ayuda junto a las etiquetas de campos con explicaciones breves."
+    },
+    "knowledgeLevel": {
+      "label": "Nivel de Conocimiento",
+      "description": "Controla cuántos tooltips de ayuda se muestran. Principiante muestra todos. Intermedio oculta campos básicos. Avanzado muestra solo tooltips complejos y específicos de la cadena.",
+      "beginner": "Principiante",
+      "intermediate": "Intermedio",
+      "advanced": "Avanzado"
+    }
+  },
   "rpcEndpoints": {
     "title": "Endpoints RPC",
     "description": "Configurá las URLs RPC para cada red. Hacé click en una red para desplegar y configurar sus endpoints.",

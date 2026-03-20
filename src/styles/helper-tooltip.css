@@ -1,0 +1,120 @@
+/* ===== Helper Tooltip ===== */
+
+.helper-tooltip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Trigger button */
+.helper-tooltip-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  margin-left: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-tertiary);
+  opacity: 0.6;
+  transition: opacity 0.15s ease, color 0.15s ease;
+  vertical-align: middle;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.helper-tooltip-trigger:hover,
+.helper-tooltip-trigger:focus-visible {
+  opacity: 1;
+  color: var(--color-info);
+  outline: none;
+}
+
+.helper-tooltip-trigger:focus-visible {
+  outline: 2px solid var(--color-info);
+  outline-offset: 2px;
+  border-radius: 50%;
+}
+
+/* Tooltip bubble — portaled to document.body, positioned via inline style */
+.helper-tooltip-bubble {
+  max-width: 260px;
+  min-width: 140px;
+  padding: 8px 12px;
+  background: var(--bg-tooltip);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 400;
+  line-height: 1.45;
+  border-radius: 6px;
+  box-shadow: var(--shadow-md);
+  z-index: 10000;
+  pointer-events: auto;
+  white-space: normal;
+  word-wrap: break-word;
+}
+
+/* Arrow pointing from bubble to trigger */
+.helper-tooltip-arrow {
+  position: absolute;
+  width: 0;
+  height: 0;
+  border: 5px solid transparent;
+  pointer-events: none;
+}
+
+/* Top placement: arrow at bottom, pointing down */
+.helper-tooltip-arrow-top {
+  bottom: -10px;
+  transform: translateX(-50%);
+  border-top-color: var(--bg-tooltip);
+}
+
+/* Bottom placement: arrow at top, pointing up */
+.helper-tooltip-arrow-bottom {
+  top: -10px;
+  transform: translateX(-50%);
+  border-bottom-color: var(--bg-tooltip);
+}
+
+/* Left placement: arrow at right, pointing right */
+.helper-tooltip-arrow-left {
+  right: -10px;
+  transform: translateY(-50%);
+  border-left-color: var(--bg-tooltip);
+}
+
+/* Right placement: arrow at left, pointing left */
+.helper-tooltip-arrow-right {
+  left: -10px;
+  transform: translateY(-50%);
+  border-right-color: var(--bg-tooltip);
+}
+
+/* Light theme text: keep tooltip text white since bg-tooltip is dark in both themes */
+.light-theme .helper-tooltip-bubble {
+  color: #fff;
+}
+
+/* ===== Navbar Tooltip Level Button ===== */
+
+.navbar-toggle-btn.navbar-tooltip-level-beginner {
+  border-color: var(--color-primary-muted);
+}
+
+.navbar-toggle-btn.navbar-tooltip-level-intermediate {
+  border-color: var(--color-info);
+}
+
+.navbar-toggle-btn.navbar-tooltip-level-advanced {
+  border-color: var(--color-accent);
+}
+
+/* Mobile adjustments */
+@media (max-width: 767px) {
+  .helper-tooltip-bubble {
+    max-width: 220px;
+    font-size: 0.78rem;
+  }
+}

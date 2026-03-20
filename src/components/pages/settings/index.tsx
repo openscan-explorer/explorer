@@ -2,6 +2,7 @@ import type React from "react";
 import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import HelperTooltip from "../../common/HelperTooltip";
 import { MetaMaskIcon } from "../../common/MetaMaskIcon";
 import { getEnabledNetworks } from "../../../config/networks";
 import { AppContext, useNetworks } from "../../../context/AppContext";
@@ -87,6 +88,7 @@ const isAlchemyUrl = (url: string): boolean => url.includes("alchemy.com");
 
 const Settings: React.FC = () => {
   const { t, i18n } = useTranslation("settings");
+  const { t: tTooltips } = useTranslation("tooltips");
   const location = useLocation();
   const navigate = useNavigate();
   const { rpcUrls, setRpcUrls } = useContext(AppContext);
@@ -910,6 +912,76 @@ const Settings: React.FC = () => {
                             {lang.name}
                           </option>
                         ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="settings-section no-margin">
+                    <h2 className="settings-section-title">💡 {t("helperTooltips.title")}</h2>
+                    <p className="settings-section-description">
+                      {t("helperTooltips.description")}
+                    </p>
+
+                    <div className="settings-item">
+                      <div>
+                        <div className="settings-item-label">
+                          {t("helperTooltips.enabled.label")}
+                        </div>
+                        <div className="settings-item-description">
+                          {t("helperTooltips.enabled.description")}
+                        </div>
+                      </div>
+                      <label className="settings-toggle">
+                        <input
+                          type="checkbox"
+                          checked={settings.showHelperTooltips !== false}
+                          onChange={(e) => updateSettings({ showHelperTooltips: e.target.checked })}
+                          className="settings-toggle-input"
+                        />
+                        <span
+                          className={`settings-toggle-slider ${settings.showHelperTooltips !== false ? "active" : ""}`}
+                        >
+                          <span
+                            className={`settings-toggle-knob ${settings.showHelperTooltips !== false ? "active" : ""}`}
+                          />
+                        </span>
+                      </label>
+                    </div>
+
+                    <div className="settings-item">
+                      <div>
+                        <div className="settings-item-label">
+                          {t("helperTooltips.knowledgeLevel.label")}
+                          {settings.showHelperTooltips !== false && (
+                            <HelperTooltip content={tTooltips("settings.knowledgeLevel")} />
+                          )}
+                        </div>
+                        <div className="settings-item-description">
+                          {t("helperTooltips.knowledgeLevel.description")}
+                        </div>
+                      </div>
+                      <select
+                        value={settings.knowledgeLevel ?? "beginner"}
+                        onChange={(e) =>
+                          updateSettings({
+                            knowledgeLevel: e.target.value as
+                              | "beginner"
+                              | "intermediate"
+                              | "advanced",
+                          })
+                        }
+                        className="settings-select"
+                        disabled={settings.showHelperTooltips === false}
+                      >
+                        <option value="beginner">
+                          {t("helperTooltips.knowledgeLevel.beginner")}
+                        </option>
+                        <option value="intermediate">
+                          {t("helperTooltips.knowledgeLevel.intermediate")}
+                        </option>
+                        <option value="advanced">
+                          {t("helperTooltips.knowledgeLevel.advanced")}
+                        </option>
                       </select>
                     </div>
                   </div>
