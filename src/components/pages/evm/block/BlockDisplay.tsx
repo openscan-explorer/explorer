@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { getNetworkById } from "../../../../config/networks";
@@ -11,6 +11,7 @@ import HelperTooltip from "../../../common/HelperTooltip";
 import LongString from "../../../common/LongString";
 import { RPCIndicator } from "../../../common/RPCIndicator";
 import { formatGweiFromWei, formatNativeFromWei } from "../../../../utils/unitFormatters";
+import BlockAnalyser from "./BlockAnalyser";
 
 interface BlockDisplayProps {
   block: Block | BlockArbitrum;
@@ -24,13 +25,10 @@ const BlockDisplay: React.FC<BlockDisplayProps> = React.memo(
   ({ block, networkId, metadata, selectedProvider, onProviderSelect }) => {
     const { t } = useTranslation("block");
     const { t: tTooltips } = useTranslation("tooltips");
-    const { settings } = useSettings();
+    const { settings, isSuperUser } = useSettings();
     const network = networkId ? getNetworkById(networkId) : undefined;
     const networkName = network?.name ?? "Unknown Network";
     const networkCurrency = network?.currency ?? "ETH";
-    const [showWithdrawals, setShowWithdrawals] = useState(false);
-    const [showTransactions, setShowTransactions] = useState(false);
-    const [showMoreDetails, setShowMoreDetails] = useState(false);
 
     // Check if this is an Arbitrum block
     const isArbitrumBlock = (block: Block | BlockArbitrum): block is BlockArbitrum => {
@@ -412,220 +410,9 @@ const BlockDisplay: React.FC<BlockDisplayProps> = React.memo(
                 )}
               </div>
             </div>
-
-            {/* Full-width: More Details (collapsible) */}
-            <div className="tx-row tx-row-vertical">
-              {/** biome-ignore lint/a11y/useButtonType: <TODO> */}
-              <button
-                className="more-details-toggle"
-                onClick={() => setShowMoreDetails(!showMoreDetails)}
-              >
-                {showMoreDetails ? "− Hide" : "+ Show"} {t("moreDetails")}
-              </button>
-
-              {showMoreDetails && (
-                <div className="more-details-content">
-                  <div className="detail-row">
-                    <span className="detail-label">
-                      Parent Hash:
-                      {settings.showHelperTooltips !== false && (
-                        <HelperTooltip content={tTooltips("block.parentHash")} />
-                      )}
-                    </span>
-                    <span className="detail-value tx-mono">
-                      {networkId &&
-                      block.parentHash !==
-                        "0x0000000000000000000000000000000000000000000000000000000000000000" ? (
-                        <Link to={`/${networkId}/block/${blockNumber - 1}`} className="link-accent">
-                          {block.parentHash}
-                        </Link>
-                      ) : (
-                        block.parentHash
-                      )}
-                    </span>
-                  </div>
-                  <div className="detail-row">
-                    <span className="detail-label">
-                      State Root:
-                      {settings.showHelperTooltips !== false && (
-                        <HelperTooltip content={tTooltips("block.stateRoot")} />
-                      )}
-                    </span>
-                    <span className="detail-value tx-mono">{block.stateRoot}</span>
-                  </div>
-                  <div className="detail-row">
-                    <span className="detail-label">
-                      Transactions Root:
-                      {settings.showHelperTooltips !== false && (
-                        <HelperTooltip content={tTooltips("block.transactionsRoot")} />
-                      )}
-                    </span>
-                    <span className="detail-value tx-mono">{block.transactionsRoot}</span>
-                  </div>
-                  <div className="detail-row">
-                    <span className="detail-label">
-                      Receipts Root:
-                      {settings.showHelperTooltips !== false && (
-                        <HelperTooltip content={tTooltips("block.receiptsRoot")} />
-                      )}
-                    </span>
-                    <span className="detail-value tx-mono">{block.receiptsRoot}</span>
-                  </div>
-                  {block.withdrawalsRoot && (
-                    <div className="detail-row">
-                      <span className="detail-label">
-                        Withdrawals Root:
-                        {settings.showHelperTooltips !== false && (
-                          <HelperTooltip content={tTooltips("block.withdrawalsRoot")} />
-                        )}
-                      </span>
-                      <span className="detail-value tx-mono">{block.withdrawalsRoot}</span>
-                    </div>
-                  )}
-                  <div className="detail-row">
-                    <span className="detail-label">
-                      Logs Bloom:
-                      {settings.showHelperTooltips !== false && (
-                        <HelperTooltip content={tTooltips("block.logsBloom")} />
-                      )}
-                    </span>
-                    <div className="detail-value">
-                      <code className="logs-bloom">{block.logsBloom}</code>
-                    </div>
-                  </div>
-                  <div className="detail-row">
-                    <span className="detail-label">
-                      Nonce:
-                      {settings.showHelperTooltips !== false && (
-                        <HelperTooltip content={tTooltips("block.nonce")} />
-                      )}
-                    </span>
-                    <span className="detail-value">{block.nonce}</span>
-                  </div>
-                  <div className="detail-row">
-                    <span className="detail-label">
-                      Mix Hash:
-                      {settings.showHelperTooltips !== false && (
-                        <HelperTooltip content={tTooltips("block.mixHash")} />
-                      )}
-                    </span>
-                    <span className="detail-value tx-mono">{block.mixHash}</span>
-                  </div>
-                  <div className="detail-row">
-                    <span className="detail-label">
-                      Sha3 Uncles:
-                      {settings.showHelperTooltips !== false && (
-                        <HelperTooltip content={tTooltips("block.sha3Uncles")} />
-                      )}
-                    </span>
-                    <span className="detail-value tx-mono">{block.sha3Uncles}</span>
-                  </div>
-                </div>
-              )}
-            </div>
           </div>
 
-          {/* Transactions List */}
-          {block.transactions && block.transactions.length > 0 && (
-            <div className="tx-section">
-              <div className="tx-section-header">
-                {/** biome-ignore lint/a11y/useButtonType: <TODO> */}
-                <button
-                  className="tx-section-toggle"
-                  onClick={() => setShowTransactions(!showTransactions)}
-                >
-                  <span className="tx-section-title">
-                    {t("transactions")} ({block.transactions.length})
-                  </span>
-                  <span className="tx-section-arrow">{showTransactions ? "▼" : "▶"}</span>
-                </button>
-              </div>
-              {showTransactions && (
-                <div className="tx-list">
-                  {block.transactions.map((txHash, index) => (
-                    <div key={txHash} className="tx-list-item">
-                      <span className="tx-list-index">{index}</span>
-                      <span className="tx-list-hash tx-mono">
-                        {networkId ? (
-                          <Link to={`/${networkId}/tx/${txHash}`} className="link-accent">
-                            {txHash}
-                          </Link>
-                        ) : (
-                          txHash
-                        )}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Withdrawals List */}
-          {block.withdrawals && block.withdrawals.length > 0 && (
-            <div className="tx-section">
-              <div className="tx-section-header">
-                {/** biome-ignore lint/a11y/useButtonType: <TODO> */}
-                <button
-                  className="tx-section-toggle"
-                  onClick={() => setShowWithdrawals(!showWithdrawals)}
-                >
-                  <span className="tx-section-title">Withdrawals ({block.withdrawals.length})</span>
-                  <span className="tx-section-arrow">{showWithdrawals ? "▼" : "▶"}</span>
-                </button>
-              </div>
-              {showWithdrawals && (
-                <div className="tx-logs">
-                  {block.withdrawals.map((withdrawal, index) => (
-                    // biome-ignore lint/suspicious/noArrayIndexKey: <TODO>
-                    <div key={index} className="tx-log">
-                      <div className="tx-log-index">{index}</div>
-                      <div className="tx-log-content">
-                        <div className="tx-log-row">
-                          <span className="tx-log-label">{t("index")}</span>
-                          <span className="tx-log-value">
-                            {Number(withdrawal.index).toLocaleString()}
-                          </span>
-                        </div>
-                        <div className="tx-log-row">
-                          <span className="tx-log-label">
-                            {t("validator")}
-                            {settings.showHelperTooltips !== false && (
-                              <HelperTooltip content={tTooltips("block.validator")} />
-                            )}
-                          </span>
-                          <span className="tx-log-value">
-                            {Number(withdrawal.validatorIndex).toLocaleString()}
-                          </span>
-                        </div>
-                        <div className="tx-log-row">
-                          <span className="tx-log-label">{t("address")}</span>
-                          <span className="tx-log-value tx-mono">
-                            {networkId ? (
-                              <Link
-                                to={`/${networkId}/address/${withdrawal.address}`}
-                                className="link-accent"
-                              >
-                                {withdrawal.address}
-                              </Link>
-                            ) : (
-                              withdrawal.address
-                            )}
-                          </span>
-                        </div>
-                        <div className="tx-log-row">
-                          <span className="tx-log-label">{t("amount")}</span>
-                          <span className="tx-log-value tx-value-highlight">
-                            {(Number(withdrawal.amount) / 1e9).toFixed(9)} ETH
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
+          <BlockAnalyser block={block} networkId={networkId} isSuperUser={isSuperUser} />
         </div>
         <AIAnalysisPanel
           analysisType="block"

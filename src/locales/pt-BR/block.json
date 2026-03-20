@@ -13,6 +13,12 @@
   "blobGasUsed": "Gas de Blob Usado:",
   "excessBlobGas": "Gas de Blob Excedente:",
   "blobCount": "Contagem de Blobs:",
+  "blobData": {
+    "title": "Dados dos Blobs ({{count}})",
+    "loading": "Carregando dados dos blobs da Beacon API...",
+    "pruned": "Os dados dos blobs foram podados e não estão mais disponíveis. Os blobs são tipicamente podados após ~18 dias.",
+    "noBeaconEndpoint": "Configure um endpoint de Beacon API nas Configurações para ver os dados dos blobs."
+  },
   "extraData": "Dados Extras",
   "difficulty": "Dificuldade",
   "totalDifficulty": "Dificuldade Total",

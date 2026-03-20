@@ -149,6 +149,12 @@
       }
     }
   },
+  "beaconApi": {
+    "title": "Beacon API",
+    "description": "Configurá endpoints de Beacon Chain API para ver datos de blobs EIP-4844. Se proporcionan endpoints públicos por defecto.",
+    "endpointLabel": "Beacon API de {{network}}",
+    "endpointPlaceholder": "https://tu-nodo-beacon.ejemplo.com"
+  },
   "helperTooltips": {
     "title": "Tooltips de Ayuda",
     "description": "Mostrar ayuda contextual para campos de datos de blockchain.",

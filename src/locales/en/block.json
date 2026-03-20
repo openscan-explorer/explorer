@@ -13,6 +13,12 @@
   "blobGasUsed": "Blob Gas Used:",
   "excessBlobGas": "Excess Blob Gas:",
   "blobCount": "Blob Count:",
+  "blobData": {
+    "title": "Blob Data ({{count}})",
+    "loading": "Loading blob data from Beacon API...",
+    "pruned": "Blob data has been pruned and is no longer available. Blobs are typically pruned after ~18 days.",
+    "noBeaconEndpoint": "Configure a Beacon API endpoint in Settings to view blob data."
+  },
   "extraData": "Extra Data",
   "difficulty": "Difficulty",
   "totalDifficulty": "Total Difficulty",
@@ -59,6 +65,23 @@
     "hour_other": "hours",
     "minute": "minute",
     "minute_other": "minutes"
+  },
+  "analyser": {
+    "moreDetails": "More Details",
+    "transactions": "Transactions",
+    "withdrawals": "Withdrawals",
+    "blobData": "Blob Data",
+    "expand": "Expand",
+    "collapse": "Collapse",
+    "parentHash": "Parent Hash:",
+    "stateRoot": "State Root:",
+    "transactionsRoot": "Transactions Root:",
+    "receiptsRoot": "Receipts Root:",
+    "withdrawalsRoot": "Withdrawals Root:",
+    "logsBloom": "Logs Bloom:",
+    "nonce": "Nonce:",
+    "mixHash": "Mix Hash:",
+    "sha3Uncles": "Sha3 Uncles:"
   },
   "aiAnalysis": {
     "sectionTitle": "AI Analysis"

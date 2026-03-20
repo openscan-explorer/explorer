@@ -7,7 +7,8 @@ export type AnalyserTab =
   | "stateChanges"
   | "rawTrace"
   | "events"
-  | "inputData";
+  | "inputData"
+  | "blobData";
 
 export interface TxAnalyserProps {
   txHash: string;
@@ -21,6 +22,8 @@ export interface TxAnalyserProps {
   inputData?: string;
   decodedInputData?: DecodedInput | null;
   isSuperUser?: boolean;
+  blobVersionedHashes?: string[];
+  blockTimestamp?: number;
 }
 
 export const CALL_TYPE_COLORS: Record<string, string> = {

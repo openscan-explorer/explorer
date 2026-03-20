@@ -6,11 +6,13 @@ import type {
   PrestateTrace,
   TraceResult,
 } from "../../../../services/adapters/NetworkAdapter";
+import { useBeaconBlobs } from "../../../../hooks/useBeaconBlobs";
 import { useCallTreeEnrichment } from "../../../../hooks/useCallTreeEnrichment";
 import { type ContractInfo, fetchContractInfoBatch } from "../../../../utils/contractLookup";
 import { useSettings } from "../../../../context/SettingsContext";
 import HelperTooltip from "../../../common/HelperTooltip";
 import { logger } from "../../../../utils/logger";
+import BlobDataDisplay from "../../../common/BlobDataDisplay";
 import type { AnalyserTab, TxAnalyserProps } from "./analyser/types";
 import CallTreeTab from "./analyser/CallTreeTab";
 import StateChangesTab from "./analyser/StateChangesTab";
@@ -30,13 +32,29 @@ const TxAnalyser: React.FC<TxAnalyserProps> = ({
   inputData,
   decodedInputData,
   isSuperUser,
+  blobVersionedHashes,
+  blockTimestamp,
 }) => {
   const { t } = useTranslation("transaction");
   const { t: tTooltips } = useTranslation("tooltips");
   const hasEvents = logs && logs.length > 0;
   const hasInputData = inputData && inputData !== "0x";
+  const hasBlobData = blobVersionedHashes && blobVersionedHashes.length > 0;
   const defaultTab: AnalyserTab = hasEvents ? "events" : hasInputData ? "inputData" : "callTree";
   const [activeTab, setActiveTab] = useState<AnalyserTab>(defaultTab);
+
+  // Beacon blob data
+  const caip2NetworkId = networkId ? `eip155:${networkId}` : undefined;
+  const {
+    blobs: blobSidecars,
+    loading: blobsLoading,
+    isPruned: blobsPruned,
+    isAvailable: beaconAvailable,
+  } = useBeaconBlobs(
+    isSuperUser && hasBlobData ? caip2NetworkId : undefined,
+    isSuperUser && hasBlobData && activeTab === "blobData" ? blockTimestamp : undefined,
+    blobVersionedHashes,
+  );
 
   // Reset to a base tab when leaving super user mode
   // biome-ignore lint/correctness/useExhaustiveDependencies: only react to isSuperUser changes
@@ -44,7 +62,13 @@ const TxAnalyser: React.FC<TxAnalyserProps> = ({
     if (isSuperUser) {
       setCollapsed(false);
     } else {
-      const superTabs: AnalyserTab[] = ["callTree", "gasProfiler", "stateChanges", "rawTrace"];
+      const superTabs: AnalyserTab[] = [
+        "callTree",
+        "gasProfiler",
+        "stateChanges",
+        "rawTrace",
+        "blobData",
+      ];
       setActiveTab((prev) => (superTabs.includes(prev) ? defaultTab : prev));
     }
   }, [isSuperUser]);
@@ -232,13 +256,13 @@ const TxAnalyser: React.FC<TxAnalyserProps> = ({
   if (!isSuperUser && !hasEvents && !hasInputData) return null;
 
   return (
-    <div className="tx-analyser">
+    <div className="detail-panel">
       {/* Tab bar */}
-      <div className="tx-analyser-tabs">
+      <div className="detail-panel-tabs">
         {hasEvents && (
           <button
             type="button"
-            className={`tx-analyser-tab${activeTab === "events" ? " tx-analyser-tab--active-base" : ""}`}
+            className={`detail-panel-tab${activeTab === "events" ? " detail-panel-tab--active-base" : ""}`}
             onClick={() => handleTabClick("events")}
           >
             {t("analyser.events")} ({logs.length})
@@ -247,7 +271,7 @@ const TxAnalyser: React.FC<TxAnalyserProps> = ({
         {hasInputData && (
           <button
             type="button"
-            className={`tx-analyser-tab${activeTab === "inputData" ? " tx-analyser-tab--active-base" : ""}`}
+            className={`detail-panel-tab${activeTab === "inputData" ? " detail-panel-tab--active-base" : ""}`}
             onClick={() => handleTabClick("inputData")}
           >
             {t("analyser.inputDataTab")}
@@ -260,7 +284,7 @@ const TxAnalyser: React.FC<TxAnalyserProps> = ({
           <>
             <button
               type="button"
-              className={`tx-analyser-tab${activeTab === "callTree" ? " tx-analyser-tab--active" : ""}`}
+              className={`detail-panel-tab${activeTab === "callTree" ? " detail-panel-tab--active" : ""}`}
               onClick={() => handleTabClick("callTree")}
             >
               {t("analyser.callTree")}
@@ -270,7 +294,7 @@ const TxAnalyser: React.FC<TxAnalyserProps> = ({
             </button>
             <button
               type="button"
-              className={`tx-analyser-tab${activeTab === "gasProfiler" ? " tx-analyser-tab--active" : ""}`}
+              className={`detail-panel-tab${activeTab === "gasProfiler" ? " detail-panel-tab--active" : ""}`}
               onClick={() => handleTabClick("gasProfiler")}
             >
               {t("analyser.gasProfiler")}
@@ -280,7 +304,7 @@ const TxAnalyser: React.FC<TxAnalyserProps> = ({
             </button>
             <button
               type="button"
-              className={`tx-analyser-tab${activeTab === "stateChanges" ? " tx-analyser-tab--active" : ""}`}
+              className={`detail-panel-tab${activeTab === "stateChanges" ? " detail-panel-tab--active" : ""}`}
               onClick={() => handleTabClick("stateChanges")}
             >
               {t("analyser.stateChanges")}
@@ -290,16 +314,25 @@ const TxAnalyser: React.FC<TxAnalyserProps> = ({
             </button>
             <button
               type="button"
-              className={`tx-analyser-tab${activeTab === "rawTrace" ? " tx-analyser-tab--active" : ""}`}
+              className={`detail-panel-tab${activeTab === "rawTrace" ? " detail-panel-tab--active" : ""}`}
               onClick={() => handleTabClick("rawTrace")}
             >
               {t("analyser.rawTrace")}
             </button>
+            {hasBlobData && beaconAvailable && (
+              <button
+                type="button"
+                className={`detail-panel-tab${activeTab === "blobData" ? " detail-panel-tab--active" : ""}`}
+                onClick={() => handleTabClick("blobData")}
+              >
+                {t("blobData.title")} ({blobVersionedHashes.length})
+              </button>
+            )}
           </>
         )}
         <button
           type="button"
-          className="tx-analyser-collapse-btn"
+          className="detail-panel-collapse-btn"
           onClick={() => setCollapsed((c) => !c)}
           aria-label={collapsed ? t("analyser.expand") : t("analyser.collapse")}
         >
@@ -309,19 +342,19 @@ const TxAnalyser: React.FC<TxAnalyserProps> = ({
 
       {/* Tab content */}
       {!collapsed && (
-        <div className="tx-analyser-body">
+        <div className="detail-panel-body">
           {activeTab === "callTree" && (
             <>
               {(loadingCallTree || enrichmentLoading) && (
-                <div className="analyser-loading">
+                <div className="detail-panel-loading">
                   {loadingCallTree ? t("analyser.loading") : t("analyser.enriching")}
                 </div>
               )}
               {callTreeError && (
-                <div className="analyser-error">
+                <div className="detail-panel-error">
                   <div>{callTreeError}</div>
                   {callTreeError === t("analyser.notSupported") && (
-                    <div className="analyser-hint">{t("analyser.traceHint")}</div>
+                    <div className="detail-panel-hint">{t("analyser.traceHint")}</div>
                   )}
                 </div>
               )}
@@ -340,15 +373,15 @@ const TxAnalyser: React.FC<TxAnalyserProps> = ({
           {activeTab === "gasProfiler" && (
             <>
               {(loadingCallTree || enrichmentLoading) && (
-                <div className="analyser-loading">
+                <div className="detail-panel-loading">
                   {loadingCallTree ? t("analyser.loading") : t("analyser.enriching")}
                 </div>
               )}
               {callTreeError && (
-                <div className="analyser-error">
+                <div className="detail-panel-error">
                   <div>{callTreeError}</div>
                   {callTreeError === t("analyser.notSupported") && (
-                    <div className="analyser-hint">{t("analyser.traceHint")}</div>
+                    <div className="detail-panel-hint">{t("analyser.traceHint")}</div>
                   )}
                 </div>
               )}
@@ -361,15 +394,15 @@ const TxAnalyser: React.FC<TxAnalyserProps> = ({
           {activeTab === "stateChanges" && (
             <>
               {(loadingPrestate || enrichmentLoading) && (
-                <div className="analyser-loading">
+                <div className="detail-panel-loading">
                   {loadingPrestate ? t("analyser.loading") : t("analyser.enriching")}
                 </div>
               )}
               {prestateError && (
-                <div className="analyser-error">
+                <div className="detail-panel-error">
                   <div>{prestateError}</div>
                   {prestateError === t("analyser.notSupported") && (
-                    <div className="analyser-hint">{t("analyser.traceHint")}</div>
+                    <div className="detail-panel-hint">{t("analyser.traceHint")}</div>
                   )}
                 </div>
               )}
@@ -386,12 +419,14 @@ const TxAnalyser: React.FC<TxAnalyserProps> = ({
 
           {activeTab === "rawTrace" && (
             <>
-              {loadingRawTrace && <div className="analyser-loading">{t("analyser.loading")}</div>}
+              {loadingRawTrace && (
+                <div className="detail-panel-loading">{t("analyser.loading")}</div>
+              )}
               {rawTraceError && (
-                <div className="analyser-error">
+                <div className="detail-panel-error">
                   <div>{rawTraceError}</div>
                   {rawTraceError === t("analyser.notSupported") && (
-                    <div className="analyser-hint">{t("analyser.traceHint")}</div>
+                    <div className="detail-panel-hint">{t("analyser.traceHint")}</div>
                   )}
                 </div>
               )}
@@ -402,7 +437,7 @@ const TxAnalyser: React.FC<TxAnalyserProps> = ({
           {activeTab === "events" && logs && logs.length > 0 && (
             <>
               {logEnrichmentLoading && (
-                <div className="analyser-loading">{t("analyser.enriching")}</div>
+                <div className="detail-panel-loading">{t("analyser.enriching")}</div>
               )}
               {!logEnrichmentLoading && (
                 <EventLogsTab
@@ -424,6 +459,16 @@ const TxAnalyser: React.FC<TxAnalyserProps> = ({
               contracts={contracts}
               txToAddress={txToAddress}
             />
+          )}
+
+          {activeTab === "blobData" && hasBlobData && (
+            <div className="blob-section-list">
+              {blobsLoading && <div className="detail-panel-loading">{t("blobData.loading")}</div>}
+              {blobsPruned && <div className="detail-panel-error">{t("blobData.pruned")}</div>}
+              {blobSidecars?.map((blob) => (
+                <BlobDataDisplay key={blob.index} blob={blob} index={Number(blob.index)} />
+              ))}
+            </div>
           )}
         </div>
       )}

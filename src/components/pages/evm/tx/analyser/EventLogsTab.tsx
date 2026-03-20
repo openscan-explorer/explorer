@@ -37,16 +37,16 @@ const EventLogsTab: React.FC<{
   };
 
   return (
-    <div className="analyser-tab-content">
-      <div className="analyser-summary">
+    <div className="detail-panel-tab-content">
+      <div className="detail-panel-summary">
         <span>
           {logs.length} {t("analyser.events").toLowerCase()}
         </span>
-        <span className="analyser-expand-controls">
-          <button type="button" className="analyser-expand-btn" onClick={expandAll}>
+        <span className="detail-panel-expand-controls">
+          <button type="button" className="detail-panel-expand-btn" onClick={expandAll}>
             {t("analyser.expandAll")}
           </button>
-          <button type="button" className="analyser-expand-btn" onClick={collapseAll}>
+          <button type="button" className="detail-panel-expand-btn" onClick={collapseAll}>
             {t("analyser.collapseAll")}
           </button>
         </span>

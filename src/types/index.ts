@@ -508,8 +508,21 @@ export interface UserSettings {
   isSuperUser?: boolean;
   promptVersion?: PromptVersion;
   persistentCacheSizeMB?: number;
+  beaconUrls?: Record<string, string>;
   knowledgeLevel?: KnowledgeLevel;
   showHelperTooltips?: boolean;
+}
+
+// ==================== BEACON/BLOB TYPES ====================
+
+/**
+ * A single blob sidecar from the Beacon API
+ */
+export interface BlobSidecar {
+  index: string;
+  blob: string;
+  kzg_commitment: string;
+  kzg_proof: string;
 }
 
 /**
@@ -521,6 +534,7 @@ export const DEFAULT_SETTINGS: UserSettings = {
   rpcStrategy: "fallback",
   maxParallelRequests: 3,
   apiKeys: {},
+  beaconUrls: {},
   isSuperUser: false,
   promptVersion: "stable",
   persistentCacheSizeMB: 10,
