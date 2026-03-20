@@ -7,7 +7,8 @@ import networksData from "../config/networks.json";
 import { logger } from "../utils/logger";
 import { extractChainIdFromNetworkId } from "../utils/networkResolver";
 
-const METADATA_BASE_URL = "https://cdn.jsdelivr.net/npm/@openscan/metadata@1.1.1-alpha.0/dist";
+export const METADATA_VERSION = "1.1.2-alpha.0";
+const METADATA_BASE_URL = `https://cdn.jsdelivr.net/npm/@openscan/metadata@${METADATA_VERSION}/dist`;
 
 export interface NetworkLink {
   name: string;

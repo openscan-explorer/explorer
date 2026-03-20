@@ -1,4 +1,4 @@
-import type { MetadataRpcEndpoint } from "../services/MetadataService";
+import { type MetadataRpcEndpoint, METADATA_VERSION } from "../services/MetadataService";
 import type { RpcUrlsContextType } from "../types";
 import { logger } from "./logger";
 
@@ -16,6 +16,7 @@ const BUILTIN_RPC_DEFAULTS: RpcUrlsContextType = {
 
 interface MetadataRpcCache {
   timestamp: number;
+  version?: string;
   rpcs: Record<string, MetadataRpcEndpoint[]>;
 }
 
@@ -40,7 +41,7 @@ export function loadMetadataRpcsFromStorage(): MetadataRpcCache | null {
  */
 export function saveMetadataRpcsToStorage(rpcs: Record<string, MetadataRpcEndpoint[]>): void {
   try {
-    const cache: MetadataRpcCache = { timestamp: Date.now(), rpcs };
+    const cache: MetadataRpcCache = { timestamp: Date.now(), version: METADATA_VERSION, rpcs };
     localStorage.setItem(METADATA_RPC_STORAGE_KEY, JSON.stringify(cache));
   } catch (err) {
     logger.warn("Failed to save metadata RPCs to storage", err);
@@ -53,6 +54,7 @@ export function saveMetadataRpcsToStorage(rpcs: Record<string, MetadataRpcEndpoi
 export function isMetadataRpcCacheFresh(): boolean {
   const cache = loadMetadataRpcsFromStorage();
   if (!cache) return false;
+  if (cache.version !== METADATA_VERSION) return false;
   return Date.now() - cache.timestamp < METADATA_RPC_TTL;
 }
 
