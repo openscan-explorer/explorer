@@ -203,5 +203,20 @@
   "language": "Lenguaje",
   "optimizer": "Optimizador",
   "optimizerEnabled": "Activado ({{runs}} iteraciones)",
-  "optimizerDisabled": "Desactivado"
+  "optimizerDisabled": "Desactivado",
+  "facilitatorInfo": "Información del Facilitador",
+  "facilitatorName": "Nombre",
+  "facilitatorDescription": "Descripción",
+  "facilitatorWebsite": "Sitio web",
+  "facilitatorBaseUrl": "URL base",
+  "facilitatorSchemes": "Esquemas compatibles",
+  "facilitatorAssets": "Activos compatibles",
+  "facilitatorCapabilities": "Capacidades",
+  "facilitatorVerify": "Verificar",
+  "facilitatorSettle": "Liquidar",
+  "facilitatorSupported": "Compatible",
+  "facilitatorList": "Listar",
+  "facilitatorYes": "Sí",
+  "facilitatorNo": "No",
+  "facilitatorVisitWebsite": "Visitar sitio web"
 }

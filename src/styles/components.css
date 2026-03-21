@@ -7744,6 +7744,65 @@ button.tx-section-header-toggle {
 }
 
 /* ==========================================================================
+   x402 Facilitator Info Card
+   ========================================================================== */
+
+.facilitator-info-card {
+	background: var(--color-surface);
+	border: 1px solid var(--color-primary-alpha-10);
+	border-radius: 8px;
+	padding: 16px;
+	margin-bottom: 16px;
+}
+
+.facilitator-name-display {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.facilitator-logo {
+	width: 24px;
+	height: 24px;
+	border-radius: 4px;
+	object-fit: cover;
+}
+
+.facilitator-link {
+	color: var(--color-primary);
+	text-decoration: none;
+}
+
+.facilitator-link:hover {
+	text-decoration: underline;
+}
+
+.facilitator-capabilities {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+
+.facilitator-capability-badge {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	padding: 2px 8px;
+	border-radius: 4px;
+	font-size: 0.85em;
+}
+
+.facilitator-capability-badge.supported {
+	background: rgba(0, 200, 83, 0.1);
+	color: var(--color-success, #00c853);
+}
+
+.facilitator-capability-badge.not-supported {
+	background: var(--color-primary-alpha-5);
+	color: var(--text-tertiary);
+}
+
+/* ==========================================================================
    Contract Details Section (inside Contract Info Card)
    ========================================================================== */
 

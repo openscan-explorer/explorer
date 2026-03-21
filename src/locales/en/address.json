@@ -203,5 +203,20 @@
   "language": "Language",
   "optimizer": "Optimizer",
   "optimizerEnabled": "Enabled ({{runs}} runs)",
-  "optimizerDisabled": "Disabled"
+  "optimizerDisabled": "Disabled",
+  "facilitatorInfo": "Facilitator Info",
+  "facilitatorName": "Name",
+  "facilitatorDescription": "Description",
+  "facilitatorWebsite": "Website",
+  "facilitatorBaseUrl": "Base URL",
+  "facilitatorSchemes": "Supported Schemes",
+  "facilitatorAssets": "Supported Assets",
+  "facilitatorCapabilities": "Capabilities",
+  "facilitatorVerify": "Verify",
+  "facilitatorSettle": "Settle",
+  "facilitatorSupported": "Supported",
+  "facilitatorList": "List",
+  "facilitatorYes": "Yes",
+  "facilitatorNo": "No",
+  "facilitatorVisitWebsite": "Visit Website"
 }

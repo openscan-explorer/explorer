@@ -8,6 +8,7 @@ export { default as ContractInfoCard } from "./ContractInfoCard";
 export { default as ContractInfoCards } from "./ContractInfoCards";
 export { default as ContractInteraction } from "./ContractInteraction";
 export { default as ERC20TokenInfoCard } from "./ERC20TokenInfoCard";
+export { default as FacilitatorInfoCard } from "./FacilitatorInfoCard";
 export { default as NFTCollectionInfoCard } from "./NFTCollectionInfoCard";
 export { default as ContractMoreInfoCard } from "./ContractMoreInfoCard";
 export { default as CustomTokenModal } from "./CustomTokenModal";

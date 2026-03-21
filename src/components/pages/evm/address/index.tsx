@@ -19,6 +19,7 @@ import {
   ERC20Display,
   ERC721Display,
   ERC1155Display,
+  X402FacilitatorDisplay,
 } from "./displays";
 
 export default function Address() {
@@ -302,6 +303,7 @@ export default function Address() {
       {addressType === "erc20" && <ERC20Display {...displayProps} />}
       {addressType === "erc721" && <ERC721Display {...displayProps} />}
       {addressType === "erc1155" && <ERC1155Display {...displayProps} />}
+      {addressType === "x402Facilitator" && <X402FacilitatorDisplay {...displayProps} />}
     </div>
   );
 }
