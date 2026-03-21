@@ -189,6 +189,28 @@ export const BASE = {
     },
   },
 
+  // ============================================
+  // x402 FACILITATORS
+  // ============================================
+  facilitators: {
+    // PayAI Facilitator - multi-network x402 facilitator
+    payai: {
+      address: "0xc6699d2aada6c36dfea5c248dd70f9cb0235cb63",
+      name: "PayAI Facilitator",
+      description: "Accept x402 payments on all networks",
+      websiteUrl: "https://facilitator.payai.network",
+      baseUrl: "https://facilitator.payai.network",
+      schemes: ["exact"],
+      assets: ["EIP-3009", "SPL", "Token-2022"],
+    },
+    // Kobaru - x402 facilitator built by payment veterans
+    kobaru: {
+      address: "0x67a3176acd5db920747eef65b813b028ad143cdb",
+      name: "Kobaru",
+      websiteUrl: "https://www.kobaru.io",
+    },
+  },
+
   // Upgrade timestamps (Unix) for reference
   upgrades: {
     canyon: {
