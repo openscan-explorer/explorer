@@ -48,8 +48,9 @@ export function useAIAnalysis(
     const apiKeys = settings.apiKeys ?? {};
 
     for (const id of AI_PROVIDER_ORDER) {
-      // openscan-groq is a free proxy — no API key needed
+      // openscan-groq is a free proxy — skip when AI worker proxy is disabled
       if (id === "openscan-groq") {
+        if (settings.workerProxyAi === false) continue;
         return { provider: AI_PROVIDERS[id], apiKey: "" };
       }
       const key = apiKeys[id];
@@ -58,7 +59,7 @@ export function useAIAnalysis(
       }
     }
     return null;
-  }, [settings.apiKeys]);
+  }, [settings.apiKeys, settings.workerProxyAi]);
 
   // Augment cache key with version and mode so switching invalidates cache
   const augmentedCacheKey = `${cacheKey}_v${promptVersion}_${userMode}`;
