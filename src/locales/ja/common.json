@@ -289,7 +289,8 @@
       "parseError": "AIレスポンスの解析に失敗しました。再試行してください。",
       "generic": "分析に失敗しました。もう一度お試しください。",
       "tryAgain": "再試行",
-      "goToSettings": "設定へ"
+      "goToSettings": "設定へ",
+      "proxyDisabled": "OpenScanの無料AIプロキシが無効です。設定 → ネットワーク → ワーカープロキシで有効にするか、設定 → プロバイダーで独自のAIプロバイダーAPIキーを設定してください。"
     }
   },
   "search": {

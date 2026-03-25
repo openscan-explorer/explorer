@@ -299,7 +299,8 @@
       "parseError": "Failed to parse AI response. Try again.",
       "generic": "Analysis failed. Please try again.",
       "tryAgain": "Try Again",
-      "goToSettings": "Go to Settings"
+      "goToSettings": "Go to Settings",
+      "proxyDisabled": "The free OpenScan AI proxy is disabled. Enable it in Settings → Network → Worker Proxy, or configure your own AI provider API keys in Settings → Providers."
     }
   },
   "search": {

@@ -292,7 +292,8 @@
       "parseError": "Falha ao analisar resposta da IA. Tente novamente.",
       "generic": "Análise falhou. Por favor, tente novamente.",
       "tryAgain": "Tentar Novamente",
-      "goToSettings": "Ir para Configurações"
+      "goToSettings": "Ir para Configurações",
+      "proxyDisabled": "O proxy de IA gratuito do OpenScan está desativado. Ative em Configurações → Rede → Proxy Worker, ou configure suas próprias chaves de API em Configurações → Provedores."
     }
   },
   "search": {

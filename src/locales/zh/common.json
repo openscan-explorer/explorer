@@ -274,7 +274,8 @@
       "parseError": "解析 AI 响应失败。请重试。",
       "generic": "分析失败。请重试。",
       "tryAgain": "重试",
-      "goToSettings": "前往设置"
+      "goToSettings": "前往设置",
+      "proxyDisabled": "OpenScan免费AI代理已禁用。请在设置 → 网络 → 工作代理中启用，或在设置 → 提供商中配置您自己的AI提供商API密钥。"
     }
   },
   "search": {
