@@ -218,7 +218,9 @@ export function getEffectiveRpcUrls(options?: {
     for (const k of Object.keys(stored)) {
       const val = stored[k];
       if (!val || !Array.isArray(val) || val.length === 0) continue;
-      merged[k] = val;
+      // Merge stored URLs with defaults so builtin worker URLs are always present
+      const defaultUrls = defaults[k] ?? [];
+      merged[k] = [...new Set([...val, ...defaultUrls])];
     }
   }
 
