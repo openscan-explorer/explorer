@@ -65,6 +65,6 @@ Located in `src/types/index.ts`:
 - **Vite** (`vite.config.ts`) - Fast bundler with TypeScript, CSS, and asset loading
 - **GitHub Pages**: Set `GITHUB_PAGES=true` for `/explorer/` base path
 - **Environment Variables**: Injected via Vite's `define` option:
-  - `REACT_APP_COMMIT_HASH` - Git commit hash
-  - `REACT_APP_OPENSCAN_NETWORKS` - Comma-separated chain IDs to display
-  - `REACT_APP_ENVIRONMENT` - production/development
+  - `OPENSCAN_COMMIT_HASH` - Git commit hash
+  - `OPENSCAN_NETWORKS` - Comma-separated chain IDs to display
+  - `OPENSCAN_ENVIRONMENT` - production/development

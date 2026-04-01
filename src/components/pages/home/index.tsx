@@ -54,7 +54,7 @@ export default function Home() {
   const [showTestnets, setShowTestnets] = useState(false);
 
   const { featuredNetworks, productionNetworks, testnetNetworks } = useMemo(() => {
-    const isDevelopment = import.meta.env.VITE_ENVIRONMENT === "development";
+    const isDevelopment = import.meta.env.OPENSCAN_ENVIRONMENT === "development";
     const localhostChainId = 31337;
 
     // In development, treat localhost as a production network (show with other networks)
