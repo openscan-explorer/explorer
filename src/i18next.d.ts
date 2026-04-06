@@ -5,6 +5,7 @@ import type devtools from "./locales/en/devtools.json";
 import type home from "./locales/en/home.json";
 import type network from "./locales/en/network.json";
 import type settings from "./locales/en/settings.json";
+import type solana from "./locales/en/solana.json";
 import type transaction from "./locales/en/transaction.json";
 import type tokenDetails from "./locales/en/tokenDetails.json";
 import type rpcs from "./locales/en/rpcs.json";
@@ -24,6 +25,7 @@ declare module "i18next" {
       tokenDetails: typeof tokenDetails;
       rpcs: typeof rpcs;
       tooltips: typeof tooltips;
+      solana: typeof solana;
     };
   }
 }

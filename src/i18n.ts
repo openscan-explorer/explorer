@@ -9,6 +9,7 @@ import enDevtools from "./locales/en/devtools.json";
 import enHome from "./locales/en/home.json";
 import enNetwork from "./locales/en/network.json";
 import enSettings from "./locales/en/settings.json";
+import enSolana from "./locales/en/solana.json";
 import enTransaction from "./locales/en/transaction.json";
 import enTokenDetails from "./locales/en/tokenDetails.json";
 import enRpcs from "./locales/en/rpcs.json";
@@ -21,6 +22,7 @@ import esDevtools from "./locales/es/devtools.json";
 import esHome from "./locales/es/home.json";
 import esNetwork from "./locales/es/network.json";
 import esSettings from "./locales/es/settings.json";
+import esSolana from "./locales/es/solana.json";
 import esTransaction from "./locales/es/transaction.json";
 import esTokenDetails from "./locales/es/tokenDetails.json";
 import esRpcs from "./locales/es/rpcs.json";
@@ -33,6 +35,7 @@ import zhDevtools from "./locales/zh/devtools.json";
 import zhHome from "./locales/zh/home.json";
 import zhNetwork from "./locales/zh/network.json";
 import zhSettings from "./locales/zh/settings.json";
+import zhSolana from "./locales/zh/solana.json";
 import zhTransaction from "./locales/zh/transaction.json";
 import zhTokenDetails from "./locales/zh/tokenDetails.json";
 import zhTooltips from "./locales/zh/tooltips.json";
@@ -44,6 +47,7 @@ import jaDevtools from "./locales/ja/devtools.json";
 import jaHome from "./locales/ja/home.json";
 import jaNetwork from "./locales/ja/network.json";
 import jaSettings from "./locales/ja/settings.json";
+import jaSolana from "./locales/ja/solana.json";
 import jaTransaction from "./locales/ja/transaction.json";
 import jaTokenDetails from "./locales/ja/tokenDetails.json";
 import jaTooltips from "./locales/ja/tooltips.json";
@@ -55,6 +59,7 @@ import ptBRDevtools from "./locales/pt-BR/devtools.json";
 import ptBRHome from "./locales/pt-BR/home.json";
 import ptBRNetwork from "./locales/pt-BR/network.json";
 import ptBRSettings from "./locales/pt-BR/settings.json";
+import ptBRSolana from "./locales/pt-BR/solana.json";
 import ptBRTransaction from "./locales/pt-BR/transaction.json";
 import ptBRTokenDetails from "./locales/pt-BR/tokenDetails.json";
 import ptBRTooltips from "./locales/pt-BR/tooltips.json";
@@ -84,6 +89,7 @@ i18n
         tokenDetails: enTokenDetails,
         rpcs: enRpcs,
         tooltips: enTooltips,
+        solana: enSolana,
       },
       es: {
         common: esCommon,
@@ -97,6 +103,7 @@ i18n
         tokenDetails: esTokenDetails,
         rpcs: esRpcs,
         tooltips: esTooltips,
+        solana: esSolana,
       },
       zh: {
         common: zhCommon,
@@ -109,6 +116,7 @@ i18n
         network: zhNetwork,
         tokenDetails: zhTokenDetails,
         tooltips: zhTooltips,
+        solana: zhSolana,
       },
       ja: {
         common: jaCommon,
@@ -121,6 +129,7 @@ i18n
         network: jaNetwork,
         tokenDetails: jaTokenDetails,
         tooltips: jaTooltips,
+        solana: jaSolana,
       },
       "pt-BR": {
         common: ptBRCommon,
@@ -133,6 +142,7 @@ i18n
         network: ptBRNetwork,
         tokenDetails: ptBRTokenDetails,
         tooltips: ptBRTooltips,
+        solana: ptBRSolana,
       },
     },
     fallbackLng: "en",
@@ -148,6 +158,7 @@ i18n
       "network",
       "rpcs",
       "tooltips",
+      "solana",
     ],
     interpolation: {
       escapeValue: false,

@@ -7,6 +7,8 @@ import { PolygonAdapter } from "./PolygonAdapter/PolygonAdapter";
 import { ArbitrumAdapter } from "./ArbitrumAdapter/ArbitrumAdapter";
 import { HardhatAdapter } from "./HardhatAdapter/HardhatAdapter";
 import { BitcoinAdapter } from "./BitcoinAdapter/BitcoinAdapter";
+import { SolanaAdapter } from "./SolanaAdapter/SolanaAdapter";
+import type { ISolanaClient } from "./SolanaAdapter/SolanaClientTypes";
 import type {
   ArbitrumClient,
   AvalancheClient,
@@ -67,5 +69,12 @@ export class AdapterFactory {
    */
   static createBitcoinAdapter(networkId: string, client: BitcoinClient): BitcoinAdapter {
     return new BitcoinAdapter(networkId, client);
+  }
+
+  /**
+   * Create a Solana network adapter
+   */
+  static createSolanaAdapter(networkId: string, client: ISolanaClient): SolanaAdapter {
+    return new SolanaAdapter(networkId, client);
   }
 }

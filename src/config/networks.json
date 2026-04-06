@@ -286,6 +286,78 @@
       ]
     },
     {
+      "type": "solana",
+      "networkId": "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp",
+      "slug": "sol",
+      "name": "Solana",
+      "shortName": "Solana",
+      "description": "High-performance blockchain with fast transactions and low fees",
+      "currency": "SOL",
+      "color": "#9945FF",
+      "isTestnet": false,
+      "logo": "assets/networks/solana.svg",
+      "links": [
+        {
+          "name": "Website",
+          "url": "https://solana.com",
+          "description": "Official Solana website"
+        },
+        {
+          "name": "Docs",
+          "url": "https://solana.com/docs",
+          "description": "Developer documentation"
+        },
+        {
+          "name": "GitHub",
+          "url": "https://github.com/solana-labs",
+          "description": "Solana Labs GitHub"
+        }
+      ]
+    },
+    {
+      "type": "solana",
+      "networkId": "solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1",
+      "slug": "sol-devnet",
+      "name": "Solana Devnet",
+      "shortName": "SOL Devnet",
+      "description": "Solana development network for testing",
+      "currency": "SOL",
+      "color": "#9945FF",
+      "isTestnet": true,
+      "logo": "assets/networks/solana.svg",
+      "links": [
+        {
+          "name": "Faucet",
+          "url": "https://faucet.solana.com",
+          "description": "Get devnet SOL"
+        },
+        {
+          "name": "Docs",
+          "url": "https://solana.com/docs",
+          "description": "Developer documentation"
+        }
+      ]
+    },
+    {
+      "type": "solana",
+      "networkId": "solana:4uhcVJyU9pJkvQyS88uRDiswHXSCkY3z",
+      "slug": "sol-testnet",
+      "name": "Solana Testnet",
+      "shortName": "SOL Testnet",
+      "description": "Solana testnet for validators and developers",
+      "currency": "SOL",
+      "color": "#9945FF",
+      "isTestnet": true,
+      "logo": "assets/networks/solana.svg",
+      "links": [
+        {
+          "name": "Faucet",
+          "url": "https://faucet.solana.com",
+          "description": "Get testnet SOL"
+        }
+      ]
+    },
+    {
       "type": "bitcoin",
       "networkId": "bip122:000000000019d6689c085ae165831e93",
       "slug": "btc",
