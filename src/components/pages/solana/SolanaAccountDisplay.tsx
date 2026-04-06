@@ -26,7 +26,7 @@ const SolanaAccountDisplay: React.FC<SolanaAccountDisplayProps> = React.memo(
           </div>
 
           <div className="tx-details">
-            {/* Address */}
+            {/* Address — full width on top */}
             <div className="tx-row">
               <span className="tx-label">{t("account.address")}:</span>
               <span
@@ -38,87 +38,92 @@ const SolanaAccountDisplay: React.FC<SolanaAccountDisplayProps> = React.memo(
               </span>
             </div>
 
-            {/* Balance */}
-            <div className="tx-row">
-              <span className="tx-label">{t("account.balance")}:</span>
-              <span className="tx-value tx-value-highlight">{formatSol(account.lamports)}</span>
-            </div>
+            <div className="btc-tx-details-grid">
+              {/* Left column — account details */}
+              <div className="btc-tx-details-column">
+                <div className="tx-row">
+                  <span className="tx-label">{t("account.balance")}:</span>
+                  <span className="tx-value tx-value-highlight">
+                    {formatSol(account.lamports)}
+                  </span>
+                </div>
 
-            {/* Owner */}
-            <div className="tx-row">
-              <span className="tx-label">{t("account.owner")}:</span>
-              <span className="tx-value tx-mono">
-                <Link
-                  to={`/${networkId}/account/${account.owner}`}
-                  className="tx-link"
-                  title={account.owner}
-                >
-                  {shortenSolanaAddress(account.owner, 10, 10)}
-                </Link>
-              </span>
-            </div>
+                <div className="tx-row">
+                  <span className="tx-label">{t("account.owner")}:</span>
+                  <span className="tx-value tx-mono">
+                    <Link
+                      to={`/${networkId}/account/${account.owner}`}
+                      className="tx-link"
+                      title={account.owner}
+                    >
+                      {shortenSolanaAddress(account.owner, 10, 10)}
+                    </Link>
+                  </span>
+                </div>
 
-            {/* Executable */}
-            <div className="tx-row">
-              <span className="tx-label">{t("account.executable")}:</span>
-              <span className="tx-value">
-                {account.executable ? t("account.yes") : t("account.no")}
-              </span>
-            </div>
+                <div className="tx-row">
+                  <span className="tx-label">{t("account.executable")}:</span>
+                  <span className="tx-value">
+                    {account.executable ? t("account.yes") : t("account.no")}
+                  </span>
+                </div>
 
-            {/* Data size */}
-            <div className="tx-row">
-              <span className="tx-label">{t("account.dataSize")}:</span>
-              <span className="tx-value">{account.space.toLocaleString()} bytes</span>
-            </div>
+                <div className="tx-row">
+                  <span className="tx-label">{t("account.dataSize")}:</span>
+                  <span className="tx-value">{account.space.toLocaleString()} bytes</span>
+                </div>
 
-            {/* Rent epoch */}
-            <div className="tx-row">
-              <span className="tx-label">{t("account.rentEpoch")}:</span>
-              <span className="tx-value">{account.rentEpoch}</span>
-            </div>
-          </div>
-
-          {/* Token Holdings */}
-          <div className="block-display-section">
-            <h3 className="block-display-section-title">
-              {t("account.tokenHoldings")}{" "}
-              {account.tokenAccounts && account.tokenAccounts.length > 0
-                ? `(${account.tokenAccounts.length})`
-                : ""}
-            </h3>
-            {account.tokenAccounts && account.tokenAccounts.length > 0 ? (
-              <div className="table-wrapper">
-                <table className="dash-table">
-                  <thead>
-                    <tr>
-                      <th>{t("token.mint")}</th>
-                      <th>{t("token.amount")}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {account.tokenAccounts.map((holding) => (
-                      <tr key={holding.tokenAccount}>
-                        <td className="table-cell-mono">
-                          <Link
-                            to={`/${networkId}/token/${holding.mint}`}
-                            className="table-cell-address"
-                            title={holding.mint}
-                          >
-                            {shortenSolanaAddress(holding.mint, 8, 8)}
-                          </Link>
-                        </td>
-                        <td className="table-cell-value">{holding.amount.uiAmountString}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                <div className="tx-row">
+                  <span className="tx-label">{t("account.rentEpoch")}:</span>
+                  <span className="tx-value">{account.rentEpoch}</span>
+                </div>
               </div>
-            ) : (
-              <div className="card-content">
-                <p className="text-muted margin-0">{t("account.noTokens")}</p>
+
+              {/* Right column — token holdings */}
+              <div className="btc-tx-details-column">
+                <div className="tx-row">
+                  <span className="tx-label">
+                    {t("account.tokenHoldings")}
+                    {account.tokenAccounts && account.tokenAccounts.length > 0
+                      ? ` (${account.tokenAccounts.length})`
+                      : ""}
+                    :
+                  </span>
+                </div>
+                {account.tokenAccounts && account.tokenAccounts.length > 0 ? (
+                  <div className="table-wrapper">
+                    <table className="dash-table">
+                      <thead>
+                        <tr>
+                          <th>{t("token.mint")}</th>
+                          <th>{t("token.amount")}</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {account.tokenAccounts.map((holding) => (
+                          <tr key={holding.tokenAccount}>
+                            <td className="table-cell-mono">
+                              <Link
+                                to={`/${networkId}/token/${holding.mint}`}
+                                className="table-cell-address"
+                                title={holding.mint}
+                              >
+                                {shortenSolanaAddress(holding.mint, 8, 8)}
+                              </Link>
+                            </td>
+                            <td className="table-cell-value">{holding.amount.uiAmountString}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <div className="tx-row">
+                    <span className="tx-value text-muted">{t("account.noTokens")}</span>
+                  </div>
+                )}
               </div>
-            )}
+            </div>
           </div>
 
           {/* Recent Transactions */}
