@@ -15,12 +15,15 @@ import type {
   SolanaTransaction,
   SolanaValidator,
 } from "../../../types";
-import type {
-  ISolanaClient,
-  SolBlock,
-  SolParsedAccountKey,
-  SolTransaction,
-} from "./SolanaClientTypes";
+import type { SolanaClient, SolBlock, SolTransaction } from "@openscan/network-connectors";
+
+// Not exported from the package — mirror the shape
+interface SolParsedAccountKey {
+  pubkey: string;
+  writable: boolean;
+  signer: boolean;
+  source?: "transaction" | "lookupTable";
+}
 
 // SPL Token Program IDs
 const TOKEN_PROGRAM_ID = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
@@ -33,9 +36,9 @@ const TOKEN_2022_PROGRAM_ID = "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb";
  */
 export class SolanaAdapter {
   readonly networkId: string;
-  private client: ISolanaClient;
+  private client: SolanaClient;
 
-  constructor(networkId: string, client: ISolanaClient) {
+  constructor(networkId: string, client: SolanaClient) {
     this.networkId = networkId;
     this.client = client;
   }
@@ -85,6 +88,9 @@ export class SolanaAdapter {
   async getEpochInfo(): Promise<SolanaEpochInfo> {
     const result = await this.client.getEpochInfo("finalized");
     const data = result.data;
+    if (!data) {
+      throw new Error("Failed to fetch epoch info");
+    }
     return {
       epoch: data.epoch,
       slotIndex: data.slotIndex,
@@ -226,13 +232,12 @@ export class SolanaAdapter {
 
     const holdings: SolanaTokenHolding[] = [];
 
-    const processAccounts = (
-      // biome-ignore lint/suspicious/noExplicitAny: RPC response varies
-      result: { data: { value: any[] } } | null,
-    ) => {
+    // biome-ignore lint/suspicious/noExplicitAny: RPC response varies
+    const processAccounts = (result: { data?: { value?: any[] } } | null) => {
       if (!result?.data?.value) return;
       for (const tokenAccount of result.data.value) {
-        const parsed = tokenAccount.account?.data?.parsed?.info;
+        // biome-ignore lint/suspicious/noExplicitAny: parsed data varies
+        const parsed = (tokenAccount.account?.data as any)?.parsed?.info;
         if (!parsed) continue;
 
         holdings.push({
@@ -294,6 +299,9 @@ export class SolanaAdapter {
   }> {
     const result = await this.client.getVoteAccounts({ commitment: "finalized" });
     const data = result.data;
+    if (!data) {
+      return { current: [], delinquent: [] };
+    }
 
     const mapValidator = (v: {
       votePubkey: string;
