@@ -58,12 +58,9 @@ const SolanaDashboardStats: React.FC<SolanaDashboardStatsProps> = ({
       </div>
 
       <div className="dashboard-stat-card">
-        <div className="dashboard-stat-label">{t("dashboard.transactions")}</div>
+        <div className="dashboard-stat-label">{t("dashboard.version")}</div>
         <div className="dashboard-stat-value">
-          {loading && !stats ? skeleton("100px") : formatSlotNumber(stats?.transactionCount ?? 0)}
-        </div>
-        <div className="dashboard-stat-subvalue">
-          {stats ? `${t("dashboard.version")}: ${stats.version}` : ""}
+          {loading && !stats ? skeleton("80px") : (stats?.version ?? "—")}
         </div>
       </div>
     </div>
