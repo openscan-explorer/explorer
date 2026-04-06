@@ -76,7 +76,7 @@ const SolanaSlotDisplay: React.FC<SolanaSlotDisplayProps> = React.memo(({ block,
           <div className="tx-row">
             <span className="tx-label">{t("block.parentSlot")}:</span>
             <span className="tx-value">
-              <Link to={`/${networkId}/slot/${block.parentSlot}`} className="tx-link">
+              <Link to={`/${networkId}/slot/${block.parentSlot}`} className="link-accent tx-mono">
                 #{formatSlotNumber(block.parentSlot)}
               </Link>
             </span>

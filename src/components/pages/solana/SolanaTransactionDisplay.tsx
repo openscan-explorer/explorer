@@ -60,7 +60,7 @@ const SolanaTransactionDisplay: React.FC<SolanaTransactionDisplayProps> = React.
             <div className="tx-row">
               <span className="tx-label">{t("transaction.slot")}:</span>
               <span className="tx-value">
-                <Link to={`/${networkId}/slot/${tx.slot}`} className="tx-link">
+                <Link to={`/${networkId}/slot/${tx.slot}`} className="link-accent tx-mono">
                   #{formatSlotNumber(tx.slot)}
                 </Link>
               </span>
@@ -143,7 +143,7 @@ const SolanaTransactionDisplay: React.FC<SolanaTransactionDisplayProps> = React.
                       <span className="tx-value tx-mono">
                         <Link
                           to={`/${networkId}/account/${ix.programId}`}
-                          className="tx-link"
+                          className="link-accent tx-mono"
                           title={ix.programId}
                         >
                           {shortenSolanaAddress(ix.programId, 10, 10)}

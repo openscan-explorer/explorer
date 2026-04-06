@@ -55,7 +55,7 @@ const SolanaAccountDisplay: React.FC<SolanaAccountDisplayProps> = React.memo(
                 <span className="tx-value tx-mono">
                   <Link
                     to={`/${networkId}/account/${account.owner}`}
-                    className="tx-link"
+                    className="link-accent tx-mono"
                     title={account.owner}
                   >
                     {shortenSolanaAddress(account.owner, 10, 10)}
