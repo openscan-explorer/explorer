@@ -44,24 +44,15 @@ export default defineConfig({
       },
     },
   },
+  envPrefix: "OPENSCAN_",
   define: {
-    "process.env.REACT_APP_COMMIT_HASH": JSON.stringify(
-      process.env.REACT_APP_COMMIT_HASH || commitHash
+    "import.meta.env.OPENSCAN_COMMIT_HASH": JSON.stringify(
+      process.env.OPENSCAN_COMMIT_HASH || commitHash
     ),
-    "process.env.REACT_APP_GITHUB_REPO": JSON.stringify(
-      process.env.REACT_APP_GITHUB_REPO ||
-        "https://github.com/openscan-explorer/explorer"
+    "import.meta.env.OPENSCAN_VERSION": JSON.stringify(
+      process.env.OPENSCAN_VERSION || appVersion
     ),
-    "process.env.REACT_APP_VERSION": JSON.stringify(
-      process.env.REACT_APP_VERSION || appVersion
-    ),
-    "process.env.REACT_APP_OPENSCAN_NETWORKS": JSON.stringify(
-      process.env.REACT_APP_OPENSCAN_NETWORKS || ""
-    ),
-    "process.env.REACT_APP_OPENSCAN_WORKER_URL": JSON.stringify(
-      process.env.REACT_APP_OPENSCAN_WORKER_URL || "https://openscan-worker-proxy.openscan.workers.dev"
-    ),
-    "import.meta.env.VITE_ENVIRONMENT": JSON.stringify(
+    "import.meta.env.OPENSCAN_ENVIRONMENT": JSON.stringify(
       process.env.NODE_ENV || "development"
     ),
   },

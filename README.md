@@ -197,7 +197,7 @@ chmod +x .git/hooks/pre-commit
 
 ### Environment Variables
 
-#### `REACT_APP_OPENSCAN_NETWORKS`
+#### `OPENSCAN_NETWORKS`
 
 Controls which networks are displayed in the application. This is useful for limiting the explorer to specific chains.
 
@@ -205,19 +205,19 @@ Controls which networks are displayed in the application. This is useful for lim
 
 **Default:** If not set, all supported networks are enabled.
 
-**Note:** The Localhost network (31337) is only visible in development mode. To enable it in production/staging, explicitly include it in `REACT_APP_OPENSCAN_NETWORKS`.
+**Note:** The Localhost network (31337) is only visible in development mode. To enable it in production/staging, explicitly include it in `OPENSCAN_NETWORKS`.
 
 **Examples:**
 
 ```bash
 # Show only Ethereum Mainnet and Localhost
-REACT_APP_OPENSCAN_NETWORKS="1,31337" npm start
+OPENSCAN_NETWORKS="1,31337" npm start
 
 # Show only Layer 2 networks
-REACT_APP_OPENSCAN_NETWORKS="42161,10,8453" npm start
+OPENSCAN_NETWORKS="42161,10,8453" npm start
 
 # Show only testnets
-REACT_APP_OPENSCAN_NETWORKS="11155111,97" npm start
+OPENSCAN_NETWORKS="11155111,97" npm start
 ```
 
 The networks will be displayed in the order specified in the environment variable.

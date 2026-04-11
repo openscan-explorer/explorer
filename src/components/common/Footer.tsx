@@ -16,17 +16,17 @@ const Footer: React.FC<FooterProps> = ({ className = "" }) => {
   const { isSuperUser } = useSettings();
 
   // Get commit hash from environment variable, fallback to 'development'
-  const commitHash = process.env.REACT_APP_COMMIT_HASH || "development";
+  const commitHash = import.meta.env.OPENSCAN_COMMIT_HASH || "development";
 
   // Format commit hash - show first 7 characters if it's a full hash
   const formattedCommitHash = commitHash.length > 7 ? commitHash.substring(0, 7) : commitHash;
 
   // Get version from environment variable or fallback
-  const appVersion = process.env.REACT_APP_VERSION || "0.1.0";
+  const appVersion = import.meta.env.OPENSCAN_VERSION || "0.1.0";
 
   // Get the GitHub repository URL from package.json or environment
   const repoUrl =
-    process.env.REACT_APP_GITHUB_REPO || "https://github.com/openscan-explorer/explorer";
+    import.meta.env.OPENSCAN_GITHUB_REPO || "https://github.com/openscan-explorer/explorer";
 
   // Determine footer version class based on environment
   const getVersionClass = () => {

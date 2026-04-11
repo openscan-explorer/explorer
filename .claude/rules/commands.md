@@ -87,7 +87,7 @@ Networks are defined in `src/config/networks.ts`. To control which networks are 
 
 ```bash
 # Show only specific networks (comma-separated chain IDs)
-REACT_APP_OPENSCAN_NETWORKS="1,31337" npm start
+OPENSCAN_NETWORKS="1,31337" npm start
 
 # Show all networks (default)
 npm start
