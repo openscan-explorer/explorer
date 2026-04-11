@@ -1,6 +1,6 @@
 /** Worker proxy URLs in failover order: Cloudflare → Vercel */
 export const WORKER_URLS: string[] = [
-  "https://openscan-worker-proxy.openscan.workers.dev",
+  import.meta.env.OPENSCAN_WORKER_URL || "https://openscan-worker-proxy.openscan.workers.dev",
   "https://openscan-worker-proxy.vercel.app",
 ];
 
