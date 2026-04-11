@@ -56,7 +56,6 @@ const SolanaDashboardStats: React.FC<SolanaDashboardStatsProps> = ({
           {stats ? `${epochProgress.toFixed(1)}% complete` : ""}
         </div>
       </div>
-
     </div>
   );
 };

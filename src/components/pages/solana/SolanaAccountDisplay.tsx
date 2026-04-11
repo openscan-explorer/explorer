@@ -45,9 +45,7 @@ const SolanaAccountDisplay: React.FC<SolanaAccountDisplayProps> = React.memo(
             <div className="btc-tx-details-column">
               <div className="tx-row">
                 <span className="tx-label">{t("account.balance")}:</span>
-                <span className="tx-value tx-value-highlight">
-                  {formatSol(account.lamports)}
-                </span>
+                <span className="tx-value tx-value-highlight">{formatSol(account.lamports)}</span>
               </div>
 
               <div className="tx-row">

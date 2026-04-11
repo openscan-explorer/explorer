@@ -211,18 +211,27 @@ const SolanaTransactionDisplay: React.FC<SolanaTransactionDisplayProps> = React.
 
           {/* Logs */}
           {tx.logMessages.length > 0 && (
-            <div className="block-display-section">
+            <div className="tx-row tx-row-vertical">
               <button
                 type="button"
-                className="block-display-section-toggle"
+                className="more-details-toggle"
                 onClick={() => setShowLogs((v) => !v)}
               >
-                <h3 className="block-display-section-title">
-                  {t("transaction.logs")} ({tx.logMessages.length})
-                </h3>
-                <span className="block-display-section-toggle-icon">{showLogs ? "−" : "+"}</span>
+                {showLogs ? "− Hide" : "+ Show"} {t("transaction.logs")} ({tx.logMessages.length})
               </button>
-              {showLogs && <pre className="log-output tx-mono">{tx.logMessages.join("\n")}</pre>}
+              {showLogs && (
+                <div className="more-details-content">
+                  {tx.logMessages.map((msg, i) => (
+                    // biome-ignore lint/suspicious/noArrayIndexKey: log messages are ordered
+                    <div key={i} className="detail-row">
+                      <span className="detail-label" style={{ minWidth: "32px" }}>
+                        {i}
+                      </span>
+                      <span className="detail-value tx-mono">{msg}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
         </div>
