@@ -7,6 +7,7 @@ import { PolygonAdapter } from "./PolygonAdapter/PolygonAdapter";
 import { ArbitrumAdapter } from "./ArbitrumAdapter/ArbitrumAdapter";
 import { HardhatAdapter } from "./HardhatAdapter/HardhatAdapter";
 import { BitcoinAdapter } from "./BitcoinAdapter/BitcoinAdapter";
+import { SolanaAdapter } from "./SolanaAdapter/SolanaAdapter";
 import type {
   ArbitrumClient,
   AvalancheClient,
@@ -18,6 +19,7 @@ import type {
   HardhatClient,
   OptimismClient,
   PolygonClient,
+  SolanaClient,
   SupportedChainId,
 } from "@openscan/network-connectors";
 
@@ -67,5 +69,12 @@ export class AdapterFactory {
    */
   static createBitcoinAdapter(networkId: string, client: BitcoinClient): BitcoinAdapter {
     return new BitcoinAdapter(networkId, client);
+  }
+
+  /**
+   * Create a Solana network adapter
+   */
+  static createSolanaAdapter(networkId: string, client: SolanaClient): SolanaAdapter {
+    return new SolanaAdapter(networkId, client);
   }
 }

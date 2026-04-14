@@ -1,24 +1,32 @@
-import { type SupportedChainId, ClientFactory, BitcoinClient } from "@openscan/network-connectors";
+import {
+  type SupportedChainId,
+  type SupportedSolanaChainId,
+  ClientFactory,
+  BitcoinClient,
+} from "@openscan/network-connectors";
 
 import { AdapterFactory } from "./adapters/adaptersFactory";
 import type { NetworkAdapter } from "./adapters/NetworkAdapter";
 import type { BitcoinAdapter } from "./adapters/BitcoinAdapter/BitcoinAdapter";
+import type { SolanaAdapter } from "./adapters/SolanaAdapter/SolanaAdapter";
 import type { NetworkConfig, RpcUrlsContextType } from "../types";
 import { getRPCUrls } from "../config/rpcConfig";
 import { getNetworkRpcKey, getChainIdFromNetwork } from "../utils/networkResolver";
 
 /**
- * DataService supports both EVM and Bitcoin networks
+ * DataService supports EVM, Bitcoin, and Solana networks
  * The adapter type varies based on network type
  */
 export class DataService {
   /**
    * The network adapter - use this directly for EVM networks
    * For Bitcoin networks, use getBitcoinAdapter() instead
+   * For Solana networks, use getSolanaAdapter() instead
    */
   networkAdapter: NetworkAdapter;
   private bitcoinAdapter?: BitcoinAdapter;
-  readonly networkType: "evm" | "bitcoin";
+  private solanaAdapter?: SolanaAdapter;
+  readonly networkType: "evm" | "bitcoin" | "solana";
 
   constructor(
     network: NetworkConfig,
@@ -37,7 +45,15 @@ export class DataService {
       });
       this.bitcoinAdapter = AdapterFactory.createBitcoinAdapter(network.networkId, bitcoinClient);
       // Create a placeholder adapter that throws for EVM methods
-      // This maintains type compatibility while ensuring Bitcoin networks use the right methods
+      this.networkAdapter = null as unknown as NetworkAdapter;
+    } else if (network.type === "solana") {
+      // Create Solana client and adapter via ClientFactory
+      const solanaChainId = network.networkId as SupportedSolanaChainId;
+      const solanaClient = ClientFactory.createTypedClient<typeof solanaChainId>(solanaChainId, {
+        rpcUrls,
+        type: strategy,
+      });
+      this.solanaAdapter = AdapterFactory.createSolanaAdapter(network.networkId, solanaClient);
       this.networkAdapter = null as unknown as NetworkAdapter;
     } else {
       // Create EVM client and adapter
@@ -65,6 +81,13 @@ export class DataService {
   }
 
   /**
+   * Check if this is a Solana network service
+   */
+  isSolana(): boolean {
+    return this.networkType === "solana";
+  }
+
+  /**
    * Get the adapter as an EVM adapter (throws if not EVM)
    */
   getEVMAdapter(): NetworkAdapter {
@@ -82,5 +105,15 @@ export class DataService {
       throw new Error("Cannot get Bitcoin adapter for non-Bitcoin network");
     }
     return this.bitcoinAdapter;
+  }
+
+  /**
+   * Get the adapter as a Solana adapter (throws if not Solana)
+   */
+  getSolanaAdapter(): SolanaAdapter {
+    if (!this.isSolana() || !this.solanaAdapter) {
+      throw new Error("Cannot get Solana adapter for non-Solana network");
+    }
+    return this.solanaAdapter;
   }
 }

@@ -44,6 +44,14 @@ import {
   LazyRpcs,
   LazySearch,
   LazySettings,
+  LazySolanaAccount,
+  LazySolanaNetwork,
+  LazySolanaSlot,
+  LazySolanaSlots,
+  LazySolanaToken,
+  LazySolanaTx,
+  LazySolanaTxs,
+  LazySolanaValidators,
   LazySupporters,
   LazyTokenDetails,
   LazyTx,
@@ -151,6 +159,33 @@ function AppContent() {
               <Route path="tbtc/address/:address" element={<LazyBitcoinAddress />} />
               <Route path="tbtc/mempool" element={<LazyBitcoinMempool />} />
               <Route path="tbtc/mempool/:filter" element={<LazyBitcoinTx />} />
+              {/* Solana Mainnet routes (must come before :networkId catch-all) */}
+              <Route path="sol" element={<LazySolanaNetwork />} />
+              <Route path="sol/slots" element={<LazySolanaSlots />} />
+              <Route path="sol/slot/:filter" element={<LazySolanaSlot />} />
+              <Route path="sol/txs" element={<LazySolanaTxs />} />
+              <Route path="sol/tx/:filter" element={<LazySolanaTx />} />
+              <Route path="sol/account/:address" element={<LazySolanaAccount />} />
+              <Route path="sol/token/:mint" element={<LazySolanaToken />} />
+              <Route path="sol/validators" element={<LazySolanaValidators />} />
+              {/* Solana Devnet routes */}
+              <Route path="sol-devnet" element={<LazySolanaNetwork />} />
+              <Route path="sol-devnet/slots" element={<LazySolanaSlots />} />
+              <Route path="sol-devnet/slot/:filter" element={<LazySolanaSlot />} />
+              <Route path="sol-devnet/txs" element={<LazySolanaTxs />} />
+              <Route path="sol-devnet/tx/:filter" element={<LazySolanaTx />} />
+              <Route path="sol-devnet/account/:address" element={<LazySolanaAccount />} />
+              <Route path="sol-devnet/token/:mint" element={<LazySolanaToken />} />
+              <Route path="sol-devnet/validators" element={<LazySolanaValidators />} />
+              {/* Solana Testnet routes */}
+              <Route path="sol-testnet" element={<LazySolanaNetwork />} />
+              <Route path="sol-testnet/slots" element={<LazySolanaSlots />} />
+              <Route path="sol-testnet/slot/:filter" element={<LazySolanaSlot />} />
+              <Route path="sol-testnet/txs" element={<LazySolanaTxs />} />
+              <Route path="sol-testnet/tx/:filter" element={<LazySolanaTx />} />
+              <Route path="sol-testnet/account/:address" element={<LazySolanaAccount />} />
+              <Route path="sol-testnet/token/:mint" element={<LazySolanaToken />} />
+              <Route path="sol-testnet/validators" element={<LazySolanaValidators />} />
               {/* EVM network routes — validated */}
               <Route path=":networkId" element={<ValidateNetwork />}>
                 <Route index element={<LazyChain />} />

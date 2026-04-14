@@ -20,6 +20,16 @@ const BitcoinTransactionsPage = lazy(() => import("./pages/bitcoin/BitcoinTransa
 const BitcoinAddressPage = lazy(() => import("./pages/bitcoin/BitcoinAddressPage"));
 const BitcoinMempoolPage = lazy(() => import("./pages/bitcoin/BitcoinMempoolPage"));
 
+// Lazy load page components - Solana
+const SolanaNetwork = lazy(() => import("./pages/solana"));
+const SolanaSlotsPage = lazy(() => import("./pages/solana/SolanaSlotsPage"));
+const SolanaSlotPage = lazy(() => import("./pages/solana/SolanaSlotPage"));
+const SolanaTransactionsPage = lazy(() => import("./pages/solana/SolanaTransactionsPage"));
+const SolanaTransactionPage = lazy(() => import("./pages/solana/SolanaTransactionPage"));
+const SolanaAccountPage = lazy(() => import("./pages/solana/SolanaAccountPage"));
+const SolanaTokenPage = lazy(() => import("./pages/solana/SolanaTokenPage"));
+const SolanaValidatorsPage = lazy(() => import("./pages/solana/SolanaValidatorsPage"));
+
 // Lazy load page components - EVM
 const Chain = lazy(() => import("./pages/evm/network"));
 const Blocks = lazy(() => import("./pages/evm/blocks"));
@@ -54,6 +64,14 @@ export const LazyBitcoinTx = withSuspense(BitcoinTransactionPage);
 export const LazyBitcoinTxs = withSuspense(BitcoinTransactionsPage);
 export const LazyBitcoinAddress = withSuspense(BitcoinAddressPage);
 export const LazyBitcoinMempool = withSuspense(BitcoinMempoolPage);
+export const LazySolanaNetwork = withSuspense(SolanaNetwork);
+export const LazySolanaSlots = withSuspense(SolanaSlotsPage);
+export const LazySolanaSlot = withSuspense(SolanaSlotPage);
+export const LazySolanaTxs = withSuspense(SolanaTransactionsPage);
+export const LazySolanaTx = withSuspense(SolanaTransactionPage);
+export const LazySolanaAccount = withSuspense(SolanaAccountPage);
+export const LazySolanaToken = withSuspense(SolanaTokenPage);
+export const LazySolanaValidators = withSuspense(SolanaValidatorsPage);
 export const LazyBlocks = withSuspense(Blocks);
 export const LazyBlock = withSuspense(Block);
 export const LazyTxs = withSuspense(Txs);
@@ -91,6 +109,15 @@ export function preloadAllRoutes() {
   import("./pages/bitcoin/BitcoinTransactionsPage");
   import("./pages/bitcoin/BitcoinAddressPage");
   import("./pages/bitcoin/BitcoinMempoolPage");
+  // Solana pages
+  import("./pages/solana");
+  import("./pages/solana/SolanaSlotsPage");
+  import("./pages/solana/SolanaSlotPage");
+  import("./pages/solana/SolanaTransactionsPage");
+  import("./pages/solana/SolanaTransactionPage");
+  import("./pages/solana/SolanaAccountPage");
+  import("./pages/solana/SolanaTokenPage");
+  import("./pages/solana/SolanaValidatorsPage");
   // EVM pages
   import("./pages/evm/network");
   import("./pages/evm/blocks");
