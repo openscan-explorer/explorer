@@ -127,6 +127,22 @@ const ERC721TokenDisplay: React.FC = () => {
   const collectionName = collectionInfo?.name;
   const collectionSymbol = collectionInfo?.symbol;
 
+  // BigInt for uint256 safety; totalSupply may be absent on non-enumerable contracts.
+  let prevTokenId: string | null = null;
+  let nextTokenId: string | null = null;
+  try {
+    const current = tokenId != null ? BigInt(tokenId) : null;
+    if (current !== null) {
+      if (current > 0n) prevTokenId = (current - 1n).toString();
+      const totalSupplyBig = collectionInfo?.totalSupply
+        ? BigInt(collectionInfo.totalSupply)
+        : null;
+      if (totalSupplyBig === null || current + 1n < totalSupplyBig) {
+        nextTokenId = (current + 1n).toString();
+      }
+    }
+  } catch {}
+
   return (
     <div className="container-wide">
       <div className="block-display-card">
@@ -148,8 +164,38 @@ const ERC721TokenDisplay: React.FC = () => {
                   )}
                 </Link>
               )}
-              <span className="tx-mono header-subtitle">
-                {t("tokenID")}: {tokenId}
+              <span className="erc721-token-nav">
+                {prevTokenId !== null && networkId && contractAddress ? (
+                  <Link
+                    to={`/${networkId}/address/${contractAddress}/${prevTokenId}`}
+                    className="block-nav-btn"
+                    title={t("previousToken")}
+                    aria-label={t("previousToken")}
+                  >
+                    ←
+                  </Link>
+                ) : (
+                  <span className="block-nav-btn block-nav-btn-disabled" aria-hidden="true">
+                    ←
+                  </span>
+                )}
+                <span className="tx-mono header-subtitle">
+                  {t("tokenID")}: {tokenId}
+                </span>
+                {nextTokenId !== null && networkId && contractAddress ? (
+                  <Link
+                    to={`/${networkId}/address/${contractAddress}/${nextTokenId}`}
+                    className="block-nav-btn"
+                    title={t("nextToken")}
+                    aria-label={t("nextToken")}
+                  >
+                    →
+                  </Link>
+                ) : (
+                  <span className="block-nav-btn block-nav-btn-disabled" aria-hidden="true">
+                    →
+                  </span>
+                )}
               </span>
             </div>
           </div>

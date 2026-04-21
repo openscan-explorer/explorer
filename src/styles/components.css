@@ -296,6 +296,12 @@
 	color: white;
 }
 
+.block-nav-btn-disabled {
+	opacity: 0.35;
+	cursor: default;
+	pointer-events: none;
+}
+
 .burnt-fees {
 	color: var(--color-warning);
 	font-weight: 600;
@@ -5836,6 +5842,12 @@ button.tx-section-header-toggle {
 	flex-wrap: wrap;
 	align-items: baseline;
 	gap: 8px;
+}
+
+.erc721-token-nav {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
 }
 
 .erc721-token-name {
