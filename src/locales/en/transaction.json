@@ -192,6 +192,12 @@
     "rawTraceSteps": "{{count}} opcode steps",
     "rawTracePrev": "Prev",
     "rawTraceNext": "Next",
-    "rawTracePage": "Page {{current}}/{{total}} ({{from}}–{{to}} of {{totalSteps}})"
+    "rawTracePage": "Page {{current}}/{{total}} ({{from}}–{{to}} of {{totalSteps}})",
+    "rawTraceColStep": "Step",
+    "rawTraceColPc": "PC",
+    "rawTraceColOpcode": "Opcode",
+    "rawTraceColGasLeft": "Gas Left",
+    "rawTraceColCost": "Cost",
+    "rawTraceColDepth": "Depth"
   }
 }

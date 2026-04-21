@@ -192,6 +192,12 @@
     "rawTraceSteps": "{{count}} 操作码步骤",
     "rawTracePrev": "上一页",
     "rawTraceNext": "下一页",
-    "rawTracePage": "第 {{current}}/{{total}} 页 ({{from}}–{{to}} / {{totalSteps}})"
+    "rawTracePage": "第 {{current}}/{{total}} 页 ({{from}}–{{to}} / {{totalSteps}})",
+    "rawTraceColStep": "步骤",
+    "rawTraceColPc": "PC",
+    "rawTraceColOpcode": "操作码",
+    "rawTraceColGasLeft": "剩余 Gas",
+    "rawTraceColCost": "消耗",
+    "rawTraceColDepth": "深度"
   }
 }

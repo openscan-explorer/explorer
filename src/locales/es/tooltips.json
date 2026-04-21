@@ -162,5 +162,14 @@
   },
   "settings": {
     "knowledgeLevel": "Controla cuánta ayuda explicativa se muestra en el explorador."
+  },
+  "analyser": {
+    "rawTrace": {
+      "pc": "Contador de Programa (Program Counter) — el desplazamiento en bytes de este opcode dentro del bytecode del contrato en ejecución.",
+      "opcode": "La instrucción EVM ejecutada en este paso (por ejemplo PUSH1, CALL, SSTORE).",
+      "gasLeft": "Gas restante en el marco de llamada actual antes de que este opcode se ejecute.",
+      "cost": "Gas consumido por este opcode individual. Opcodes como SSTORE y CALL son mucho más costosos que la aritmética.",
+      "depth": "Profundidad de la pila de llamadas. 1 es la llamada de nivel superior; cada CALL/DELEGATECALL/STATICCALL interno aumenta la profundidad en uno."
+    }
   }
 }

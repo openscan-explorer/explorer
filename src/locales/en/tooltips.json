@@ -162,5 +162,14 @@
   },
   "settings": {
     "knowledgeLevel": "Controls how much explanatory help is shown throughout the explorer."
+  },
+  "analyser": {
+    "rawTrace": {
+      "pc": "Program Counter — the byte offset of this opcode within the contract bytecode being executed.",
+      "opcode": "The EVM instruction executed at this step (e.g. PUSH1, CALL, SSTORE).",
+      "gasLeft": "Gas remaining in the current call frame before this opcode executes.",
+      "cost": "Gas consumed by this individual opcode. Opcodes like SSTORE and CALL are much more expensive than arithmetic.",
+      "depth": "Call stack depth. 1 is the top-level call; each internal CALL/DELEGATECALL/STATICCALL increases the depth by one."
+    }
   }
 }

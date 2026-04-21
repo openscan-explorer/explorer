@@ -1,6 +1,7 @@
 import type React from "react";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import FieldLabel from "../../../../common/FieldLabel";
 import type { TraceLog, TraceResult } from "../../../../../services/adapters/NetworkAdapter";
 
 const OPCODES_PER_PAGE = 200;
@@ -118,12 +119,32 @@ const RawTraceTab: React.FC<{
       </div>
 
       <div className="raw-trace-header">
-        <span className="raw-trace-step">Step</span>
-        <span className="raw-trace-pc">PC</span>
-        <span className="raw-trace-op">Opcode</span>
-        <span className="raw-trace-gas">Gas</span>
-        <span className="raw-trace-gas-cost">Cost</span>
-        <span className="raw-trace-depth">Depth</span>
+        <span className="raw-trace-step">{t("analyser.rawTraceColStep")}</span>
+        <FieldLabel
+          className="raw-trace-pc"
+          label={t("analyser.rawTraceColPc")}
+          tooltipKey="analyser.rawTrace.pc"
+        />
+        <FieldLabel
+          className="raw-trace-op"
+          label={t("analyser.rawTraceColOpcode")}
+          tooltipKey="analyser.rawTrace.opcode"
+        />
+        <FieldLabel
+          className="raw-trace-gas"
+          label={t("analyser.rawTraceColGasLeft")}
+          tooltipKey="analyser.rawTrace.gasLeft"
+        />
+        <FieldLabel
+          className="raw-trace-gas-cost"
+          label={t("analyser.rawTraceColCost")}
+          tooltipKey="analyser.rawTrace.cost"
+        />
+        <FieldLabel
+          className="raw-trace-depth"
+          label={t("analyser.rawTraceColDepth")}
+          tooltipKey="analyser.rawTrace.depth"
+        />
         <span className="raw-trace-expand" />
       </div>
 
