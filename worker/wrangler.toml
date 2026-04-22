@@ -3,7 +3,7 @@ main = "src/index.ts"
 compatibility_date = "2024-12-01"
 
 [vars]
-ALLOWED_ORIGINS = "https://openscan.eth.link,https://openscan.eth.limo,https://openscan-explorer.github.io,https://openscan.netlify.app,*--openscan.netlify.app"
+ALLOWED_ORIGINS = "https://openscan.eth.link,https://openscan.eth.limo,https://openscan-explorer.github.io,https://openscan.netlify.app,re:^https://(pr-\\d+|deploy-preview-\\d+)--openscan\\.netlify\\.app$"
 GROQ_MODEL = "groq/compound"
 
 # Secrets — set via `wrangler secret put <NAME>`

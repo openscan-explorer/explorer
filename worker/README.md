@@ -53,7 +53,7 @@ All platforms require the same secrets:
 | `DRPC_API_KEY` | dRPC API key for `/evm/drpc/*`, `/btc/drpc` |
 | `ANKR_API_KEY` | Ankr API key for `/evm/ankr/*`, `/btc/ankr` |
 | `ONFINALITY_BTC_API_KEY` | OnFinality API key for `/btc/onfinality/*` |
-| `ALLOWED_ORIGINS` | Comma-separated allowed CORS origins |
+| `ALLOWED_ORIGINS` | Comma-separated allowed CORS origins. Entries prefixed with `re:` are anchored regex patterns matched against the full origin (e.g. `re:^https://(pr-\d+\|deploy-preview-\d+)--openscan\.netlify\.app$`). Other entries are exact matches. |
 | `GROQ_MODEL` | AI model (default: `groq/compound`) |
 
 ## Deployment
