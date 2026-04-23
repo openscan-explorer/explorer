@@ -269,9 +269,17 @@ test.describe("Arbitrum One - Transaction Page", () => {
       await expect(page.locator("text=To:")).toBeVisible({ timeout: t });
       await expect(page.locator("text=Value:")).toBeVisible({ timeout: t });
 
-      // Verify gas information
+      // Verify gas information. Use an exact regex for "Gas Price:" —
+      // Arbitrum post-Nitro renders both `Gas Price:` and
+      // `Effective Gas Price:` (receipt vs. tx), so a `hasText: "Gas Price:"`
+      // substring filter matches two `.tx-label` spans and violates
+      // Playwright's strict single-element expectation.
       await expect(page.locator("text=Gas Limit")).toBeVisible({ timeout: t });
-      await expect(page.locator(".tx-label", { hasText: "Gas Price:" })).toBeVisible({
+      // FieldLabel renders `<span class="tx-label">Gas Price:<HelperTooltip/></span>`
+      // so the span's combined textContent is `Gas Price:...` (with the
+      // tooltip's text appended). Use a start-anchored regex so it matches
+      // the "Gas Price" label but not "Effective Gas Price".
+      await expect(page.locator(".tx-label", { hasText: /^Gas Price:/ })).toBeVisible({
         timeout: t,
       });
     }
