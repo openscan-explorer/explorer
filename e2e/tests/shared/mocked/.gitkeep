@@ -1,0 +1,2 @@
+# Cross-network shared specs live here (search, errors, settings, nft-safety, etc.).
+# Specs under `shared/mocked/` run in the mocked Playwright project.
