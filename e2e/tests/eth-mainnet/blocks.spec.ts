@@ -7,12 +7,14 @@ test.describe("Blocks Page", () => {
     const blocksPage = new BlocksPage(page);
     await blocksPage.goto("1");
 
-    // Wait for loader to disappear
-    await expect(blocksPage.loader).toBeHidden({ timeout: DEFAULT_TIMEOUT * 3 });
+    // The Blocks component renders a skeleton table (no `.loader-container`)
+    // while loading, then swaps the whole tree for the data branch which is
+    // the one that mounts `.blocks-header-main`. Waiting on the loader is a
+    // no-op — anchor on the data-branch element with an RPC-sized budget.
+    await expect(blocksPage.blocksHeaderMain).toBeVisible({ timeout: DEFAULT_TIMEOUT * 3 });
 
     // Verify header structure
     await expect(blocksPage.blocksHeader).toBeVisible();
-    await expect(blocksPage.blocksHeaderMain).toBeVisible();
     await expect(blocksPage.blockLabel).toBeVisible();
     await expect(blocksPage.blockLabel).toHaveText("Ethereum Mainnet Blocks");
 
@@ -51,10 +53,11 @@ test.describe("Blocks Page", () => {
     const blocksPage = new BlocksPage(page);
     await blocksPage.goto("1");
 
-    await expect(blocksPage.loader).toBeHidden({ timeout: DEFAULT_TIMEOUT * 3 });
+    // `.loader-container` doesn't exist in this component (skeleton table
+    // only), so anchor on the data-branch element with an RPC-sized budget.
+    await expect(blocksPage.blocksHeaderMain).toBeVisible({ timeout: DEFAULT_TIMEOUT * 3 });
 
     // Verify header main container has flex layout elements
-    await expect(blocksPage.blocksHeaderMain).toBeVisible();
     await expect(blocksPage.blockLabel).toBeVisible();
 
     // Verify divider is present
@@ -94,7 +97,9 @@ test.describe("Blocks Page", () => {
     const blocksPage = new BlocksPage(page);
     await blocksPage.goto("1");
 
-    await expect(blocksPage.loader).toBeHidden({ timeout: DEFAULT_TIMEOUT * 3 });
+    // Wait for the data branch to mount; `.loader-container` doesn't exist
+    // on this page so waiting for it to hide is a no-op.
+    await expect(blocksPage.blocksHeaderMain).toBeVisible({ timeout: DEFAULT_TIMEOUT * 3 });
 
     // On latest page, Latest and Newer should be disabled
     await expect(blocksPage.latestBtn).toBeDisabled();
@@ -103,14 +108,16 @@ test.describe("Blocks Page", () => {
     // Older should be enabled
     await expect(blocksPage.olderBtn).toBeEnabled();
 
-    // Click Older button
+    // Click Older button and wait for the URL param to apply — this is the
+    // signal that the navigate has actually happened, rather than hoping
+    // the next render arrives within a default 5s poll.
     await blocksPage.olderBtn.click();
+    await page.waitForURL(/fromBlock=/, { timeout: DEFAULT_TIMEOUT * 3 });
 
-    // Wait for new blocks to load
-    await expect(blocksPage.loader).toBeHidden({ timeout: DEFAULT_TIMEOUT * 3 });
-
-    // Now Newer should be enabled
-    await expect(blocksPage.newerBtn).toBeEnabled();
+    // After navigation, the Newer button must become enabled. The state
+    // transition depends on an RPC round-trip for the older page's data;
+    // give it a full RPC budget rather than the default 5s.
+    await expect(blocksPage.newerBtn).toBeEnabled({ timeout: DEFAULT_TIMEOUT * 3 });
   });
 
   test("navigates between block pages correctly", async ({ page }) => {

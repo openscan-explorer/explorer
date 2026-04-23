@@ -85,8 +85,14 @@ test.describe("Transaction Page", () => {
 
     const loaded = await waitForTxContent(page, testInfo);
     if (loaded) {
-      // Verify input data exists (shown as tab in TX Analyser)
-      await expect(page.locator("text=Input Data").first()).toBeVisible();
+      // The "Input Data" tab lives inside `TxAnalyser`, which only mounts
+      // once `hasEvents || hasInputData || isSuperUser`. `hasInputData` is
+      // derived from the receipt, which arrives after `waitForTxContent`
+      // returns (that helper only waits for the basic tx-by-hash render).
+      // Give the receipt fetch a full RPC budget.
+      await expect(page.locator("text=Input Data").first()).toBeVisible({
+        timeout: DEFAULT_TIMEOUT * 3,
+      });
     }
   });
 
