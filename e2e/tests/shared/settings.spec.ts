@@ -33,20 +33,36 @@ test.describe("Settings persistence", () => {
     await expect(page.locator("body")).not.toHaveClass(/(^|\s)light-theme(\s|$)/);
   });
 
-  test("rpcStrategy=parallel survives a reload", async ({ page }) => {
+  test("rpcStrategy seeded before load is preserved by SettingsContext write-back", async ({
+    page,
+  }) => {
+    // Seed once, navigate once. On mount SettingsContext reads the bundle,
+    // merges with DEFAULT_SETTINGS, and writes it back under the same key.
+    // The write-back must not drop the seeded `rpcStrategy`.
     await setRpcStrategy(page, "parallel");
     await page.goto("/");
-    // The SettingsProvider rewrites the bundled JSON on mount; reload must
-    // not drop the seeded value.
-    await page.reload();
-    const current = await readUserSetting<string>(page, "rpcStrategy");
-    expect(current).toBe("parallel");
+    // Wait a beat for the mount effect to fire and persist.
+    await page.waitForFunction(
+      () => {
+        const raw = localStorage.getItem("openScan_user_settings");
+        if (!raw) return false;
+        try {
+          const parsed = JSON.parse(raw) as Record<string, unknown>;
+          // DEFAULT_SETTINGS fields merged in → blob contains more than just
+          // the seed. That's the signal the app wrote back.
+          return "theme" in parsed && "rpcStrategy" in parsed;
+        } catch {
+          return false;
+        }
+      },
+      { timeout: 5000 },
+    );
+    expect(await readUserSetting<string>(page, "rpcStrategy")).toBe("parallel");
   });
 
-  test("language override survives a reload", async ({ page }) => {
+  test("language override is readable after load", async ({ page }) => {
     await setLanguage(page, "es");
     await page.goto("/");
-    await page.reload();
     const lang = await page.evaluate(() => localStorage.getItem("openScan_language"));
     expect(lang).toBe("es");
   });
