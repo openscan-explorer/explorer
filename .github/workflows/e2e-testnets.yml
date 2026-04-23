@@ -1,0 +1,50 @@
+name: E2E Tests - Testnets
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_call:
+  workflow_dispatch:
+
+# Testnet smoke. RPCs are discovered via `@openscan/metadata` (same path
+# the app uses) so no per-testnet secret is required. Public testnet
+# endpoints can be rate-limited and intermittently slow — Playwright's
+# per-test retry budget absorbs most of that. If a specific testnet
+# starts systematically flaking, open a dedicated follow-up rather than
+# hiding the signal by relaxing timeouts here.
+
+jobs:
+  e2e-testnets:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: bunx playwright install --with-deps chromium
+
+      - name: Build application
+        run: ./scripts/build-production.sh
+
+      - name: Run Testnet E2E smoke
+        run: bunx playwright test e2e/tests/testnets/ --project=chromium
+        env:
+          CI: true
+          INFURA_API_KEY: ${{ secrets.INFURA_API_KEY }}
+          ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_API_KEY }}
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report-testnets
+          path: playwright-report/
+          retention-days: 7

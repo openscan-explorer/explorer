@@ -1,4 +1,4 @@
-name: E2E Tests - EVM Networks
+name: E2E Tests - Shared (cross-network)
 
 on:
   pull_request:
@@ -7,27 +7,27 @@ on:
   workflow_dispatch:
 
 jobs:
-  e2e-evm:
+  e2e-shared:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     strategy:
       fail-fast: false
       matrix:
         shard:
-          - name: arbitrum
-            tests: "e2e/tests/evm-networks/arbitrum.spec.ts"
-          - name: base
-            tests: "e2e/tests/evm-networks/base.spec.ts"
-          - name: optimism
-            tests: "e2e/tests/evm-networks/optimism.spec.ts"
-          - name: bsc
-            tests: "e2e/tests/evm-networks/bsc.spec.ts"
-          - name: polygon
-            tests: "e2e/tests/evm-networks/polygon.spec.ts"
-          - name: avalanche
-            tests: "e2e/tests/evm-networks/avalanche.spec.ts"
-          - name: l2-fields
-            tests: "e2e/tests/evm-networks/l2-fields.spec.ts"
+          # Live (chromium project): cross-network specs that don't need
+          # hermetic RPC control.
+          - name: errors
+            tests: "e2e/tests/shared/errors.spec.ts"
+          - name: search
+            tests: "e2e/tests/shared/search.spec.ts"
+          - name: settings
+            tests: "e2e/tests/shared/settings.spec.ts"
+          - name: contract-interaction
+            tests: "e2e/tests/shared/contract-interaction.spec.ts"
+          - name: ai-and-worker
+            tests: "e2e/tests/shared/ai-and-worker.spec.ts"
+          - name: large-tx
+            tests: "e2e/tests/shared/large-tx.spec.ts"
 
     steps:
       - uses: actions/checkout@v4
@@ -46,8 +46,8 @@ jobs:
       - name: Build application
         run: ./scripts/build-production.sh
 
-      - name: Run EVM Networks E2E tests (${{ matrix.shard.name }})
-        run: bunx playwright test ${{ matrix.shard.tests }}
+      - name: Run Shared E2E tests (${{ matrix.shard.name }})
+        run: bunx playwright test ${{ matrix.shard.tests }} --project=chromium
         env:
           CI: true
           INFURA_API_KEY: ${{ secrets.INFURA_API_KEY }}
@@ -57,6 +57,6 @@ jobs:
         uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: playwright-report-evm-${{ matrix.shard.name }}
+          name: playwright-report-shared-${{ matrix.shard.name }}
           path: playwright-report/
           retention-days: 7

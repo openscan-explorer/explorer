@@ -1,0 +1,22 @@
+name: E2E Tests - Nightly
+
+# Run the full e2e matrix once a day against live RPCs. Catches
+# provider-side drift (method deprecations, response schema changes,
+# stale data) between PR cycles without gating merges on cron-scheduled
+# flakes.
+#
+# Failures here do not block merges — they're a signal to investigate.
+# If a test starts failing consistently in nightly but passes on PR, the
+# root cause is almost always upstream (provider change, chain upgrade),
+# not the PR.
+
+on:
+  schedule:
+    # 06:00 UTC — after US-west engineers are offline, before EU starts.
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+
+jobs:
+  e2e-all:
+    uses: ./.github/workflows/e2e-all.yml
+    secrets: inherit
