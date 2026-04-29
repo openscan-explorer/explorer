@@ -1,0 +1,13 @@
+{
+  "unstable": ["sloppy-imports"],
+  "tasks": {
+    "dev": "deno run --allow-net --allow-env src/entry-deno.ts"
+  },
+  "imports": {
+    "hono": "npm:hono@^4.7.0",
+    "hono/": "npm:hono@^4.7.0/"
+  },
+  "compilerOptions": {
+    "strict": true
+  }
+}

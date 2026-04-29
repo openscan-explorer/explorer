@@ -123,26 +123,30 @@ test.describe("Transactions Page", () => {
 
     const loaded = await waitForTxsContent(page, testInfo);
     if (loaded) {
-      // Navigate to older transactions and wait for URL change
+      // Navigate to older transactions and wait for URL change. Give the
+      // router + RPC a full multiplier budget — public RPCs under worker
+      // contention can exceed the 5s default.
       await txsPage.olderBtn.first().click();
-      await page.waitForURL(/block=/, { timeout: DEFAULT_TIMEOUT });
+      await page.waitForURL(/block=/, { timeout: DEFAULT_TIMEOUT * 3 });
 
       // Wait for older page data to load (RPC-dependent)
       const olderLoaded = await waitForTxsContent(page, testInfo);
       if (olderLoaded) {
         // Verify transactions are displayed
-        await expect(txsPage.txTable).toBeVisible();
+        await expect(txsPage.txTable).toBeVisible({ timeout: DEFAULT_TIMEOUT * 3 });
 
         // Navigate back to latest - wait for button to be enabled first
-        await expect(txsPage.latestBtn.first()).toBeEnabled({ timeout: DEFAULT_TIMEOUT });
+        await expect(txsPage.latestBtn.first()).toBeEnabled({
+          timeout: DEFAULT_TIMEOUT * 3,
+        });
         await txsPage.latestBtn.first().click();
-        await page.waitForURL(/\/txs(?!\?)/, { timeout: DEFAULT_TIMEOUT });
+        await page.waitForURL(/\/txs(?!\?)/, { timeout: DEFAULT_TIMEOUT * 3 });
 
         // Wait for latest page data to load
         const latestLoaded = await waitForTxsContent(page, testInfo);
         if (latestLoaded) {
           // Verify we're back on latest transactions
-          await expect(txsPage.txTable).toBeVisible();
+          await expect(txsPage.txTable).toBeVisible({ timeout: DEFAULT_TIMEOUT * 3 });
         }
       }
     }

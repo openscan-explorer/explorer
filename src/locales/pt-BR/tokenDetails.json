@@ -29,6 +29,8 @@
   "checkBalance": "Verificar Saldo",
   "balance": "Saldo",
   "detectingTokenType": "Detectando tipo de token...",
+  "previousToken": "Token anterior",
+  "nextToken": "Próximo token",
   "errors": {
     "error": "Erro"
   }

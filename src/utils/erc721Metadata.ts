@@ -265,6 +265,40 @@ export function getImageUrl(metadata: ERC721TokenMetadata): string | null {
   return ipfsToHttp(image);
 }
 
+/**
+ * Fetch tokenByIndex (ERC721Enumerable). Returns null if the contract is not enumerable.
+ */
+export async function fetchTokenByIndex(
+  contractAddress: string,
+  index: string,
+  rpcUrl: string,
+): Promise<string | null> {
+  try {
+    // tokenByIndex(uint256) selector: 0x4f6ccce5
+    const indexHex = BigInt(index).toString(16).padStart(64, "0");
+    const data = `0x4f6ccce5${indexHex}`;
+
+    const response = await fetch(rpcUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        jsonrpc: "2.0",
+        method: "eth_call",
+        params: [{ to: contractAddress, data }, "latest"],
+        id: 1,
+      }),
+    });
+
+    const result = await response.json();
+    if (result.error || !result.result || result.result === "0x") return null;
+
+    return BigInt(result.result).toString();
+  } catch (error) {
+    logger.error("Failed to fetch tokenByIndex:", error);
+    return null;
+  }
+}
+
 export interface CollectionInfo {
   name?: string;
   symbol?: string;

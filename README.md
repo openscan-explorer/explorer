@@ -153,28 +153,76 @@ npm run lint:fix
 
 ### End-to-End Tests
 
-The project uses Playwright for E2E testing against Ethereum mainnet data.
+The project uses Playwright to test the explorer against live blockchain
+data. Specs are organized by scope:
+
+```
+e2e/
+  fixtures/        # shared helpers (networks.ts, assertions.ts,
+                   # rpcMock.ts, localStorage.ts) and per-network
+                   # fixture tables (mainnet.ts, arbitrum.ts, …)
+  pages/           # page objects (block, tx, address, blocks list, …)
+  tests/
+    eth-mainnet/   # deep Ethereum mainnet coverage
+    evm-networks/  # per-chain specs (arbitrum, base, optimism, bsc,
+                   # polygon, avalanche, l2-fields, x402-facilitator)
+    bitcoin/       # Bitcoin block / tx / address
+    solana/        # Solana mainnet smoke
+    testnets/      # Sepolia + L2 sepolias + Polygon Amoy + Fuji smoke
+    shared/        # cross-network specs (search, errors, settings,
+                   # contract-interaction, ai-and-worker, event-logs)
+    shared/mocked/ # hermetic specs run under the `mocked` Playwright
+                   # project (RPC stubbed via page.route)
+```
 
 ```bash
-# Run all E2E tests
+# Run all E2E tests (both `chromium` and `mocked` projects)
 npm run test:e2e
 
-# Run tests with UI mode (for debugging)
+# Run a single spec file
+npx playwright test e2e/tests/shared/errors.spec.ts
+
+# UI mode (for debugging)
 npm run test:e2e:ui
 
-# Run tests in debug mode
+# Debug mode
 npm run test:e2e:debug
 ```
 
-**Test Coverage:**
+**Test coverage:**
 
-- **Block Page** - Pre/post London blocks, hash fields, navigation
-- **Transaction Page** - Legacy and EIP-1559 transactions, from/to addresses, gas info
-- **Address Page** - EOA balances, ENS names, ERC20/ERC721/ERC1155 contracts
-- **Token Details** - NFT metadata, properties, token URI, collection info
-- **Contract Interaction** - Verified contract functions, events, verification status
+- Block / tx / address pages on Ethereum, Arbitrum, Optimism, Base, BSC,
+  Polygon, Avalanche (EVM) plus Bitcoin and Solana.
+- L2-specific fields — Arbitrum `l1BlockNumber` / `sendCount` / `sendRoot`
+  and OP-stack `l1Fee` / `l1GasPrice` / `l1GasUsed`.
+- Token details — ERC-20, ERC-721, ERC-1155 metadata.
+- Verified contract interaction — read/write function sections.
+- Cross-network — global search, error paths, settings persistence, AI
+  Analysis panel rendering, event-log decoding.
+- Smoke coverage for the 6 EVM testnets registered in
+  `src/config/networks.json`.
 
-Tests run automatically on every PR via GitHub Actions.
+**CI triggers:**
+
+- `pull_request` → `main`: runs `e2e-eth-mainnet`, `e2e-evm-networks`,
+  `e2e-bitcoin`, `e2e-shared`, `e2e-solana`, `e2e-testnets`.
+- Nightly (`e2e-nightly.yml`, 06:00 UTC): full matrix against live
+  RPCs to catch provider-side drift between PR cycles. Does not gate
+  merges.
+
+**Adding a new spec:**
+
+1. A new production network → add a row to
+   `e2e/fixtures/networks.ts`; add the shard name to the matching CI
+   workflow.
+2. A cross-network feature (search, settings, …) → drop a spec into
+   `e2e/tests/shared/` and add a shard entry to
+   `.github/workflows/e2e-shared.yml`.
+3. A network-specific feature (per-chain deep dive) → add to
+   `e2e/tests/evm-networks/<chain>.spec.ts` (live) or a new file, and
+   extend the evm-networks workflow matrix.
+4. A hermetic / mocked test → drop it into `e2e/tests/shared/mocked/`;
+   Playwright's `mocked` project picks it up automatically.
 
 ## Configuration
 
@@ -197,7 +245,7 @@ chmod +x .git/hooks/pre-commit
 
 ### Environment Variables
 
-#### `REACT_APP_OPENSCAN_NETWORKS`
+#### `OPENSCAN_NETWORKS`
 
 Controls which networks are displayed in the application. This is useful for limiting the explorer to specific chains.
 
@@ -205,19 +253,19 @@ Controls which networks are displayed in the application. This is useful for lim
 
 **Default:** If not set, all supported networks are enabled.
 
-**Note:** The Localhost network (31337) is only visible in development mode. To enable it in production/staging, explicitly include it in `REACT_APP_OPENSCAN_NETWORKS`.
+**Note:** The Localhost network (31337) is only visible in development mode. To enable it in production/staging, explicitly include it in `OPENSCAN_NETWORKS`.
 
 **Examples:**
 
 ```bash
 # Show only Ethereum Mainnet and Localhost
-REACT_APP_OPENSCAN_NETWORKS="1,31337" npm start
+OPENSCAN_NETWORKS="1,31337" npm start
 
 # Show only Layer 2 networks
-REACT_APP_OPENSCAN_NETWORKS="42161,10,8453" npm start
+OPENSCAN_NETWORKS="42161,10,8453" npm start
 
 # Show only testnets
-REACT_APP_OPENSCAN_NETWORKS="11155111,97" npm start
+OPENSCAN_NETWORKS="11155111,97" npm start
 ```
 
 The networks will be displayed in the order specified in the environment variable.

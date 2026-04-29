@@ -286,6 +286,198 @@
       ]
     },
     {
+      "type": "evm",
+      "networkId": "eip155:421614",
+      "slug": "arb-sepolia",
+      "name": "Arbitrum Sepolia",
+      "shortName": "Arb Sepolia",
+      "description": "Arbitrum testnet for developers",
+      "currency": "ETH",
+      "color": "#28A0F0",
+      "isTestnet": true,
+      "logo": "assets/networks/421614.svg",
+      "links": [
+        {
+          "name": "Bridge",
+          "url": "https://bridge.arbitrum.io",
+          "description": "Bridge from Sepolia"
+        },
+        {
+          "name": "Docs",
+          "url": "https://docs.arbitrum.io",
+          "description": "Developer documentation"
+        }
+      ]
+    },
+    {
+      "type": "evm",
+      "networkId": "eip155:11155420",
+      "slug": "op-sepolia",
+      "name": "Optimism Sepolia",
+      "shortName": "OP Sepolia",
+      "description": "Optimism testnet for developers",
+      "currency": "ETH",
+      "color": "#FF0420",
+      "isTestnet": true,
+      "logo": "assets/networks/11155420.svg",
+      "links": [
+        {
+          "name": "Bridge",
+          "url": "https://app.optimism.io/bridge",
+          "description": "Bridge from Sepolia"
+        },
+        {
+          "name": "Docs",
+          "url": "https://docs.optimism.io",
+          "description": "Developer documentation"
+        }
+      ]
+    },
+    {
+      "type": "evm",
+      "networkId": "eip155:84532",
+      "slug": "base-sepolia",
+      "name": "Base Sepolia",
+      "shortName": "Base Sepolia",
+      "description": "Base testnet for developers",
+      "currency": "ETH",
+      "color": "#0052FF",
+      "isTestnet": true,
+      "logo": "assets/networks/84532.svg",
+      "links": [
+        {
+          "name": "Faucet",
+          "url": "https://www.coinbase.com/faucets/base-ethereum-sepolia-faucet",
+          "description": "Get testnet ETH"
+        },
+        {
+          "name": "Docs",
+          "url": "https://docs.base.org",
+          "description": "Developer documentation"
+        }
+      ]
+    },
+    {
+      "type": "evm",
+      "networkId": "eip155:80002",
+      "slug": "polygon-amoy",
+      "name": "Polygon Amoy",
+      "shortName": "Amoy",
+      "description": "Polygon testnet for developers",
+      "currency": "POL",
+      "color": "#8247E5",
+      "isTestnet": true,
+      "logo": "assets/networks/80002.svg",
+      "links": [
+        {
+          "name": "Faucet",
+          "url": "https://faucet.polygon.technology",
+          "description": "Get testnet POL"
+        },
+        {
+          "name": "Docs",
+          "url": "https://docs.polygon.technology",
+          "description": "Developer documentation"
+        }
+      ]
+    },
+    {
+      "type": "evm",
+      "networkId": "eip155:43113",
+      "slug": "avax-fuji",
+      "name": "Avalanche Fuji",
+      "shortName": "Fuji",
+      "description": "Avalanche testnet for developers",
+      "currency": "AVAX",
+      "color": "#E84142",
+      "isTestnet": true,
+      "logo": "assets/networks/43113.svg",
+      "links": [
+        {
+          "name": "Faucet",
+          "url": "https://faucet.avax.network",
+          "description": "Get testnet AVAX"
+        },
+        {
+          "name": "Docs",
+          "url": "https://docs.avax.network",
+          "description": "Developer documentation"
+        }
+      ]
+    },
+    {
+      "type": "solana",
+      "networkId": "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp",
+      "slug": "sol",
+      "name": "Solana",
+      "shortName": "Solana",
+      "description": "High-performance blockchain with fast transactions and low fees",
+      "currency": "SOL",
+      "color": "#9945FF",
+      "isTestnet": false,
+      "logo": "assets/networks/solana.svg",
+      "links": [
+        {
+          "name": "Website",
+          "url": "https://solana.com",
+          "description": "Official Solana website"
+        },
+        {
+          "name": "Docs",
+          "url": "https://solana.com/docs",
+          "description": "Developer documentation"
+        },
+        {
+          "name": "GitHub",
+          "url": "https://github.com/solana-labs",
+          "description": "Solana Labs GitHub"
+        }
+      ]
+    },
+    {
+      "type": "solana",
+      "networkId": "solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1",
+      "slug": "sol-devnet",
+      "name": "Solana Devnet",
+      "shortName": "SOL Devnet",
+      "description": "Solana development network for testing",
+      "currency": "SOL",
+      "color": "#9945FF",
+      "isTestnet": true,
+      "logo": "assets/networks/solana.svg",
+      "links": [
+        {
+          "name": "Faucet",
+          "url": "https://faucet.solana.com",
+          "description": "Get devnet SOL"
+        },
+        {
+          "name": "Docs",
+          "url": "https://solana.com/docs",
+          "description": "Developer documentation"
+        }
+      ]
+    },
+    {
+      "type": "solana",
+      "networkId": "solana:4uhcVJyU9pJkvQyS88uRDiswHXSCkY3z",
+      "slug": "sol-testnet",
+      "name": "Solana Testnet",
+      "shortName": "SOL Testnet",
+      "description": "Solana testnet for validators and developers",
+      "currency": "SOL",
+      "color": "#9945FF",
+      "isTestnet": true,
+      "logo": "assets/networks/solana.svg",
+      "links": [
+        {
+          "name": "Faucet",
+          "url": "https://faucet.solana.com",
+          "description": "Get testnet SOL"
+        }
+      ]
+    },
+    {
       "type": "bitcoin",
       "networkId": "bip122:000000000019d6689c085ae165831e93",
       "slug": "btc",

@@ -23,7 +23,7 @@ import type { ArbitrumClient, EthereumClient } from "@openscan/network-connector
 export class ArbitrumAdapter extends NetworkAdapter {
   private client: ArbitrumClient;
 
-  constructor(networkId: 42161, client: ArbitrumClient) {
+  constructor(networkId: 42161 | 421614, client: ArbitrumClient) {
     super(networkId);
     this.client = client;
     this.initTxSearch(client as unknown as EthereumClient);

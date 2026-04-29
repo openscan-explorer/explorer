@@ -57,7 +57,22 @@ export function buildPrompt(
       return buildBitcoinBlockPrompt(config, context, promptContext);
     case "bitcoin_address":
       return buildBitcoinAddressPrompt(config, context, promptContext);
+    case "solana_transaction":
+    case "solana_block":
+    case "solana_account":
+      // Solana uses a generic prompt builder (no specialized builder yet)
+      return buildGenericSolanaPrompt(config, context, promptContext);
   }
+}
+
+function buildGenericSolanaPrompt(
+  config: PromptConfig,
+  context: Record<string, unknown>,
+  promptContext: PromptContext,
+): PromptPair {
+  const system = buildSystemPrompt(config, promptContext, config.customRules);
+  const user = `${config.task}. Analyze the following Solana data:\n\n${JSON.stringify(context, null, 2)}`;
+  return { system, user };
 }
 
 function languageInstruction(language?: string): string {
@@ -173,6 +188,38 @@ const POWER_STABLE_CONFIGS: Record<AIAnalysisType, PromptConfig> = {
     sections: ["Address Analysis", "Balance and UTXOs", "Activity", "Notable Aspects"],
     customRules: "Express amounts in BTC. Never use gas, wei, Gwei, or EVM terminology.",
   },
+  solana_transaction: {
+    role: "Solana blockchain analyst",
+    conciseness: "6-8 sentences",
+    focusAreas:
+      "instructions, programs invoked, token transfers, fee and compute units, success/failure, and notable aspects",
+    audience: "senior Solana developer",
+    task: "Analyze this Solana transaction",
+    sections: ["Transaction Analysis", "Instructions", "Token Changes", "Notable Aspects"],
+    customRules:
+      "Express amounts in SOL (not lamports). Never use gas, wei, Gwei, or EVM terminology. Use lamports only for fee display alongside SOL.",
+  },
+  solana_block: {
+    role: "Solana blockchain analyst",
+    conciseness: "3-5 sentences",
+    focusAreas:
+      "transaction count, slot number, block rewards, leader identity, and block utilization",
+    audience: "senior Solana developer",
+    task: "Analyze this Solana block (slot)",
+    sections: ["Block Analysis", "Rewards", "Notable Aspects"],
+    customRules: "Express amounts in SOL. Never use gas, wei, Gwei, or EVM terminology.",
+  },
+  solana_account: {
+    role: "Solana blockchain analyst",
+    conciseness: "4-6 sentences",
+    focusAreas:
+      "account type (wallet/program/token), SOL balance, owner program, token holdings, and executable status",
+    audience: "senior Solana developer",
+    task: "Analyze this Solana account",
+    sections: ["Account Analysis", "Balance and Holdings", "Activity", "Notable Aspects"],
+    customRules:
+      "Express amounts in SOL. Identify if account is a program, system account, or token account. Never use gas, wei, Gwei, or EVM terminology.",
+  },
 };
 
 // --- Regular User Stable Configs (simpler prompts for non-super-users) ---
@@ -239,6 +286,34 @@ const REGULAR_STABLE_CONFIGS: Record<AIAnalysisType, PromptConfig> = {
     task: "Provide a simple overview of this Bitcoin address",
     sections: ["Overview", "Balance"],
     customRules: "Express amounts in BTC. No EVM terminology.",
+  },
+  solana_transaction: {
+    role: "Solana educator",
+    conciseness: "4-6 sentences",
+    focusAreas: "what happened, who signed, programs called, and the fee paid",
+    audience: "general user",
+    task: "Explain this Solana transaction in simple, easy-to-understand language",
+    sections: ["What Happened", "Programs Used", "Fee Details"],
+    customRules:
+      "Use simple language. Avoid jargon. Express amounts in SOL. Never use gas, wei, or EVM terminology.",
+  },
+  solana_block: {
+    role: "Solana educator",
+    conciseness: "2-3 sentences",
+    focusAreas: "what happened in this slot, how many transactions it included",
+    audience: "general user",
+    task: "Summarize this Solana block in simple terms",
+    sections: ["Block Summary", "Activity"],
+    customRules: "Express amounts in SOL. No EVM terminology.",
+  },
+  solana_account: {
+    role: "Solana educator",
+    conciseness: "3-4 sentences",
+    focusAreas: "what this account is, its current SOL balance, and any token holdings",
+    audience: "general user",
+    task: "Provide a simple overview of this Solana account",
+    sections: ["Overview", "Balance"],
+    customRules: "Express amounts in SOL. No EVM terminology.",
   },
 };
 

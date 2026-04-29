@@ -1,3 +1,4 @@
+import { fetchWithWorkerFailover } from "../config/workerConfig";
 import type { AIAnalysisResult, AIAnalysisType, AIProviderConfig, PromptVersion } from "../types";
 import { logger } from "../utils/logger";
 import { buildPrompt } from "./AIPromptTemplates";
@@ -100,7 +101,6 @@ export class AIService {
     user: string,
     analysisType: AIAnalysisType,
   ): Promise<string> {
-    const url = `${this.provider.baseUrl}/ai/analyze`;
     const body = {
       type: analysisType,
       messages: [
@@ -109,11 +109,15 @@ export class AIService {
       ],
     };
 
-    const response = await this.fetchWithRetry(url, {
+    const response = await fetchWithWorkerFailover("/ai/analyze", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
     });
+
+    if (!response.ok) {
+      this.handleErrorResponse(response.status);
+    }
 
     const data = await response.json();
     const content = data?.choices?.[0]?.message?.content;

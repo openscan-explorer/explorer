@@ -24,12 +24,16 @@ jobs:
             tests: "e2e/tests/evm-networks/bsc.spec.ts"
           - name: polygon
             tests: "e2e/tests/evm-networks/polygon.spec.ts"
+          - name: avalanche
+            tests: "e2e/tests/evm-networks/avalanche.spec.ts"
+          - name: l2-fields
+            tests: "e2e/tests/evm-networks/l2-fields.spec.ts"
 
     steps:
       - uses: actions/checkout@v4
 
       - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
         with:
           bun-version: latest
 

@@ -1,4 +1,4 @@
-import { OPENSCAN_WORKER_URL } from "../config/workerConfig";
+import { OPENSCAN_WORKER_URL, isWorkerProxyUrl } from "../config/workerConfig";
 import { type MetadataRpcEndpoint, METADATA_VERSION } from "../services/MetadataService";
 import type { RpcUrlsContextType } from "../types";
 import { logger } from "./logger";
@@ -63,6 +63,24 @@ const BUILTIN_RPC_DEFAULTS: RpcUrlsContextType = {
     `${OPENSCAN_WORKER_URL}/evm/infura/eip155:43114`,
     `${OPENSCAN_WORKER_URL}/evm/drpc/eip155:43114`,
     `${OPENSCAN_WORKER_URL}/evm/ankr/eip155:43114`,
+  ],
+  // Solana — public RPC endpoints (rate-limited; users should add their own for production use)
+  "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp": [
+    "https://api.mainnet-beta.solana.com",
+    "https://solana-rpc.publicnode.com",
+    "https://solana.drpc.org",
+    "https://rpc.ankr.com/solana",
+    "https://solana.api.pocket.network",
+  ],
+  "solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1": [
+    "https://api.devnet.solana.com",
+    "https://solana-devnet-rpc.publicnode.com",
+    "https://solana-devnet.drpc.org",
+    "https://rpc.ankr.com/solana_devnet",
+  ],
+  "solana:4uhcVJyU9pJkvQyS88uRDiswHXSCkY3z": [
+    "https://api.testnet.solana.com",
+    "https://solana-testnet-rpc.publicnode.com",
   ],
 };
 
@@ -189,12 +207,8 @@ export function saveRpcUrlsToStorage(map: RpcUrlsContextType): void {
  * Stored values override default for a network; missing networks fall back to defaults.
  * Keys are networkId strings (CAIP-2 format)
  */
-/**
- * Check whether a URL points to the OpenScan worker proxy.
- */
-export function isWorkerProxyUrl(url: string): boolean {
-  return OPENSCAN_WORKER_URL.length > 0 && url.startsWith(OPENSCAN_WORKER_URL);
-}
+// isWorkerProxyUrl is re-exported from workerConfig (checks all worker URLs)
+export { isWorkerProxyUrl };
 
 export function getEffectiveRpcUrls(options?: {
   excludeWorkerProxy?: boolean;

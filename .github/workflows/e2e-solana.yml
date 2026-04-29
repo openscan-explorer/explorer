@@ -1,0 +1,49 @@
+name: E2E Tests - Solana
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_call:
+  workflow_dispatch:
+
+# Solana smoke specs discover their RPC endpoints through the
+# `@openscan/metadata` CDN (same path the app uses), so no dedicated
+# Solana RPC secret is required. If the metadata fetch is slow in CI the
+# `buildRpcUrls` helper also seeds no-op from env vars; the default
+# fallback is public RPC, which is rate-limited and may cause occasional
+# retries — the test-level retry budget in `playwright.config.ts`
+# absorbs this.
+
+jobs:
+  e2e-solana:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: bunx playwright install --with-deps chromium
+
+      - name: Build application
+        run: ./scripts/build-production.sh
+
+      - name: Run Solana E2E smoke
+        run: bunx playwright test e2e/tests/solana/ --project=chromium
+        env:
+          CI: true
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report-solana
+          path: playwright-report/
+          retention-days: 7

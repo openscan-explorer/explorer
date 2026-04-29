@@ -22,7 +22,7 @@ import type { OptimismClient, EthereumClient } from "@openscan/network-connector
 export class OptimismAdapter extends NetworkAdapter {
   private client: OptimismClient;
 
-  constructor(networkId: 10, client: OptimismClient) {
+  constructor(networkId: 10 | 11155420, client: OptimismClient) {
     super(networkId);
     this.client = client;
     this.initTxSearch(client as unknown as EthereumClient);

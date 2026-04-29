@@ -29,6 +29,8 @@
   "checkBalance": "残高を確認",
   "balance": "残高",
   "detectingTokenType": "トークンタイプを検出中...",
+  "previousToken": "前のトークン",
+  "nextToken": "次のトークン",
   "errors": {
     "error": "エラー"
   }

@@ -2,6 +2,7 @@ import type React from "react";
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import type { MetadataRpcEndpoint } from "../../../services/MetadataService";
+import { redactSensitiveUrl } from "../../../utils/urlUtils";
 import type { RpcTestResult, RpcTestStatus } from "./useRpcLatencyTest";
 
 interface RpcTestRowProps {
@@ -42,32 +43,6 @@ function getProviderLabel(url: string, metadata: MetadataRpcEndpoint | undefined
     return new URL(url).hostname;
   } catch {
     return url;
-  }
-}
-
-function redactSensitiveUrl(rawUrl: string): string {
-  try {
-    const parsed = new URL(rawUrl);
-
-    // Hide common credential query params
-    const sensitiveParamRegex = /key|token|secret|auth|signature|apikey|api_key|access_token/i;
-    for (const [key] of parsed.searchParams.entries()) {
-      if (sensitiveParamRegex.test(key)) {
-        parsed.searchParams.set(key, "***");
-      }
-    }
-
-    // Hide credential-like path segments (long, high-entropy tokens)
-    const segments = parsed.pathname.split("/").map((segment) => {
-      if (!segment) return segment;
-      const looksLikeToken = segment.length >= 24 && /[A-Za-z]/.test(segment) && /\d/.test(segment);
-      return looksLikeToken ? "***" : segment;
-    });
-    parsed.pathname = segments.join("/");
-
-    return parsed.toString();
-  } catch {
-    return rawUrl;
   }
 }
 

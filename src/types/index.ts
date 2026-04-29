@@ -4,16 +4,16 @@ import type React from "react";
 // ==================== NETWORK TYPES ====================
 
 /**
- * Network type - EVM or Bitcoin
+ * Network type - EVM, Bitcoin, or Solana
  */
-export type NetworkType = "evm" | "bitcoin";
+export type NetworkType = "evm" | "bitcoin" | "solana";
 
 /**
  * All EVM chain IDs supported by the app.
- * Maps directly to the connector library's SupportedChainId.
- * When adding a new EVM network, add its chain ID to network-connectors first.
+ * Extends the connector library's SupportedChainId with testnet chain IDs
+ * that reuse their L1 family's client (not yet registered in network-connectors).
  */
-export type AppChainId = SupportedChainId;
+export type AppChainId = SupportedChainId | 43113 | 421614 | 11155420 | 84532 | 80002;
 
 // ==================== CORE DOMAIN TYPES ====================
 
@@ -273,6 +273,198 @@ export interface BitcoinAddress {
   txids?: string[];
 }
 
+// ==================== SOLANA TYPES ====================
+
+/**
+ * Solana network statistics
+ */
+export interface SolanaNetworkStats {
+  currentSlot: number;
+  blockHeight: number;
+  epoch: number;
+  epochSlotIndex: number;
+  epochSlotsTotal: number;
+  transactionCount: number;
+  version: string;
+}
+
+/**
+ * Solana epoch info
+ */
+export interface SolanaEpochInfo {
+  epoch: number;
+  slotIndex: number;
+  slotsInEpoch: number;
+  absoluteSlot: number;
+  blockHeight: number;
+  transactionCount?: number;
+}
+
+/**
+ * Solana block/slot data
+ */
+export interface SolanaBlock {
+  slot: number;
+  blockhash: string;
+  previousBlockhash: string;
+  parentSlot: number;
+  blockHeight: number | null;
+  blockTime: number | null;
+  transactionCount: number;
+  rewards: SolanaReward[];
+  // Transaction signatures (for block list views)
+  signatures?: string[];
+}
+
+/**
+ * Solana block reward entry
+ */
+export interface SolanaReward {
+  pubkey: string;
+  lamports: number;
+  postBalance: number;
+  rewardType: "fee" | "rent" | "staking" | "voting" | null;
+  commission?: number | null;
+}
+
+/**
+ * Solana transaction data
+ */
+export interface SolanaTransaction {
+  signature: string;
+  slot: number;
+  blockTime: number | null;
+  fee: number;
+  status: "success" | "failed";
+  // biome-ignore lint/suspicious/noExplicitAny: error format varies
+  err: any;
+  signers: string[];
+  accountKeys: SolanaAccountKey[];
+  instructions: SolanaInstruction[];
+  innerInstructions: SolanaInnerInstruction[];
+  logMessages: string[];
+  preBalances: number[];
+  postBalances: number[];
+  preTokenBalances: SolanaTokenBalance[];
+  postTokenBalances: SolanaTokenBalance[];
+  computeUnitsConsumed?: number;
+  version?: "legacy" | 0;
+}
+
+/**
+ * Solana parsed account key with permissions
+ */
+export interface SolanaAccountKey {
+  pubkey: string;
+  writable: boolean;
+  signer: boolean;
+}
+
+/**
+ * Solana instruction
+ */
+export interface SolanaInstruction {
+  programId: string;
+  accounts: string[];
+  data: string;
+  // biome-ignore lint/suspicious/noExplicitAny: parsed instruction formats vary
+  parsed?: any;
+}
+
+/**
+ * Solana inner instruction group
+ */
+export interface SolanaInnerInstruction {
+  index: number;
+  instructions: SolanaInstruction[];
+}
+
+/**
+ * Solana token balance (pre/post transaction)
+ */
+export interface SolanaTokenBalance {
+  accountIndex: number;
+  mint: string;
+  owner?: string;
+  uiTokenAmount: SolanaTokenAmount;
+}
+
+/**
+ * Solana token amount
+ */
+export interface SolanaTokenAmount {
+  amount: string;
+  decimals: number;
+  uiAmount: number | null;
+  uiAmountString: string;
+}
+
+/**
+ * Solana account data
+ */
+export interface SolanaAccount {
+  address: string;
+  lamports: number;
+  owner: string;
+  executable: boolean;
+  rentEpoch: number;
+  space: number;
+  // Token holdings (fetched separately)
+  tokenAccounts?: SolanaTokenHolding[];
+}
+
+/**
+ * Solana SPL token holding for an account
+ */
+export interface SolanaTokenHolding {
+  mint: string;
+  tokenAccount: string;
+  amount: SolanaTokenAmount;
+}
+
+/**
+ * Solana token largest account holder
+ */
+export interface SolanaTokenLargestAccount {
+  address: string;
+  amount: string;
+  decimals: number;
+  uiAmount: number | null;
+  uiAmountString: string;
+}
+
+/**
+ * Solana validator (vote account)
+ */
+export interface SolanaValidator {
+  votePubkey: string;
+  nodePubkey: string;
+  activatedStake: number;
+  commission: number;
+  lastVote: number;
+  epochVoteAccount: boolean;
+  epochCredits: [number, number, number][];
+  rootSlot?: number;
+}
+
+/**
+ * Solana signature info (for address transaction history)
+ */
+export interface SolanaSignatureInfo {
+  signature: string;
+  slot: number;
+  blockTime: number | null;
+  // biome-ignore lint/suspicious/noExplicitAny: error format varies
+  err: any;
+  memo: string | null;
+  confirmationStatus: "processed" | "confirmed" | "finalized" | null;
+}
+
+/**
+ * Solana leader schedule
+ */
+export type SolanaLeaderSchedule = Record<string, number[]>;
+
 export interface Address {
   address: string;
   balance: string;
@@ -490,7 +682,10 @@ export type AIAnalysisType =
   | "block"
   | "bitcoin_transaction"
   | "bitcoin_block"
-  | "bitcoin_address";
+  | "bitcoin_address"
+  | "solana_transaction"
+  | "solana_block"
+  | "solana_account";
 
 /**
  * Prompt version for AI analysis

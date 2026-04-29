@@ -4392,6 +4392,11 @@ code {
   color: var(--color-warning);
 }
 
+.block-status-failed {
+  background: var(--color-error-alpha-15);
+  color: var(--color-error);
+}
+
 .block-display-grid {
   display: flex;
   flex-direction: column;

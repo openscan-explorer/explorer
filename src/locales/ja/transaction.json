@@ -192,6 +192,12 @@
     "rawTraceSteps": "{{count}} オペコードステップ",
     "rawTracePrev": "前へ",
     "rawTraceNext": "次へ",
-    "rawTracePage": "ページ {{current}}/{{total}} ({{from}}–{{to}} / {{totalSteps}})"
+    "rawTracePage": "ページ {{current}}/{{total}} ({{from}}–{{to}} / {{totalSteps}})",
+    "rawTraceColStep": "ステップ",
+    "rawTraceColPc": "PC",
+    "rawTraceColOpcode": "オペコード",
+    "rawTraceColGasLeft": "残ガス",
+    "rawTraceColCost": "コスト",
+    "rawTraceColDepth": "深度"
   }
 }

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { OPENSCAN_WORKER_URL } from "../config/workerConfig";
+import { fetchWithWorkerFailover } from "../config/workerConfig";
 import { useSettings } from "../context/SettingsContext";
 import { logger } from "../utils/logger";
 import type { SourcifyContractDetails } from "./useSourcify";
@@ -111,8 +111,8 @@ export function useEtherscan(
             signal: controller.signal,
           });
         } else {
-          // Proxy through OpenScan Worker (free, no key needed)
-          response = await fetch(`${OPENSCAN_WORKER_URL}/etherscan/verify`, {
+          // Proxy through OpenScan Worker (free, no key needed) with failover
+          response = await fetchWithWorkerFailover("/etherscan/verify", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ chainId: networkId, address }),

@@ -92,18 +92,18 @@ export function getAllNetworks(): NetworkConfig[] {
 
 /**
  * Get the list of enabled networks based on environment variable
- * REACT_APP_OPENSCAN_NETWORKS can be a comma-separated list of chain IDs, slugs, or network IDs
+ * OPENSCAN_NETWORKS can be a comma-separated list of chain IDs, slugs, or network IDs
  * If not set, all networks are enabled
  */
 export function getEnabledNetworks(): NetworkConfig[] {
   const allNetworks = getAllNetworks();
-  const envNetworks = process.env.REACT_APP_OPENSCAN_NETWORKS;
+  const envNetworks: string | undefined = import.meta.env.OPENSCAN_NETWORKS;
   const localhostChainId = 31337;
 
-  // VITE_ENVIRONMENT is injected via vite.config.ts define block based on NODE_ENV
-  const isDevelopment = import.meta.env.VITE_ENVIRONMENT === "development";
+  // OPENSCAN_ENVIRONMENT is injected via vite.config.ts define block based on NODE_ENV
+  const isDevelopment = import.meta.env.OPENSCAN_ENVIRONMENT === "development";
 
-  // Check if localhost is explicitly enabled in REACT_APP_OPENSCAN_NETWORKS
+  // Check if localhost is explicitly enabled in OPENSCAN_NETWORKS
   const isLocalhostExplicitlyEnabled = envNetworks
     ?.split(",")
     .map((id) => id.trim())

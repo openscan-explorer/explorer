@@ -162,5 +162,14 @@
   },
   "settings": {
     "knowledgeLevel": "控制整个浏览器中显示的帮助说明数量。"
+  },
+  "analyser": {
+    "rawTrace": {
+      "pc": "程序计数器 — 此操作码在正在执行的合约字节码中的字节偏移量。",
+      "opcode": "此步骤执行的 EVM 指令 (例如 PUSH1、CALL、SSTORE)。",
+      "gasLeft": "当前调用帧在此操作码执行之前剩余的 gas。",
+      "cost": "此单个操作码消耗的 gas。SSTORE 和 CALL 等操作码比算术运算昂贵得多。",
+      "depth": "调用栈深度。1 是顶层调用；每个内部 CALL/DELEGATECALL/STATICCALL 使深度增加一。"
+    }
   }
 }

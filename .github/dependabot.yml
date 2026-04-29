@@ -1,0 +1,12 @@
+version: 2
+updates:
+  # Keep third-party GitHub Actions pinned to SHAs up to date. Dependabot
+  # updates the pinned SHA and the trailing `# vX` tag comment together.
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "github-actions"

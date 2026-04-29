@@ -5,9 +5,9 @@ import { buildRpcUrls } from "../helpers/rpc";
 const customRpcUrls = buildRpcUrls();
 
 /**
- * Custom test fixture that:
- * 1. Injects Infura/Alchemy RPC URLs via localStorage (if API keys are set)
- * 2. Increases timeout on retries
+ * Custom test fixture that injects Infura/Alchemy RPC URLs via localStorage
+ * when e2e secrets are present, so tests run against private endpoints
+ * instead of public rate-limited ones.
  *
  * RPC keys can be set via environment variables:
  *   INFURA_API_KEY=your_key
@@ -18,7 +18,6 @@ const customRpcUrls = buildRpcUrls();
 export const test = base.extend({
   page: async ({ page }, use) => {
     if (customRpcUrls) {
-      // Inject RPC URLs into localStorage before the app initializes
       const rpcJson = JSON.stringify(customRpcUrls);
       await page.addInitScript((json) => {
         localStorage.setItem("OPENSCAN_RPC_URLS_V3", json);
@@ -28,12 +27,21 @@ export const test = base.extend({
   },
 });
 
-const BASE_TIMEOUT = 60000;
-const TIMEOUT_INCREMENT = 20000; // 20 seconds per retry
+// Fixed 60s timeout. A retry gets an extra 30s — enough slack for a cold
+// provider round-trip without masking genuine flakiness behind an unbounded
+// growth schedule.
+const BASE_TIMEOUT = 60_000;
+const RETRY_BONUS = 30_000;
 
 test.beforeEach(async ({}, testInfo) => {
-  const newTimeout = BASE_TIMEOUT + TIMEOUT_INCREMENT * testInfo.retry;
-  testInfo.setTimeout(newTimeout);
+  const budget = BASE_TIMEOUT + (testInfo.retry > 0 ? RETRY_BONUS : 0);
+  testInfo.setTimeout(budget);
+  if (testInfo.retry > 0) {
+    // Surface retries so flakiness is visible in the CI log.
+    console.warn(
+      `[e2e] retry ${testInfo.retry} for "${testInfo.title}" (timeout=${budget}ms)`,
+    );
+  }
 });
 
 export { expect } from "@playwright/test";

@@ -2,6 +2,8 @@ name: E2E Tests - All
 
 on:
   workflow_dispatch:
+  # Called by `e2e-nightly.yml`.
+  workflow_call:
 
 jobs:
   e2e-eth-mainnet:
@@ -14,4 +16,16 @@ jobs:
 
   e2e-bitcoin:
     uses: ./.github/workflows/e2e-bitcoin.yml
+    secrets: inherit
+
+  e2e-shared:
+    uses: ./.github/workflows/e2e-shared.yml
+    secrets: inherit
+
+  e2e-solana:
+    uses: ./.github/workflows/e2e-solana.yml
+    secrets: inherit
+
+  e2e-testnets:
+    uses: ./.github/workflows/e2e-testnets.yml
     secrets: inherit

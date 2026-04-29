@@ -12,6 +12,7 @@ import {
   getImageUrl,
 } from "../../../../utils/erc1155Metadata";
 import { logger } from "../../../../utils/logger";
+import { toSafeExternalHref } from "../../../../utils/urlUtils";
 import FieldLabel from "../../../common/FieldLabel";
 import LoaderWithTimeout from "../../../common/LoaderWithTimeout";
 
@@ -155,6 +156,9 @@ const ERC1155TokenDetails: React.FC = () => {
   const tokenName = metadata?.name;
   const collectionName = collectionInfo?.name;
   const collectionSymbol = collectionInfo?.symbol;
+  const externalHref = toSafeExternalHref(metadata?.external_url);
+  const animationHref = toSafeExternalHref(metadata?.animation_url);
+  const tokenUriHref = toSafeExternalHref(tokenUri);
 
   return (
     <div className="container-wide">
@@ -316,15 +320,15 @@ const ERC1155TokenDetails: React.FC = () => {
           </div>
 
           {/* Links Section */}
-          {(metadata?.external_url || metadata?.animation_url) && (
+          {(externalHref || animationHref) && (
             <div className="tx-details">
               <div className="tx-section">
-                <span className="tx-section-title">Links</span>
+                <span className="tx-section-title">{t("links")}</span>
               </div>
               <div className="nft-links">
-                {metadata?.external_url && (
+                {externalHref && (
                   <a
-                    href={metadata.external_url}
+                    href={externalHref}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="nft-link-button"
@@ -332,13 +336,9 @@ const ERC1155TokenDetails: React.FC = () => {
                     {t("externalURL")} ↗
                   </a>
                 )}
-                {metadata?.animation_url && (
+                {animationHref && (
                   <a
-                    href={
-                      metadata.animation_url.startsWith("ipfs://")
-                        ? metadata.animation_url.replace("ipfs://", "https://ipfs.io/ipfs/")
-                        : metadata.animation_url
-                    }
+                    href={animationHref}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="nft-link-button"
@@ -358,13 +358,9 @@ const ERC1155TokenDetails: React.FC = () => {
               </div>
               <div className="nft-token-uri">
                 <code className="nft-token-uri-code">{tokenUri}</code>
-                {!tokenUri.startsWith("data:") && (
+                {tokenUriHref && (
                   <a
-                    href={
-                      tokenUri.startsWith("ipfs://")
-                        ? tokenUri.replace("ipfs://", "https://ipfs.io/ipfs/")
-                        : tokenUri
-                    }
+                    href={tokenUriHref}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="nft-link-button nft-token-uri-link"

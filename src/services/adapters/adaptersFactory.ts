@@ -7,6 +7,7 @@ import { PolygonAdapter } from "./PolygonAdapter/PolygonAdapter";
 import { ArbitrumAdapter } from "./ArbitrumAdapter/ArbitrumAdapter";
 import { HardhatAdapter } from "./HardhatAdapter/HardhatAdapter";
 import { BitcoinAdapter } from "./BitcoinAdapter/BitcoinAdapter";
+import { SolanaAdapter } from "./SolanaAdapter/SolanaAdapter";
 import type {
   ArbitrumClient,
   AvalancheClient,
@@ -18,6 +19,7 @@ import type {
   HardhatClient,
   OptimismClient,
   PolygonClient,
+  SolanaClient,
   SupportedChainId,
 } from "@openscan/network-connectors";
 
@@ -27,7 +29,7 @@ export class AdapterFactory {
    * Create an EVM network adapter
    */
   static createAdapter(
-    networkId: SupportedChainId,
+    networkId: SupportedChainId | number,
     client:
       | EthereumClient
       | OptimismClient
@@ -43,19 +45,24 @@ export class AdapterFactory {
       case 1:
       case 11155111:
       case 43114:
+      case 43113:
         return new EVMAdapter(networkId, client as unknown as EthereumClient);
       case 31337:
         return new HardhatAdapter(client as HardhatClient);
       case 10:
+      case 11155420:
         return new OptimismAdapter(networkId, client as OptimismClient);
       case 56:
       case 97:
         return new BNBAdapter(networkId, client as BNBClient);
       case 137:
+      case 80002:
         return new PolygonAdapter(networkId, client as PolygonClient);
       case 8453:
+      case 84532:
         return new BaseAdapter(networkId, client as BaseClient);
       case 42161:
+      case 421614:
         return new ArbitrumAdapter(networkId, client as ArbitrumClient);
       default:
         throw new Error(`Unknown adapter for networkId: ${networkId}`);
@@ -67,5 +74,12 @@ export class AdapterFactory {
    */
   static createBitcoinAdapter(networkId: string, client: BitcoinClient): BitcoinAdapter {
     return new BitcoinAdapter(networkId, client);
+  }
+
+  /**
+   * Create a Solana network adapter
+   */
+  static createSolanaAdapter(networkId: string, client: SolanaClient): SolanaAdapter {
+    return new SolanaAdapter(networkId, client);
   }
 }

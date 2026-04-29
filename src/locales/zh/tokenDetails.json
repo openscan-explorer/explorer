@@ -29,6 +29,8 @@
   "checkBalance": "查询余额",
   "balance": "余额",
   "detectingTokenType": "检测代币类型...",
+  "previousToken": "上一个代币",
+  "nextToken": "下一个代币",
   "errors": {
     "error": "错误"
   }

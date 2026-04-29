@@ -1,0 +1,98 @@
+name: Deploy PR Preview
+
+on:
+  workflow_run:
+    workflows: ["Build PR Preview"]
+    types: [completed]
+
+permissions:
+  contents: read
+  pull-requests: write
+  actions: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'pull_request'
+    steps:
+      - name: Download preview artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: pr-preview
+          path: artifact
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.workflow_run.id }}
+
+      - name: Validate PR metadata
+        id: meta
+        run: |
+          set -euo pipefail
+          pr_number=$(cat artifact/pr-meta/pr-number)
+          pr_sha=$(cat artifact/pr-meta/pr-sha)
+          if ! [[ "$pr_number" =~ ^[0-9]+$ ]]; then
+            echo "Invalid PR number: $pr_number" >&2
+            exit 1
+          fi
+          if ! [[ "$pr_sha" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "Invalid PR SHA: $pr_sha" >&2
+            exit 1
+          fi
+          echo "pr_number=$pr_number" >> "$GITHUB_OUTPUT"
+          echo "pr_sha=$pr_sha" >> "$GITHUB_OUTPUT"
+
+      - name: Deploy to Netlify
+        id: netlify
+        uses: nwtgck/actions-netlify@4cbaf4c08f1a7bfa537d6113472ef4424e4eb654 # v3
+        with:
+          publish-dir: artifact/dist
+          production-deploy: false
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          deploy-message: "PR Preview #${{ steps.meta.outputs.pr_number }}"
+          alias: pr-${{ steps.meta.outputs.pr_number }}
+          enable-pull-request-comment: false
+          enable-commit-comment: false
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+
+      - name: Comment PR with Preview URL
+        uses: actions/github-script@v7
+        env:
+          PR_NUMBER: ${{ steps.meta.outputs.pr_number }}
+          PR_SHA: ${{ steps.meta.outputs.pr_sha }}
+          DEPLOY_URL: ${{ steps.netlify.outputs.deploy-url }}
+        with:
+          script: |
+            const prNumber = Number(process.env.PR_NUMBER);
+            const prSha = process.env.PR_SHA;
+            const deployUrl = process.env.DEPLOY_URL;
+            const body = `🚀 **Preview:** ${deployUrl}\n📝 **Commit:** \`${prSha}\``;
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+            });
+
+            const botComment = comments.find(comment =>
+              comment.user.type === 'Bot' &&
+              comment.body.includes('Preview:')
+            );
+
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: body
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body: body
+              });
+            }
