@@ -27,19 +27,26 @@ NODE_ENV=production OPENSCAN_COMMIT_HASH=$COMMIT_HASH npm run build
 echo "Production build completed!"
 echo "Build output is in ./dist/"
 
-# Get IPFS hash (ensure consistent chunking)
-ipfs add -r --chunker=size-262144 --raw-leaves=false ./dist
-HASH=$(ipfs add -r -Q --chunker=size-262144 --raw-leaves=false ./dist)
-HASH_V1=$(ipfs cid format -v 1 -b base32 $HASH)
+# Generate IPFS hash if ipfs CLI (Kubo) is available
+if command -v ipfs &> /dev/null; then
+  echo ""
+  echo "Generating IPFS hash..."
+  HASH=$(ipfs add -r -Q --chunker=size-262144 --raw-leaves=false ./dist)
+  HASH_V1=$(ipfs cid format -v 1 -b base32 $HASH)
 
-echo "IPFS Hash (v0): $HASH"
-echo "IPFS Hash (v1): $HASH_V1"
-echo ""
-echo "IPFS URLs:"
-echo "  - https://ipfs.io/ipfs/$HASH"
-echo "  - https://cloudflare-ipfs.com/ipfs/$HASH"
-echo "  - https://gateway.ipfs.io/ipfs/$HASH"
-echo ""
-echo "IPFS v1 URLs:"
-echo "  - https://$HASH_V1.ipfs.dweb.link"
-echo "  - https://$HASH_V1.ipfs.cf-ipfs.com"
+  echo "IPFS Hash (v0): $HASH"
+  echo "IPFS Hash (v1): $HASH_V1"
+  echo ""
+  echo "IPFS URLs:"
+  echo "  - https://ipfs.io/ipfs/$HASH"
+  echo "  - https://cloudflare-ipfs.com/ipfs/$HASH"
+  echo "  - https://gateway.ipfs.io/ipfs/$HASH"
+  echo ""
+  echo "IPFS v1 URLs:"
+  echo "  - https://$HASH_V1.ipfs.dweb.link"
+  echo "  - https://$HASH_V1.ipfs.cf-ipfs.com"
+else
+  echo ""
+  echo "IPFS CLI (Kubo) not found. Skipping hash generation."
+  echo "Install Kubo to generate IPFS hashes: https://docs.ipfs.tech/install/"
+fi
