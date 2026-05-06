@@ -4,6 +4,7 @@ updates:
   # updates the pinned SHA and the trailing `# vX` tag comment together.
   - package-ecosystem: "github-actions"
     directory: "/"
+    target-branch: "dev"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 5
