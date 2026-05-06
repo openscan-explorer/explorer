@@ -12,6 +12,16 @@ export function isWorkerProxyUrl(url: string): boolean {
   return WORKER_URLS.some((baseUrl) => url.startsWith(baseUrl));
 }
 
+/**
+ * Build a worker `/proxy/metadata?url=...` URL for the given target.
+ * Returns null if no worker proxy is configured. Uses the primary worker URL.
+ */
+export function buildMetadataProxyUrl(targetUrl: string): string | null {
+  const base = WORKER_URLS[0];
+  if (!base) return null;
+  return `${base}/proxy/metadata?url=${encodeURIComponent(targetUrl)}`;
+}
+
 /** HTTP status codes that trigger immediate failover to the next worker */
 const FAILOVER_STATUSES = new Set([502, 503]);
 

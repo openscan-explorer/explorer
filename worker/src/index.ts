@@ -6,11 +6,13 @@ import { rateLimitBeaconMiddleware } from "./middleware/rateLimitBeacon";
 import { rateLimitBtcMiddleware } from "./middleware/rateLimitBtc";
 import { rateLimitEtherscanMiddleware } from "./middleware/rateLimitEtherscan";
 import { rateLimitEvmMiddleware } from "./middleware/rateLimitEvm";
+import { rateLimitMetadataMiddleware } from "./middleware/rateLimitMetadata";
 import { validateMiddleware } from "./middleware/validate";
 import { validateBeaconMiddleware } from "./middleware/validateBeacon";
 import { validateBtcMiddleware } from "./middleware/validateBtc";
 import { validateEtherscanMiddleware } from "./middleware/validateEtherscan";
 import { validateEvmMiddleware } from "./middleware/validateEvm";
+import { validateMetadataProxyMiddleware } from "./middleware/validateMetadataProxy";
 import { analyzeHandler } from "./routes/analyze";
 import { btcAnkrHandler, evmAnkrHandler } from "./routes/ankrRpc";
 import { beaconAlchemyHandler } from "./routes/beaconBlobSidecars";
@@ -18,6 +20,7 @@ import { btcAlchemyHandler } from "./routes/btcRpc";
 import { etherscanVerifyHandler } from "./routes/etherscanVerify";
 import { btcDrpcHandler, evmDrpcHandler } from "./routes/drpcRpc";
 import { evmAlchemyHandler, evmInfuraHandler } from "./routes/evmRpc";
+import { metadataProxyHandler } from "./routes/metadataProxy";
 import { btcOnfinalityHandler } from "./routes/onfinalityRpc";
 
 const app = new Hono<{ Bindings: Env }>();
@@ -76,6 +79,14 @@ app.post(
   rateLimitBtcMiddleware,
   validateBtcMiddleware,
   btcOnfinalityHandler,
+);
+
+// GET /proxy/metadata?url=<https-url> — CORS-bypassing fetch for NFT metadata JSON
+app.get(
+  "/proxy/metadata",
+  rateLimitMetadataMiddleware,
+  validateMetadataProxyMiddleware,
+  metadataProxyHandler,
 );
 
 // Health check

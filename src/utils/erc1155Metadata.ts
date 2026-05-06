@@ -3,6 +3,7 @@
  * Handles fetching and parsing ERC1155 token metadata from various URI formats
  */
 
+import { buildMetadataProxyUrl } from "../config/workerConfig";
 import { decodeAbiString, hexToString } from "./hexUtils";
 import { logger } from "./logger";
 
@@ -205,19 +206,34 @@ export async function fetchERC1155MetadataWithUri(
   // IPFS or HTTP URI - fetch the metadata
   const httpUri = ipfsToHttp(uri);
 
+  // Try direct fetch first; on CORS/network failure or non-OK response, fall
+  // back to the worker proxy (handles hosts without Access-Control-Allow-Origin).
   try {
     const response = await fetch(httpUri);
-    if (!response.ok) {
-      logger.error("Failed to fetch metadata:", response.status);
-      return { metadata: null, tokenUri: uri };
+    if (response.ok) {
+      const metadata = await response.json();
+      return { metadata: metadata as ERC1155TokenMetadata, tokenUri: uri };
     }
-
-    const metadata = await response.json();
-    return { metadata: metadata as ERC1155TokenMetadata, tokenUri: uri };
+    logger.warn("Direct metadata fetch returned non-OK, retrying via proxy:", response.status);
   } catch (error) {
-    logger.error("Failed to fetch/parse metadata:", error);
-    return { metadata: null, tokenUri: uri };
+    logger.warn("Direct metadata fetch failed, retrying via proxy:", error);
   }
+
+  const proxyUri = buildMetadataProxyUrl(httpUri);
+  if (proxyUri) {
+    try {
+      const response = await fetch(proxyUri);
+      if (response.ok) {
+        const metadata = await response.json();
+        return { metadata: metadata as ERC1155TokenMetadata, tokenUri: uri };
+      }
+      logger.error("Proxy metadata fetch returned non-OK:", response.status);
+    } catch (error) {
+      logger.error("Proxy metadata fetch failed:", error);
+    }
+  }
+
+  return { metadata: null, tokenUri: uri };
 }
 
 /**
