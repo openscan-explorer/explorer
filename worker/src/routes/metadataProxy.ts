@@ -4,7 +4,6 @@ import type { Env } from "../types";
 
 const FETCH_TIMEOUT_MS = 5_000;
 const MAX_RESPONSE_BYTES = 1_048_576; // 1 MB
-const DEFAULT_CONTENT_TYPE = "application/octet-stream";
 
 export async function metadataProxyHandler(c: Context<{ Bindings: Env }>) {
   const targetUrl = c.get("validatedUrl" as never) as unknown as string;
@@ -44,14 +43,29 @@ export async function metadataProxyHandler(c: Context<{ Bindings: Env }>) {
     return c.json({ error: "Response too large" }, 413);
   }
 
-  const upstreamContentType = upstream.headers.get("content-type") ?? DEFAULT_CONTENT_TYPE;
+  // Parse and re-emit as JSON only. The route is reachable via top-level
+  // navigation (CORS fails open on missing Origin), so passing through the
+  // upstream Content-Type would let an attacker URL render arbitrary HTML/JS
+  // on the worker origin. Forcing JSON-parse + JSON content-type closes that
+  // vector and also transitively defends against a redirect chain landing on
+  // a non-JSON body. Frontend callers only ever invoke `response.json()`, so
+  // this is not a behavior change for them.
+  let parsed: unknown;
+  try {
+    const text = new TextDecoder("utf-8", { fatal: false }).decode(bodyBytes);
+    parsed = JSON.parse(text);
+  } catch {
+    return c.json({ error: "Upstream response is not valid JSON" }, 415);
+  }
 
   // Mirror upstream status, but cap network/origin failure codes at 502 so
   // clients can distinguish proxy issues from request issues.
   let status = upstream.status;
   if (status >= 500) status = 502;
 
-  c.header("Content-Type", upstreamContentType);
+  c.header("Content-Type", "application/json; charset=utf-8");
+  c.header("X-Content-Type-Options", "nosniff");
+  c.header("Content-Disposition", 'attachment; filename="metadata.json"');
   c.header("Cache-Control", "public, max-age=300");
-  return c.body(bodyBytes, status as ContentfulStatusCode);
+  return c.body(JSON.stringify(parsed), status as ContentfulStatusCode);
 }
