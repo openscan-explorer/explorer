@@ -57,6 +57,15 @@ export function NetworkBlockIndicator({ className }: NetworkBlockIndicatorProps)
             setGasPrice(null); // Bitcoin doesn't have gas
             setIsLoading(false);
           }
+        } else if (network.type === "solana" && dataService?.isSolana()) {
+          // Fetch Solana current slot
+          const adapter = dataService.getSolanaAdapter();
+          const slot = await adapter.getLatestSlot();
+          if (isMounted) {
+            setBlockNumber(slot);
+            setGasPrice(null); // Solana doesn't have gas in the EVM sense
+            setIsLoading(false);
+          }
         } else if (network.type === "evm") {
           // Fetch EVM block number
           const urls = getRPCUrls(networkRpcKey, rpcUrls);

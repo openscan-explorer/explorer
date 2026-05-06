@@ -7,7 +7,7 @@ import networksData from "../config/networks.json";
 import { logger } from "../utils/logger";
 import { extractChainIdFromNetworkId } from "../utils/networkResolver";
 
-export const METADATA_VERSION = "1.1.2-alpha.0";
+export const METADATA_VERSION = "1.2.1-alpha.0";
 const METADATA_BASE_URL = `https://cdn.jsdelivr.net/npm/@openscan/metadata@${METADATA_VERSION}/dist`;
 
 export interface NetworkLink {
@@ -81,10 +81,18 @@ const BTC_NETWORK_SLUGS: Record<string, string> = {
   "00000000da84f2bafbbc53dee25a72ae": "testnet4",
 };
 
+// Solana CAIP-2 chain IDs (first 32 chars of genesis hash) → friendly file names
+const SOLANA_NETWORK_SLUGS: Record<string, string> = {
+  "5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp": "mainnet",
+  EtWTRABZaYq6iMfeYKouRu166VU2xqa1: "devnet",
+  "4uhcVJyU9pJkvQyS88uRDiswHXSCkY3z": "testnet",
+};
+
 /**
  * Parse a CAIP-2 networkId to determine the RPC file path
  * "eip155:{chainId}" → rpcs/evm/{chainId}.json
  * "bip122:{hash}"    → rpcs/btc/{slug}.json (using genesis hash → slug mapping)
+ * "solana:{hash}"    → rpcs/solana/{slug}.json (using genesis hash → slug mapping)
  */
 function getRpcPathFromNetworkId(networkId: string): string | null {
   if (networkId.startsWith("eip155:")) {
@@ -96,6 +104,12 @@ function getRpcPathFromNetworkId(networkId: string): string | null {
     const slug = BTC_NETWORK_SLUGS[hash];
     if (!slug) return null;
     return `rpcs/btc/${slug}.json`;
+  }
+  if (networkId.startsWith("solana:")) {
+    const hash = networkId.slice(7);
+    const slug = SOLANA_NETWORK_SLUGS[hash];
+    if (!slug) return null;
+    return `rpcs/solana/${slug}.json`;
   }
   return null;
 }

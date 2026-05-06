@@ -86,7 +86,7 @@ echo "🔍 Starting OpenScan (Ethereum Mainnet + hardhat only)..."
 cd "$OPENSCAN_DIR"
 
 # Start OpenScan - it will read .env.local on start
-REACT_APP_OPENSCAN_NETWORKS="31337" npm start &
+OPENSCAN_NETWORKS="31337" npm start &
 OPENSCAN_PID=$!
 
 # Wait for OpenScan to start

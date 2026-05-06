@@ -1,0 +1,62 @@
+name: E2E Tests - Shared (cross-network)
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_call:
+  workflow_dispatch:
+
+jobs:
+  e2e-shared:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        shard:
+          # Live (chromium project): cross-network specs that don't need
+          # hermetic RPC control.
+          - name: errors
+            tests: "e2e/tests/shared/errors.spec.ts"
+          - name: search
+            tests: "e2e/tests/shared/search.spec.ts"
+          - name: settings
+            tests: "e2e/tests/shared/settings.spec.ts"
+          - name: contract-interaction
+            tests: "e2e/tests/shared/contract-interaction.spec.ts"
+          - name: ai-and-worker
+            tests: "e2e/tests/shared/ai-and-worker.spec.ts"
+          - name: event-logs
+            tests: "e2e/tests/shared/event-logs.spec.ts"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: bunx playwright install --with-deps chromium
+
+      - name: Build application
+        run: ./scripts/build-production.sh
+
+      - name: Run Shared E2E tests (${{ matrix.shard.name }})
+        run: bunx playwright test ${{ matrix.shard.tests }} --project=chromium
+        env:
+          CI: true
+          INFURA_API_KEY: ${{ secrets.INFURA_API_KEY }}
+          ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_API_KEY }}
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report-shared-${{ matrix.shard.name }}
+          path: playwright-report/
+          retention-days: 7

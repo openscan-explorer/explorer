@@ -72,6 +72,13 @@ export function isBitcoinNetwork(network: NetworkConfig): boolean {
 }
 
 /**
+ * Check if a network is a Solana network
+ */
+export function isSolanaNetwork(network: NetworkConfig): boolean {
+  return network.type === "solana";
+}
+
+/**
  * Get the URL path segment for a network
  * Uses slug if available, otherwise chainId for EVM or networkId
  */

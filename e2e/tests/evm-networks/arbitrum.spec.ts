@@ -257,17 +257,31 @@ test.describe("Arbitrum One - Transaction Page", () => {
 
     const loaded = await waitForTxContent(page, testInfo);
     if (loaded) {
+      // Arbitrum public RPCs are slower than mainnet; a field that hasn't
+      // rendered in 5s often renders in 10–15. Use the project-standard
+      // triple-multiplier budget instead of the default 5s.
+      const t = DEFAULT_TIMEOUT * 3;
       // Verify core transaction details
-      await expect(page.locator("text=Transaction Hash:")).toBeVisible();
-      await expect(page.locator("text=Status:")).toBeVisible();
-      await expect(page.locator("text=Block:")).toBeVisible();
-      await expect(page.locator("text=From:")).toBeVisible();
-      await expect(page.locator("text=To:")).toBeVisible();
-      await expect(page.locator("text=Value:")).toBeVisible();
+      await expect(page.locator("text=Transaction Hash:")).toBeVisible({ timeout: t });
+      await expect(page.locator("text=Status:")).toBeVisible({ timeout: t });
+      await expect(page.locator("text=Block:")).toBeVisible({ timeout: t });
+      await expect(page.locator("text=From:")).toBeVisible({ timeout: t });
+      await expect(page.locator("text=To:")).toBeVisible({ timeout: t });
+      await expect(page.locator("text=Value:")).toBeVisible({ timeout: t });
 
-      // Verify gas information
-      await expect(page.locator("text=Gas Limit")).toBeVisible();
-      await expect(page.locator(".tx-label", { hasText: "Gas Price:" })).toBeVisible();
+      // Verify gas information. Use an exact regex for "Gas Price:" —
+      // Arbitrum post-Nitro renders both `Gas Price:` and
+      // `Effective Gas Price:` (receipt vs. tx), so a `hasText: "Gas Price:"`
+      // substring filter matches two `.tx-label` spans and violates
+      // Playwright's strict single-element expectation.
+      await expect(page.locator("text=Gas Limit")).toBeVisible({ timeout: t });
+      // FieldLabel renders `<span class="tx-label">Gas Price:<HelperTooltip/></span>`
+      // so the span's combined textContent is `Gas Price:...` (with the
+      // tooltip's text appended). Use a start-anchored regex so it matches
+      // the "Gas Price" label but not "Effective Gas Price".
+      await expect(page.locator(".tx-label", { hasText: /^Gas Price:/ })).toBeVisible({
+        timeout: t,
+      });
     }
   });
 

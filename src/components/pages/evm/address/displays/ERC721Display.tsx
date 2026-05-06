@@ -16,6 +16,7 @@ import { logger } from "../../../../../utils/logger";
 import { formatNativeFromWei } from "../../../../../utils/unitFormatters";
 import AIAnalysisPanel from "../../../../common/AIAnalysis/AIAnalysisPanel";
 import { AddressHeader } from "../shared";
+import CollectionTokenList from "../shared/CollectionTokenList";
 import ContractInfoCard from "../shared/ContractInfoCard";
 import ContractInfoCards from "../shared/ContractInfoCards";
 import NFTCollectionInfoCard from "../shared/NFTCollectionInfoCard";
@@ -252,6 +253,12 @@ const ERC721Display: React.FC<ERC721DisplayProps> = ({
             totalSupply={totalSupply}
             networkId={networkId}
             addressHash={addressHash}
+          />
+
+          <CollectionTokenList
+            networkId={networkId}
+            addressHash={addressHash}
+            totalSupply={totalSupply}
           />
 
           {/* Contract Info Card (includes Contract Details) */}

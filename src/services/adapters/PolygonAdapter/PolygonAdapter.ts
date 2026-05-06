@@ -12,7 +12,7 @@ import {
 
 import { normalizeBlockNumber } from "../shared/normalizeBlockNumber";
 import { mergeMetadata } from "../shared/mergeMetadata";
-import type { PolygonClient, SupportedChainId, EthereumClient } from "@openscan/network-connectors";
+import type { PolygonClient, EthereumClient } from "@openscan/network-connectors";
 
 /**
  * Polygon blockchain service
@@ -21,7 +21,7 @@ import type { PolygonClient, SupportedChainId, EthereumClient } from "@openscan/
 export class PolygonAdapter extends NetworkAdapter {
   private client: PolygonClient;
 
-  constructor(networkId: SupportedChainId, client: PolygonClient) {
+  constructor(networkId: 137 | 80002, client: PolygonClient) {
     super(networkId);
     this.client = client;
     this.initTxSearch(client as unknown as EthereumClient);

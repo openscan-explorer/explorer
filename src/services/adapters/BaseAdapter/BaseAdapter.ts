@@ -22,7 +22,7 @@ import type { BaseClient, EthereumClient } from "@openscan/network-connectors";
 export class BaseAdapter extends NetworkAdapter {
   private client: BaseClient;
 
-  constructor(networkId: 8453, client: BaseClient) {
+  constructor(networkId: 8453 | 84532, client: BaseClient) {
     super(networkId);
     this.client = client;
     this.initTxSearch(client as unknown as EthereumClient);

@@ -17,7 +17,22 @@ export default defineConfig({
     screenshot: "only-on-failure",
     headless: true,
   },
-  projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
+  projects: [
+    {
+      name: "chromium",
+      use: { ...devices["Desktop Chrome"] },
+      // Default project — live RPC. Does not run the mocked suite.
+      testIgnore: ["**/shared/mocked/**"],
+    },
+    {
+      // Hermetic suite: mocks RPC + worker traffic via `page.route`. Used for
+      // strategy / fallover / error-path / large-tx tests that must be
+      // deterministic.
+      name: "mocked",
+      use: { ...devices["Desktop Chrome"] },
+      testMatch: ["**/shared/mocked/**/*.spec.ts"],
+    },
+  ],
   webServer: {
     command: "npm run start",
     url: "http://localhost:3030",

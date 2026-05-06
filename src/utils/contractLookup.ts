@@ -1,4 +1,4 @@
-import { OPENSCAN_WORKER_URL } from "../config/workerConfig";
+import { fetchWithWorkerFailover } from "../config/workerConfig";
 import { logger } from "./logger";
 
 export interface ContractInfo {
@@ -29,8 +29,8 @@ async function fetchEtherscanVerification(
       const url = `https://api.etherscan.io/v2/api?chainid=${chainId}&module=contract&action=getsourcecode&address=${address}&apikey=${etherscanKey}`;
       res = await fetch(url, { signal });
     } else {
-      // Proxy through OpenScan Worker (free, no key needed)
-      res = await fetch(`${OPENSCAN_WORKER_URL}/etherscan/verify`, {
+      // Proxy through OpenScan Worker (free, no key needed) with failover
+      res = await fetchWithWorkerFailover("/etherscan/verify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ chainId, address }),

@@ -12,7 +12,7 @@ bun install --frozen-lockfile
 
 # Create .env file for production
 echo "Creating production environment file..."
-echo "REACT_APP_ENVIRONMENT=production" > .env
+echo "OPENSCAN_ENVIRONMENT=production" > .env
 
 # Get current commit hash
 COMMIT_HASH=$(git rev-parse HEAD)
@@ -22,7 +22,7 @@ rm -rf dist || true
 
 # Build the app using Vite
 echo "Building React app on commit $COMMIT_HASH"
-NODE_ENV=production REACT_APP_COMMIT_HASH=$COMMIT_HASH npm run build
+NODE_ENV=production OPENSCAN_COMMIT_HASH=$COMMIT_HASH npm run build
 
 echo "Production build completed!"
 echo "Build output is in ./dist/"

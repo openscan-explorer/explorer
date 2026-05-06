@@ -173,16 +173,14 @@ export const MAINNET = {
       // No gasPrice field in Type 2 transactions
     },
 
-    // USDC approval transaction - common ERC20 interaction (Type 2)
-    "0xc55e2b90168af6972193c1f86fa4d7d7b31a29c156665d15b9cd48618b5177ef": {
-      hash: "0xc55e2b90168af6972193c1f86fa4d7d7b31a29c156665d15b9cd48618b5177ef",
-      type: 2,
-      from: "0x28C6c06298d514Db089934071355E5743bf21d60",
-      to: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-      blockNumber: 15537394,
-      status: "success" as const,
-      hasInputData: true,
-    },
+    // (Removed) `0xc55e2b90168af69721…` was labeled "USDC approval (Type 2)"
+    // with blockNumber 15537394 — but on-chain this hash resolves to a 2016
+    // Binance transfer at block 2,000,000 with `input: "0x"` (plain ETH
+    // transfer, no calldata). USDC didn't deploy until 2018. The metadata
+    // here was fabricated; any test that navigated to this hash would see
+    // the real, unrelated tx and fail. Removed to avoid misleading future
+    // contributors; use `TX_WITH_INPUT_DATA` (the Type 2 entry above) for
+    // specs that need a tx with calldata.
 
     // ============================================
     // BLOB TRANSACTIONS (Type 3) - Post-Dencun (EIP-4844)

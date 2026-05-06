@@ -13,6 +13,7 @@ import {
   getImageUrl,
 } from "../../../../utils/erc721Metadata";
 import { logger } from "../../../../utils/logger";
+import { toSafeExternalHref } from "../../../../utils/urlUtils";
 import FieldLabel from "../../../common/FieldLabel";
 import LoaderWithTimeout from "../../../common/LoaderWithTimeout";
 
@@ -126,6 +127,25 @@ const ERC721TokenDisplay: React.FC = () => {
   const tokenName = metadata?.name;
   const collectionName = collectionInfo?.name;
   const collectionSymbol = collectionInfo?.symbol;
+  const externalHref = toSafeExternalHref(metadata?.external_url);
+  const animationHref = toSafeExternalHref(metadata?.animation_url);
+  const tokenUriHref = toSafeExternalHref(tokenUri);
+
+  // BigInt for uint256 safety; totalSupply may be absent on non-enumerable contracts.
+  let prevTokenId: string | null = null;
+  let nextTokenId: string | null = null;
+  try {
+    const current = tokenId != null ? BigInt(tokenId) : null;
+    if (current !== null) {
+      if (current > 0n) prevTokenId = (current - 1n).toString();
+      const totalSupplyBig = collectionInfo?.totalSupply
+        ? BigInt(collectionInfo.totalSupply)
+        : null;
+      if (totalSupplyBig === null || current + 1n < totalSupplyBig) {
+        nextTokenId = (current + 1n).toString();
+      }
+    }
+  } catch {}
 
   return (
     <div className="container-wide">
@@ -148,8 +168,38 @@ const ERC721TokenDisplay: React.FC = () => {
                   )}
                 </Link>
               )}
-              <span className="tx-mono header-subtitle">
-                {t("tokenID")}: {tokenId}
+              <span className="erc721-token-nav">
+                {prevTokenId !== null && networkId && contractAddress ? (
+                  <Link
+                    to={`/${networkId}/address/${contractAddress}/${prevTokenId}`}
+                    className="block-nav-btn"
+                    title={t("previousToken")}
+                    aria-label={t("previousToken")}
+                  >
+                    ←
+                  </Link>
+                ) : (
+                  <span className="block-nav-btn block-nav-btn-disabled" aria-hidden="true">
+                    ←
+                  </span>
+                )}
+                <span className="tx-mono header-subtitle">
+                  {t("tokenID")}: {tokenId}
+                </span>
+                {nextTokenId !== null && networkId && contractAddress ? (
+                  <Link
+                    to={`/${networkId}/address/${contractAddress}/${nextTokenId}`}
+                    className="block-nav-btn"
+                    title={t("nextToken")}
+                    aria-label={t("nextToken")}
+                  >
+                    →
+                  </Link>
+                ) : (
+                  <span className="block-nav-btn block-nav-btn-disabled" aria-hidden="true">
+                    →
+                  </span>
+                )}
               </span>
             </div>
           </div>
@@ -298,15 +348,15 @@ const ERC721TokenDisplay: React.FC = () => {
           )}
 
           {/* Additional Details */}
-          {(metadata?.external_url || metadata?.animation_url) && (
+          {(externalHref || animationHref) && (
             <div className="tx-details">
               <div className="tx-section">
                 <span className="tx-section-title">{t("links")}</span>
               </div>
               <div className="nft-links">
-                {metadata?.external_url && (
+                {externalHref && (
                   <a
-                    href={metadata.external_url}
+                    href={externalHref}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="nft-link-button"
@@ -314,13 +364,9 @@ const ERC721TokenDisplay: React.FC = () => {
                     {t("externalURL")} ↗
                   </a>
                 )}
-                {metadata?.animation_url && (
+                {animationHref && (
                   <a
-                    href={
-                      metadata.animation_url.startsWith("ipfs://")
-                        ? metadata.animation_url.replace("ipfs://", "https://ipfs.io/ipfs/")
-                        : metadata.animation_url
-                    }
+                    href={animationHref}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="nft-link-button"
@@ -340,13 +386,9 @@ const ERC721TokenDisplay: React.FC = () => {
               </div>
               <div className="nft-token-uri">
                 <code className="nft-token-uri-code">{tokenUri}</code>
-                {!tokenUri.startsWith("data:") && (
+                {tokenUriHref && (
                   <a
-                    href={
-                      tokenUri.startsWith("ipfs://")
-                        ? tokenUri.replace("ipfs://", "https://ipfs.io/ipfs/")
-                        : tokenUri
-                    }
+                    href={tokenUriHref}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="nft-link-button nft-token-uri-link"
