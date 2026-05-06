@@ -13,5 +13,6 @@ export { default as NFTCollectionInfoCard } from "./NFTCollectionInfoCard";
 export { default as ContractMoreInfoCard } from "./ContractMoreInfoCard";
 export { default as CustomTokenModal } from "./CustomTokenModal";
 export { default as ENSRecordsDisplay } from "./ENSRecordsDisplay";
+export { default as MultichainBalances } from "./MultichainBalances";
 export { default as TokenHoldings } from "./TokenHoldings";
 export { default as TransactionHistory } from "./TransactionHistory";

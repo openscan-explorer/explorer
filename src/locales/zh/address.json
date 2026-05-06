@@ -205,5 +205,10 @@
   "language": "语言",
   "optimizer": "优化器",
   "optimizerEnabled": "启用 ({{runs}} 次)",
-  "optimizerDisabled": "禁用"
+  "optimizerDisabled": "禁用",
+  "multichainBalances": "多链余额",
+  "loadingMultichainBalances": "加载多链余额中...",
+  "multichainNetworksCount": "{{count}} 个网络",
+  "noMultichainBalances": "其他网络上无余额",
+  "multichainBalanceErrorTooltip": "无法获取余额：{{error}}"
 }

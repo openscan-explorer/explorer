@@ -221,5 +221,10 @@
   "facilitatorList": "List",
   "facilitatorYes": "Yes",
   "facilitatorNo": "No",
-  "facilitatorVisitWebsite": "Visit Website"
+  "facilitatorVisitWebsite": "Visit Website",
+  "multichainBalances": "Multichain Balances",
+  "loadingMultichainBalances": "Loading multichain balances...",
+  "multichainNetworksCount": "{{count}} networks",
+  "noMultichainBalances": "No balances on other networks",
+  "multichainBalanceErrorTooltip": "Could not fetch balance: {{error}}"
 }

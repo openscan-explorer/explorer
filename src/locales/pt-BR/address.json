@@ -205,5 +205,10 @@
   "language": "Linguagem",
   "optimizer": "Otimizador",
   "optimizerEnabled": "Ativado ({{runs}} execuções)",
-  "optimizerDisabled": "Desativado"
+  "optimizerDisabled": "Desativado",
+  "multichainBalances": "Saldos Multichain",
+  "loadingMultichainBalances": "Carregando saldos multichain...",
+  "multichainNetworksCount": "{{count}} redes",
+  "noMultichainBalances": "Sem saldo em outras redes",
+  "multichainBalanceErrorTooltip": "Não foi possível obter o saldo: {{error}}"
 }

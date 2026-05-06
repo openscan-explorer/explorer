@@ -2,6 +2,7 @@ import type React from "react";
 import type { ENSReverseResult } from "../../../../../types";
 import { useTranslation } from "react-i18next";
 import FieldLabel from "../../../../common/FieldLabel";
+import MultichainBalances from "./MultichainBalances";
 import TokenHoldings from "./TokenHoldings";
 
 interface AccountMoreInfoCardProps {
@@ -79,6 +80,12 @@ const AccountMoreInfoCard: React.FC<AccountMoreInfoCardProps> = ({
       {/* Token Holdings - Collapsible */}
       <div className="account-card-token-holdings">
         <TokenHoldings ownerAddress={ownerAddress} networkId={networkId} defaultCollapsed compact />
+        <MultichainBalances
+          address={ownerAddress}
+          currentChainId={networkId}
+          defaultCollapsed
+          compact
+        />
       </div>
     </div>
   );
