@@ -221,5 +221,10 @@
   "facilitatorList": "Listar",
   "facilitatorYes": "Sí",
   "facilitatorNo": "No",
-  "facilitatorVisitWebsite": "Visitar sitio web"
+  "facilitatorVisitWebsite": "Visitar sitio web",
+  "multichainBalances": "Saldos Multichain",
+  "loadingMultichainBalances": "Cargando saldos multichain...",
+  "multichainNetworksCount": "{{count}} redes",
+  "noMultichainBalances": "Sin saldo en otras redes",
+  "multichainBalanceErrorTooltip": "No se pudo obtener el saldo: {{error}}"
 }

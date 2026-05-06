@@ -205,5 +205,10 @@
   "language": "言語",
   "optimizer": "オプティマイザ",
   "optimizerEnabled": "有効 ({{runs}} 回)",
-  "optimizerDisabled": "無効"
+  "optimizerDisabled": "無効",
+  "multichainBalances": "マルチチェーン残高",
+  "loadingMultichainBalances": "マルチチェーン残高を読み込み中...",
+  "multichainNetworksCount": "{{count}} ネットワーク",
+  "noMultichainBalances": "他のネットワークに残高はありません",
+  "multichainBalanceErrorTooltip": "残高を取得できませんでした: {{error}}"
 }
