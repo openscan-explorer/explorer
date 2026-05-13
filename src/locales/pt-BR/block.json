@@ -72,5 +72,14 @@
   "errors": {
     "failedToFetchBlock": "Falha ao buscar dados do bloco",
     "failedToFetchBlocks": "Falha ao buscar blocos"
+  },
+  "gasTendency": {
+    "title": "Tendência do Gas",
+    "baseFee": "Taxa base (gwei)",
+    "gasUsed": "Gas usado",
+    "blockShort": "#{{number}}",
+    "tooltipBlock": "Bloco #{{number}}",
+    "tooltipBaseFee": "Taxa base: {{value}} gwei",
+    "tooltipGasUsed": "Gas usado: {{value}}%"
   }
 }

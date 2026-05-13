@@ -39,6 +39,15 @@
   "aboutNetwork": "{{name}}について",
   "officialLinks": "公式リンク",
   "collapseProfile": "プロフィールを折りたたむ",
+  "gasTendency": {
+    "title": "ガスの傾向",
+    "baseFee": "ベース料金 (gwei)",
+    "gasUsed": "ガス使用量",
+    "blockShort": "#{{number}}",
+    "tooltipBlock": "ブロック #{{number}}",
+    "tooltipBaseFee": "ベース料金: {{value}} gwei",
+    "tooltipGasUsed": "ガス使用量: {{value}}%"
+  },
   "gasTracker": {
     "title": "ガストラッカー",
     "loadingGasPrices": "ガス価格を読み込み中...",

@@ -39,6 +39,15 @@
   "aboutNetwork": "About {{name}}",
   "officialLinks": "Official Links",
   "collapseProfile": "Collapse profile",
+  "gasTendency": {
+    "title": "Gas Tendency",
+    "baseFee": "Base fee (gwei)",
+    "gasUsed": "Gas used",
+    "blockShort": "#{{number}}",
+    "tooltipBlock": "Block #{{number}}",
+    "tooltipBaseFee": "Base fee: {{value}} gwei",
+    "tooltipGasUsed": "Gas used: {{value}}%"
+  },
   "gasTracker": {
     "title": "Gas Tracker",
     "loadingGasPrices": "Loading gas prices...",

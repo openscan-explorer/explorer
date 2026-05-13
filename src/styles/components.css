@@ -8848,3 +8848,204 @@ button.tx-section-header-toggle {
 .copy-button-copied {
 	color: var(--color-primary, #3ecfa0);
 }
+
+/* ========== Gas Tendency Chart ========== */
+.gas-tendency-section {
+	margin-bottom: 16px;
+}
+
+.gas-tendency-chart {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	width: 100%;
+}
+
+.gas-tendency-chart-meta {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 12px;
+	flex-wrap: wrap;
+}
+
+.gas-tendency-chart-meta-value {
+	font-family: "Outfit", sans-serif;
+	font-size: 1.5rem;
+	font-weight: 600;
+	color: var(--text-primary);
+}
+
+.gas-tendency-chart-meta-unit {
+	font-size: 0.85rem;
+	font-weight: 400;
+	color: var(--text-secondary);
+}
+
+.gas-tendency-chart-meta-range {
+	font-size: 0.8rem;
+	color: var(--text-tertiary);
+	font-variant-numeric: tabular-nums;
+}
+
+.gas-tendency-chart-plot {
+	position: relative;
+	width: 100%;
+	height: 140px;
+}
+
+.gas-tendency-chart-svg {
+	width: 100%;
+	height: 100%;
+	display: block;
+	overflow: visible;
+}
+
+.gas-tendency-chart-bar {
+	fill: var(--color-primary-alpha-15, rgba(99, 102, 241, 0.15));
+}
+
+.gas-tendency-chart-area {
+	fill: var(--color-primary-alpha-15, rgba(99, 102, 241, 0.15));
+	stroke: none;
+}
+
+.gas-tendency-chart-line {
+	fill: none;
+	stroke: var(--color-primary);
+	stroke-width: 2;
+	stroke-linejoin: round;
+	stroke-linecap: round;
+	vector-effect: non-scaling-stroke;
+}
+
+.gas-tendency-chart-guide {
+	stroke: var(--text-tertiary);
+	stroke-width: 1;
+	stroke-dasharray: 3 3;
+	vector-effect: non-scaling-stroke;
+	pointer-events: none;
+}
+
+.gas-tendency-chart-reference-line {
+	stroke: var(--text-tertiary);
+	stroke-width: 1;
+	stroke-dasharray: 2 4;
+	stroke-opacity: 0.6;
+	vector-effect: non-scaling-stroke;
+	pointer-events: none;
+}
+
+.gas-tendency-chart-reference-label {
+	position: absolute;
+	top: 50%;
+	right: 4px;
+	transform: translateY(-50%);
+	font-size: 0.7rem;
+	color: var(--text-tertiary);
+	background: var(--bg-secondary);
+	padding: 0 4px;
+	border-radius: 3px;
+	font-variant-numeric: tabular-nums;
+	pointer-events: none;
+	z-index: 1;
+}
+
+.gas-tendency-chart-dot {
+	fill: var(--color-primary);
+	stroke: var(--bg-secondary);
+	stroke-width: 2;
+	vector-effect: non-scaling-stroke;
+	pointer-events: none;
+}
+
+.gas-tendency-chart-tooltip {
+	position: absolute;
+	bottom: calc(100% + 6px);
+	transform: translateX(-50%);
+	background: var(--bg-primary);
+	border: 1px solid var(--overlay-light-6);
+	border-radius: 8px;
+	padding: 8px 10px;
+	min-width: 140px;
+	font-size: 0.75rem;
+	color: var(--text-secondary);
+	pointer-events: none;
+	z-index: 2;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.gas-tendency-chart-tooltip-block {
+	font-weight: 600;
+	color: var(--text-primary);
+	margin-bottom: 4px;
+}
+
+.gas-tendency-chart-tooltip-row {
+	font-variant-numeric: tabular-nums;
+	white-space: nowrap;
+}
+
+.gas-tendency-chart-axis {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 12px;
+	font-size: 0.75rem;
+	color: var(--text-tertiary);
+	font-variant-numeric: tabular-nums;
+}
+
+.gas-tendency-chart-axis-legend {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	flex-wrap: wrap;
+}
+
+.gas-tendency-chart-legend-line {
+	display: inline-block;
+	width: 12px;
+	height: 2px;
+	background: var(--color-primary);
+	border-radius: 1px;
+	margin-right: 2px;
+	margin-left: 8px;
+}
+
+.gas-tendency-chart-legend-bar {
+	display: inline-block;
+	width: 8px;
+	height: 8px;
+	background: var(--color-primary-alpha-15, rgba(99, 102, 241, 0.15));
+	border-radius: 1px;
+	margin-right: 2px;
+	margin-left: 8px;
+}
+
+.gas-tendency-chart-loading {
+	min-height: 140px;
+}
+
+.gas-tendency-chart-skeleton {
+	width: 100%;
+	height: 140px;
+	background: linear-gradient(
+		90deg,
+		var(--overlay-light-6) 0%,
+		var(--overlay-light-3, rgba(255, 255, 255, 0.04)) 50%,
+		var(--overlay-light-6) 100%
+	);
+	background-size: 200% 100%;
+	border-radius: 8px;
+	animation: gas-tendency-skeleton 1.4s ease-in-out infinite;
+}
+
+@keyframes gas-tendency-skeleton {
+	0% {
+		background-position: 200% 0;
+	}
+	100% {
+		background-position: -200% 0;
+	}
+}

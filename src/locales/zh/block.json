@@ -72,5 +72,14 @@
   "errors": {
     "failedToFetchBlock": "获取区块数据失败",
     "failedToFetchBlocks": "获取区块列表失败"
+  },
+  "gasTendency": {
+    "title": "Gas 趋势",
+    "baseFee": "基础费用 (gwei)",
+    "gasUsed": "Gas 使用量",
+    "blockShort": "#{{number}}",
+    "tooltipBlock": "区块 #{{number}}",
+    "tooltipBaseFee": "基础费用: {{value}} gwei",
+    "tooltipGasUsed": "Gas 使用量: {{value}}%"
   }
 }

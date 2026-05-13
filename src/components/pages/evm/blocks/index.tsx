@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { RPCIndicator } from "../../../common/RPCIndicator";
 import Breadcrumb from "../../../common/Breadcrumb";
+import GasTendencyChartSection from "../shared/GasTendencyChartSection";
 import { getNetworkById } from "../../../../config/networks";
 import { useDataService } from "../../../../hooks/useDataService";
 import { useProviderSelection } from "../../../../hooks/useProviderSelection";
@@ -280,6 +281,8 @@ export default function Blocks() {
             />
           )}
         </div>
+
+        <GasTendencyChartSection network={numericNetworkId} namespace="block" />
 
         <div className="table-wrapper">
           <table className="dash-table blocks-table">

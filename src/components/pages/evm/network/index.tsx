@@ -6,6 +6,7 @@ import { resolveNetwork, getChainIdFromNetwork } from "../../../../utils/network
 import { getAllNetworks } from "../../../../config/networks";
 import SearchBox from "../../../common/SearchBox";
 import DashboardStats from "./DashboardStats";
+import GasTendencyChartSection from "../shared/GasTendencyChartSection";
 import LatestBlocksTable from "./LatestBlocksTable";
 import LatestTransactionsTable from "./LatestTransactionsTable";
 import ProfileDisplay from "./NetworkProfileDisplay";
@@ -67,6 +68,8 @@ export default function Network() {
           loading={dashboard.loading && dashboard.latestBlocks.length === 0}
           networkId={chainId}
         />
+
+        {network && <GasTendencyChartSection network={network} namespace="network" />}
 
         <div className="dashboard-tables-row">
           <LatestBlocksTable

@@ -72,5 +72,14 @@
   "errors": {
     "failedToFetchBlock": "ブロックデータの取得に失敗しました",
     "failedToFetchBlocks": "ブロックの取得に失敗しました"
+  },
+  "gasTendency": {
+    "title": "ガスの傾向",
+    "baseFee": "ベース料金 (gwei)",
+    "gasUsed": "ガス使用量",
+    "blockShort": "#{{number}}",
+    "tooltipBlock": "ブロック #{{number}}",
+    "tooltipBaseFee": "ベース料金: {{value}} gwei",
+    "tooltipGasUsed": "ガス使用量: {{value}}%"
   }
 }

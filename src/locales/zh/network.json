@@ -39,6 +39,15 @@
   "aboutNetwork": "关于 {{name}}",
   "officialLinks": "官方链接",
   "collapseProfile": "折叠简介",
+  "gasTendency": {
+    "title": "Gas 趋势",
+    "baseFee": "基础费用 (gwei)",
+    "gasUsed": "Gas 使用量",
+    "blockShort": "#{{number}}",
+    "tooltipBlock": "区块 #{{number}}",
+    "tooltipBaseFee": "基础费用: {{value}} gwei",
+    "tooltipGasUsed": "Gas 使用量: {{value}}%"
+  },
   "gasTracker": {
     "title": "Gas 追踪器",
     "loadingGasPrices": "加载 Gas 价格...",

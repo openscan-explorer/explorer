@@ -8,6 +8,7 @@ import type {
   DataWithMetadata,
   AddressTransactionsResult,
   GasPrices,
+  FeeHistory,
 } from "../../types";
 import { logger } from "../../utils/logger";
 
@@ -340,6 +341,41 @@ export abstract class NetworkAdapter {
         lastBlock: `0x${lastBlock.toString(16)}`,
       },
       metadata: feeHistoryResult.metadata as DataWithMetadata<GasPrices>["metadata"],
+    };
+  }
+
+  /**
+   * Get base fee + gas-used ratio history for the latest N blocks via eth_feeHistory.
+   * Returns ready-to-plot values (bigint base fees in wei, decimal gas-used ratios).
+   * @param blockCount - Number of blocks to retrieve (e.g. 50)
+   * @param newestBlock - Newest block in the range (default "latest")
+   * @returns Fee history with base fees and gas-used ratios
+   */
+  async getFeeHistory(
+    blockCount: number,
+    newestBlock: BlockNumberOrTag = "latest",
+  ): Promise<DataWithMetadata<FeeHistory>> {
+    const client = this.getClient();
+    const hexCount = `0x${blockCount.toString(16)}`;
+    const newest = typeof newestBlock === "number" ? `0x${newestBlock.toString(16)}` : newestBlock;
+
+    const result = await client.feeHistory(hexCount, newest);
+    const raw = result.data;
+
+    if (!raw || !raw.baseFeePerGas || !raw.gasUsedRatio) {
+      return {
+        data: { oldestBlock: 0, baseFeePerGas: [], gasUsedRatio: [] },
+        metadata: result.metadata as DataWithMetadata<FeeHistory>["metadata"],
+      };
+    }
+
+    return {
+      data: {
+        oldestBlock: Number(BigInt(raw.oldestBlock)),
+        baseFeePerGas: raw.baseFeePerGas.map((v: string) => BigInt(v)),
+        gasUsedRatio: raw.gasUsedRatio,
+      },
+      metadata: result.metadata as DataWithMetadata<FeeHistory>["metadata"],
     };
   }
 
