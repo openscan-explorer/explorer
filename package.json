@@ -53,6 +53,7 @@
 		"build:development": "vite build --mode development",
 		"build:production": "bash ./scripts/build-production.sh",
 		"build:staging": "bash ./scripts/build-staging.sh",
+		"docs:llms": "node scripts/generate-llms.mjs",
 		"preview": "vite preview",
 		"test": "vitest",
 		"test:run": "vitest run",

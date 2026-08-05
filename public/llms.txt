@@ -1,0 +1,19 @@
+# OpenScan
+
+> OpenScan is a trustless, open-source, standalone web-app and multi-chain blockchain explorer for Ethereum and Layer 2 networks. It allows direct interaction with verified smart contracts and supports local development chains.
+
+## Overview
+
+- [OpenScan - Claude Code Instructions](https://raw.githubusercontent.com/openscan-explorer/explorer/8ccaa3283333eb4616efe3255398a77ca6d6ef93/.claude/CLAUDE.md): OpenScan is a trustless, open-source, standalone web-app and multi-chain blockchain explorer for Ethereum and Layer 2 networks. It allows direct interaction with verified smart contracts and supports local development chains.
+
+## Project
+
+- [OpenScan](https://raw.githubusercontent.com/openscan-explorer/explorer/8ccaa3283333eb4616efe3255398a77ca6d6ef93/README.md): Production IPFS Hash
+- [Contributing to OpenScan](https://raw.githubusercontent.com/openscan-explorer/explorer/8ccaa3283333eb4616efe3255398a77ca6d6ef93/CONTRIBUTING.md): Thank you for your interest in contributing to OpenScan! This guide will help you get started.
+
+## Development
+
+- [Architecture Overview](https://raw.githubusercontent.com/openscan-explorer/explorer/8ccaa3283333eb4616efe3255398a77ca6d6ef93/.claude/rules/architecture.md): OpenScan follows a layered architecture with clear separation between data fetching, transformation, and presentation:
+- [Testing](https://raw.githubusercontent.com/openscan-explorer/explorer/8ccaa3283333eb4616efe3255398a77ca6d6ef93/.claude/rules/testing.md): OpenScan has two test layers: Vitest for unit tests and Playwright for end-to-end browser tests against a real Vite dev server. Most test commands also live in commands.md; this file documents the *model* — projects, suites, mocking, and CI mapping — so future test work lands in the right place.
+- [Git Workflow and Collaboration](https://raw.githubusercontent.com/openscan-explorer/explorer/8ccaa3283333eb4616efe3255398a77ca6d6ef93/.claude/rules/workflow.md): The project uses two workflows depending on the scope of changes:
+- [Code Style and Quality](https://raw.githubusercontent.com/openscan-explorer/explorer/8ccaa3283333eb4616efe3255398a77ca6d6ef93/.claude/rules/code-style.md): ALWAYS run these commands before committing:
