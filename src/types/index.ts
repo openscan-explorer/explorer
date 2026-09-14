@@ -937,6 +937,9 @@ export type AIAnalysisType =
   | "bitcoin_transaction"
   | "bitcoin_block"
   | "bitcoin_address"
+  | "zcash_transaction"
+  | "zcash_block"
+  | "zcash_address"
   | "solana_transaction"
   | "solana_block"
   | "solana_account";
