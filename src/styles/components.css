@@ -6480,6 +6480,65 @@ button.tx-section-header-toggle {
 	color: var(--color-warning);
 }
 
+/* Zcash block details */
+.zec-inline-copy {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+}
+
+.zec-solution {
+	word-break: break-all;
+}
+
+.zec-pool-chips {
+	display: inline-flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	margin-left: 8px;
+	vertical-align: middle;
+}
+
+.zec-pool-chip {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	padding: 1px 8px;
+	border-radius: 10px;
+	font-size: 0.75rem;
+	background: var(--overlay-light-5);
+	color: var(--text-secondary);
+}
+
+.zec-pool-chip::before {
+	content: "";
+	width: 8px;
+	height: 8px;
+	border-radius: 2px;
+	background: var(--pool-color);
+}
+
+.zec-coinbase-outputs {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.zec-coinbase-outputs li {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px;
+}
+
+.zec-coinbase-value {
+	color: var(--text-secondary);
+	font-variant-numeric: tabular-nums;
+}
+
 /* Clickable stat label */
 .dashboard-stat-label-link {
 	display: block;

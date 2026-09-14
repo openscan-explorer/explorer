@@ -1,7 +1,7 @@
 import type React from "react";
 import { useTranslation } from "react-i18next";
 import { useSettings } from "../../../context/SettingsContext";
-import type { ZcashNetworkStats, ZcashValuePoolId } from "../../../types";
+import type { ZcashValuePool, ZcashValuePoolId } from "../../../types";
 import { formatZECCompact } from "../../../utils/zcashFormatters";
 import HelperTooltip from "../../common/HelperTooltip";
 
@@ -24,32 +24,37 @@ const POOL_TOOLTIP_KEYS = {
 } as const satisfies Record<ZcashValuePoolId, string>;
 
 interface ZcashValuePoolsProps {
-  stats: ZcashNetworkStats | null;
+  valuePools: ZcashValuePool[];
+  chainSupplyZat?: number;
   currency: string;
+  title?: string;
 }
 
-const ZcashValuePools: React.FC<ZcashValuePoolsProps> = ({ stats, currency }) => {
+const ZcashValuePools: React.FC<ZcashValuePoolsProps> = ({
+  valuePools,
+  chainSupplyZat,
+  currency,
+  title,
+}) => {
   const { t } = useTranslation("zcash");
   const { t: tTooltips } = useTranslation("tooltips");
   const { settings } = useSettings();
   const showTooltips = settings.showHelperTooltips !== false;
 
-  const pools = stats?.valuePools ?? [];
-  const totalZat =
-    stats?.chainSupplyZat || pools.reduce((sum, pool) => sum + pool.valueZat, 0) || 0;
-  if (pools.length === 0 || totalZat <= 0) return null;
+  const totalZat = chainSupplyZat || valuePools.reduce((sum, pool) => sum + pool.valueZat, 0);
+  if (valuePools.length === 0 || totalZat <= 0) return null;
 
   const sharePercent = (valueZat: number) => (valueZat / totalZat) * 100;
 
   return (
     <section className="zec-value-pools" data-testid="zcash-value-pools">
       <div className="zec-value-pools-header">
-        <h3 className="dashboard-table-title">{t("valuePools.title")}</h3>
+        <h3 className="dashboard-table-title">{title ?? t("valuePools.title")}</h3>
         {showTooltips && <HelperTooltip content={tTooltips("zcash.valuePools")} />}
       </div>
 
       <div className="zec-pool-bar" role="img" aria-label={t("valuePools.barLabel")}>
-        {pools.map((pool) => (
+        {valuePools.map((pool) => (
           <span
             key={pool.id}
             className={`zec-pool-segment zec-pool-${pool.id}`}
@@ -59,7 +64,7 @@ const ZcashValuePools: React.FC<ZcashValuePoolsProps> = ({ stats, currency }) =>
       </div>
 
       <ul className="zec-pool-list">
-        {pools.map((pool) => (
+        {valuePools.map((pool) => (
           <li key={pool.id} className="zec-pool-item">
             <span className={`zec-pool-swatch zec-pool-${pool.id}`} />
             <span className="zec-pool-name">{t(POOL_LABEL_KEYS[pool.id])}</span>
