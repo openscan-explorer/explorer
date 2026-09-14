@@ -144,3 +144,5 @@ npm start
 ```
 
 Supported chain IDs: 1 (Ethereum), 42161 (Arbitrum), 10 (Optimism), 8453 (Base), 56 (BSC), 137 (Polygon), 31337 (Hardhat), 97 (BSC Testnet), 11155111 (Sepolia), 43114 (Avalanche)
+
+Non-EVM networks are selected by slug: `btc`, `tbtc`, `zec`, `tzec`, `sol`, `sol-devnet`, `sol-testnet` (e.g. `OPENSCAN_NETWORKS="1,btc,zec"`).
