@@ -47,7 +47,49 @@
     "block": "ブロック #{{height}}",
     "transactions": "トランザクション",
     "transaction": "{{txid}}",
-    "mempool": "メンプール"
+    "mempool": "メンプール",
+    "address": "{{address}}"
+  },
+  "address": {
+    "title": "アドレス",
+    "loading": "アドレスデータを読み込み中...",
+    "loadError": "このアドレスを読み込めませんでした: {{message}}",
+    "address": "アドレス:",
+    "types": {
+      "p2pkh": "トランスペアレント (P2PKH)",
+      "p2sh": "トランスペアレント (P2SH)",
+      "tex": "TEX",
+      "sprout": "Sprout",
+      "sapling": "Sapling",
+      "unified": "ユニファイド",
+      "unknown": "不明"
+    },
+    "receivers": "レシーバー:",
+    "receiverTypes": {
+      "orchard": "Orchard",
+      "sapling": "Sapling",
+      "p2pkh": "トランスペアレント (P2PKH)",
+      "p2sh": "トランスペアレント (P2SH)"
+    },
+    "transparentReceiverNote": "トランスペアレントレシーバー {{address}}",
+    "balance": "残高:",
+    "received": "総受取額:",
+    "unspentOutputsLabel": "未使用出力:",
+    "transactionsLabel": "トランザクション:",
+    "unspentOutputs": "未使用出力 ({{count}})",
+    "transactions": "トランザクション ({{count}})",
+    "moreTransactions": "…他 {{count}} 件",
+    "noUtxos": "未使用出力はありません",
+    "atHeight": "ブロック #{{height}}",
+    "unavailable": "このRPCエンドポイントでは利用できません",
+    "sectionError": "このデータを読み込めませんでした。",
+    "retry": "再試行",
+    "shieldedNotice": "シールドアドレスはオンチェーンで残高や取引履歴を公開しません。所有者の閲覧キーでのみ確認できます。",
+    "unifiedShieldedNotice": "このユニファイドアドレスにはトランスペアレントレシーバーがないため、残高と履歴は非公開です。",
+    "texNotice": "TEXアドレスはトランスペアレントな資金のみを受け取ります。残高と履歴の照会はまだ利用できません。",
+    "unknownNotice": "これはZcashアドレスではないようです。",
+    "indexUnsupported": "このRPCエンドポイントはZebraのアドレスインデックスを提供していないため、残高・未使用出力・履歴を表示できません。ホスト型ゲートウェイはこれらのメソッドをブロックしています。表示するには自前のZebraノードを追加してください。",
+    "configureRpc": "RPCエンドポイントを設定"
   },
   "mempool": {
     "title": "{{network}} メンプール",

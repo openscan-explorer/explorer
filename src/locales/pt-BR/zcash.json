@@ -47,7 +47,49 @@
     "block": "Bloco #{{height}}",
     "transactions": "Transações",
     "transaction": "{{txid}}",
-    "mempool": "Mempool"
+    "mempool": "Mempool",
+    "address": "{{address}}"
+  },
+  "address": {
+    "title": "Endereço",
+    "loading": "Carregando dados do endereço...",
+    "loadError": "Não foi possível carregar este endereço: {{message}}",
+    "address": "Endereço:",
+    "types": {
+      "p2pkh": "Transparente (P2PKH)",
+      "p2sh": "Transparente (P2SH)",
+      "tex": "TEX",
+      "sprout": "Sprout",
+      "sapling": "Sapling",
+      "unified": "Unificado",
+      "unknown": "Desconhecido"
+    },
+    "receivers": "Receptores:",
+    "receiverTypes": {
+      "orchard": "Orchard",
+      "sapling": "Sapling",
+      "p2pkh": "Transparente (P2PKH)",
+      "p2sh": "Transparente (P2SH)"
+    },
+    "transparentReceiverNote": "receptor transparente {{address}}",
+    "balance": "Saldo:",
+    "received": "Total recebido:",
+    "unspentOutputsLabel": "Saídas não gastas:",
+    "transactionsLabel": "Transações:",
+    "unspentOutputs": "Saídas não gastas ({{count}})",
+    "transactions": "Transações ({{count}})",
+    "moreTransactions": "…e mais {{count}}",
+    "noUtxos": "Nenhuma saída não gasta",
+    "atHeight": "bloco #{{height}}",
+    "unavailable": "Indisponível neste endpoint RPC",
+    "sectionError": "Não foi possível carregar estes dados.",
+    "retry": "Tentar novamente",
+    "shieldedNotice": "Endereços blindados não revelam saldos nem histórico na blockchain. Só a chave de visualização do dono consegue vê-los.",
+    "unifiedShieldedNotice": "Este endereço unificado não tem receptor transparente, então seu saldo e histórico permanecem privados.",
+    "texNotice": "Endereços TEX só recebem fundos transparentes. Consultas de saldo e histórico ainda não estão disponíveis para eles.",
+    "unknownNotice": "Isto não parece um endereço Zcash.",
+    "indexUnsupported": "Este endpoint RPC não oferece o índice de endereços do Zebra, então saldo, saídas não gastas e histórico não podem ser exibidos. Gateways hospedados bloqueiam esses métodos; adicione um nó Zebra próprio para vê-los.",
+    "configureRpc": "Configurar endpoints RPC"
   },
   "mempool": {
     "title": "Mempool de {{network}}",

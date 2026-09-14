@@ -47,7 +47,49 @@
     "block": "区块 #{{height}}",
     "transactions": "交易",
     "transaction": "{{txid}}",
-    "mempool": "内存池"
+    "mempool": "内存池",
+    "address": "{{address}}"
+  },
+  "address": {
+    "title": "地址",
+    "loading": "正在加载地址数据...",
+    "loadError": "无法加载此地址: {{message}}",
+    "address": "地址:",
+    "types": {
+      "p2pkh": "透明 (P2PKH)",
+      "p2sh": "透明 (P2SH)",
+      "tex": "TEX",
+      "sprout": "Sprout",
+      "sapling": "Sapling",
+      "unified": "统一地址",
+      "unknown": "未知"
+    },
+    "receivers": "接收器:",
+    "receiverTypes": {
+      "orchard": "Orchard",
+      "sapling": "Sapling",
+      "p2pkh": "透明 (P2PKH)",
+      "p2sh": "透明 (P2SH)"
+    },
+    "transparentReceiverNote": "透明接收器 {{address}}",
+    "balance": "余额:",
+    "received": "累计接收:",
+    "unspentOutputsLabel": "未花费输出:",
+    "transactionsLabel": "交易:",
+    "unspentOutputs": "未花费输出 ({{count}})",
+    "transactions": "交易 ({{count}})",
+    "moreTransactions": "…还有 {{count}} 笔",
+    "noUtxos": "没有未花费输出",
+    "atHeight": "区块 #{{height}}",
+    "unavailable": "此 RPC 端点不提供该数据",
+    "sectionError": "无法加载此数据。",
+    "retry": "重试",
+    "shieldedNotice": "屏蔽地址不会在链上公开余额或交易历史，只有所有者的查看密钥才能看到。",
+    "unifiedShieldedNotice": "此统一地址没有透明接收器，因此其余额和历史保持私密。",
+    "texNotice": "TEX 地址只接收透明资金，暂不支持查询其余额和历史。",
+    "unknownNotice": "这看起来不是 Zcash 地址。",
+    "indexUnsupported": "此 RPC 端点不提供 Zebra 地址索引，因此无法显示余额、未花费输出和历史。托管网关会屏蔽这些方法；请添加自建的 Zebra 节点以查看。",
+    "configureRpc": "配置 RPC 端点"
   },
   "mempool": {
     "title": "{{network}} 内存池",

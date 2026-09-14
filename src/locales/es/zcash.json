@@ -47,7 +47,49 @@
     "block": "Bloque #{{height}}",
     "transactions": "Transacciones",
     "transaction": "{{txid}}",
-    "mempool": "Mempool"
+    "mempool": "Mempool",
+    "address": "{{address}}"
+  },
+  "address": {
+    "title": "Dirección",
+    "loading": "Cargando datos de la dirección...",
+    "loadError": "No se pudo cargar esta dirección: {{message}}",
+    "address": "Dirección:",
+    "types": {
+      "p2pkh": "Transparente (P2PKH)",
+      "p2sh": "Transparente (P2SH)",
+      "tex": "TEX",
+      "sprout": "Sprout",
+      "sapling": "Sapling",
+      "unified": "Unificada",
+      "unknown": "Desconocida"
+    },
+    "receivers": "Receptores:",
+    "receiverTypes": {
+      "orchard": "Orchard",
+      "sapling": "Sapling",
+      "p2pkh": "Transparente (P2PKH)",
+      "p2sh": "Transparente (P2SH)"
+    },
+    "transparentReceiverNote": "receptor transparente {{address}}",
+    "balance": "Saldo:",
+    "received": "Total recibido:",
+    "unspentOutputsLabel": "Salidas no gastadas:",
+    "transactionsLabel": "Transacciones:",
+    "unspentOutputs": "Salidas no gastadas ({{count}})",
+    "transactions": "Transacciones ({{count}})",
+    "moreTransactions": "…y {{count}} más",
+    "noUtxos": "Sin salidas no gastadas",
+    "atHeight": "bloque #{{height}}",
+    "unavailable": "No disponible en este endpoint RPC",
+    "sectionError": "No se pudieron cargar estos datos.",
+    "retry": "Reintentar",
+    "shieldedNotice": "Las direcciones blindadas no revelan saldos ni historial en la cadena. Solo la clave de visualización del propietario puede verlos.",
+    "unifiedShieldedNotice": "Esta dirección unificada no tiene receptor transparente, así que su saldo e historial son privados.",
+    "texNotice": "Las direcciones TEX solo reciben fondos transparentes. Aún no se pueden consultar su saldo ni su historial.",
+    "unknownNotice": "Esto no parece una dirección de Zcash.",
+    "indexUnsupported": "Este endpoint RPC no ofrece el índice de direcciones de Zebra, así que no se pueden mostrar el saldo, las salidas no gastadas ni el historial. Los gateways alojados bloquean estos métodos; agrega un nodo Zebra propio para verlos.",
+    "configureRpc": "Configurar endpoints RPC"
   },
   "mempool": {
     "title": "Mempool de {{network}}",
