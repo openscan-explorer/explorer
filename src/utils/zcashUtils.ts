@@ -75,6 +75,13 @@ export function classifyTransaction(tx: ZcashTransaction): ZcashTxKind {
   return "shielded";
 }
 
+/**
+ * Number of distinct previous transactions spent by the transparent inputs
+ */
+export function countPreviousTransactions(tx: ZcashTransaction): number {
+  return new Set(tx.vin.flatMap((input) => (input.txid ? [input.txid] : []))).size;
+}
+
 export function getTransparentOutputZat(tx: ZcashTransaction): number {
   return tx.vout.reduce((sum, output) => sum + output.valueZat, 0);
 }

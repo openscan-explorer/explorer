@@ -6539,6 +6539,78 @@ button.tx-section-header-toggle {
 	font-variant-numeric: tabular-nums;
 }
 
+/* Zcash transaction details */
+.zec-kind-row {
+	display: inline-flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 6px;
+}
+
+.zec-fee-rate {
+	margin-left: 8px;
+	font-weight: 400;
+	color: var(--text-secondary);
+}
+
+.zec-fee-resolve {
+	display: inline-flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px;
+}
+
+.zec-shielded {
+	background: var(--bg-secondary);
+	border: 1px solid var(--overlay-light-8);
+	border-radius: 12px;
+	padding: 16px 20px;
+	margin: 16px 0;
+}
+
+.zec-fully-shielded {
+	padding: 12px 16px;
+	margin-bottom: 12px;
+	border: 1px solid var(--color-primary-alpha-20);
+	border-radius: 8px;
+	background: var(--color-primary-alpha-8);
+	color: var(--text-primary);
+}
+
+.zec-fully-shielded p {
+	margin: 4px 0 0;
+	font-size: 0.85rem;
+	color: var(--text-secondary);
+}
+
+.zec-bundle-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+	gap: 12px;
+}
+
+.zec-bundle-card {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	padding: 12px 14px;
+	border-left: 3px solid var(--pool-color);
+	border-radius: 6px;
+	background: var(--overlay-light-3);
+}
+
+.zec-bundle-title {
+	font-weight: 600;
+	color: var(--text-primary);
+}
+
+.zec-bundle-counts,
+.zec-bundle-balance {
+	font-size: 0.85rem;
+	color: var(--text-secondary);
+	font-variant-numeric: tabular-nums;
+}
+
 /* Clickable stat label */
 .dashboard-stat-label-link {
 	display: block;

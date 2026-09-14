@@ -4,6 +4,7 @@ import {
   classifyRpcErrors,
   classifyTransaction,
   computeFeeZat,
+  countPreviousTransactions,
   detectZcashAddressType,
   getShieldedSupplyPercent,
   getTransactionPools,
@@ -193,5 +194,21 @@ describe("getShieldedSupplyPercent", () => {
 
   it("returns null when the chain supply is unknown", () => {
     expect(getShieldedSupplyPercent({ chainSupplyZat: undefined, valuePools: [] })).toBeNull();
+  });
+});
+
+describe("countPreviousTransactions", () => {
+  it("counts each spent transaction once and ignores coinbase inputs", () => {
+    const spending = tx({
+      vin: [
+        { txid: "c".repeat(64), vout: 0, sequence: 0 },
+        { txid: "c".repeat(64), vout: 1, sequence: 0 },
+        { txid: "d".repeat(64), vout: 0, sequence: 0 },
+      ],
+    });
+    const coinbase = tx({ vin: [{ coinbase: "03", sequence: 0 }] });
+
+    expect(countPreviousTransactions(spending)).toBe(2);
+    expect(countPreviousTransactions(coinbase)).toBe(0);
   });
 });
