@@ -21,6 +21,26 @@ type RpcMethodHandler =
   | { result: unknown }
   | { error: { code: number; message: string } };
 
+const RPC_ERROR = Symbol("rpcError");
+
+interface RpcErrorResponse {
+  [RPC_ERROR]: true;
+  code: number;
+  message: string;
+}
+
+/**
+ * Return this from a function handler to answer with a JSON-RPC error instead of a result,
+ * e.g. `getblock: ([hash]) => (known(hash) ? block : rpcError(-8, "Block not found"))`.
+ */
+export function rpcError(code: number, message: string): RpcErrorResponse {
+  return { [RPC_ERROR]: true, code, message };
+}
+
+function isRpcError(value: unknown): value is RpcErrorResponse {
+  return typeof value === "object" && value !== null && RPC_ERROR in value;
+}
+
 export interface MockOptions {
   /** Return HTTP status instead of a JSON-RPC response. Overrides handlers. */
   httpStatus?: number;
@@ -77,7 +97,10 @@ export async function mockJsonRpc(
         error: { code: -32601, message: `method ${method} not mocked` },
       };
     } else if (typeof handler === "function") {
-      body = { jsonrpc: "2.0", id, result: handler(params) };
+      const value = handler(params);
+      body = isRpcError(value)
+        ? { jsonrpc: "2.0", id, error: { code: value.code, message: value.message } }
+        : { jsonrpc: "2.0", id, result: value };
     } else if ("result" in handler) {
       body = { jsonrpc: "2.0", id, result: handler.result };
     } else {
