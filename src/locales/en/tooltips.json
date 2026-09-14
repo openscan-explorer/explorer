@@ -182,6 +182,19 @@
       "nonce": "32-byte value miners vary while searching for a valid Equihash solution.",
       "solution": "The Equihash proof-of-work solution for this block.",
       "trees": "Number of notes committed to each shielded pool's note commitment tree as of this block."
+    },
+    "tx": {
+      "txid": "A unique identifier for this transaction.",
+      "confirmations": "Blocks mined since the block containing this transaction. More confirmations means higher finality.",
+      "kind": "How value moves: between transparent addresses, into shielded pools (shielding), out of them (deshielding), entirely inside them (fully shielded), or a mix.",
+      "transparentInputs": "Previous transparent outputs being spent. Zebra doesn't return their values, so they are looked up on request.",
+      "transparentOutputs": "New transparent outputs. Like Bitcoin, their addresses and amounts are public.",
+      "fee": "Paid to the miner: transparent inputs plus value leaving the shielded pools, minus transparent outputs.",
+      "size": "Serialized transaction size, including shielded proofs.",
+      "versionGroupId": "Identifies which network upgrade's transaction format this transaction uses.",
+      "expiryHeight": "The transaction can no longer be mined after this block height.",
+      "locktime": "Earliest block height or time at which this transaction can be mined.",
+      "shieldedActivity": "Value moving through Zcash's shielded pools. Amounts and parties stay encrypted; only each pool's net value balance is public."
     }
   },
   "network": {

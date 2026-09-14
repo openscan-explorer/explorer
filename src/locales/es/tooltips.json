@@ -182,6 +182,19 @@
       "nonce": "Valor de 32 bytes que los mineros varían al buscar una solución Equihash válida.",
       "solution": "La solución de prueba de trabajo Equihash de este bloque.",
       "trees": "Cantidad de notas comprometidas en el árbol de compromisos de cada pool blindado hasta este bloque."
+    },
+    "tx": {
+      "txid": "Identificador único de esta transacción.",
+      "confirmations": "Bloques minados desde el bloque que contiene esta transacción. Más confirmaciones significa mayor finalidad.",
+      "kind": "Cómo se mueve el valor: entre direcciones transparentes, hacia pools blindados (blindaje), fuera de ellos (desblindaje), completamente dentro de ellos (totalmente blindada) o una combinación.",
+      "transparentInputs": "Salidas transparentes anteriores que se gastan. Zebra no devuelve sus valores, así que se consultan a pedido.",
+      "transparentOutputs": "Nuevas salidas transparentes. Como en Bitcoin, sus direcciones y montos son públicos.",
+      "fee": "Pagada al minero: entradas transparentes más el valor que sale de los pools blindados, menos las salidas transparentes.",
+      "size": "Tamaño de la transacción serializada, incluidas las pruebas blindadas.",
+      "versionGroupId": "Identifica qué formato de transacción de actualización de red usa esta transacción.",
+      "expiryHeight": "La transacción ya no puede minarse después de esta altura de bloque.",
+      "locktime": "Altura de bloque o momento más temprano en que puede minarse esta transacción.",
+      "shieldedActivity": "Valor que se mueve por los pools blindados de Zcash. Montos y participantes permanecen cifrados; solo es público el balance neto de cada pool."
     }
   },
   "network": {
