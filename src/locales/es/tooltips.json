@@ -161,6 +161,27 @@
       "orchard": "Pool blindado introducido con NU5 en 2022, con pruebas Halo 2 que no requieren configuración de confianza.",
       "lockbox": "Fondo de desarrollo diferido: parte de cada recompensa de bloque desde NU6, retenida por el protocolo hasta que se decida su uso.",
       "ironwood": "Pool blindado introducido con la actualización de red NU6.3 (Ironwood)."
+    },
+    "block": {
+      "hash": "Identificador único de este bloque, derivado de su encabezado.",
+      "confirmations": "Bloques minados sobre este. Más confirmaciones significa que el bloque es más difícil de revertir.",
+      "reward": "Valor total de las salidas coinbase: el subsidio del minero más las comisiones y los flujos de financiamiento pagados a direcciones transparentes.",
+      "coinbaseOutputs": "Salidas transparentes creadas por la transacción coinbase, como la recompensa del minero y los pagos al fondo de desarrollo.",
+      "transactions": "Transacciones en este bloque. Las etiquetas cuentan las transacciones que usan cada pool blindado.",
+      "transparentOutput": "Suma de todas las salidas transparentes de este bloque. Los montos blindados no son públicos.",
+      "difficulty": "Qué tan difícil fue encontrar una solución Equihash válida para este bloque.",
+      "size": "Tamaño del bloque serializado, incluidas las pruebas blindadas.",
+      "previousBlock": "El bloque sobre el que se construye este.",
+      "nextBlock": "El bloque construido sobre este, si existe.",
+      "merkleRoot": "Raíz del árbol Merkle de todos los IDs de transacción de este bloque.",
+      "blockCommitments": "Compromiso con el historial de la cadena y los datos de autorización, requerido desde NU5.",
+      "finalSaplingRoot": "Raíz del árbol de compromisos de notas de Sapling después de este bloque.",
+      "finalOrchardRoot": "Raíz del árbol de compromisos de notas de Orchard después de este bloque. Presente en bloques posteriores a NU5.",
+      "version": "Versión del formato del bloque.",
+      "bits": "Codificación compacta del objetivo de prueba de trabajo.",
+      "nonce": "Valor de 32 bytes que los mineros varían al buscar una solución Equihash válida.",
+      "solution": "La solución de prueba de trabajo Equihash de este bloque.",
+      "trees": "Cantidad de notas comprometidas en el árbol de compromisos de cada pool blindado hasta este bloque."
     }
   },
   "network": {
