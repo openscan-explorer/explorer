@@ -1,6 +1,7 @@
 import {
   type SupportedChainId,
   type SupportedSolanaChainId,
+  type SupportedZcashChainId,
   ArbitrumClient,
   BaseClient,
   BitcoinClient,
@@ -14,7 +15,8 @@ import { AdapterFactory } from "./adapters/adaptersFactory";
 import type { NetworkAdapter } from "./adapters/NetworkAdapter";
 import type { BitcoinAdapter } from "./adapters/BitcoinAdapter/BitcoinAdapter";
 import type { SolanaAdapter } from "./adapters/SolanaAdapter/SolanaAdapter";
-import type { NetworkConfig, RpcUrlsContextType } from "../types";
+import type { ZcashAdapter } from "./adapters/ZcashAdapter/ZcashAdapter";
+import type { NetworkConfig, NetworkType, RpcUrlsContextType } from "../types";
 import { getRPCUrls } from "../config/rpcConfig";
 import { getNetworkRpcKey, getChainIdFromNetwork } from "../utils/networkResolver";
 
@@ -41,19 +43,21 @@ const EVM_TESTNET_CLIENTS: Record<number, (config: EVMClientConfig) => EVMTestne
 };
 
 /**
- * DataService supports EVM, Bitcoin, and Solana networks
+ * DataService supports EVM, Bitcoin, Zcash, and Solana networks
  * The adapter type varies based on network type
  */
 export class DataService {
   /**
    * The network adapter - use this directly for EVM networks
    * For Bitcoin networks, use getBitcoinAdapter() instead
+   * For Zcash networks, use getZcashAdapter() instead
    * For Solana networks, use getSolanaAdapter() instead
    */
   networkAdapter: NetworkAdapter;
   private bitcoinAdapter?: BitcoinAdapter;
+  private zcashAdapter?: ZcashAdapter;
   private solanaAdapter?: SolanaAdapter;
-  readonly networkType: "evm" | "bitcoin" | "solana";
+  readonly networkType: NetworkType;
 
   constructor(
     network: NetworkConfig,
@@ -72,6 +76,15 @@ export class DataService {
       });
       this.bitcoinAdapter = AdapterFactory.createBitcoinAdapter(network.networkId, bitcoinClient);
       // Create a placeholder adapter that throws for EVM methods
+      this.networkAdapter = null as unknown as NetworkAdapter;
+    } else if (network.type === "zcash") {
+      // Zcash shares the bip122 namespace with Bitcoin; ClientFactory routes by registry membership
+      const zcashChainId = network.networkId as SupportedZcashChainId;
+      const zcashClient = ClientFactory.createTypedClient<typeof zcashChainId>(zcashChainId, {
+        rpcUrls,
+        type: strategy,
+      });
+      this.zcashAdapter = AdapterFactory.createZcashAdapter(network.networkId, zcashClient);
       this.networkAdapter = null as unknown as NetworkAdapter;
     } else if (network.type === "solana") {
       // Create Solana client and adapter via ClientFactory
@@ -108,6 +121,13 @@ export class DataService {
   }
 
   /**
+   * Check if this is a Zcash network service
+   */
+  isZcash(): boolean {
+    return this.networkType === "zcash";
+  }
+
+  /**
    * Check if this is a Solana network service
    */
   isSolana(): boolean {
@@ -132,6 +152,16 @@ export class DataService {
       throw new Error("Cannot get Bitcoin adapter for non-Bitcoin network");
     }
     return this.bitcoinAdapter;
+  }
+
+  /**
+   * Get the adapter as a Zcash adapter (throws if not Zcash)
+   */
+  getZcashAdapter(): ZcashAdapter {
+    if (!this.isZcash() || !this.zcashAdapter) {
+      throw new Error("Cannot get Zcash adapter for non-Zcash network");
+    }
+    return this.zcashAdapter;
   }
 
   /**

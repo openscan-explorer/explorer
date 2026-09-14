@@ -72,6 +72,13 @@ export function isBitcoinNetwork(network: NetworkConfig): boolean {
 }
 
 /**
+ * Check if a network is a Zcash network
+ */
+export function isZcashNetwork(network: NetworkConfig): boolean {
+  return network.type === "zcash";
+}
+
+/**
  * Check if a network is a Solana network
  */
 export function isSolanaNetwork(network: NetworkConfig): boolean {
