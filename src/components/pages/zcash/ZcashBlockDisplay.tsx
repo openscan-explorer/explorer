@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
+import { getNetworkById } from "../../../config/networks";
 import { ZCASH_SHIELDED_POOLS, ZCASH_TREE_POOLS } from "../../../config/zcashConstants";
 import { useSettings } from "../../../context/SettingsContext";
 import { useTimeAgo } from "../../../hooks/useTimeAgo";
@@ -13,10 +14,12 @@ import {
   formatZEC,
   truncateBlockHash,
 } from "../../../utils/zcashFormatters";
+import AIAnalysisPanel from "../../common/AIAnalysis/AIAnalysisPanel";
 import CopyButton from "../../common/CopyButton";
 import FieldLabel from "../../common/FieldLabel";
 import HelperTooltip from "../../common/HelperTooltip";
 import LongString from "../../common/LongString";
+import { buildBlockAnalysisContext } from "./aiContext";
 import { VALUE_POOL_LABEL_KEYS } from "./labels";
 import { ZcashPoolChip } from "./ZcashCells";
 import ZcashValuePools from "./ZcashValuePools";
@@ -84,305 +87,323 @@ const ZcashBlockDisplay: React.FC<ZcashBlockDisplayProps> = React.memo(
           ];
     });
 
+    const network = getNetworkById(networkId);
+    const aiContext = useMemo(() => buildBlockAnalysisContext(block), [block]);
+
     return (
-      <div className="block-display-card">
-        <div className="block-display-header">
-          <div className="block-header-main">
-            {block.height > 0 && (
-              <Link
-                to={`/${networkId}/block/${block.height - 1}`}
-                className="block-nav-btn"
-                title={t("block.previousBlock")}
-              >
-                ←
-              </Link>
-            )}
-            <div className="block-header-info">
-              <span className="block-label">{t("block.title")}</span>
-              <span className="block-number">#{block.height.toLocaleString()}</span>
-            </div>
-            {block.nextBlockHash && (
-              <Link
-                to={`/${networkId}/block/${block.height + 1}`}
-                className="block-nav-btn"
-                title={t("block.nextBlock")}
-              >
-                →
-              </Link>
-            )}
-            <span className="block-header-divider">•</span>
-            <span className="block-header-timestamp">
-              <span className="block-timestamp-age">{timeAgo(block.time)}</span>
-              <span className="block-timestamp-full">({formatTimestamp(block.time)})</span>
-            </span>
-          </div>
-          {block.confirmations !== undefined && (
-            <span className="block-status-badge block-status-finalized">
-              {confirmationsAtLeast
-                ? t("block.confirmationsAtLeast", { count: block.confirmations })
-                : t("block.confirmations", { count: block.confirmations })}
-              {showTooltips && (
-                <HelperTooltip content={tTooltips("zcash.block.confirmations")} placement="left" />
+      <div className="page-with-analysis">
+        <div className="block-display-card">
+          <div className="block-display-header">
+            <div className="block-header-main">
+              {block.height > 0 && (
+                <Link
+                  to={`/${networkId}/block/${block.height - 1}`}
+                  className="block-nav-btn"
+                  title={t("block.previousBlock")}
+                >
+                  ←
+                </Link>
               )}
-            </span>
-          )}
-        </div>
-
-        <div className="tx-details">
-          <div className="tx-row">
-            <FieldLabel
-              label={t("block.hash")}
-              tooltipKey="zcash.block.hash"
-              visibleFor={["beginner"]}
-            />
-            <span className="tx-value tx-mono zec-inline-copy">
-              {block.hash}
-              <CopyButton value={block.hash} />
-            </span>
+              <div className="block-header-info">
+                <span className="block-label">{t("block.title")}</span>
+                <span className="block-number">#{block.height.toLocaleString()}</span>
+              </div>
+              {block.nextBlockHash && (
+                <Link
+                  to={`/${networkId}/block/${block.height + 1}`}
+                  className="block-nav-btn"
+                  title={t("block.nextBlock")}
+                >
+                  →
+                </Link>
+              )}
+              <span className="block-header-divider">•</span>
+              <span className="block-header-timestamp">
+                <span className="block-timestamp-age">{timeAgo(block.time)}</span>
+                <span className="block-timestamp-full">({formatTimestamp(block.time)})</span>
+              </span>
+            </div>
+            {block.confirmations !== undefined && (
+              <span className="block-status-badge block-status-finalized">
+                {confirmationsAtLeast
+                  ? t("block.confirmationsAtLeast", { count: block.confirmations })
+                  : t("block.confirmations", { count: block.confirmations })}
+                {showTooltips && (
+                  <HelperTooltip
+                    content={tTooltips("zcash.block.confirmations")}
+                    placement="left"
+                  />
+                )}
+              </span>
+            )}
           </div>
 
-          <div className="btc-tx-details-grid">
-            <div className="btc-tx-details-column">
-              {rewardZat > 0 && (
+          <div className="tx-details">
+            <div className="tx-row">
+              <FieldLabel
+                label={t("block.hash")}
+                tooltipKey="zcash.block.hash"
+                visibleFor={["beginner"]}
+              />
+              <span className="tx-value tx-mono zec-inline-copy">
+                {block.hash}
+                <CopyButton value={block.hash} />
+              </span>
+            </div>
+
+            <div className="btc-tx-details-grid">
+              <div className="btc-tx-details-column">
+                {rewardZat > 0 && (
+                  <div className="tx-row">
+                    <FieldLabel
+                      label={t("block.reward")}
+                      tooltipKey="zcash.block.reward"
+                      visibleFor={["beginner", "intermediate"]}
+                    />
+                    <span className="tx-value tx-value-highlight">
+                      {formatZEC(rewardZat, currency)}
+                      {coinbaseShieldedZat > 0 && (
+                        <span className="text-muted">
+                          {" "}
+                          {t("block.shieldedReward", {
+                            amount: formatZEC(coinbaseShieldedZat, currency),
+                          })}
+                        </span>
+                      )}
+                    </span>
+                  </div>
+                )}
+
                 <div className="tx-row">
                   <FieldLabel
-                    label={t("block.reward")}
-                    tooltipKey="zcash.block.reward"
-                    visibleFor={["beginner", "intermediate"]}
+                    label={t("block.transactions")}
+                    tooltipKey="zcash.block.transactions"
+                    visibleFor={["beginner"]}
                   />
-                  <span className="tx-value tx-value-highlight">
-                    {formatZEC(rewardZat, currency)}
-                    {coinbaseShieldedZat > 0 && (
-                      <span className="text-muted">
-                        {" "}
-                        {t("block.shieldedReward", {
-                          amount: formatZEC(coinbaseShieldedZat, currency),
-                        })}
+                  <span className="tx-value">
+                    {t("block.txCount", { count: block.nTx })}
+                    {poolCounts.length > 0 && (
+                      <span className="zec-pool-chips">
+                        {poolCounts.map(({ pool, count }) => (
+                          <ZcashPoolChip key={pool} pool={pool}>
+                            {t("block.poolTxCount", {
+                              count,
+                              pool: t(VALUE_POOL_LABEL_KEYS[pool]),
+                            })}
+                          </ZcashPoolChip>
+                        ))}
                       </span>
                     )}
                   </span>
                 </div>
-              )}
 
-              <div className="tx-row">
-                <FieldLabel
-                  label={t("block.transactions")}
-                  tooltipKey="zcash.block.transactions"
-                  visibleFor={["beginner"]}
-                />
-                <span className="tx-value">
-                  {t("block.txCount", { count: block.nTx })}
-                  {poolCounts.length > 0 && (
-                    <span className="zec-pool-chips">
-                      {poolCounts.map(({ pool, count }) => (
-                        <ZcashPoolChip key={pool} pool={pool}>
-                          {t("block.poolTxCount", { count, pool: t(VALUE_POOL_LABEL_KEYS[pool]) })}
-                        </ZcashPoolChip>
-                      ))}
+                {block.transparentOutputZat !== undefined && (
+                  <div className="tx-row">
+                    <FieldLabel
+                      label={t("block.transparentOutput")}
+                      tooltipKey="zcash.block.transparentOutput"
+                      visibleFor={["beginner", "intermediate"]}
+                    />
+                    <span className="tx-value">
+                      {formatZEC(block.transparentOutputZat, currency)}
                     </span>
-                  )}
-                </span>
+                  </div>
+                )}
               </div>
 
-              {block.transparentOutputZat !== undefined && (
+              <div className="btc-tx-details-column">
                 <div className="tx-row">
                   <FieldLabel
-                    label={t("block.transparentOutput")}
-                    tooltipKey="zcash.block.transparentOutput"
+                    label={t("block.difficulty")}
+                    tooltipKey="zcash.block.difficulty"
                     visibleFor={["beginner", "intermediate"]}
                   />
-                  <span className="tx-value">
-                    {formatZEC(block.transparentOutputZat, currency)}
-                  </span>
+                  <span className="tx-value">{formatDifficulty(block.difficulty)}</span>
                 </div>
-              )}
+
+                <div className="tx-row">
+                  <FieldLabel
+                    label={t("block.size")}
+                    tooltipKey="zcash.block.size"
+                    visibleFor={["beginner"]}
+                  />
+                  <span className="tx-value">{formatSize(block.size)}</span>
+                </div>
+
+                {block.previousBlockHash && (
+                  <div className="tx-row">
+                    <FieldLabel
+                      label={t("block.previousBlockLabel")}
+                      tooltipKey="zcash.block.previousBlock"
+                      visibleFor={["beginner"]}
+                    />
+                    <span className="tx-value tx-mono">
+                      <Link to={`/${networkId}/block/${block.height - 1}`} className="link-accent">
+                        {truncateBlockHash(block.previousBlockHash)}
+                      </Link>
+                    </span>
+                  </div>
+                )}
+
+                {block.nextBlockHash && (
+                  <div className="tx-row">
+                    <FieldLabel
+                      label={t("block.nextBlockLabel")}
+                      tooltipKey="zcash.block.nextBlock"
+                      visibleFor={["beginner"]}
+                    />
+                    <span className="tx-value tx-mono">
+                      <Link to={`/${networkId}/block/${block.height + 1}`} className="link-accent">
+                        {truncateBlockHash(block.nextBlockHash)}
+                      </Link>
+                    </span>
+                  </div>
+                )}
+              </div>
             </div>
 
-            <div className="btc-tx-details-column">
+            {coinbaseOutputs.length > 0 && (
               <div className="tx-row">
                 <FieldLabel
-                  label={t("block.difficulty")}
-                  tooltipKey="zcash.block.difficulty"
+                  label={t("block.coinbaseOutputs")}
+                  tooltipKey="zcash.block.coinbaseOutputs"
                   visibleFor={["beginner", "intermediate"]}
                 />
-                <span className="tx-value">{formatDifficulty(block.difficulty)}</span>
+                <ul className="tx-value zec-coinbase-outputs">
+                  {coinbaseOutputs.map((output, index) => (
+                    // biome-ignore lint/suspicious/noArrayIndexKey: outputs keep their on-chain order
+                    <li key={index}>
+                      {output.address ? (
+                        <Link
+                          to={`/${networkId}/address/${output.address}`}
+                          className="link-accent tx-mono"
+                        >
+                          {output.address}
+                        </Link>
+                      ) : (
+                        <span className="text-muted">{t("block.noAddress")}</span>
+                      )}
+                      <span className="zec-coinbase-value">
+                        {formatZEC(output.valueZat, currency)}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
               </div>
+            )}
 
-              <div className="tx-row">
-                <FieldLabel
-                  label={t("block.size")}
-                  tooltipKey="zcash.block.size"
-                  visibleFor={["beginner"]}
-                />
-                <span className="tx-value">{formatSize(block.size)}</span>
-              </div>
+            <div className="tx-row tx-row-vertical">
+              <button
+                type="button"
+                className="more-details-toggle"
+                onClick={() => setShowMoreDetails(!showMoreDetails)}
+              >
+                {showMoreDetails ? t("block.hideDetails") : t("block.showDetails")}
+              </button>
 
-              {block.previousBlockHash && (
-                <div className="tx-row">
-                  <FieldLabel
-                    label={t("block.previousBlockLabel")}
-                    tooltipKey="zcash.block.previousBlock"
-                    visibleFor={["beginner"]}
-                  />
-                  <span className="tx-value tx-mono">
-                    <Link to={`/${networkId}/block/${block.height - 1}`} className="link-accent">
-                      {truncateBlockHash(block.previousBlockHash)}
-                    </Link>
-                  </span>
-                </div>
-              )}
-
-              {block.nextBlockHash && (
-                <div className="tx-row">
-                  <FieldLabel
-                    label={t("block.nextBlockLabel")}
-                    tooltipKey="zcash.block.nextBlock"
-                    visibleFor={["beginner"]}
-                  />
-                  <span className="tx-value tx-mono">
-                    <Link to={`/${networkId}/block/${block.height + 1}`} className="link-accent">
-                      {truncateBlockHash(block.nextBlockHash)}
-                    </Link>
-                  </span>
+              {showMoreDetails && (
+                <div className="more-details-content">
+                  <DetailRow label={t("block.merkleRoot")} tooltipKey="zcash.block.merkleRoot" mono>
+                    {block.merkleRoot}
+                  </DetailRow>
+                  {block.blockCommitments && (
+                    <DetailRow
+                      label={t("block.blockCommitments")}
+                      tooltipKey="zcash.block.blockCommitments"
+                      mono
+                    >
+                      {block.blockCommitments}
+                    </DetailRow>
+                  )}
+                  {block.finalSaplingRoot && (
+                    <DetailRow
+                      label={t("block.finalSaplingRoot")}
+                      tooltipKey="zcash.block.finalSaplingRoot"
+                      mono
+                    >
+                      {block.finalSaplingRoot}
+                    </DetailRow>
+                  )}
+                  {block.finalOrchardRoot && (
+                    <DetailRow
+                      label={t("block.finalOrchardRoot")}
+                      tooltipKey="zcash.block.finalOrchardRoot"
+                      mono
+                    >
+                      {block.finalOrchardRoot}
+                    </DetailRow>
+                  )}
+                  <DetailRow label={t("block.version")} tooltipKey="zcash.block.version">
+                    {block.version}
+                  </DetailRow>
+                  <DetailRow label={t("block.bits")} tooltipKey="zcash.block.bits" mono>
+                    {block.bits}
+                  </DetailRow>
+                  <DetailRow label={t("block.nonce")} tooltipKey="zcash.block.nonce" mono>
+                    {block.nonce}
+                  </DetailRow>
+                  {block.solution && (
+                    <DetailRow label={t("block.solution")} tooltipKey="zcash.block.solution" mono>
+                      <LongString value={block.solution} start={32} end={32} />
+                    </DetailRow>
+                  )}
+                  {treeSizes.length > 0 && (
+                    <DetailRow label={t("block.trees")} tooltipKey="zcash.block.trees">
+                      {treeSizes.join(" · ")}
+                    </DetailRow>
+                  )}
                 </div>
               )}
             </div>
-          </div>
 
-          {coinbaseOutputs.length > 0 && (
-            <div className="tx-row">
-              <FieldLabel
-                label={t("block.coinbaseOutputs")}
-                tooltipKey="zcash.block.coinbaseOutputs"
-                visibleFor={["beginner", "intermediate"]}
-              />
-              <ul className="tx-value zec-coinbase-outputs">
-                {coinbaseOutputs.map((output, index) => (
-                  // biome-ignore lint/suspicious/noArrayIndexKey: outputs keep their on-chain order
-                  <li key={index}>
-                    {output.address ? (
-                      <Link
-                        to={`/${networkId}/address/${output.address}`}
-                        className="link-accent tx-mono"
-                      >
-                        {output.address}
-                      </Link>
-                    ) : (
-                      <span className="text-muted">{t("block.noAddress")}</span>
-                    )}
-                    <span className="zec-coinbase-value">
-                      {formatZEC(output.valueZat, currency)}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
+            {txids.length > 0 && (
+              <div className="tx-row tx-row-vertical">
+                <button
+                  type="button"
+                  className="more-details-toggle"
+                  onClick={() => setShowTransactions(!showTransactions)}
+                >
+                  {showTransactions
+                    ? t("block.hideTransactions", { count: txids.length })
+                    : t("block.showTransactions", { count: txids.length })}
+                </button>
 
-          <div className="tx-row tx-row-vertical">
-            <button
-              type="button"
-              className="more-details-toggle"
-              onClick={() => setShowMoreDetails(!showMoreDetails)}
-            >
-              {showMoreDetails ? t("block.hideDetails") : t("block.showDetails")}
-            </button>
-
-            {showMoreDetails && (
-              <div className="more-details-content">
-                <DetailRow label={t("block.merkleRoot")} tooltipKey="zcash.block.merkleRoot" mono>
-                  {block.merkleRoot}
-                </DetailRow>
-                {block.blockCommitments && (
-                  <DetailRow
-                    label={t("block.blockCommitments")}
-                    tooltipKey="zcash.block.blockCommitments"
-                    mono
-                  >
-                    {block.blockCommitments}
-                  </DetailRow>
-                )}
-                {block.finalSaplingRoot && (
-                  <DetailRow
-                    label={t("block.finalSaplingRoot")}
-                    tooltipKey="zcash.block.finalSaplingRoot"
-                    mono
-                  >
-                    {block.finalSaplingRoot}
-                  </DetailRow>
-                )}
-                {block.finalOrchardRoot && (
-                  <DetailRow
-                    label={t("block.finalOrchardRoot")}
-                    tooltipKey="zcash.block.finalOrchardRoot"
-                    mono
-                  >
-                    {block.finalOrchardRoot}
-                  </DetailRow>
-                )}
-                <DetailRow label={t("block.version")} tooltipKey="zcash.block.version">
-                  {block.version}
-                </DetailRow>
-                <DetailRow label={t("block.bits")} tooltipKey="zcash.block.bits" mono>
-                  {block.bits}
-                </DetailRow>
-                <DetailRow label={t("block.nonce")} tooltipKey="zcash.block.nonce" mono>
-                  {block.nonce}
-                </DetailRow>
-                {block.solution && (
-                  <DetailRow label={t("block.solution")} tooltipKey="zcash.block.solution" mono>
-                    <LongString value={block.solution} start={32} end={32} />
-                  </DetailRow>
-                )}
-                {treeSizes.length > 0 && (
-                  <DetailRow label={t("block.trees")} tooltipKey="zcash.block.trees">
-                    {treeSizes.join(" · ")}
-                  </DetailRow>
+                {showTransactions && (
+                  <div className="more-details-content">
+                    <div className="btc-block-txs">
+                      {txids.map((txid, index) => (
+                        <div key={txid} className="btc-block-tx-item">
+                          <span className="btc-block-tx-index">{index}</span>
+                          <span className="btc-block-tx-hash tx-mono">
+                            <Link to={`/${networkId}/tx/${txid}`} className="link-accent">
+                              {txid}
+                            </Link>
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 )}
               </div>
             )}
           </div>
 
-          {txids.length > 0 && (
-            <div className="tx-row tx-row-vertical">
-              <button
-                type="button"
-                className="more-details-toggle"
-                onClick={() => setShowTransactions(!showTransactions)}
-              >
-                {showTransactions
-                  ? t("block.hideTransactions", { count: txids.length })
-                  : t("block.showTransactions", { count: txids.length })}
-              </button>
-
-              {showTransactions && (
-                <div className="more-details-content">
-                  <div className="btc-block-txs">
-                    {txids.map((txid, index) => (
-                      <div key={txid} className="btc-block-tx-item">
-                        <span className="btc-block-tx-index">{index}</span>
-                        <span className="btc-block-tx-hash tx-mono">
-                          <Link to={`/${networkId}/tx/${txid}`} className="link-accent">
-                            {txid}
-                          </Link>
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
+          {block.valuePools && block.valuePools.length > 0 && (
+            <ZcashValuePools
+              valuePools={block.valuePools}
+              chainSupplyZat={block.chainSupplyZat}
+              currency={currency}
+              title={t("block.valuePoolsTitle")}
+            />
           )}
         </div>
-
-        {block.valuePools && block.valuePools.length > 0 && (
-          <ZcashValuePools
-            valuePools={block.valuePools}
-            chainSupplyZat={block.chainSupplyZat}
-            currency={currency}
-            title={t("block.valuePoolsTitle")}
-          />
-        )}
+        <AIAnalysisPanel
+          analysisType="zcash_block"
+          context={aiContext}
+          networkName={network?.name ?? "Zcash"}
+          networkCurrency={currency}
+          cacheKey={`openscan_ai_zcash_block_${networkId}_${block.hash}`}
+        />
       </div>
     );
   },

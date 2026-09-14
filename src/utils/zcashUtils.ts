@@ -99,6 +99,13 @@ export function zecToZat(value: number): number {
 }
 
 /**
+ * Convert integer zatoshis to a ZEC amount
+ */
+export function zatToZec(valueZat: number): number {
+  return valueZat / ZATOSHIS_PER_ZEC;
+}
+
+/**
  * Zebra marks the coinbase input with a `coinbase` field, so check for it directly rather than
  * Bitcoin's "single input without a txid" heuristic (shielded transactions can have no inputs)
  */
