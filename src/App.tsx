@@ -58,6 +58,7 @@ import {
   LazyTxs,
   LazyZcashBlock,
   LazyZcashBlocks,
+  LazyZcashMempool,
   LazyZcashNetwork,
   LazyZcashTx,
   LazyZcashTxs,
@@ -170,12 +171,16 @@ function AppContent() {
               <Route path="zec/block/:filter" element={<LazyZcashBlock />} />
               <Route path="zec/txs" element={<LazyZcashTxs />} />
               <Route path="zec/tx/:filter" element={<LazyZcashTx />} />
+              <Route path="zec/mempool" element={<LazyZcashMempool />} />
+              <Route path="zec/mempool/:filter" element={<LazyZcashTx />} />
               {/* Zcash Testnet routes */}
               <Route path="tzec" element={<LazyZcashNetwork />} />
               <Route path="tzec/blocks" element={<LazyZcashBlocks />} />
               <Route path="tzec/block/:filter" element={<LazyZcashBlock />} />
               <Route path="tzec/txs" element={<LazyZcashTxs />} />
               <Route path="tzec/tx/:filter" element={<LazyZcashTx />} />
+              <Route path="tzec/mempool" element={<LazyZcashMempool />} />
+              <Route path="tzec/mempool/:filter" element={<LazyZcashTx />} />
               {/* Solana Mainnet routes (must come before :networkId catch-all) */}
               <Route path="sol" element={<LazySolanaNetwork />} />
               <Route path="sol/slots" element={<LazySolanaSlots />} />
