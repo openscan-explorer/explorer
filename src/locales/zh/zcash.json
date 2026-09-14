@@ -1,0 +1,50 @@
+{
+  "dashboard": {
+    "blockHeight": "区块高度",
+    "difficulty": "难度: {{value}}",
+    "mempool": "内存池",
+    "mempoolTxs": "{{count}} 笔交易",
+    "chainSupply": "总供应量",
+    "shieldedShare": "{{percent}}% 已屏蔽",
+    "loadError": "无法从 RPC 端点加载数据: {{message}}",
+    "rateLimited": "RPC 端点正在限制请求。数据会自动刷新。"
+  },
+  "valuePools": {
+    "title": "价值池",
+    "barLabel": "各价值池持有的总供应量比例",
+    "pools": {
+      "transparent": "透明",
+      "sprout": "Sprout",
+      "sapling": "Sapling",
+      "orchard": "Orchard",
+      "lockbox": "锁箱",
+      "ironwood": "Ironwood"
+    }
+  },
+  "blocks": {
+    "title": "最新区块",
+    "viewAll": "查看全部",
+    "txCount": "{{count}} 笔交易",
+    "noBlocks": "未找到区块"
+  },
+  "transactions": {
+    "title": "最新交易",
+    "viewAll": "查看全部",
+    "noTransactions": "未找到交易",
+    "shieldedValue": "已屏蔽",
+    "kinds": {
+      "coinbase": "Coinbase",
+      "transparent": "透明",
+      "shielding": "屏蔽",
+      "deshielding": "解除屏蔽",
+      "shielded": "完全屏蔽",
+      "mixed": "混合"
+    }
+  },
+  "common": {
+    "secondsAgo": "{{count}}秒前",
+    "minutesAgo": "{{count}}分钟前",
+    "hoursAgo": "{{count}}小时前",
+    "daysAgo": "{{count}}天前"
+  }
+}

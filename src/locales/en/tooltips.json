@@ -151,6 +151,18 @@
     "inputsColumn": "Previous transaction outputs being spent. Each input references a UTXO (Unspent Transaction Output).",
     "outputsColumn": "New outputs created by this transaction. Each output locks BTC to a recipient address."
   },
+  "zcash": {
+    "valuePools": "Balances held in each of Zcash's value pools. Transparent funds are public, like Bitcoin; shielded pools (Sprout, Sapling, Orchard, Ironwood) hide amounts and parties.",
+    "chainSupply": "Total ZEC in circulation across all value pools.",
+    "pools": {
+      "transparent": "Public UTXOs with visible addresses and amounts, like Bitcoin.",
+      "sprout": "The original shielded pool from Zcash's 2016 launch. Deprecated: funds can only move out.",
+      "sapling": "Shielded pool introduced in 2018 with fast, lightweight proofs.",
+      "orchard": "Shielded pool introduced with NU5 in 2022, using Halo 2 proofs that need no trusted setup.",
+      "lockbox": "Deferred development fund: part of every block reward since NU6, held by the protocol until its use is decided.",
+      "ironwood": "Shielded pool introduced with the NU6.3 (Ironwood) network upgrade."
+    }
+  },
   "network": {
     "gasPrice": "Current cost per unit of gas on this network.",
     "blockNumber": "The most recently mined block number on this network.",

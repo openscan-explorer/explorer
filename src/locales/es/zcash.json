@@ -1,0 +1,50 @@
+{
+  "dashboard": {
+    "blockHeight": "Altura de bloque",
+    "difficulty": "Dificultad: {{value}}",
+    "mempool": "Mempool",
+    "mempoolTxs": "{{count}} txs",
+    "chainSupply": "Suministro total",
+    "shieldedShare": "{{percent}}% blindado",
+    "loadError": "No se pudieron cargar datos del endpoint RPC: {{message}}",
+    "rateLimited": "El endpoint RPC está limitando las solicitudes. Los datos se actualizan automáticamente."
+  },
+  "valuePools": {
+    "title": "Pools de valor",
+    "barLabel": "Proporción del suministro total en cada pool de valor",
+    "pools": {
+      "transparent": "Transparente",
+      "sprout": "Sprout",
+      "sapling": "Sapling",
+      "orchard": "Orchard",
+      "lockbox": "Lockbox",
+      "ironwood": "Ironwood"
+    }
+  },
+  "blocks": {
+    "title": "Últimos bloques",
+    "viewAll": "Ver todos",
+    "txCount": "{{count}} txs",
+    "noBlocks": "No se encontraron bloques"
+  },
+  "transactions": {
+    "title": "Últimas transacciones",
+    "viewAll": "Ver todas",
+    "noTransactions": "No se encontraron transacciones",
+    "shieldedValue": "Blindado",
+    "kinds": {
+      "coinbase": "Coinbase",
+      "transparent": "Transparente",
+      "shielding": "Blindaje",
+      "deshielding": "Desblindaje",
+      "shielded": "Totalmente blindada",
+      "mixed": "Mixta"
+    }
+  },
+  "common": {
+    "secondsAgo": "hace {{count}} s",
+    "minutesAgo": "hace {{count}} min",
+    "hoursAgo": "hace {{count}} h",
+    "daysAgo": "hace {{count}} d"
+  }
+}

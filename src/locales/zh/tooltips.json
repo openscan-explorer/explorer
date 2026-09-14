@@ -151,6 +151,18 @@
     "inputsColumn": "正在花费的先前交易输出。每个输入引用一个UTXO（未花费交易输出）。",
     "outputsColumn": "此交易创建的新输出。每个输出将BTC锁定到接收地址。"
   },
+  "zcash": {
+    "valuePools": "Zcash 各价值池中的余额。透明资金与比特币一样公开可见；屏蔽池（Sprout、Sapling、Orchard、Ironwood）会隐藏金额和参与方。",
+    "chainSupply": "所有价值池中流通的 ZEC 总量。",
+    "pools": {
+      "transparent": "地址和金额公开可见的 UTXO，与比特币相同。",
+      "sprout": "Zcash 2016 年上线时的初代屏蔽池。已弃用，资金只能转出。",
+      "sapling": "2018 年引入的屏蔽池，证明快速且轻量。",
+      "orchard": "随 2022 年 NU5 升级引入的屏蔽池，使用无需可信设置的 Halo 2 证明。",
+      "lockbox": "递延开发基金：自 NU6 起每个区块奖励的一部分，由协议保管，直至决定其用途。",
+      "ironwood": "随 NU6.3（Ironwood）网络升级引入的屏蔽池。"
+    }
+  },
   "network": {
     "gasPrice": "此网络每单位Gas的当前成本。",
     "blockNumber": "此网络上最近挖出的区块号。",

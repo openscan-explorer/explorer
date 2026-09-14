@@ -14,6 +14,7 @@ import enTransaction from "./locales/en/transaction.json";
 import enTokenDetails from "./locales/en/tokenDetails.json";
 import enRpcs from "./locales/en/rpcs.json";
 import enTooltips from "./locales/en/tooltips.json";
+import enZcash from "./locales/en/zcash.json";
 
 import esAddress from "./locales/es/address.json";
 import esBlock from "./locales/es/block.json";
@@ -27,6 +28,7 @@ import esTransaction from "./locales/es/transaction.json";
 import esTokenDetails from "./locales/es/tokenDetails.json";
 import esRpcs from "./locales/es/rpcs.json";
 import esTooltips from "./locales/es/tooltips.json";
+import esZcash from "./locales/es/zcash.json";
 
 import zhAddress from "./locales/zh/address.json";
 import zhBlock from "./locales/zh/block.json";
@@ -39,6 +41,7 @@ import zhSolana from "./locales/zh/solana.json";
 import zhTransaction from "./locales/zh/transaction.json";
 import zhTokenDetails from "./locales/zh/tokenDetails.json";
 import zhTooltips from "./locales/zh/tooltips.json";
+import zhZcash from "./locales/zh/zcash.json";
 
 import jaAddress from "./locales/ja/address.json";
 import jaBlock from "./locales/ja/block.json";
@@ -51,6 +54,7 @@ import jaSolana from "./locales/ja/solana.json";
 import jaTransaction from "./locales/ja/transaction.json";
 import jaTokenDetails from "./locales/ja/tokenDetails.json";
 import jaTooltips from "./locales/ja/tooltips.json";
+import jaZcash from "./locales/ja/zcash.json";
 
 import ptBRAddress from "./locales/pt-BR/address.json";
 import ptBRBlock from "./locales/pt-BR/block.json";
@@ -63,6 +67,7 @@ import ptBRSolana from "./locales/pt-BR/solana.json";
 import ptBRTransaction from "./locales/pt-BR/transaction.json";
 import ptBRTokenDetails from "./locales/pt-BR/tokenDetails.json";
 import ptBRTooltips from "./locales/pt-BR/tooltips.json";
+import ptBRZcash from "./locales/pt-BR/zcash.json";
 
 export const SUPPORTED_LANGUAGES = [
   { code: "en", name: "English" },
@@ -90,6 +95,7 @@ i18n
         rpcs: enRpcs,
         tooltips: enTooltips,
         solana: enSolana,
+        zcash: enZcash,
       },
       es: {
         common: esCommon,
@@ -104,6 +110,7 @@ i18n
         rpcs: esRpcs,
         tooltips: esTooltips,
         solana: esSolana,
+        zcash: esZcash,
       },
       zh: {
         common: zhCommon,
@@ -117,6 +124,7 @@ i18n
         tokenDetails: zhTokenDetails,
         tooltips: zhTooltips,
         solana: zhSolana,
+        zcash: zhZcash,
       },
       ja: {
         common: jaCommon,
@@ -130,6 +138,7 @@ i18n
         tokenDetails: jaTokenDetails,
         tooltips: jaTooltips,
         solana: jaSolana,
+        zcash: jaZcash,
       },
       "pt-BR": {
         common: ptBRCommon,
@@ -143,6 +152,7 @@ i18n
         tokenDetails: ptBRTokenDetails,
         tooltips: ptBRTooltips,
         solana: ptBRSolana,
+        zcash: ptBRZcash,
       },
     },
     fallbackLng: "en",
@@ -159,6 +169,7 @@ i18n
       "rpcs",
       "tooltips",
       "solana",
+      "zcash",
     ],
     interpolation: {
       escapeValue: false,
