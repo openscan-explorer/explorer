@@ -56,6 +56,8 @@ import {
   LazyTokenDetails,
   LazyTx,
   LazyTxs,
+  LazyZcashBlock,
+  LazyZcashBlocks,
   LazyZcashNetwork,
   preloadAllRoutes,
 } from "./components/LazyComponents";
@@ -162,8 +164,12 @@ function AppContent() {
               <Route path="tbtc/mempool/:filter" element={<LazyBitcoinTx />} />
               {/* Zcash Mainnet routes (must come before :networkId catch-all) */}
               <Route path="zec" element={<LazyZcashNetwork />} />
+              <Route path="zec/blocks" element={<LazyZcashBlocks />} />
+              <Route path="zec/block/:filter" element={<LazyZcashBlock />} />
               {/* Zcash Testnet routes */}
               <Route path="tzec" element={<LazyZcashNetwork />} />
+              <Route path="tzec/blocks" element={<LazyZcashBlocks />} />
+              <Route path="tzec/block/:filter" element={<LazyZcashBlock />} />
               {/* Solana Mainnet routes (must come before :networkId catch-all) */}
               <Route path="sol" element={<LazySolanaNetwork />} />
               <Route path="sol/slots" element={<LazySolanaSlots />} />

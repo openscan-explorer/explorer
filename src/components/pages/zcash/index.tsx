@@ -58,7 +58,11 @@ export default function ZcashNetwork() {
           loading={dashboard.loading}
         />
 
-        <ZcashValuePools stats={dashboard.stats} currency={network.currency} />
+        <ZcashValuePools
+          valuePools={dashboard.stats?.valuePools ?? []}
+          chainSupplyZat={dashboard.stats?.chainSupplyZat}
+          currency={network.currency}
+        />
 
         <div className="dashboard-tables-row">
           <ZcashBlocksTable

@@ -22,6 +22,8 @@ const BitcoinMempoolPage = lazy(() => import("./pages/bitcoin/BitcoinMempoolPage
 
 // Lazy load page components - Zcash
 const ZcashNetwork = lazy(() => import("./pages/zcash"));
+const ZcashBlocksPage = lazy(() => import("./pages/zcash/ZcashBlocksPage"));
+const ZcashBlockPage = lazy(() => import("./pages/zcash/ZcashBlockPage"));
 
 // Lazy load page components - Solana
 const SolanaNetwork = lazy(() => import("./pages/solana"));
@@ -68,6 +70,8 @@ export const LazyBitcoinTxs = withSuspense(BitcoinTransactionsPage);
 export const LazyBitcoinAddress = withSuspense(BitcoinAddressPage);
 export const LazyBitcoinMempool = withSuspense(BitcoinMempoolPage);
 export const LazyZcashNetwork = withSuspense(ZcashNetwork);
+export const LazyZcashBlocks = withSuspense(ZcashBlocksPage);
+export const LazyZcashBlock = withSuspense(ZcashBlockPage);
 export const LazySolanaNetwork = withSuspense(SolanaNetwork);
 export const LazySolanaSlots = withSuspense(SolanaSlotsPage);
 export const LazySolanaSlot = withSuspense(SolanaSlotPage);
@@ -115,6 +119,8 @@ export function preloadAllRoutes() {
   import("./pages/bitcoin/BitcoinMempoolPage");
   // Zcash pages
   import("./pages/zcash");
+  import("./pages/zcash/ZcashBlocksPage");
+  import("./pages/zcash/ZcashBlockPage");
   // Solana pages
   import("./pages/solana");
   import("./pages/solana/SolanaSlotsPage");
