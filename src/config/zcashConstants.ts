@@ -22,3 +22,7 @@ export const BLOCKS_PER_PAGE = 10;
 
 // Transactions list page size (paged client-side within a single block)
 export const TXS_PER_PAGE = 25;
+
+// Mempool page: one verbose getrawmempool call per refresh, paged client-side
+export const MEMPOOL_PAGE_SIZE = 50;
+export const MEMPOOL_REFRESH_MS = 60_000;

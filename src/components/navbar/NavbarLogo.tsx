@@ -3,7 +3,12 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useNetworks } from "../../context/AppContext";
 import { getBaseDomainUrl, getSubdomain, getSubdomainRedirect } from "../../utils/subdomainUtils";
-import { getNetworkUrlPath, isBitcoinNetwork, resolveNetwork } from "../../utils/networkResolver";
+import {
+  getNetworkUrlPath,
+  isBitcoinNetwork,
+  isZcashNetwork,
+  resolveNetwork,
+} from "../../utils/networkResolver";
 import NetworkIcon from "../common/NetworkIcon";
 
 // OpenScan cube SVG component
@@ -183,8 +188,8 @@ export default function NavbarLogo() {
             <span>{t("nav.txs")}</span>
           </Link>
 
-          {/* Mempool link (Bitcoin networks only) */}
-          {isBitcoinNetwork(currentNetwork) && (
+          {/* Mempool link (Bitcoin and Zcash networks) */}
+          {(isBitcoinNetwork(currentNetwork) || isZcashNetwork(currentNetwork)) && (
             <Link
               to={`/${getNetworkUrlPath(currentNetwork)}/mempool`}
               className="navbar-logo-dropdown-item"
