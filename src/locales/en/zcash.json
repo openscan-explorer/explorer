@@ -46,7 +46,20 @@
     "blocks": "Blocks",
     "block": "Block #{{height}}",
     "transactions": "Transactions",
-    "transaction": "{{txid}}"
+    "transaction": "{{txid}}",
+    "mempool": "Mempool"
+  },
+  "mempool": {
+    "title": "{{network}} Mempool",
+    "loading": "Loading mempool...",
+    "summary": "{{count}} pending transactions ({{size}})",
+    "empty": "No pending transactions in the mempool",
+    "txid": "Transaction ID",
+    "age": "Age",
+    "size": "Size",
+    "fee": "Fee",
+    "feeRate": "Fee Rate",
+    "loadError": "Couldn't load the mempool: {{message}}"
   },
   "blocksPage": {
     "title": "{{network}} Blocks",
