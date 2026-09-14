@@ -5,7 +5,7 @@ import { mockJsonRpc, rpcError } from "./rpcMock";
 /** The built-in Zcash RPC defaults are Tatum's gateways, so every Zcash request matches this */
 export const ZCASH_RPC_PATTERN = /zcash-(mainnet|testnet)(-zebrad)?\.gateway\.tatum\.io/;
 
-const T_ADDRESS = "t1KAuVfS2r2hc7RwSh6GTuyfqCGMFEpwkZ2";
+export const T_ADDRESS = "t1KAuVfS2r2hc7RwSh6GTuyfqCGMFEpwkZ2";
 const PREVIOUS_OUTPUT_ZAT = 30_000;
 
 // Synthetic transparent transaction added to the tip block: two inputs, each resolving to a
@@ -88,9 +88,24 @@ const MEMPOOL = {
   ["e3".repeat(32)]: mempoolEntry(372, 0.00025, 10),
 };
 
+// Receivers of the unified address used in tests; its transparent receiver is T_ADDRESS
+const UNIFIED_RECEIVERS = {
+  orchard: `u1${"p".repeat(80)}`,
+  sapling: `zs1${"q".repeat(75)}`,
+  p2pkh: T_ADDRESS,
+};
+
 export interface RecordedRpcCall {
   method: string;
   params: unknown[];
+}
+
+export interface MockZcashOptions {
+  /**
+   * Serve Zebra's address index, as a self-hosted node does. By default the address index and
+   * z_listunifiedreceivers fail with -32601, as they do on hosted gateways.
+   */
+  addressIndex?: boolean;
 }
 
 /** Earlier blocks reuse the tip's header with their own height and hash */
@@ -151,12 +166,20 @@ function pendingTransaction(txid: string) {
   };
 }
 
+/** Tatum's response to a blocked method */
+const methodNotFound = (method: string) => ({
+  error: { code: -32601, message: `Method not found: ${method}` },
+});
+
 /**
  * Serve a Zcash chain whose tip is mainnet block 3,483,400 (plus one synthetic transparent
  * transaction) and record every Zcash RPC call the page makes, including unmocked methods.
  * Unknown transactions and block hashes fail the way Zebra does.
  */
-export async function mockZcashRpc(page: Page): Promise<RecordedRpcCall[]> {
+export async function mockZcashRpc(
+  page: Page,
+  options: MockZcashOptions = {},
+): Promise<RecordedRpcCall[]> {
   const calls: RecordedRpcCall[] = [];
   page.on("request", (request) => {
     if (request.method() !== "POST" || !ZCASH_RPC_PATTERN.test(request.url())) return;
@@ -167,6 +190,32 @@ export async function mockZcashRpc(page: Page): Promise<RecordedRpcCall[]> {
       // Not a JSON-RPC body
     }
   });
+
+  const addressIndexHandlers = options.addressIndex
+    ? {
+        getaddressbalance: { result: { balance: 9_514_810, received: 19_029_620 } },
+        getaddressutxos: {
+          result: [
+            {
+              address: T_ADDRESS,
+              txid: TRANSPARENT_TX.txid,
+              outputIndex: 0,
+              script: "76a914",
+              satoshis: 50_000,
+              height: ZCASH.tipHeight,
+            },
+          ],
+        },
+        // Chain order, oldest first
+        getaddresstxids: { result: ["a1".repeat(32), TRANSPARENT_TX.txid] },
+        z_listunifiedreceivers: { result: UNIFIED_RECEIVERS },
+      }
+    : {
+        getaddressbalance: methodNotFound("getaddressbalance"),
+        getaddressutxos: methodNotFound("getaddressutxos"),
+        getaddresstxids: methodNotFound("getaddresstxids"),
+        z_listunifiedreceivers: methodNotFound("z_listunifiedreceivers"),
+      };
 
   await mockJsonRpc(page, ZCASH_RPC_PATTERN, {
     getblockcount: { result: ZCASH.tipHeight },
@@ -216,6 +265,7 @@ export async function mockZcashRpc(page: Page): Promise<RecordedRpcCall[]> {
       const [verbose] = params as [boolean | undefined];
       return verbose ? MEMPOOL : Object.keys(MEMPOOL);
     },
+    ...addressIndexHandlers,
   });
 
   return calls;
