@@ -1,18 +1,10 @@
 import type React from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
-import type { ZcashTransaction, ZcashTxKind } from "../../../types";
+import type { ZcashTransaction } from "../../../types";
 import { formatZEC, truncateHash } from "../../../utils/zcashFormatters";
 import { classifyTransaction, getTransparentOutputZat } from "../../../utils/zcashUtils";
-
-const KIND_LABEL_KEYS = {
-  coinbase: "transactions.kinds.coinbase",
-  transparent: "transactions.kinds.transparent",
-  shielding: "transactions.kinds.shielding",
-  deshielding: "transactions.kinds.deshielding",
-  shielded: "transactions.kinds.shielded",
-  mixed: "transactions.kinds.mixed",
-} as const satisfies Record<ZcashTxKind, string>;
+import { TX_KIND_LABEL_KEYS } from "./labels";
 
 interface ZcashTransactionsTableProps {
   transactions: ZcashTransaction[];
@@ -87,7 +79,7 @@ const ZcashTransactionsTable: React.FC<ZcashTransactionsTableProps> = ({
                 </div>
                 <div className="dashboard-tx-details">
                   <span className={`zec-kind-badge zec-kind-${kind}`}>
-                    {t(KIND_LABEL_KEYS[kind])}
+                    {t(TX_KIND_LABEL_KEYS[kind])}
                   </span>
                 </div>
                 <div className="dashboard-tx-value">

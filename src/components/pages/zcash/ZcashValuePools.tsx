@@ -4,15 +4,7 @@ import { useSettings } from "../../../context/SettingsContext";
 import type { ZcashValuePool, ZcashValuePoolId } from "../../../types";
 import { formatZECCompact } from "../../../utils/zcashFormatters";
 import HelperTooltip from "../../common/HelperTooltip";
-
-const POOL_LABEL_KEYS = {
-  transparent: "valuePools.pools.transparent",
-  sprout: "valuePools.pools.sprout",
-  sapling: "valuePools.pools.sapling",
-  orchard: "valuePools.pools.orchard",
-  lockbox: "valuePools.pools.lockbox",
-  ironwood: "valuePools.pools.ironwood",
-} as const satisfies Record<ZcashValuePoolId, string>;
+import { VALUE_POOL_LABEL_KEYS } from "./labels";
 
 const POOL_TOOLTIP_KEYS = {
   transparent: "zcash.pools.transparent",
@@ -67,7 +59,7 @@ const ZcashValuePools: React.FC<ZcashValuePoolsProps> = ({
         {valuePools.map((pool) => (
           <li key={pool.id} className="zec-pool-item">
             <span className={`zec-pool-swatch zec-pool-${pool.id}`} />
-            <span className="zec-pool-name">{t(POOL_LABEL_KEYS[pool.id])}</span>
+            <span className="zec-pool-name">{t(VALUE_POOL_LABEL_KEYS[pool.id])}</span>
             {showTooltips && <HelperTooltip content={tTooltips(POOL_TOOLTIP_KEYS[pool.id])} />}
             <span className="zec-pool-value">{formatZECCompact(pool.valueZat, currency)}</span>
             <span className="zec-pool-share">{sharePercent(pool.valueZat).toFixed(1)}%</span>

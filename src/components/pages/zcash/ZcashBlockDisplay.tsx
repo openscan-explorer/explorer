@@ -15,17 +15,11 @@ import {
 import CopyButton from "../../common/CopyButton";
 import FieldLabel from "../../common/FieldLabel";
 import HelperTooltip from "../../common/HelperTooltip";
+import { VALUE_POOL_LABEL_KEYS } from "./labels";
 import ZcashValuePools from "./ZcashValuePools";
 
 const SHIELDED_POOLS: ZcashShieldedPool[] = ["sprout", "sapling", "orchard", "ironwood"];
 const TREE_POOLS = ["sapling", "orchard", "ironwood"] as const;
-
-const POOL_NAME_KEYS = {
-  sprout: "valuePools.pools.sprout",
-  sapling: "valuePools.pools.sapling",
-  orchard: "valuePools.pools.orchard",
-  ironwood: "valuePools.pools.ironwood",
-} as const satisfies Record<ZcashShieldedPool, string>;
 
 interface DetailRowProps {
   label: string;
@@ -71,7 +65,7 @@ const ZcashBlockDisplay: React.FC<ZcashBlockDisplayProps> = React.memo(
       const size = block.trees?.[pool];
       return size === undefined
         ? []
-        : [t("block.treeSize", { pool: t(POOL_NAME_KEYS[pool]), size: formatNumber(size) })];
+        : [t("block.treeSize", { pool: t(VALUE_POOL_LABEL_KEYS[pool]), size: formatNumber(size) })];
     });
 
     return (
@@ -156,7 +150,10 @@ const ZcashBlockDisplay: React.FC<ZcashBlockDisplayProps> = React.memo(
                     <span className="zec-pool-chips">
                       {poolCounts.map(({ pool, count }) => (
                         <span key={pool} className={`zec-pool-chip zec-pool-${pool}`}>
-                          {t("block.poolTxCount", { count, pool: t(POOL_NAME_KEYS[pool]) })}
+                          {t("block.poolTxCount", {
+                            count,
+                            pool: t(VALUE_POOL_LABEL_KEYS[pool]),
+                          })}
                         </span>
                       ))}
                     </span>
