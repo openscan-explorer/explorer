@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { CACHE_MIN_CONFIRMATIONS, LOADER_TIMEOUT_MS } from "../../../config/zcashConstants";
 import { useDataService } from "../../../hooks/useDataService";
 import { usePersistentCache } from "../../../hooks/usePersistentCache";
@@ -12,9 +12,12 @@ import Breadcrumb from "../../common/Breadcrumb";
 import LoaderWithTimeout from "../../common/LoaderWithTimeout";
 import ZcashTransactionDisplay, { type InputResolution } from "./ZcashTransactionDisplay";
 
+const HASH_PATTERN = /^[0-9a-f]{64}$/i;
+
 export default function ZcashTransactionPage() {
   const { t } = useTranslation("zcash");
   const { filter: txid } = useParams<{ filter?: string }>();
+  const navigate = useNavigate();
   const {
     slug: networkSlug,
     label: networkLabel,
@@ -69,7 +72,18 @@ export default function ZcashTransactionPage() {
         setTransaction(data);
         cacheIfFinal(data);
       } catch (err) {
-        if (!signal.aborted) setError(err instanceof Error ? err.message : String(err));
+        if (signal.aborted) return;
+        // Search sends every 64-character hash here, and Zcash block hashes look like txids,
+        // so a hash that matches no transaction may still be a block
+        const block = HASH_PATTERN.test(txid)
+          ? await adapter.getBlock(txid, { signal }).catch(() => null)
+          : null;
+        if (signal.aborted) return;
+        if (block) {
+          navigate(`/${networkSlug}/block/${block.data.block.hash}`, { replace: true });
+          return;
+        }
+        setError(err instanceof Error ? err.message : String(err));
       } finally {
         if (!signal.aborted) setLoading(false);
       }
@@ -80,7 +94,16 @@ export default function ZcashTransactionPage() {
       controller.abort();
       resolveControllerRef.current?.abort();
     };
-  }, [dataService, txid, getCached, cacheNetworkId, cacheIfFinal, attempt]);
+  }, [
+    dataService,
+    txid,
+    getCached,
+    cacheNetworkId,
+    cacheIfFinal,
+    attempt,
+    navigate,
+    networkSlug,
+  ]);
 
   // Zebra omits transparent input values, so the fee is only resolved when the user asks.
   // A failed run keeps what it resolved, so asking again resumes from there.
