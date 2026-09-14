@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-01-30",
+  "updatedAt": "2026-09-14",
   "networks": [
     {
       "type": "evm",
@@ -522,6 +522,59 @@
           "name": "Faucet",
           "url": "https://mempool.space/testnet4/faucet",
           "description": "Get testnet BTC"
+        }
+      ]
+    },
+    {
+      "type": "zcash",
+      "networkId": "bip122:00040fe8ec8471911baa1db1266ea15d",
+      "slug": "zec",
+      "name": "Zcash Mainnet",
+      "shortName": "Zcash",
+      "description": "Privacy-preserving cryptocurrency with shielded transactions",
+      "currency": "ZEC",
+      "color": "#F4B728",
+      "isTestnet": false,
+      "logo": "assets/networks/zcash-mainnet.svg",
+      "links": [
+        {
+          "name": "Website",
+          "url": "https://z.cash",
+          "description": "Official Zcash website"
+        },
+        {
+          "name": "Docs",
+          "url": "https://zebra.zfnd.org",
+          "description": "Zebra node documentation"
+        },
+        {
+          "name": "GitHub",
+          "url": "https://github.com/ZcashFoundation/zebra",
+          "description": "Zebra repository"
+        }
+      ]
+    },
+    {
+      "type": "zcash",
+      "networkId": "bip122:05a60a92d99d85997cce3b87616c089f",
+      "slug": "tzec",
+      "name": "Zcash Testnet",
+      "shortName": "ZEC Testnet",
+      "description": "Zcash testnet for developers",
+      "currency": "TAZ",
+      "color": "#F4B728",
+      "isTestnet": true,
+      "logo": "assets/networks/zcash-mainnet.svg",
+      "links": [
+        {
+          "name": "Website",
+          "url": "https://z.cash",
+          "description": "Official Zcash website"
+        },
+        {
+          "name": "Docs",
+          "url": "https://zebra.zfnd.org",
+          "description": "Zebra node documentation"
         }
       ]
     }

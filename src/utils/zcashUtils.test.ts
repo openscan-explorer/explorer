@@ -5,6 +5,7 @@ import {
   classifyTransaction,
   computeFeeZat,
   detectZcashAddressType,
+  getShieldedSupplyPercent,
   getTransactionPools,
   isZcashAddress,
   zecToZat,
@@ -170,5 +171,27 @@ describe("zecToZat", () => {
   it("rounds away floating point drift", () => {
     expect(zecToZat(18.77663138)).toBe(1_877_663_138);
     expect(zecToZat(0.0001)).toBe(10_000);
+  });
+});
+
+describe("getShieldedSupplyPercent", () => {
+  it("sums the shielded pools but not transparent or lockbox funds", () => {
+    const percent = getShieldedSupplyPercent({
+      chainSupplyZat: 1_000,
+      valuePools: [
+        { id: "transparent", valueZat: 600 },
+        { id: "sprout", valueZat: 10 },
+        { id: "sapling", valueZat: 100 },
+        { id: "orchard", valueZat: 90 },
+        { id: "lockbox", valueZat: 50 },
+        { id: "ironwood", valueZat: 150 },
+      ],
+    });
+
+    expect(percent).toBe(35);
+  });
+
+  it("returns null when the chain supply is unknown", () => {
+    expect(getShieldedSupplyPercent({ chainSupplyZat: undefined, valuePools: [] })).toBeNull();
   });
 });

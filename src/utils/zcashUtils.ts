@@ -5,10 +5,12 @@
 import { ZATOSHIS_PER_ZEC } from "../config/zcashConstants";
 import type {
   ZcashAddressType,
+  ZcashNetworkStats,
   ZcashShieldedPool,
   ZcashTransaction,
   ZcashTxKind,
   ZcashTxPool,
+  ZcashValuePoolId,
 } from "../types";
 
 const BASE58 = "[1-9A-HJ-NP-Za-km-z]";
@@ -99,6 +101,21 @@ export function computeFeeZat(tx: ZcashTransaction): number | null {
     (ironwood?.valueBalanceZat ?? 0);
 
   return inputZat + shieldedNetZat - getTransparentOutputZat(tx);
+}
+
+const SHIELDED_VALUE_POOLS: ZcashValuePoolId[] = ["sprout", "sapling", "orchard", "ironwood"];
+
+/**
+ * Percentage of the chain supply held in shielded pools, or null when the supply is unknown
+ */
+export function getShieldedSupplyPercent(
+  stats: Pick<ZcashNetworkStats, "chainSupplyZat" | "valuePools">,
+): number | null {
+  if (!stats.chainSupplyZat) return null;
+  const shieldedZat = stats.valuePools
+    .filter((pool) => SHIELDED_VALUE_POOLS.includes(pool.id))
+    .reduce((sum, pool) => sum + pool.valueZat, 0);
+  return (shieldedZat / stats.chainSupplyZat) * 100;
 }
 
 export type ZcashRpcErrorKind = "unsupported" | "rateLimited" | "failed";
