@@ -161,6 +161,27 @@
       "orchard": "Pool blindado introduzido com o NU5 em 2022, usando provas Halo 2 que dispensam configuração confiável.",
       "lockbox": "Fundo de desenvolvimento diferido: parte de cada recompensa de bloco desde o NU6, retida pelo protocolo até que seu uso seja decidido.",
       "ironwood": "Pool blindado introduzido com a atualização de rede NU6.3 (Ironwood)."
+    },
+    "block": {
+      "hash": "Identificador único deste bloco, derivado do seu cabeçalho.",
+      "confirmations": "Blocos minerados sobre este. Mais confirmações significa que o bloco é mais difícil de reverter.",
+      "reward": "Valor total das saídas coinbase: o subsídio do minerador mais as taxas e os fluxos de financiamento pagos a endereços transparentes.",
+      "coinbaseOutputs": "Saídas transparentes criadas pela transação coinbase, como a recompensa do minerador e os pagamentos ao fundo de desenvolvimento.",
+      "transactions": "Transações neste bloco. As etiquetas contam as transações que usam cada pool blindado.",
+      "transparentOutput": "Soma de todas as saídas transparentes deste bloco. Valores blindados não são públicos.",
+      "difficulty": "Quão difícil foi encontrar uma solução Equihash válida para este bloco.",
+      "size": "Tamanho do bloco serializado, incluindo as provas blindadas.",
+      "previousBlock": "O bloco sobre o qual este é construído.",
+      "nextBlock": "O bloco construído sobre este, se houver.",
+      "merkleRoot": "Raiz da árvore Merkle de todos os IDs de transação deste bloco.",
+      "blockCommitments": "Compromisso com o histórico da cadeia e os dados de autorização, exigido desde o NU5.",
+      "finalSaplingRoot": "Raiz da árvore de compromissos de notas do Sapling após este bloco.",
+      "finalOrchardRoot": "Raiz da árvore de compromissos de notas do Orchard após este bloco. Presente em blocos posteriores ao NU5.",
+      "version": "Versão do formato do bloco.",
+      "bits": "Codificação compacta do alvo da prova de trabalho.",
+      "nonce": "Valor de 32 bytes que os mineradores variam ao buscar uma solução Equihash válida.",
+      "solution": "A solução de prova de trabalho Equihash deste bloco.",
+      "trees": "Número de notas comprometidas na árvore de compromissos de cada pool blindado até este bloco."
     }
   },
   "network": {

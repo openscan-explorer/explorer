@@ -161,6 +161,27 @@
       "orchard": "Shielded pool introduced with NU5 in 2022, using Halo 2 proofs that need no trusted setup.",
       "lockbox": "Deferred development fund: part of every block reward since NU6, held by the protocol until its use is decided.",
       "ironwood": "Shielded pool introduced with the NU6.3 (Ironwood) network upgrade."
+    },
+    "block": {
+      "hash": "The unique identifier of this block, derived from its header.",
+      "confirmations": "Blocks mined on top of this one. More confirmations means the block is harder to reverse.",
+      "reward": "Total value of the coinbase outputs: the miner's subsidy plus fees, and funding streams paid to transparent addresses.",
+      "coinbaseOutputs": "Transparent outputs created by the coinbase transaction, such as the miner reward and development fund payments.",
+      "transactions": "Transactions in this block. Chips count the transactions that use each shielded pool.",
+      "transparentOutput": "Sum of all transparent outputs in this block. Shielded amounts are not publicly visible.",
+      "difficulty": "How hard it was to find a valid Equihash solution for this block.",
+      "size": "Size of the serialized block, including shielded proofs.",
+      "previousBlock": "The block this one builds on.",
+      "nextBlock": "The block built on top of this one, if any.",
+      "merkleRoot": "Root of the Merkle tree of all transaction IDs in this block.",
+      "blockCommitments": "Commitment to the chain history and authorizing data, required since NU5.",
+      "finalSaplingRoot": "Root of the Sapling note commitment tree after this block.",
+      "finalOrchardRoot": "Root of the Orchard note commitment tree after this block. Present on blocks after NU5.",
+      "version": "Block format version.",
+      "bits": "Compact encoding of the proof-of-work target.",
+      "nonce": "32-byte value miners vary while searching for a valid Equihash solution.",
+      "solution": "The Equihash proof-of-work solution for this block.",
+      "trees": "Number of notes committed to each shielded pool's note commitment tree as of this block."
     }
   },
   "network": {
