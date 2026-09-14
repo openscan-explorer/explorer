@@ -1,6 +1,7 @@
 import { useContext, useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { getRPCUrls } from "../../config/rpcConfig";
+import { REFRESH_INTERVAL_MS as ZCASH_REFRESH_INTERVAL_MS } from "../../config/zcashConstants";
 import { AppContext, useNetworks } from "../../context/AppContext";
 import { RpcClient } from "@openscan/network-connectors";
 import { useDataService } from "../../hooks/useDataService";
@@ -57,6 +58,15 @@ export function NetworkBlockIndicator({ className }: NetworkBlockIndicatorProps)
             setGasPrice(null); // Bitcoin doesn't have gas
             setIsLoading(false);
           }
+        } else if (network.type === "zcash" && dataService?.isZcash()) {
+          // Fetch Zcash block height
+          const adapter = dataService.getZcashAdapter();
+          const height = await adapter.getLatestBlockNumber();
+          if (isMounted) {
+            setBlockNumber(height);
+            setGasPrice(null); // Zcash doesn't have gas
+            setIsLoading(false);
+          }
         } else if (network.type === "solana" && dataService?.isSolana()) {
           // Fetch Solana current slot
           const adapter = dataService.getSolanaAdapter();
@@ -99,8 +109,14 @@ export function NetworkBlockIndicator({ className }: NetworkBlockIndicatorProps)
     setIsLoading(true);
     fetchData();
 
-    // Poll every 12 seconds for EVM, 60 seconds for Bitcoin
-    const pollInterval = network.type === "bitcoin" ? 60000 : 12000;
+    // Poll every 12 seconds for EVM, 60 seconds for Bitcoin, and 90 seconds for Zcash
+    // (75 second blocks served by rate-limited gateways)
+    const pollInterval =
+      network.type === "zcash"
+        ? ZCASH_REFRESH_INTERVAL_MS
+        : network.type === "bitcoin"
+          ? 60000
+          : 12000;
     intervalId = setInterval(fetchData, pollInterval);
 
     return () => {

@@ -10,6 +10,7 @@ import {
 import type {
   ZcashAddressType,
   ZcashFee,
+  ZcashNetworkStats,
   ZcashShieldedPool,
   ZcashTransaction,
   ZcashTxKind,
@@ -162,6 +163,19 @@ export function computeFee(tx: ZcashTransaction): ZcashFee {
   }
 
   return { kind: "known", zat: inputZat + getShieldedNetZat(tx) - getTransparentOutputZat(tx) };
+}
+
+/**
+ * Percentage of the chain supply held in shielded pools, or null when the supply is unknown
+ */
+export function getShieldedSupplyPercent(
+  stats: Pick<ZcashNetworkStats, "chainSupplyZat" | "valuePools">,
+): number | null {
+  if (!stats.chainSupplyZat) return null;
+  const shieldedZat = stats.valuePools
+    .filter((pool) => (ZCASH_SHIELDED_POOLS as readonly string[]).includes(pool.id))
+    .reduce((sum, pool) => sum + pool.valueZat, 0);
+  return (shieldedZat / stats.chainSupplyZat) * 100;
 }
 
 export type ZcashRpcErrorKind = "unsupported" | "rateLimited" | "failed";

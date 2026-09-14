@@ -6353,6 +6353,133 @@ button.tx-section-header-toggle {
 	justify-content: center;
 }
 
+/* Zcash value pools */
+.zec-value-pools {
+	background: var(--bg-secondary);
+	border: 1px solid var(--overlay-light-8);
+	border-radius: 12px;
+	padding: 16px 20px;
+	margin: 16px 0;
+}
+
+.zec-value-pools-header {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	margin-bottom: 12px;
+}
+
+.zec-pool-bar {
+	display: flex;
+	height: 10px;
+	border-radius: 5px;
+	overflow: hidden;
+	background: var(--overlay-light-5);
+}
+
+.zec-pool-segment {
+	width: var(--pool-share);
+	background: var(--pool-color);
+}
+
+.zec-pool-list {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 8px 16px;
+	list-style: none;
+	margin: 12px 0 0;
+	padding: 0;
+}
+
+.zec-pool-item {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	min-width: 0;
+	font-size: 0.85rem;
+}
+
+.zec-pool-swatch {
+	width: 10px;
+	height: 10px;
+	border-radius: 2px;
+	flex-shrink: 0;
+	background: var(--pool-color);
+}
+
+.zec-pool-name {
+	color: var(--text-primary);
+}
+
+.zec-pool-value {
+	margin-left: auto;
+	color: var(--text-secondary);
+	font-variant-numeric: tabular-nums;
+	white-space: nowrap;
+}
+
+.zec-pool-share {
+	min-width: 3.5em;
+	text-align: right;
+	color: var(--color-text-muted);
+	font-variant-numeric: tabular-nums;
+}
+
+.zec-pool-transparent {
+	--pool-color: var(--text-tertiary);
+}
+
+.zec-pool-sprout {
+	--pool-color: var(--color-primary-muted);
+}
+
+.zec-pool-sapling {
+	--pool-color: var(--color-info);
+}
+
+.zec-pool-orchard {
+	--pool-color: var(--color-primary);
+}
+
+.zec-pool-lockbox {
+	--pool-color: var(--color-warning);
+}
+
+.zec-pool-ironwood {
+	--pool-color: var(--color-accent);
+}
+
+@media (max-width: 768px) {
+	.zec-pool-list {
+		grid-template-columns: 1fr;
+	}
+}
+
+/* Zcash transaction kind badge */
+.zec-kind-badge {
+	display: inline-block;
+	padding: 1px 8px;
+	border-radius: 10px;
+	font-size: 0.7rem;
+	font-weight: 600;
+	white-space: nowrap;
+	background: var(--overlay-light-5);
+	color: var(--text-secondary);
+}
+
+.zec-kind-shielded,
+.zec-kind-shielding,
+.zec-kind-deshielding,
+.zec-kind-mixed {
+	background: var(--color-primary-alpha-15);
+	color: var(--color-primary);
+}
+
+.zec-kind-coinbase {
+	background: var(--color-warning-alpha-15);
+	color: var(--color-warning);
+}
+
 /* Clickable stat label */
 .dashboard-stat-label-link {
 	display: block;

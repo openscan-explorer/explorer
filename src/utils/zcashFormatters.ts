@@ -22,3 +22,13 @@ export {
 export function formatZEC(valueZat: number, currency = "ZEC"): string {
   return `${(valueZat / ZATOSHIS_PER_ZEC).toFixed(8)} ${currency}`;
 }
+
+/**
+ * Format a zatoshi amount as ZEC with thousands separators and few decimals (for dashboards)
+ */
+export function formatZECCompact(valueZat: number, currency = "ZEC"): string {
+  const value = valueZat / ZATOSHIS_PER_ZEC;
+  const maximumFractionDigits = value < 1_000 ? 2 : 0;
+  return `${value.toLocaleString(undefined, { maximumFractionDigits })} ${currency}`;
+}
+
