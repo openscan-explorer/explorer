@@ -195,6 +195,12 @@
       "expiryHeight": "The transaction can no longer be mined after this block height.",
       "locktime": "Earliest block height or time at which this transaction can be mined.",
       "shieldedActivity": "Value moving through Zcash's shielded pools. Amounts and parties stay encrypted; only each pool's net value balance is public."
+    },
+    "address": {
+      "address": "A Zcash address. Transparent addresses (t1, t3) are public like Bitcoin; shielded (zs) and unified (u1) addresses keep amounts and history private.",
+      "receivers": "A unified address bundles several receivers. Senders pay the most private receiver their wallet supports.",
+      "balance": "Sum of this address's unspent transparent outputs, from Zebra's address index.",
+      "received": "Total transparent value this address has received."
     }
   },
   "network": {
