@@ -81,6 +81,13 @@ const BTC_NETWORK_SLUGS: Record<string, string> = {
   "00000000da84f2bafbbc53dee25a72ae": "testnet4",
 };
 
+// Zcash genesis block hashes → friendly file names. Zcash shares the bip122 namespace with
+// Bitcoin, so these are checked before the BTC mapping.
+const ZEC_NETWORK_SLUGS: Record<string, string> = {
+  "00040fe8ec8471911baa1db1266ea15d": "mainnet",
+  "05a60a92d99d85997cce3b87616c089f": "testnet",
+};
+
 // Solana CAIP-2 chain IDs (first 32 chars of genesis hash) → friendly file names
 const SOLANA_NETWORK_SLUGS: Record<string, string> = {
   "5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp": "mainnet",
@@ -91,7 +98,7 @@ const SOLANA_NETWORK_SLUGS: Record<string, string> = {
 /**
  * Parse a CAIP-2 networkId to determine the RPC file path
  * "eip155:{chainId}" → rpcs/evm/{chainId}.json
- * "bip122:{hash}"    → rpcs/btc/{slug}.json (using genesis hash → slug mapping)
+ * "bip122:{hash}"    → rpcs/zec/{slug}.json or rpcs/btc/{slug}.json (genesis hash → slug mapping)
  * "solana:{hash}"    → rpcs/solana/{slug}.json (using genesis hash → slug mapping)
  */
 function getRpcPathFromNetworkId(networkId: string): string | null {
@@ -101,6 +108,8 @@ function getRpcPathFromNetworkId(networkId: string): string | null {
   }
   if (networkId.startsWith("bip122:")) {
     const hash = networkId.slice(7);
+    const zecSlug = ZEC_NETWORK_SLUGS[hash];
+    if (zecSlug) return `rpcs/zec/${zecSlug}.json`;
     const slug = BTC_NETWORK_SLUGS[hash];
     if (!slug) return null;
     return `rpcs/btc/${slug}.json`;

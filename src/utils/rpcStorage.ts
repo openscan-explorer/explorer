@@ -9,7 +9,7 @@ const METADATA_RPC_TTL = 24 * 60 * 60 * 1000; // 24 hours
 
 /**
  * Hardcoded fallback defaults for networks that are never in the metadata service.
- * Includes localhost, worker-proxied BTC, and worker-proxied EVM endpoints.
+ * Includes localhost, worker-proxied BTC and EVM, and public Zcash and Solana endpoints.
  * Metadata service RPCs and user-configured RPCs take priority via getEffectiveRpcUrls().
  */
 const BUILTIN_RPC_DEFAULTS: RpcUrlsContextType = {
@@ -22,6 +22,16 @@ const BUILTIN_RPC_DEFAULTS: RpcUrlsContextType = {
   ],
   "bip122:00000000da84f2bafbbc53dee25a72ae": [
     `${OPENSCAN_WORKER_URL}/btc/onfinality/bip122:00000000da84f2bafbbc53dee25a72ae`,
+  ],
+  // Zcash — Tatum's public zebrad gateways. Both hosts share a ~5 requests/min per-IP limit
+  // and block the address index and z_* methods; add a self-hosted zebrad for those.
+  "bip122:00040fe8ec8471911baa1db1266ea15d": [
+    "https://zcash-mainnet-zebrad.gateway.tatum.io",
+    "https://zcash-mainnet.gateway.tatum.io",
+  ],
+  "bip122:05a60a92d99d85997cce3b87616c089f": [
+    "https://zcash-testnet-zebrad.gateway.tatum.io",
+    "https://zcash-testnet.gateway.tatum.io",
   ],
   "eip155:1": [
     `${OPENSCAN_WORKER_URL}/evm/alchemy/eip155:1`,
