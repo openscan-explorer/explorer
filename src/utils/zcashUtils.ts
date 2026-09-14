@@ -44,6 +44,13 @@ export function zecToZat(value: number): number {
   return Math.round(value * ZATOSHIS_PER_ZEC);
 }
 
+/**
+ * Convert integer zatoshis to a ZEC amount
+ */
+export function zatToZec(valueZat: number): number {
+  return valueZat / ZATOSHIS_PER_ZEC;
+}
+
 export function isCoinbaseTransaction(tx: ZcashTransaction): boolean {
   return tx.vin[0]?.coinbase !== undefined;
 }
