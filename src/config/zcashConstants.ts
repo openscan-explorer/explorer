@@ -16,3 +16,6 @@ export const DASHBOARD_TXS = 10;
 
 // Zcash targets a 75 second block interval
 export const REFRESH_INTERVAL_MS = 90_000;
+
+// Blocks list page size (each block costs one getblock call)
+export const BLOCKS_PER_PAGE = 10;

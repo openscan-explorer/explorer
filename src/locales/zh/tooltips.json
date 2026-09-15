@@ -161,6 +161,27 @@
       "orchard": "随 2022 年 NU5 升级引入的屏蔽池，使用无需可信设置的 Halo 2 证明。",
       "lockbox": "递延开发基金：自 NU6 起每个区块奖励的一部分，由协议保管，直至决定其用途。",
       "ironwood": "随 NU6.3（Ironwood）网络升级引入的屏蔽池。"
+    },
+    "block": {
+      "hash": "由区块头派生的该区块唯一标识符。",
+      "confirmations": "在此区块之上挖出的区块数。确认越多，区块越难被撤销。",
+      "reward": "Coinbase 输出总额：矿工补贴加手续费，以及支付给透明地址的资金流。",
+      "coinbaseOutputs": "Coinbase 交易创建的透明输出，例如矿工奖励和开发基金付款。",
+      "transactions": "此区块中的交易。标签统计使用各屏蔽池的交易数量。",
+      "transparentOutput": "此区块中所有透明输出的总和。屏蔽金额不公开。",
+      "difficulty": "为此区块找到有效 Equihash 解的难度。",
+      "size": "序列化区块的大小，包括屏蔽证明。",
+      "previousBlock": "此区块所基于的区块。",
+      "nextBlock": "构建在此区块之上的区块（如有）。",
+      "merkleRoot": "此区块中所有交易 ID 的默克尔树根。",
+      "blockCommitments": "对链历史和授权数据的承诺，自 NU5 起必需。",
+      "finalSaplingRoot": "此区块之后 Sapling 票据承诺树的根。",
+      "finalOrchardRoot": "此区块之后 Orchard 票据承诺树的根。仅存在于 NU5 之后的区块。",
+      "version": "区块格式版本。",
+      "bits": "工作量证明目标的紧凑编码。",
+      "nonce": "矿工在寻找有效 Equihash 解时改变的 32 字节值。",
+      "solution": "此区块的 Equihash 工作量证明解。",
+      "trees": "截至此区块，各屏蔽池票据承诺树中已提交的票据数量。"
     }
   },
   "network": {
