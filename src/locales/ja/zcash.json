@@ -46,7 +46,20 @@
     "blocks": "ブロック",
     "block": "ブロック #{{height}}",
     "transactions": "トランザクション",
-    "transaction": "{{txid}}"
+    "transaction": "{{txid}}",
+    "mempool": "メンプール"
+  },
+  "mempool": {
+    "title": "{{network}} メンプール",
+    "loading": "メンプールを読み込み中...",
+    "summary": "保留中のトランザクション {{count}} 件 ({{size}})",
+    "empty": "メンプールに保留中のトランザクションはありません",
+    "txid": "トランザクションID",
+    "age": "経過時間",
+    "size": "サイズ",
+    "fee": "手数料",
+    "feeRate": "手数料率",
+    "loadError": "メンプールを読み込めませんでした: {{message}}"
   },
   "blocksPage": {
     "title": "{{network}} のブロック",

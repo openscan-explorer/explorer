@@ -46,7 +46,20 @@
     "blocks": "Blocos",
     "block": "Bloco #{{height}}",
     "transactions": "Transações",
-    "transaction": "{{txid}}"
+    "transaction": "{{txid}}",
+    "mempool": "Mempool"
+  },
+  "mempool": {
+    "title": "Mempool de {{network}}",
+    "loading": "Carregando mempool...",
+    "summary": "{{count}} transações pendentes ({{size}})",
+    "empty": "Nenhuma transação pendente na mempool",
+    "txid": "ID da transação",
+    "age": "Idade",
+    "size": "Tamanho",
+    "fee": "Taxa",
+    "feeRate": "Taxa por byte",
+    "loadError": "Não foi possível carregar a mempool: {{message}}"
   },
   "blocksPage": {
     "title": "Blocos de {{network}}",

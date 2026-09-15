@@ -62,6 +62,27 @@ const VALUE_POOLS: Array<[string, number]> = [
 ];
 const CHAIN_SUPPLY_ZAT = 1_693_254_079_054_480;
 
+function mempoolEntry(size: number, feeZec: number, secondsAgo: number) {
+  return {
+    size,
+    fee: feeZec,
+    modifiedfee: feeZec,
+    time: Math.floor(Date.now() / 1000) - secondsAgo,
+    height: ZCASH.tipHeight,
+    descendantcount: 1,
+    descendantsize: size,
+    descendantfees: Math.round(feeZec * 1e8),
+    depends: [],
+  };
+}
+
+// Pending transactions, deliberately out of fee-rate order: e3… pays the highest rate, d2… the lowest
+const MEMPOOL = {
+  ["c1".repeat(32)]: mempoolEntry(245, 0.000113, 30),
+  ["d2".repeat(32)]: mempoolEntry(2_450, 0.0001, 90),
+  ["e3".repeat(32)]: mempoolEntry(372, 0.00025, 10),
+};
+
 export interface RecordedRpcCall {
   method: string;
   params: unknown[];
@@ -155,6 +176,10 @@ export async function mockZcashRpc(page: Page): Promise<RecordedRpcCall[]> {
     getrawtransaction: (params) => {
       const [txid] = params as [string];
       return KNOWN_TRANSACTIONS.get(txid) ?? previousTransaction(txid);
+    },
+    getrawmempool: (params) => {
+      const [verbose] = params as [boolean | undefined];
+      return verbose ? MEMPOOL : Object.keys(MEMPOOL);
     },
   });
 

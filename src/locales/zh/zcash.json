@@ -46,7 +46,20 @@
     "blocks": "区块",
     "block": "区块 #{{height}}",
     "transactions": "交易",
-    "transaction": "{{txid}}"
+    "transaction": "{{txid}}",
+    "mempool": "内存池"
+  },
+  "mempool": {
+    "title": "{{network}} 内存池",
+    "loading": "正在加载内存池...",
+    "summary": "{{count}} 笔待处理交易（{{size}}）",
+    "empty": "内存池中没有待处理的交易",
+    "txid": "交易 ID",
+    "age": "时长",
+    "size": "大小",
+    "fee": "手续费",
+    "feeRate": "费率",
+    "loadError": "无法加载内存池: {{message}}"
   },
   "blocksPage": {
     "title": "{{network}} 区块",

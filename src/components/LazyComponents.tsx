@@ -26,6 +26,7 @@ const ZcashBlocksPage = lazy(() => import("./pages/zcash/ZcashBlocksPage"));
 const ZcashBlockPage = lazy(() => import("./pages/zcash/ZcashBlockPage"));
 const ZcashTransactionsPage = lazy(() => import("./pages/zcash/ZcashTransactionsPage"));
 const ZcashTransactionPage = lazy(() => import("./pages/zcash/ZcashTransactionPage"));
+const ZcashMempoolPage = lazy(() => import("./pages/zcash/ZcashMempoolPage"));
 
 // Lazy load page components - Solana
 const SolanaNetwork = lazy(() => import("./pages/solana"));
@@ -76,6 +77,7 @@ export const LazyZcashBlocks = withSuspense(ZcashBlocksPage);
 export const LazyZcashBlock = withSuspense(ZcashBlockPage);
 export const LazyZcashTxs = withSuspense(ZcashTransactionsPage);
 export const LazyZcashTx = withSuspense(ZcashTransactionPage);
+export const LazyZcashMempool = withSuspense(ZcashMempoolPage);
 export const LazySolanaNetwork = withSuspense(SolanaNetwork);
 export const LazySolanaSlots = withSuspense(SolanaSlotsPage);
 export const LazySolanaSlot = withSuspense(SolanaSlotPage);
@@ -127,6 +129,7 @@ export function preloadAllRoutes() {
   import("./pages/zcash/ZcashBlockPage");
   import("./pages/zcash/ZcashTransactionsPage");
   import("./pages/zcash/ZcashTransactionPage");
+  import("./pages/zcash/ZcashMempoolPage");
   // Solana pages
   import("./pages/solana");
   import("./pages/solana/SolanaSlotsPage");
