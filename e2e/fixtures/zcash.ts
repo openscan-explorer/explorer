@@ -1,6 +1,6 @@
 import type { Page } from "@playwright/test";
 import { BLOCK_3483400 } from "../../src/services/adapters/ZcashAdapter/fixtures";
-import { mockJsonRpc } from "./rpcMock";
+import { mockJsonRpc, rpcError } from "./rpcMock";
 
 /** The built-in Zcash RPC defaults are Tatum's gateways, so every Zcash request matches this */
 export const ZCASH_RPC_PATTERN = /zcash-(mainnet|testnet)(-zebrad)?\.gateway\.tatum\.io/;
@@ -43,6 +43,11 @@ const TRANSPARENT_TX = {
 
 const TIP_BLOCK = { ...BLOCK_3483400, tx: [...BLOCK_3483400.tx, TRANSPARENT_TX] };
 const KNOWN_TRANSACTIONS = new Map(TIP_BLOCK.tx.map((tx) => [tx.txid, tx]));
+
+// Transactions spent by the known transactions' transparent inputs, served for input lookups
+const PREVIOUS_TXIDS = new Set<string>(
+  TIP_BLOCK.tx.flatMap((tx) => tx.vin.flatMap((input) => (input.txid ? [input.txid] : []))),
+);
 
 export const ZCASH = {
   networkSlug: "zec",
@@ -99,7 +104,7 @@ function blockSummary(height: number) {
   };
 }
 
-/** Any unknown txid is served as a previous transaction with 20 outputs of 0.0003 ZEC */
+/** A previous transaction with 20 outputs of 0.0003 ZEC */
 function previousTransaction(txid: string) {
   return {
     txid,
@@ -122,9 +127,34 @@ function previousTransaction(txid: string) {
   };
 }
 
+/** An unconfirmed transparent transaction, served for mempool txids */
+function pendingTransaction(txid: string) {
+  return {
+    txid,
+    version: 5,
+    size: 372,
+    locktime: 0,
+    expiryheight: ZCASH.tipHeight + 40,
+    time: Math.floor(Date.now() / 1000),
+    vin: [{ txid: "a1".repeat(32), vout: 2, sequence: 4294967295 }],
+    vout: [
+      {
+        value: 0.0002,
+        valueZat: 20_000,
+        n: 0,
+        scriptPubKey: { type: "pubkeyhash", addresses: [T_ADDRESS] },
+      },
+    ],
+    vShieldedSpend: [],
+    vShieldedOutput: [],
+    vjoinsplit: [],
+  };
+}
+
 /**
  * Serve a Zcash chain whose tip is mainnet block 3,483,400 (plus one synthetic transparent
  * transaction) and record every Zcash RPC call the page makes, including unmocked methods.
+ * Unknown transactions and block hashes fail the way Zebra does.
  */
 export async function mockZcashRpc(page: Page): Promise<RecordedRpcCall[]> {
   const calls: RecordedRpcCall[] = [];
@@ -170,12 +200,17 @@ export async function mockZcashRpc(page: Page): Promise<RecordedRpcCall[]> {
       if (isTip) {
         return verbosity === 2 ? TIP_BLOCK : { ...TIP_BLOCK, tx: TIP_BLOCK.tx.map((tx) => tx.txid) };
       }
+      if (!/^\d+$/.test(hashOrHeight)) return rpcError(-8, "Block not found");
       const summary = blockSummary(Number(hashOrHeight));
       return verbosity === 2 ? { ...summary, tx: [] } : summary;
     },
     getrawtransaction: (params) => {
       const [txid] = params as [string];
-      return KNOWN_TRANSACTIONS.get(txid) ?? previousTransaction(txid);
+      const known = KNOWN_TRANSACTIONS.get(txid);
+      if (known) return known;
+      if (PREVIOUS_TXIDS.has(txid)) return previousTransaction(txid);
+      if (txid in MEMPOOL) return pendingTransaction(txid);
+      return rpcError(-5, "No such mempool or main chain transaction");
     },
     getrawmempool: (params) => {
       const [verbose] = params as [boolean | undefined];

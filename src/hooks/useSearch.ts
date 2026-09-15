@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { AppContext, useNetworks } from "../context";
 import { ENSService } from "../services/ENS/ENSService";
 import { isEVMNetwork, resolveNetwork } from "../utils/networkResolver";
+import { isZcashAddress } from "../utils/zcashUtils";
 
 interface UseSearchResult {
   searchTerm: string;
@@ -95,10 +96,13 @@ export function useSearch(): UseSearchResult {
       const isEvmAddress = /^0x[a-fA-F0-9]{40}$/.test(term);
       const isBitcoinTxid = /^[a-fA-F0-9]{64}$/.test(term);
       const isBitcoinAddress = /^(1|3|bc1)[a-zA-Z0-9]{25,62}$/.test(term);
+      // Transparent, Sapling, unified, Sprout and TEX addresses. Zcash block hashes are also 64
+      // hex characters: they go to the transaction page, which redirects to the matching block.
+      const isZcashAddressTerm = resolvedNetwork?.type === "zcash" && isZcashAddress(term);
       const isBlockNumber = /^\d+$/.test(term);
 
       const isTransactionHash = isEvmTransactionHash || isBitcoinTxid;
-      const isAddress = isEvmAddress || isBitcoinAddress;
+      const isAddress = isEvmAddress || isBitcoinAddress || isZcashAddressTerm;
 
       // If pattern doesn't match any valid type, show error immediately
       if (!isTransactionHash && !isAddress && !isBlockNumber) {

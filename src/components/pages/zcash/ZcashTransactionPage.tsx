@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { getNetworkBySlug } from "../../../config/networks";
 import { useDataService } from "../../../hooks/useDataService";
 import { usePersistentCache } from "../../../hooks/usePersistentCache";
@@ -11,10 +11,13 @@ import Breadcrumb from "../../common/Breadcrumb";
 import LoaderWithTimeout from "../../common/LoaderWithTimeout";
 import ZcashTransactionDisplay, { type InputResolution } from "./ZcashTransactionDisplay";
 
+const HASH_PATTERN = /^[0-9a-f]{64}$/i;
+
 export default function ZcashTransactionPage() {
   const { t } = useTranslation("zcash");
   const { filter: txid } = useParams<{ filter?: string }>();
   const location = useLocation();
+  const navigate = useNavigate();
 
   // Extract network slug from path (e.g., "/tzec/tx/..." → "tzec")
   const networkSlug = location.pathname.split("/")[1] || "zec";
@@ -52,7 +55,17 @@ export default function ZcashTransactionPage() {
         setTransaction(data);
         if (data.confirmations) setCached(cacheNetworkId, "transaction", txid, data);
       } catch (err) {
-        if (!cancelled) setError(err instanceof Error ? err.message : String(err));
+        // Search sends every 64-character hash here, and Zcash block hashes look like txids,
+        // so a hash that matches no transaction may still be a block
+        const block = HASH_PATTERN.test(txid)
+          ? await adapter.getBlock(txid).catch(() => null)
+          : null;
+        if (cancelled) return;
+        if (block) {
+          navigate(`/${networkSlug}/block/${block.data.block.hash}`, { replace: true });
+          return;
+        }
+        setError(err instanceof Error ? err.message : String(err));
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -62,7 +75,7 @@ export default function ZcashTransactionPage() {
     return () => {
       cancelled = true;
     };
-  }, [dataService, txid, getCached, setCached, cacheNetworkId]);
+  }, [dataService, txid, getCached, setCached, cacheNetworkId, navigate, networkSlug]);
 
   // Zebra omits transparent input values, so the fee is only resolved when the user asks
   const resolveInputs = useCallback(async () => {
