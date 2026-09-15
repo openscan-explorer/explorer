@@ -19,3 +19,6 @@ export const REFRESH_INTERVAL_MS = 90_000;
 
 // Blocks list page size (each block costs one getblock call)
 export const BLOCKS_PER_PAGE = 10;
+
+// Transactions list page size (paged client-side within a single block)
+export const TXS_PER_PAGE = 25;
