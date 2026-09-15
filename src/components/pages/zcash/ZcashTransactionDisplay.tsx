@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
+import { getNetworkById } from "../../../config/networks";
 import { MAX_INPUT_LOOKUPS } from "../../../config/zcashConstants";
 import { useSettings } from "../../../context/SettingsContext";
 import { useZcashTimeAgo } from "../../../hooks/useZcashTimeAgo";
@@ -21,9 +22,11 @@ import {
   getTransparentOutputZat,
   isCoinbaseTransaction,
 } from "../../../utils/zcashUtils";
+import AIAnalysisPanel from "../../common/AIAnalysis/AIAnalysisPanel";
 import CopyButton from "../../common/CopyButton";
 import FieldLabel from "../../common/FieldLabel";
 import HelperTooltip from "../../common/HelperTooltip";
+import { buildTransactionAnalysisContext } from "./aiContext";
 import { TX_KIND_LABEL_KEYS, VALUE_POOL_LABEL_KEYS } from "./labels";
 import ZcashShieldedBundles from "./ZcashShieldedBundles";
 
@@ -108,314 +111,333 @@ const ZcashTransactionDisplay: React.FC<ZcashTransactionDisplayProps> = React.me
       );
     };
 
-    return (
-      <div className="block-display-card">
-        <div className="block-display-header">
-          <span className="block-label">{t("tx.title")}</span>
-          {isUnconfirmed ? (
-            <span className="block-status-badge block-status-pending">{t("tx.inMempool")}</span>
-          ) : (
-            <span className="block-status-badge block-status-finalized">
-              {t("tx.confirmations", { count: transaction.confirmations ?? 0 })}
-              {showTooltips && (
-                <HelperTooltip content={tTooltips("zcash.tx.confirmations")} placement="left" />
-              )}
-            </span>
-          )}
-        </div>
+    const network = getNetworkById(networkId);
+    const aiContext = useMemo(() => buildTransactionAnalysisContext(transaction), [transaction]);
 
-        <div className="tx-details">
-          <div className="tx-row">
-            <FieldLabel label={t("tx.txid")} tooltipKey="zcash.tx.txid" visibleFor={["beginner"]} />
-            <span className="tx-value tx-mono zec-inline-copy">
-              {transaction.txid}
-              <CopyButton value={transaction.txid} />
-            </span>
+    return (
+      <div className="page-with-analysis">
+        <div className="block-display-card">
+          <div className="block-display-header">
+            <span className="block-label">{t("tx.title")}</span>
+            {isUnconfirmed ? (
+              <span className="block-status-badge block-status-pending">{t("tx.inMempool")}</span>
+            ) : (
+              <span className="block-status-badge block-status-finalized">
+                {t("tx.confirmations", { count: transaction.confirmations ?? 0 })}
+                {showTooltips && (
+                  <HelperTooltip content={tTooltips("zcash.tx.confirmations")} placement="left" />
+                )}
+              </span>
+            )}
           </div>
 
-          {transaction.blockhash && (
+          <div className="tx-details">
             <div className="tx-row">
-              <FieldLabel label={t("tx.block")} />
-              <span className="tx-value">
-                <Link
-                  to={`/${networkId}/block/${transaction.blockheight ?? transaction.blockhash}`}
-                  className="link-accent"
-                >
-                  {transaction.blockheight !== undefined
-                    ? `#${formatNumber(transaction.blockheight)}`
-                    : truncateBlockHash(transaction.blockhash)}
-                </Link>
+              <FieldLabel
+                label={t("tx.txid")}
+                tooltipKey="zcash.tx.txid"
+                visibleFor={["beginner"]}
+              />
+              <span className="tx-value tx-mono zec-inline-copy">
+                {transaction.txid}
+                <CopyButton value={transaction.txid} />
               </span>
             </div>
-          )}
 
-          <div className="btc-tx-details-grid">
-            <div className="btc-tx-details-column">
+            {transaction.blockhash && (
               <div className="tx-row">
-                <FieldLabel
-                  label={t("tx.kind")}
-                  tooltipKey="zcash.tx.kind"
-                  visibleFor={["beginner", "intermediate"]}
-                />
-                <span className="tx-value zec-kind-row">
-                  <span className={`zec-kind-badge zec-kind-${kind}`}>
-                    {t(TX_KIND_LABEL_KEYS[kind])}
-                  </span>
-                  {pools.map((pool) => (
-                    <span key={pool} className={`zec-pool-chip zec-pool-${pool}`}>
-                      {t(VALUE_POOL_LABEL_KEYS[pool])}
-                    </span>
-                  ))}
+                <FieldLabel label={t("tx.block")} />
+                <span className="tx-value">
+                  <Link
+                    to={`/${networkId}/block/${transaction.blockheight ?? transaction.blockhash}`}
+                    className="link-accent"
+                  >
+                    {transaction.blockheight !== undefined
+                      ? `#${formatNumber(transaction.blockheight)}`
+                      : truncateBlockHash(transaction.blockhash)}
+                  </Link>
                 </span>
               </div>
+            )}
 
-              {isUnconfirmed ? (
+            <div className="btc-tx-details-grid">
+              <div className="btc-tx-details-column">
                 <div className="tx-row">
-                  <FieldLabel label={t("tx.status")} />
-                  <span className="tx-value">
-                    <span className="btc-mempool-status">{t("tx.waiting")}</span>
+                  <FieldLabel
+                    label={t("tx.kind")}
+                    tooltipKey="zcash.tx.kind"
+                    visibleFor={["beginner", "intermediate"]}
+                  />
+                  <span className="tx-value zec-kind-row">
+                    <span className={`zec-kind-badge zec-kind-${kind}`}>
+                      {t(TX_KIND_LABEL_KEYS[kind])}
+                    </span>
+                    {pools.map((pool) => (
+                      <span key={pool} className={`zec-pool-chip zec-pool-${pool}`}>
+                        {t(VALUE_POOL_LABEL_KEYS[pool])}
+                      </span>
+                    ))}
                   </span>
                 </div>
-              ) : (
-                transaction.blocktime !== undefined && (
+
+                {isUnconfirmed ? (
+                  <div className="tx-row">
+                    <FieldLabel label={t("tx.status")} />
+                    <span className="tx-value">
+                      <span className="btc-mempool-status">{t("tx.waiting")}</span>
+                    </span>
+                  </div>
+                ) : (
+                  transaction.blocktime !== undefined && (
+                    <>
+                      <div className="tx-row">
+                        <FieldLabel label={t("tx.time")} />
+                        <span className="tx-value">{formatTimestamp(transaction.blocktime)}</span>
+                      </div>
+                      <div className="tx-row">
+                        <FieldLabel label={t("tx.age")} />
+                        <span className="tx-value">{timeAgo(transaction.blocktime)}</span>
+                      </div>
+                    </>
+                  )
+                )}
+
+                {hasTransparent && (
                   <>
                     <div className="tx-row">
-                      <FieldLabel label={t("tx.time")} />
-                      <span className="tx-value">{formatTimestamp(transaction.blocktime)}</span>
+                      <FieldLabel
+                        label={t("tx.transparentInputs")}
+                        tooltipKey="zcash.tx.transparentInputs"
+                        visibleFor={["beginner", "intermediate"]}
+                      />
+                      <span className="tx-value">
+                        {transaction.vin.length}
+                        {inputTotalZat !== null && inputTotalZat > 0 && (
+                          <span className="btc-value-inline">
+                            {" "}
+                            ({formatZEC(inputTotalZat, currency)})
+                          </span>
+                        )}
+                      </span>
                     </div>
                     <div className="tx-row">
-                      <FieldLabel label={t("tx.age")} />
-                      <span className="tx-value">{timeAgo(transaction.blocktime)}</span>
+                      <FieldLabel
+                        label={t("tx.transparentOutputs")}
+                        tooltipKey="zcash.tx.transparentOutputs"
+                        visibleFor={["beginner", "intermediate"]}
+                      />
+                      <span className="tx-value">
+                        {transaction.vout.length}
+                        {outputTotalZat > 0 && (
+                          <span className="btc-value-inline">
+                            {" "}
+                            ({formatZEC(outputTotalZat, currency)})
+                          </span>
+                        )}
+                      </span>
                     </div>
                   </>
-                )
-              )}
+                )}
 
-              {hasTransparent && (
-                <>
+                {!isCoinbase && (
                   <div className="tx-row">
                     <FieldLabel
-                      label={t("tx.transparentInputs")}
-                      tooltipKey="zcash.tx.transparentInputs"
+                      label={t("tx.fee")}
+                      tooltipKey="zcash.tx.fee"
                       visibleFor={["beginner", "intermediate"]}
                     />
-                    <span className="tx-value">
-                      {transaction.vin.length}
-                      {inputTotalZat !== null && inputTotalZat > 0 && (
-                        <span className="btc-value-inline">
-                          {" "}
-                          ({formatZEC(inputTotalZat, currency)})
-                        </span>
-                      )}
-                    </span>
+                    {renderFee()}
                   </div>
-                  <div className="tx-row">
-                    <FieldLabel
-                      label={t("tx.transparentOutputs")}
-                      tooltipKey="zcash.tx.transparentOutputs"
-                      visibleFor={["beginner", "intermediate"]}
-                    />
-                    <span className="tx-value">
-                      {transaction.vout.length}
-                      {outputTotalZat > 0 && (
-                        <span className="btc-value-inline">
-                          {" "}
-                          ({formatZEC(outputTotalZat, currency)})
-                        </span>
-                      )}
-                    </span>
-                  </div>
-                </>
-              )}
+                )}
+              </div>
 
-              {!isCoinbase && (
+              <div className="btc-tx-details-column">
                 <div className="tx-row">
                   <FieldLabel
-                    label={t("tx.fee")}
-                    tooltipKey="zcash.tx.fee"
+                    label={t("tx.size")}
+                    tooltipKey="zcash.tx.size"
                     visibleFor={["beginner", "intermediate"]}
                   />
-                  {renderFee()}
+                  <span className="tx-value">{formatSize(transaction.size)}</span>
                 </div>
-              )}
-            </div>
-
-            <div className="btc-tx-details-column">
-              <div className="tx-row">
-                <FieldLabel
-                  label={t("tx.size")}
-                  tooltipKey="zcash.tx.size"
-                  visibleFor={["beginner", "intermediate"]}
-                />
-                <span className="tx-value">{formatSize(transaction.size)}</span>
-              </div>
-              <div className="tx-row">
-                <FieldLabel label={t("tx.version")} />
-                <span className="tx-value">{transaction.version}</span>
-              </div>
-              {transaction.versionGroupId && (
+                <div className="tx-row">
+                  <FieldLabel label={t("tx.version")} />
+                  <span className="tx-value">{transaction.version}</span>
+                </div>
+                {transaction.versionGroupId && (
+                  <div className="tx-row">
+                    <FieldLabel
+                      label={t("tx.versionGroupId")}
+                      tooltipKey="zcash.tx.versionGroupId"
+                      visibleFor={["beginner", "intermediate", "advanced"]}
+                    />
+                    <span className="tx-value tx-mono">{transaction.versionGroupId}</span>
+                  </div>
+                )}
+                {transaction.expiryHeight !== undefined && transaction.expiryHeight > 0 && (
+                  <div className="tx-row">
+                    <FieldLabel
+                      label={t("tx.expiryHeight")}
+                      tooltipKey="zcash.tx.expiryHeight"
+                      visibleFor={["beginner", "intermediate"]}
+                    />
+                    <span className="tx-value">{formatNumber(transaction.expiryHeight)}</span>
+                  </div>
+                )}
                 <div className="tx-row">
                   <FieldLabel
-                    label={t("tx.versionGroupId")}
-                    tooltipKey="zcash.tx.versionGroupId"
+                    label={t("tx.locktime")}
+                    tooltipKey="zcash.tx.locktime"
                     visibleFor={["beginner", "intermediate", "advanced"]}
                   />
-                  <span className="tx-value tx-mono">{transaction.versionGroupId}</span>
+                  <span className="tx-value">{formatNumber(transaction.locktime)}</span>
                 </div>
-              )}
-              {transaction.expiryHeight !== undefined && transaction.expiryHeight > 0 && (
-                <div className="tx-row">
-                  <FieldLabel
-                    label={t("tx.expiryHeight")}
-                    tooltipKey="zcash.tx.expiryHeight"
-                    visibleFor={["beginner", "intermediate"]}
-                  />
-                  <span className="tx-value">{formatNumber(transaction.expiryHeight)}</span>
-                </div>
-              )}
-              <div className="tx-row">
-                <FieldLabel
-                  label={t("tx.locktime")}
-                  tooltipKey="zcash.tx.locktime"
-                  visibleFor={["beginner", "intermediate", "advanced"]}
-                />
-                <span className="tx-value">{formatNumber(transaction.locktime)}</span>
               </div>
             </div>
           </div>
-        </div>
 
-        <ZcashShieldedBundles transaction={transaction} currency={currency} />
+          <ZcashShieldedBundles transaction={transaction} currency={currency} />
 
-        {hasTransparent && (
-          <div className="btc-io-columns">
-            <div className="btc-io-column">
-              <div className="btc-io-column-header">
-                <span className="btc-io-column-title">
-                  {t("tx.inputsColumn", { count: transaction.vin.length })}
-                </span>
-                {inputTotalZat !== null && inputTotalZat > 0 && (
-                  <div className="btc-io-column-totals">
-                    <span className="btc-io-column-total">
-                      {formatZEC(inputTotalZat, currency)}
-                    </span>
-                  </div>
-                )}
-              </div>
-              <div className="btc-io-column-content">
-                {transaction.vin.length === 0 && (
-                  <div className="btc-io-item text-muted">{t("tx.noTransparentInputs")}</div>
-                )}
-                {transaction.vin.map((input, index) => (
-                  // biome-ignore lint/suspicious/noArrayIndexKey: inputs keep their on-chain order
-                  <div key={index} className="btc-io-item">
-                    <div className="btc-io-index">{index}</div>
-                    <div className="btc-io-content">
-                      {input.coinbase !== undefined ? (
-                        <div className="btc-io-coinbase">{t("tx.newCoins")}</div>
-                      ) : (
-                        <>
-                          <div className="btc-io-address">
-                            {input.address ? (
-                              <>
-                                <Link
-                                  to={`/${networkId}/address/${input.address}`}
-                                  className="link-accent tx-mono"
-                                >
-                                  {input.address}
-                                </Link>
-                                <CopyButton value={input.address} />
-                              </>
-                            ) : (
-                              <span className="tx-mono text-muted">{t("tx.unknownAddress")}</span>
-                            )}
-                          </div>
-                          <div className="btc-io-details">
-                            <span className="btc-io-value">
-                              {input.valueZat !== undefined
-                                ? formatZEC(input.valueZat, currency)
-                                : t("tx.unknownValue")}
-                            </span>
-                            {input.txid && (
-                              <span className="btc-io-txref">
-                                <Link to={`/${networkId}/tx/${input.txid}`} className="link-accent">
-                                  {t("tx.spends", {
-                                    outpoint: `${truncateHash(input.txid, "short")}:${input.vout}`,
-                                  })}
-                                </Link>
-                              </span>
-                            )}
-                          </div>
-                        </>
-                      )}
+          {hasTransparent && (
+            <div className="btc-io-columns">
+              <div className="btc-io-column">
+                <div className="btc-io-column-header">
+                  <span className="btc-io-column-title">
+                    {t("tx.inputsColumn", { count: transaction.vin.length })}
+                  </span>
+                  {inputTotalZat !== null && inputTotalZat > 0 && (
+                    <div className="btc-io-column-totals">
+                      <span className="btc-io-column-total">
+                        {formatZEC(inputTotalZat, currency)}
+                      </span>
                     </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="btc-io-arrow">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                <title>{t("tx.flowArrow")}</title>
-                <path
-                  d="M5 12h14M13 5l7 7-7 7"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </div>
-
-            <div className="btc-io-column">
-              <div className="btc-io-column-header">
-                <span className="btc-io-column-title">
-                  {t("tx.outputsColumn", { count: transaction.vout.length })}
-                </span>
-                {outputTotalZat > 0 && (
-                  <div className="btc-io-column-totals">
-                    <span className="btc-io-column-total">
-                      {formatZEC(outputTotalZat, currency)}
-                    </span>
-                  </div>
-                )}
-              </div>
-              <div className="btc-io-column-content">
-                {transaction.vout.length === 0 && (
-                  <div className="btc-io-item text-muted">{t("tx.noTransparentOutputs")}</div>
-                )}
-                {transaction.vout.map((output) => (
-                  <div key={output.n} className="btc-io-item">
-                    <div className="btc-io-index">{output.n}</div>
-                    <div className="btc-io-content">
-                      <div className="btc-io-address">
-                        {output.address ? (
-                          <>
-                            <Link
-                              to={`/${networkId}/address/${output.address}`}
-                              className="link-accent tx-mono"
-                            >
-                              {output.address}
-                            </Link>
-                            <CopyButton value={output.address} />
-                          </>
+                  )}
+                </div>
+                <div className="btc-io-column-content">
+                  {transaction.vin.length === 0 && (
+                    <div className="btc-io-item text-muted">{t("tx.noTransparentInputs")}</div>
+                  )}
+                  {transaction.vin.map((input, index) => (
+                    // biome-ignore lint/suspicious/noArrayIndexKey: inputs keep their on-chain order
+                    <div key={index} className="btc-io-item">
+                      <div className="btc-io-index">{index}</div>
+                      <div className="btc-io-content">
+                        {input.coinbase !== undefined ? (
+                          <div className="btc-io-coinbase">{t("tx.newCoins")}</div>
                         ) : (
-                          <span className="tx-mono text-muted">{t("tx.nonStandard")}</span>
+                          <>
+                            <div className="btc-io-address">
+                              {input.address ? (
+                                <>
+                                  <Link
+                                    to={`/${networkId}/address/${input.address}`}
+                                    className="link-accent tx-mono"
+                                  >
+                                    {input.address}
+                                  </Link>
+                                  <CopyButton value={input.address} />
+                                </>
+                              ) : (
+                                <span className="tx-mono text-muted">{t("tx.unknownAddress")}</span>
+                              )}
+                            </div>
+                            <div className="btc-io-details">
+                              <span className="btc-io-value">
+                                {input.valueZat !== undefined
+                                  ? formatZEC(input.valueZat, currency)
+                                  : t("tx.unknownValue")}
+                              </span>
+                              {input.txid && (
+                                <span className="btc-io-txref">
+                                  <Link
+                                    to={`/${networkId}/tx/${input.txid}`}
+                                    className="link-accent"
+                                  >
+                                    {t("tx.spends", {
+                                      outpoint: `${truncateHash(input.txid, "short")}:${input.vout}`,
+                                    })}
+                                  </Link>
+                                </span>
+                              )}
+                            </div>
+                          </>
                         )}
                       </div>
-                      <div className="btc-io-details">
-                        <span className="btc-io-value tx-value-highlight">
-                          {formatZEC(output.valueZat, currency)}
-                        </span>
-                        <span className="btc-io-type">{output.scriptType}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="btc-io-arrow">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                  <title>{t("tx.flowArrow")}</title>
+                  <path
+                    d="M5 12h14M13 5l7 7-7 7"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </div>
+
+              <div className="btc-io-column">
+                <div className="btc-io-column-header">
+                  <span className="btc-io-column-title">
+                    {t("tx.outputsColumn", { count: transaction.vout.length })}
+                  </span>
+                  {outputTotalZat > 0 && (
+                    <div className="btc-io-column-totals">
+                      <span className="btc-io-column-total">
+                        {formatZEC(outputTotalZat, currency)}
+                      </span>
+                    </div>
+                  )}
+                </div>
+                <div className="btc-io-column-content">
+                  {transaction.vout.length === 0 && (
+                    <div className="btc-io-item text-muted">{t("tx.noTransparentOutputs")}</div>
+                  )}
+                  {transaction.vout.map((output) => (
+                    <div key={output.n} className="btc-io-item">
+                      <div className="btc-io-index">{output.n}</div>
+                      <div className="btc-io-content">
+                        <div className="btc-io-address">
+                          {output.address ? (
+                            <>
+                              <Link
+                                to={`/${networkId}/address/${output.address}`}
+                                className="link-accent tx-mono"
+                              >
+                                {output.address}
+                              </Link>
+                              <CopyButton value={output.address} />
+                            </>
+                          ) : (
+                            <span className="tx-mono text-muted">{t("tx.nonStandard")}</span>
+                          )}
+                        </div>
+                        <div className="btc-io-details">
+                          <span className="btc-io-value tx-value-highlight">
+                            {formatZEC(output.valueZat, currency)}
+                          </span>
+                          <span className="btc-io-type">{output.scriptType}</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
+        <AIAnalysisPanel
+          analysisType="zcash_transaction"
+          context={aiContext}
+          networkName={network?.name ?? "Zcash"}
+          networkCurrency={currency}
+          cacheKey={`openscan_ai_zcash_transaction_${networkId}_${transaction.txid}`}
+        />
       </div>
     );
   },

@@ -57,6 +57,10 @@ export function buildPrompt(
       return buildBitcoinBlockPrompt(config, context, promptContext);
     case "bitcoin_address":
       return buildBitcoinAddressPrompt(config, context, promptContext);
+    case "zcash_transaction":
+    case "zcash_block":
+    case "zcash_address":
+      return buildZcashPrompt(config, context, promptContext);
     case "solana_transaction":
     case "solana_block":
     case "solana_account":
@@ -188,6 +192,43 @@ const POWER_STABLE_CONFIGS: Record<AIAnalysisType, PromptConfig> = {
     sections: ["Address Analysis", "Balance and UTXOs", "Activity", "Notable Aspects"],
     customRules: "Express amounts in BTC. Never use gas, wei, Gwei, or EVM terminology.",
   },
+  zcash_transaction: {
+    role: "Zcash blockchain analyst",
+    conciseness: "6-8 sentences",
+    focusAreas:
+      "how value moves between the transparent and shielded pools (Sprout, Sapling, Orchard, Ironwood), transparent inputs and outputs, the fee derived from value balances, coinbase vs regular, and expiry height",
+    audience: "senior Zcash developer",
+    task: "Analyze this Zcash transaction",
+    sections: [
+      "Transaction Analysis",
+      "Transparent and Shielded Flow",
+      "Fee Analysis",
+      "Notable Aspects",
+    ],
+    customRules:
+      "Express amounts in ZEC. A positive value balance means value left that shielded pool; a negative one means value entered it. Shielded amounts, senders and recipients are encrypted: never guess them, and do not treat empty transparent inputs or outputs as an error. Never use gas, wei, Gwei, or EVM terminology.",
+  },
+  zcash_block: {
+    role: "Zcash blockchain analyst",
+    conciseness: "3-5 sentences",
+    focusAreas:
+      "transaction count, how many transactions use each shielded pool, coinbase outputs (miner reward and funding streams), difficulty, and the value pool balances after the block",
+    audience: "senior Zcash developer",
+    task: "Analyze this Zcash block",
+    sections: ["Block Analysis", "Shielded Activity", "Reward and Value Pools", "Notable Aspects"],
+    customRules: "Express amounts in ZEC. Never use gas, wei, Gwei, or EVM terminology.",
+  },
+  zcash_address: {
+    role: "Zcash blockchain analyst",
+    conciseness: "4-6 sentences",
+    focusAreas:
+      "address type (transparent, Sapling, unified, Sprout, TEX), its receivers, transparent balance and history when available, and the privacy implications of the address type",
+    audience: "senior Zcash developer",
+    task: "Analyze this Zcash address",
+    sections: ["Address Analysis", "Balance and Activity", "Privacy", "Notable Aspects"],
+    customRules:
+      "Express amounts in ZEC. Shielded balances are not publicly visible. If the address index was unavailable, say the data could not be loaded rather than implying a zero balance. Never use gas, wei, Gwei, or EVM terminology.",
+  },
   solana_transaction: {
     role: "Solana blockchain analyst",
     conciseness: "6-8 sentences",
@@ -286,6 +327,36 @@ const REGULAR_STABLE_CONFIGS: Record<AIAnalysisType, PromptConfig> = {
     task: "Provide a simple overview of this Bitcoin address",
     sections: ["Overview", "Balance"],
     customRules: "Express amounts in BTC. No EVM terminology.",
+  },
+  zcash_transaction: {
+    role: "Zcash educator",
+    conciseness: "4-6 sentences",
+    focusAreas: "what happened, whether funds moved publicly or privately, and the fee paid",
+    audience: "general user",
+    task: "Explain this Zcash transaction in simple, easy-to-understand language",
+    sections: ["What Happened", "Public or Private", "Fee Details"],
+    customRules:
+      "Use simple language. Express amounts in ZEC. Explain that shielded amounts and parties are private instead of guessing them. Never use gas, wei, or EVM terminology.",
+  },
+  zcash_block: {
+    role: "Zcash educator",
+    conciseness: "2-3 sentences",
+    focusAreas:
+      "what happened in this block, how many transactions it included, and how many were private",
+    audience: "general user",
+    task: "Summarize this Zcash block in simple terms",
+    sections: ["Block Summary", "Activity"],
+    customRules: "Express amounts in ZEC. No EVM terminology.",
+  },
+  zcash_address: {
+    role: "Zcash educator",
+    conciseness: "3-4 sentences",
+    focusAreas:
+      "what kind of address this is, whether its balance is public, and its balance when available",
+    audience: "general user",
+    task: "Provide a simple overview of this Zcash address",
+    sections: ["Overview", "Privacy", "Balance"],
+    customRules: "Express amounts in ZEC. No EVM terminology.",
   },
   solana_transaction: {
     role: "Solana educator",
@@ -439,6 +510,17 @@ function buildBitcoinBlockPrompt(
 }
 
 function buildBitcoinAddressPrompt(
+  config: PromptConfig,
+  context: Record<string, unknown>,
+  promptContext: PromptContext,
+): PromptPair {
+  return {
+    system: buildSystemPrompt(config, promptContext),
+    user: formatContext(context),
+  };
+}
+
+function buildZcashPrompt(
   config: PromptConfig,
   context: Record<string, unknown>,
   promptContext: PromptContext,

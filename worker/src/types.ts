@@ -6,6 +6,9 @@ export const VALID_ANALYSIS_TYPES = [
   "bitcoin_transaction",
   "bitcoin_block",
   "bitcoin_address",
+  "zcash_transaction",
+  "zcash_block",
+  "zcash_address",
 ] as const;
 
 export type AIAnalysisType = (typeof VALID_ANALYSIS_TYPES)[number];
