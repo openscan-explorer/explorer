@@ -4,9 +4,9 @@ import type React from "react";
 // ==================== NETWORK TYPES ====================
 
 /**
- * Network type - EVM, Bitcoin, or Solana
+ * Network type - EVM, Bitcoin, Zcash, or Solana
  */
-export type NetworkType = "evm" | "bitcoin" | "solana";
+export type NetworkType = "evm" | "bitcoin" | "zcash" | "solana";
 
 /**
  * All EVM chain IDs supported by the app.
@@ -271,6 +271,260 @@ export interface BitcoinAddress {
   totalReceived?: number;
   txCount?: number;
   txids?: string[];
+}
+
+// ==================== ZCASH TYPES ====================
+
+/**
+ * Zcash value pools, in the order the protocol introduced them
+ */
+export type ZcashValuePoolId =
+  | "transparent"
+  | "sprout"
+  | "sapling"
+  | "orchard"
+  | "lockbox"
+  | "ironwood";
+
+/**
+ * Shielded pools a transaction can move value through
+ */
+export type ZcashShieldedPool = "sprout" | "sapling" | "orchard" | "ironwood";
+
+/**
+ * Pools a transaction touches: transparent inputs/outputs plus its shielded bundles
+ */
+export type ZcashTxPool = "transparent" | ZcashShieldedPool;
+
+/**
+ * Balance of a single value pool, in zatoshis (1 ZEC = 100,000,000 zat)
+ */
+export interface ZcashValuePool {
+  id: ZcashValuePoolId;
+  valueZat: number;
+}
+
+/**
+ * Zcash network statistics from getblockchaininfo + getmempoolinfo
+ */
+export interface ZcashNetworkStats {
+  blockHeight: number;
+  bestBlockHash: string;
+  difficulty: number;
+  chain: string;
+  estimatedHeight?: number;
+  verificationProgress?: number;
+  mempoolSize: number;
+  mempoolBytes: number;
+  chainSupplyZat?: number;
+  valuePools: ZcashValuePool[];
+}
+
+/**
+ * Note commitment tree sizes at a block
+ */
+export interface ZcashTreeSizes {
+  sapling?: number;
+  orchard?: number;
+  ironwood?: number;
+}
+
+/**
+ * Transparent output of a coinbase transaction (miner reward or funding stream)
+ */
+export interface ZcashCoinbaseOutput {
+  address?: string;
+  valueZat: number;
+}
+
+/**
+ * Zcash block data
+ */
+export interface ZcashBlock {
+  hash: string;
+  height: number;
+  time: number;
+  nTx: number;
+  size: number;
+  version: number;
+  merkleRoot: string;
+  previousBlockHash?: string;
+  nextBlockHash?: string;
+  bits: string;
+  nonce: string; // 32-byte hex string, unlike Bitcoin's numeric nonce
+  difficulty: number;
+  confirmations?: number;
+  solution?: string; // Equihash solution (hex)
+  blockCommitments?: string;
+  finalSaplingRoot?: string;
+  finalOrchardRoot?: string; // Only on post-NU5 blocks
+  trees?: ZcashTreeSizes;
+  chainSupplyZat?: number;
+  valuePools?: ZcashValuePool[];
+  txids?: string[];
+  // Derived from full transaction data (getblock verbosity 2)
+  coinbaseOutputs?: ZcashCoinbaseOutput[];
+  shieldedTxCounts?: Partial<Record<ZcashShieldedPool, number>>;
+  transparentOutputZat?: number;
+}
+
+/**
+ * Transparent transaction input. Zebra doesn't return the output being spent, so value and
+ * address stay undefined until the previous transaction is looked up.
+ */
+export interface ZcashTransparentInput {
+  txid?: string;
+  vout?: number;
+  coinbase?: string;
+  sequence: number;
+  valueZat?: number;
+  address?: string;
+}
+
+/**
+ * Transparent transaction output
+ */
+export interface ZcashTransparentOutput {
+  n: number;
+  valueZat: number;
+  address?: string;
+  scriptType: string;
+}
+
+/**
+ * Sapling spends and outputs; valueBalanceZat is the net value leaving the pool
+ */
+export interface ZcashSaplingBundle {
+  spends: number;
+  outputs: number;
+  valueBalanceZat: number;
+}
+
+/**
+ * Orchard or Ironwood actions (each action combines a spend and an output)
+ */
+export interface ZcashActionBundle {
+  actions: number;
+  valueBalanceZat: number;
+}
+
+/**
+ * Sprout-era JoinSplits
+ */
+export interface ZcashSproutBundle {
+  joinSplits: number;
+  vpubOldZat: number; // Value entering the Sprout pool
+  vpubNewZat: number; // Value leaving the Sprout pool
+}
+
+/**
+ * Shielded bundles of a transaction; a bundle is present only when it carries data
+ */
+export interface ZcashShieldedBundles {
+  sprout?: ZcashSproutBundle;
+  sapling?: ZcashSaplingBundle;
+  orchard?: ZcashActionBundle;
+  ironwood?: ZcashActionBundle;
+}
+
+/**
+ * How a transaction moves value between the transparent and shielded pools
+ */
+export type ZcashTxKind =
+  | "coinbase"
+  | "transparent"
+  | "shielding"
+  | "deshielding"
+  | "shielded"
+  | "mixed";
+
+/**
+ * Zcash transaction data
+ */
+export interface ZcashTransaction {
+  txid: string;
+  version: number;
+  versionGroupId?: string;
+  size: number;
+  locktime: number;
+  expiryHeight?: number;
+  vin: ZcashTransparentInput[];
+  vout: ZcashTransparentOutput[];
+  shielded: ZcashShieldedBundles;
+  blockhash?: string;
+  blockheight?: number;
+  confirmations?: number;
+  blocktime?: number;
+  time?: number;
+}
+
+/**
+ * A block together with its decoded transactions (from a single getblock call)
+ */
+export interface ZcashBlockWithTransactions {
+  block: ZcashBlock;
+  transactions: ZcashTransaction[];
+}
+
+/**
+ * Pending transaction from getrawmempool (verbose)
+ */
+export interface ZcashMempoolEntry {
+  txid: string;
+  size: number;
+  feeZat: number;
+  time: number;
+  height: number;
+}
+
+/**
+ * Zcash address encodings
+ */
+export type ZcashAddressType =
+  | "p2pkh"
+  | "p2sh"
+  | "tex"
+  | "sprout"
+  | "sapling"
+  | "unified"
+  | "unknown";
+
+/**
+ * Whether the RPC endpoint served a section: "unsupported" when it doesn't expose the method
+ * (hosted gateways block the address index), "error" for any other failure
+ */
+export type ZcashRpcAvailability = "ok" | "unsupported" | "error";
+
+export interface ZcashRpcSection<T> {
+  availability: ZcashRpcAvailability;
+  data?: T;
+}
+
+export interface ZcashAddressUtxo {
+  txid: string;
+  outputIndex: number;
+  valueZat: number;
+  height: number;
+}
+
+export interface ZcashUnifiedReceivers {
+  orchard?: string;
+  sapling?: string;
+  p2pkh?: string;
+  p2sh?: string;
+}
+
+/**
+ * Zcash address data; each section is only present when it applies to the address type
+ */
+export interface ZcashAddress {
+  address: string;
+  type: ZcashAddressType;
+  transparentAddress?: string; // Address the index queries ran against
+  receivers?: ZcashRpcSection<ZcashUnifiedReceivers>;
+  balance?: ZcashRpcSection<{ balanceZat: number; receivedZat?: number }>;
+  utxos?: ZcashRpcSection<ZcashAddressUtxo[]>;
+  txids?: ZcashRpcSection<string[]>;
 }
 
 // ==================== SOLANA TYPES ====================

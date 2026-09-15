@@ -7,6 +7,7 @@ import { PolygonAdapter } from "./PolygonAdapter/PolygonAdapter";
 import { ArbitrumAdapter } from "./ArbitrumAdapter/ArbitrumAdapter";
 import { HardhatAdapter } from "./HardhatAdapter/HardhatAdapter";
 import { BitcoinAdapter } from "./BitcoinAdapter/BitcoinAdapter";
+import { ZcashAdapter } from "./ZcashAdapter/ZcashAdapter";
 import { SolanaAdapter } from "./SolanaAdapter/SolanaAdapter";
 import type {
   ArbitrumClient,
@@ -21,6 +22,7 @@ import type {
   PolygonClient,
   SolanaClient,
   SupportedChainId,
+  ZcashClient,
 } from "@openscan/network-connectors";
 
 // biome-ignore lint/complexity/noStaticOnlyClass: <TODO>
@@ -74,6 +76,13 @@ export class AdapterFactory {
    */
   static createBitcoinAdapter(networkId: string, client: BitcoinClient): BitcoinAdapter {
     return new BitcoinAdapter(networkId, client);
+  }
+
+  /**
+   * Create a Zcash network adapter
+   */
+  static createZcashAdapter(networkId: string, client: ZcashClient): ZcashAdapter {
+    return new ZcashAdapter(networkId, client);
   }
 
   /**

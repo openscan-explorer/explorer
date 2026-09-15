@@ -9,6 +9,7 @@ Typed RPC clients for blockchain communication:
 - `EthereumClient` - Standard JSON-RPC for EVM chains
 - `HardhatClient` - Extended client with Hardhat-specific methods (`hardhat_*`, `evm_*`, `debug_*`)
 - `BitcoinClient` - Bitcoin JSON-RPC (`getblock`, `getrawtransaction`, etc.)
+- `ZcashClient` - Zebra (`zebrad`) JSON-RPC. HTTP only; heights are passed to `getblock` as decimal strings
 - Supports `fallback`, `parallel`, and `race` strategies
 
 ### 2. Adapter Layer (`services/adapters/`)
@@ -21,10 +22,11 @@ Abstract `NetworkAdapter` base class with chain-specific implementations:
 - `PolygonAdapter` - Polygon (137) + Amoy testnet (80002)
 - `HardhatAdapter` - Localhost (31337) with trace support via struct log conversion
 - `BitcoinAdapter` - Bitcoin networks (bip122:*) with UTXO model, mempool, and block explorer
+- `ZcashAdapter` - Zcash networks (bip122:00040fe8…, bip122:05a60a92…) with shielded pools. Budgets RPC calls for rate-limited hosted gateways and throws `ZcashRpcError` instead of returning empty data
 - `SolanaAdapter` - Solana networks
 - Each adapter implements: `getBlock`, `getTransaction`, `getAddress`, `getNetworkStats`, trace methods
-- `AdapterFactory` routes chain ID to the correct adapter via three entry points:
-  `createAdapter` (EVM), `createBitcoinAdapter`, `createSolanaAdapter`
+- `AdapterFactory` routes chain ID to the correct adapter via four entry points:
+  `createAdapter` (EVM), `createBitcoinAdapter`, `createZcashAdapter`, `createSolanaAdapter`
 
 ### 3. Service Layer (`DataService.ts`)
 Orchestrates data fetching with caching and metadata:
@@ -55,6 +57,7 @@ Chain ID detection in `AdapterFactory` determines which adapter to instantiate
 - **BSC** (56, 97): `BNBAdapter`
 - **Polygon** (137, 80002): `PolygonAdapter`
 - **Bitcoin** (bip122:*): `BitcoinAdapter` - UTXO model, mempool transactions, block rewards (constructed via `createBitcoinAdapter`)
+- **Zcash** (bip122:00040fe8…, bip122:05a60a92…): `ZcashAdapter` - transparent UTXOs plus Sprout/Sapling/Orchard/Ironwood shielded bundles (constructed via `createZcashAdapter`). Zcash shares the bip122 namespace with Bitcoin, so routing keys off `type: "zcash"`, never the prefix
 - **Solana**: `SolanaAdapter` (constructed via `createSolanaAdapter`)
 - **Hardhat** (31337): `HardhatAdapter` - uses `HardhatClient` from `@openscan/network-connectors`; trace support via struct log conversion (`buildCallTreeFromStructLogs`, `buildPrestateFromStructLogs` in `src/utils/structLogConverter.ts`) since Hardhat v3 does not support `callTracer`/`prestateTracer`
 - **Default EVM**: `EVMAdapter` for Ethereum (1), Sepolia (11155111), Avalanche (43114, 43113)
