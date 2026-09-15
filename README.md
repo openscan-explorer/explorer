@@ -22,6 +22,10 @@ A trustless, open-source blockchain explorer for Bitcoin, Ethereum, and Layer 2 
 - **Bitcoin Mainnet** (`/btc`) - The main Bitcoin network
 - **Bitcoin Testnet4** (`/tbtc`) - Bitcoin test network for development
 
+#### Zcash Networks
+- **Zcash Mainnet** (`/zec`) - Privacy-preserving network with transparent and shielded value pools
+- **Zcash Testnet** (`/tzec`) - Zcash test network for development
+
 #### EVM Networks
 - **Ethereum Mainnet** - The main Ethereum network
 - **Sepolia Testnet** - Ethereum test network for development

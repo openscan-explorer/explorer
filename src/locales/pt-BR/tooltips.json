@@ -151,6 +151,18 @@
     "inputsColumn": "Saídas de transações anteriores sendo gastas. Cada entrada referencia um UTXO (Saída de Transação Não Gasta).",
     "outputsColumn": "Novas saídas criadas por esta transação. Cada saída bloqueia BTC para um endereço receptor."
   },
+  "zcash": {
+    "valuePools": "Saldos em cada pool de valor do Zcash. Fundos transparentes são públicos, como no Bitcoin; os pools blindados (Sprout, Sapling, Orchard, Ironwood) ocultam valores e participantes.",
+    "chainSupply": "Total de ZEC em circulação em todos os pools de valor.",
+    "pools": {
+      "transparent": "UTXOs públicos com endereços e valores visíveis, como no Bitcoin.",
+      "sprout": "O pool blindado original do lançamento do Zcash em 2016. Obsoleto: os fundos só podem sair.",
+      "sapling": "Pool blindado introduzido em 2018 com provas rápidas e leves.",
+      "orchard": "Pool blindado introduzido com o NU5 em 2022, usando provas Halo 2 que dispensam configuração confiável.",
+      "lockbox": "Fundo de desenvolvimento diferido: parte de cada recompensa de bloco desde o NU6, retida pelo protocolo até que seu uso seja decidido.",
+      "ironwood": "Pool blindado introduzido com a atualização de rede NU6.3 (Ironwood)."
+    }
+  },
   "network": {
     "gasPrice": "Custo atual por unidade de gas nesta rede.",
     "blockNumber": "O número do bloco mais recentemente minerado nesta rede.",

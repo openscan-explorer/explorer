@@ -1,0 +1,50 @@
+{
+  "dashboard": {
+    "blockHeight": "ブロック高",
+    "difficulty": "難易度: {{value}}",
+    "mempool": "メンプール",
+    "mempoolTxs": "{{count}} 件",
+    "chainSupply": "総供給量",
+    "shieldedShare": "{{percent}}% シールド",
+    "loadError": "RPCエンドポイントからデータを読み込めませんでした: {{message}}",
+    "rateLimited": "RPCエンドポイントがリクエストを制限しています。データは自動的に更新されます。"
+  },
+  "valuePools": {
+    "title": "バリュープール",
+    "barLabel": "各バリュープールが保有する総供給量の割合",
+    "pools": {
+      "transparent": "トランスペアレント",
+      "sprout": "Sprout",
+      "sapling": "Sapling",
+      "orchard": "Orchard",
+      "lockbox": "ロックボックス",
+      "ironwood": "Ironwood"
+    }
+  },
+  "blocks": {
+    "title": "最新ブロック",
+    "viewAll": "すべて表示",
+    "txCount": "{{count}} 件",
+    "noBlocks": "ブロックが見つかりません"
+  },
+  "transactions": {
+    "title": "最新トランザクション",
+    "viewAll": "すべて表示",
+    "noTransactions": "トランザクションが見つかりません",
+    "shieldedValue": "シールド済み",
+    "kinds": {
+      "coinbase": "コインベース",
+      "transparent": "トランスペアレント",
+      "shielding": "シールド化",
+      "deshielding": "アンシールド化",
+      "shielded": "完全シールド",
+      "mixed": "混合"
+    }
+  },
+  "common": {
+    "secondsAgo": "{{count}}秒前",
+    "minutesAgo": "{{count}}分前",
+    "hoursAgo": "{{count}}時間前",
+    "daysAgo": "{{count}}日前"
+  }
+}

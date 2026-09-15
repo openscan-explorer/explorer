@@ -56,6 +56,7 @@ import {
   LazyTokenDetails,
   LazyTx,
   LazyTxs,
+  LazyZcashNetwork,
   preloadAllRoutes,
 } from "./components/LazyComponents";
 import { SettingsProvider, useSettings, useTheme } from "./context/SettingsContext";
@@ -159,6 +160,10 @@ function AppContent() {
               <Route path="tbtc/address/:address" element={<LazyBitcoinAddress />} />
               <Route path="tbtc/mempool" element={<LazyBitcoinMempool />} />
               <Route path="tbtc/mempool/:filter" element={<LazyBitcoinTx />} />
+              {/* Zcash Mainnet routes (must come before :networkId catch-all) */}
+              <Route path="zec" element={<LazyZcashNetwork />} />
+              {/* Zcash Testnet routes */}
+              <Route path="tzec" element={<LazyZcashNetwork />} />
               {/* Solana Mainnet routes (must come before :networkId catch-all) */}
               <Route path="sol" element={<LazySolanaNetwork />} />
               <Route path="sol/slots" element={<LazySolanaSlots />} />
