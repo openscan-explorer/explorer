@@ -195,6 +195,12 @@
       "expiryHeight": "La transacción ya no puede minarse después de esta altura de bloque.",
       "locktime": "Altura de bloque o momento más temprano en que puede minarse esta transacción.",
       "shieldedActivity": "Valor que se mueve por los pools blindados de Zcash. Montos y participantes permanecen cifrados; solo es público el balance neto de cada pool."
+    },
+    "address": {
+      "address": "Una dirección de Zcash. Las transparentes (t1, t3) son públicas como en Bitcoin; las blindadas (zs) y unificadas (u1) mantienen privados los montos y el historial.",
+      "receivers": "Una dirección unificada agrupa varios receptores. Quien envía paga al receptor más privado que admita su billetera.",
+      "balance": "Suma de las salidas transparentes no gastadas de esta dirección, según el índice de direcciones de Zebra.",
+      "received": "Valor transparente total que ha recibido esta dirección."
     }
   },
   "network": {

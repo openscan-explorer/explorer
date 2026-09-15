@@ -47,7 +47,49 @@
     "block": "Block #{{height}}",
     "transactions": "Transactions",
     "transaction": "{{txid}}",
-    "mempool": "Mempool"
+    "mempool": "Mempool",
+    "address": "{{address}}"
+  },
+  "address": {
+    "title": "Address",
+    "loading": "Loading address data...",
+    "loadError": "Couldn't load this address: {{message}}",
+    "address": "Address:",
+    "types": {
+      "p2pkh": "Transparent (P2PKH)",
+      "p2sh": "Transparent (P2SH)",
+      "tex": "TEX",
+      "sprout": "Sprout",
+      "sapling": "Sapling",
+      "unified": "Unified",
+      "unknown": "Unknown"
+    },
+    "receivers": "Receivers:",
+    "receiverTypes": {
+      "orchard": "Orchard",
+      "sapling": "Sapling",
+      "p2pkh": "Transparent (P2PKH)",
+      "p2sh": "Transparent (P2SH)"
+    },
+    "transparentReceiverNote": "transparent receiver {{address}}",
+    "balance": "Balance:",
+    "received": "Total Received:",
+    "unspentOutputsLabel": "Unspent Outputs:",
+    "transactionsLabel": "Transactions:",
+    "unspentOutputs": "Unspent Outputs ({{count}})",
+    "transactions": "Transactions ({{count}})",
+    "moreTransactions": "…and {{count}} more",
+    "noUtxos": "No unspent outputs",
+    "atHeight": "block #{{height}}",
+    "unavailable": "Not available from this RPC endpoint",
+    "sectionError": "Couldn't load this data.",
+    "retry": "Retry",
+    "shieldedNotice": "Shielded addresses don't reveal balances or transaction history on-chain. Only the owner's viewing key can see them.",
+    "unifiedShieldedNotice": "This unified address has no transparent receiver, so its balance and history stay private.",
+    "texNotice": "TEX addresses only receive transparent funds. Balance and history lookups aren't available for them yet.",
+    "unknownNotice": "This doesn't look like a Zcash address.",
+    "indexUnsupported": "This RPC endpoint doesn't provide Zebra's address index, so balance, unspent outputs and history can't be shown. Hosted gateways block these methods; add a self-hosted Zebra node to see them.",
+    "configureRpc": "Configure RPC endpoints"
   },
   "mempool": {
     "title": "{{network}} Mempool",

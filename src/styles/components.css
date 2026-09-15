@@ -6611,6 +6611,42 @@ button.tx-section-header-toggle {
 	font-variant-numeric: tabular-nums;
 }
 
+/* Zcash address page */
+.zec-address-notice {
+	margin: 12px 0;
+}
+
+.zec-address-notice p {
+	margin: 0 0 6px;
+}
+
+.zec-address-value {
+	word-break: break-all;
+}
+
+.zec-receivers {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.zec-receivers li {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px;
+	min-width: 0;
+}
+
+.zec-receiver-kind {
+	min-width: 9em;
+	font-size: 0.85rem;
+	color: var(--text-secondary);
+}
+
 /* Clickable stat label */
 .dashboard-stat-label-link {
 	display: block;
