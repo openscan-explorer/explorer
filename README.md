@@ -290,6 +290,50 @@ Default RPC endpoints:
 - **Polygon**: `https://polygon-rpc.com`, `https://polygon.llamarpc.com`, `https://polygon-bor.publicnode.com`
 - **Localhost**: `http://localhost:8545`
 
+### Using a self-hosted Zcash node
+
+A Zcash node cannot be used directly from the browser. Neither Zebra nor Zaino sends CORS headers: a preflight `OPTIONS` is answered with `405`, and responses carry no `Access-Control-Allow-Origin`, so the browser blocks the page from reading them. The symptom is `Failed to fetch` in the console while the explorer quietly falls back to the public gateways.
+
+Cookie authentication is a separate matter and is not the cause. Setting `enable_cookie_auth = false` does not add CORS headers, and a browser cannot send those credentials in any case.
+
+Run the bundled proxy in front of your node:
+
+```bash
+npm run zcash:proxy
+# listens on 127.0.0.1:8231 and forwards to http://127.0.0.1:8232
+```
+
+Then set the Zcash RPC endpoint to `http://localhost:8231` in Settings → RPCs, as the first entry.
+
+By default the proxy accepts any `localhost` or `127.0.0.1` origin, on any port, so it keeps working when the dev server moves (Vite falls back to `3031` when `3030` is taken). Pass `--origin` to narrow it to one origin, or to open it to every site:
+
+```bash
+npm run zcash:proxy -- --origin http://localhost:3031   # only this origin
+npm run zcash:proxy -- --origin '*'                     # every site — see the security notes
+```
+
+Any refused origin is logged by the proxy, along with what it does accept.
+
+If your node uses cookie authentication (Zebra's default), point the proxy at the cookie so it can add the credentials the browser cannot:
+
+```bash
+npm run zcash:proxy -- --cookie-file ~/.cache/zebra/.cookie
+npm run zcash:proxy -- --docker-container zebra   # read it from a container instead
+```
+
+Options: `--port`, `--upstream`, `--origin` (repeatable), `--cookie-file`, `--docker-container`, `--cookie-path`, `--allow-method` (repeatable).
+
+#### Security notes
+
+- The proxy binds to `127.0.0.1` and accepts only loopback origins by default. `--origin '*'` accepts every site: any page you visit can then read from your node through the proxy, with the node's credentials attached. That is limited to the read-only method allow-list below, but use it only where that is acceptable.
+- Only the RPC methods the explorer uses are forwarded; anything else is refused.
+- Keep the node itself bound to loopback. An RPC port published on all interfaces with cookie auth disabled lets anyone on your network query it and submit transactions through it.
+- Zebra writes a new cookie on every restart. The proxy re-reads it automatically.
+
+A self-hosted node is also the only way to get working address pages: the public gateways block Zebra's address index (`getaddressbalance`, `getaddresstxids`, `getaddressutxos`).
+
+[Zaino](https://github.com/zingolabs/zaino) works as well — its JSON-RPC API is Zebra-compatible and needs the same proxy. It does not implement `z_listunifiedreceivers`, so unified-address receiver details are unavailable there.
+
 ### Supported Networks
 
 #### Bitcoin Networks
