@@ -1,0 +1,49 @@
+name: Checkov
+
+on:
+  push:
+    branches:
+      - dev
+      - main
+  pull_request:
+    branches:
+      - dev
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  checkov:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Run Checkov
+        uses: bridgecrewio/checkov-action@c3e106d5f8f4253a6de5110efb41a080f83db294 # v12.3135.0
+        with:
+          directory: .
+          config_file: .checkov.yml
+          output_format: cli,sarif,github_failed_only
+          output_file_path: console,results.sarif,checkov-summary.md
+      - name: Add failed checks to job summary
+        if: success() || failure()
+        run: |
+          if [ -s checkov-summary.md ]; then
+            cat checkov-summary.md >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Checkov: no failed checks." >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Upload SARIF to code scanning
+        if: (success() || failure()) && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: results.sarif
+          category: checkov

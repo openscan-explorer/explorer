@@ -1,0 +1,44 @@
+# Checkov configuration. Keys are the CLI long options without the leading "--"
+# (https://www.checkov.io/2.Basics/CLI%20Command%20Reference.html). CLI flags override
+# values set here. Used by .github/workflows/checkov.yml and by local runs
+# (see .claude/rules/commands.md, "Security Audit").
+
+# Frameworks to scan. Explicit list instead of "all" on purpose:
+# - `secrets` is excluded: the repo is full of tx hashes, contract addresses and other
+#   high-entropy chain data (e2e fixtures, ABI-encoded calldata) that trip entropy detection.
+#   Secret scanning is handled by Gitleaks (separate issue under #369).
+# - `github_configuration` is excluded: it queries org/repo settings via the GitHub API
+#   and needs an admin token.
+# - `dockerfile` and `kubernetes` match nothing today; they stay listed so any Dockerfile
+#   or Kubernetes manifest added later is scanned automatically.
+# Checkov has no TOML parser, so worker/wrangler.toml is out of scope for built-in
+# policies (it only holds variable names; secrets are set with `wrangler secret put`).
+framework:
+  - github_actions
+  - dockerfile
+  - kubernetes
+
+# Phase 1 (informational): report every finding but always exit 0.
+# Phase 2 (blocking): uncomment `hard-fail-on`. Checks listed there fail the run (exit 1)
+# even with soft-fail enabled; everything else stays informational. Severity names
+# (CRITICAL/HIGH) do NOT work here: without a Prisma Cloud API key built-in checks carry
+# no severity, so blocking must be expressed with explicit check IDs. Fix every open
+# finding of the listed checks before enabling it, otherwise the run fails immediately.
+soft-fail: true
+# hard-fail-on:
+#   - CKV_GHA_1   # ACTIONS_ALLOW_UNSECURE_COMMANDS enabled
+#   - CKV_GHA_2   # shell injection: untrusted ${{ }} context used inside run:
+#   - CKV_GHA_3   # curl invoked with secrets inside run:
+#   - CKV_GHA_4   # netcat / reverse shell inside run:
+#   - CKV2_GHA_1  # top-level `permissions` block missing or set to write-all
+
+# Project-wide suppressions. For a single resource prefer an inline comment next to the
+# offending block (`# checkov:skip=CKV_GHA_7: <reason>`); list a check here only when it
+# does not apply to the repository as a whole, and keep the reason in the comment.
+# skip-check:
+#   - CKV_GHA_7   # example: workflow_dispatch inputs are required because <reason>
+
+# Console output only: show failed checks, without code blocks. These do not affect the
+# SARIF upload or the github_failed_only markdown summary (both only contain failures).
+quiet: true
+compact: true

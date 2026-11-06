@@ -5,6 +5,7 @@
 # OpenScan
 
 ![Production IPFS Hash](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/openscan-explorer/explorer/meta/ipfs-hash.json)
+[![Checkov](https://github.com/openscan-explorer/explorer/actions/workflows/checkov.yml/badge.svg)](https://github.com/openscan-explorer/explorer/actions/workflows/checkov.yml)
 
 A trustless, open-source blockchain explorer for Bitcoin, Ethereum, and Layer 2 networks. OpenScan connects directly to blockchain nodes via RPC, giving you unfettered access to on-chain data without intermediaries or centralized services.
 

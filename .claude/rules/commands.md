@@ -110,6 +110,22 @@ npm run audit
 
 Backed by [scripts/audit.sh](../../scripts/audit.sh).
 
+### Infrastructure-as-Code Scan (Checkov)
+
+```bash
+# Scan GitHub Actions workflows (and any Dockerfile / Kubernetes manifest) with Checkov.
+# Reads the root .checkov.yml (frameworks, suppressions, soft-fail); exits 0 in informational mode.
+pipx run checkov -d . --config-file .checkov.yml
+
+# Same scan via Docker (no Python needed). On Git Bash for Windows prefix MSYS_NO_PATHCONV=1.
+docker run --rm -v "$PWD:/src" -w /src bridgecrew/checkov -d . --config-file .checkov.yml
+```
+
+CI runs the same scan in [.github/workflows/checkov.yml](../../.github/workflows/checkov.yml)
+on pushes and PRs to `dev`/`main`. Findings show up in the job summary, as run annotations,
+and under Security → Code scanning (tool `Checkov`). Suppress a single finding inline with
+`# checkov:skip=<CHECK_ID>: <reason>` next to the offending block.
+
 ## Publishing
 
 ```bash
