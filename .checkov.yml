@@ -4,8 +4,8 @@
 # (see .claude/rules/commands.md, "Security Audit").
 
 # Frameworks to scan. Explicit list instead of "all" on purpose:
-# - `secrets` is excluded: the repo is full of tx hashes, addresses and well-known Hardhat
-#   test keys (hardhat-node-test/, e2e fixtures) that trip high-entropy detection.
+# - `secrets` is excluded: the repo is full of tx hashes, contract addresses and other
+#   high-entropy chain data (e2e fixtures, ABI-encoded calldata) that trip entropy detection.
 #   Secret scanning is handled by Gitleaks (separate issue under #369).
 # - `github_configuration` is excluded: it queries org/repo settings via the GitHub API
 #   and needs an admin token.
