@@ -5,6 +5,7 @@
 # OpenScan
 
 ![Production IPFS Hash](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/openscan-explorer/explorer/meta/ipfs-hash.json)
+[![Gitleaks](https://github.com/openscan-explorer/explorer/actions/workflows/gitleaks.yml/badge.svg)](https://github.com/openscan-explorer/explorer/actions/workflows/gitleaks.yml)
 
 A trustless, open-source blockchain explorer for Bitcoin, Ethereum, and Layer 2 networks. OpenScan connects directly to blockchain nodes via RPC, giving you unfettered access to on-chain data without intermediaries or centralized services.
 
@@ -228,20 +229,24 @@ npm run test:e2e:debug
 
 ### Git pre-commit
 
-1. Create a new file under `.git/hooks/pre-commit`
+Hooks are managed by [husky](https://typicode.github.io/husky/) and installed automatically by
+`bun install` (the `prepare` script points `core.hooksPath` at `.husky/_`). `.husky/pre-commit`
+runs on every commit:
 
-```bash
-#!/bin/sh
-set -eu
+1. `biome check --staged` — formatting and lint rules on the staged files.
+2. `gitleaks git --pre-commit --staged` — secret detection on the staged diff, when the
+   [gitleaks](https://github.com/gitleaks/gitleaks#installing) binary (>= 8.25) is installed
+   (`brew install gitleaks`, `scoop install gitleaks`, `choco install gitleaks`, or a release
+   binary on your PATH). Without it the hook prints a warning and skips the scan; CI runs the same
+   scan on every PR and blocks on findings.
 
-bunx @biomejs/biome check --staged --files-ignore-unknown=true --no-errors-on-unmatched
-```
+If the hook is not active (`git config core.hooksPath` should print `.husky/_`), run
+`bun run prepare`. A manual `.git/hooks/pre-commit` from the previous setup is ignored once husky
+is active and can be deleted. Skip the hook for one commit with `git commit --no-verify`.
 
-2. Make it executable
-
-```bash
-chmod +x .git/hooks/pre-commit
-```
+Line endings are pinned to LF by `.gitattributes` (Biome's formatter expects LF). On a Windows clone
+made before that rule existed, commit or stash your work and run `git checkout-index -a -f` once to
+rewrite the working tree with LF; otherwise Biome reports every staged file as unformatted.
 
 ### Environment Variables
 

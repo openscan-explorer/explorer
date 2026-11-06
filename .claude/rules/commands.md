@@ -110,6 +110,30 @@ npm run audit
 
 Backed by [scripts/audit.sh](../../scripts/audit.sh).
 
+### Secret Scan (Gitleaks)
+
+```bash
+# Full git history with the repo config (.gitleaks.toml and .gitleaksignore are read from the
+# repo root). Exit code 1 when leaks are found; secrets are redacted in the output.
+gitleaks git . --redact -v --no-banner
+
+# Working tree only (no history)
+gitleaks dir . --redact -v --no-banner
+
+# Same via Docker (no local install). On Git Bash for Windows prefix MSYS_NO_PATHCONV=1.
+docker run --rm -v "$PWD:/repo" ghcr.io/gitleaks/gitleaks:v8.30.1 git /repo --redact -v --no-banner
+```
+
+Triage, in this order: a real secret → remove it, rotate the credential, then add the historical
+`commit:file:rule:line` fingerprint (printed as `Fingerprint:`) to `.gitleaksignore` with a comment;
+one accepted line → append `// gitleaks:allow`; a whole class of false positives (e.g. EVM
+addresses) → extend `[[allowlists]]` in `.gitleaks.toml`.
+
+CI runs the same scan in [.github/workflows/gitleaks.yml](../../.github/workflows/gitleaks.yml):
+the PR commits on every PR to `dev`/`main` (blocking; findings are annotated on the PR), pushed
+commits on `dev`/`main`, and the full history weekly. The pre-commit hook (`.husky/pre-commit`) runs
+`gitleaks git --pre-commit --staged` when the binary is installed.
+
 ## Publishing
 
 ```bash
