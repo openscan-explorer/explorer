@@ -69,7 +69,8 @@
 		"lint:fix": "biome lint --write --max-diagnostics 1024",
 		"check": "biome check --max-diagnostics 1024",
 		"audit": "bash ./scripts/audit.sh",
-		"publish:dist": "cd dist && npm publish --tag alpha"
+		"publish:dist": "cd dist && npm publish --tag alpha",
+		"prepare": "husky"
 	},
 	"browserslist": {
 		"production": [
@@ -96,6 +97,7 @@
 		"@vitejs/plugin-react": "^5.1.2",
 		"dotenv": "^17.2.3",
 		"happy-dom": "^20.8.9",
+		"husky": "^9.1.7",
 		"vite": "^7.3.2",
 		"vitest": "^4.0.14"
 	}

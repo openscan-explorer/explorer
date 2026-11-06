@@ -16,10 +16,12 @@ Thank you for your interest in contributing to OpenScan! This guide will help yo
    git clone https://github.com/YOUR_USERNAME/openscan.git
    cd openscan
    ```
-3. Install dependencies:
+3. Install dependencies (this also installs the git pre-commit hook via husky):
    ```bash
    bun install
    ```
+   Optional but recommended: install [gitleaks](https://github.com/gitleaks/gitleaks#installing)
+   so the hook can scan staged changes for secrets before CI does.
 4. Start the development server:
    ```bash
    npm start

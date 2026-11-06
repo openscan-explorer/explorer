@@ -1,0 +1,15 @@
+# Accepted historical findings. Format: commit:file:rule:line (full 40-char SHA). An entry only
+# silences that exact commit and line; the same value elsewhere still fails. Comments must be on
+# their own line. Review changes to this file with the same care as the secret itself.
+
+# Test private key fixture (Hardhat default account #1, publicly documented); file later removed.
+b4436d01eb7f3a2a73341a730ba6fdfdaa7b373f:src/components/pages/DevTools.test.ts:generic-api-key:168
+
+# The Graph gateway key for the Kleros subgraph: public key restricted to authorized domains
+# (comment in src/services/KlerosService.ts); the current line carries `gitleaks:allow`.
+80a6f9eac0afa4f6530106636924630aaa8f3f2f:src/services/KlerosService.ts:generic-api-key:21
+c40524fac204e3a3c3312e5a398d11660708979b:src/services/KlerosService.ts:generic-api-key:21
+
+# Infura project ID committed in hardhat-node-test/hardhat.config.ts, removed in b44c3a1 but still
+# in history. Reported for rotation in the PR that introduced this file.
+3194595ea3878616eca25c2290ec9aa48f42453e:hardhat-node-test/hardhat.config.ts:infura-project-id:45

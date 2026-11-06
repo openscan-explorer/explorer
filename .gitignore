@@ -11,6 +11,10 @@ package-lock.json
 .env.test.local
 .env.production.local
 
+# Cloudflare Workers local secrets (wrangler)
+.dev.vars
+.dev.vars.*
+
 # Hardhat files
 cache/
 artifacts/

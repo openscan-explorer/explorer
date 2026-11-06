@@ -1,0 +1,14 @@
+# Runs on every commit (husky: sh -e, cwd = repo root). Skip once with `git commit --no-verify`.
+
+# 1. Biome format + lint on the staged files (same rules as the Lint workflow). Called through
+#    node to avoid package-manager specific .bin shims (bun on Windows).
+[ -f node_modules/@biomejs/biome/bin/biome ] || { echo "[pre-commit] node_modules missing: run bun install" >&2; exit 1; }
+node node_modules/@biomejs/biome/bin/biome check --staged --files-ignore-unknown=true --no-errors-on-unmatched
+
+# 2. Gitleaks on the staged diff. Optional locally; CI runs the same scan on every PR.
+if command -v gitleaks >/dev/null 2>&1; then
+  gitleaks git --pre-commit --staged --redact -v --no-banner
+else
+  echo "[pre-commit] gitleaks not installed - skipping local secret scan (CI still enforces it)." >&2
+  echo "[pre-commit] Install it: https://github.com/gitleaks/gitleaks#installing (README > Git pre-commit)." >&2
+fi
