@@ -1,0 +1,37 @@
+# Gitleaks configuration (https://github.com/gitleaks/gitleaks#configuration), gitleaks >= 8.25.
+# Picked up automatically by `gitleaks git|dir` run from the repo root, by the pre-commit hook
+# and by .github/workflows/gitleaks.yml. Triage order for a finding: real secret -> remove and
+# rotate; one accepted line -> `gitleaks:allow` comment; historical commit -> fingerprint in
+# .gitleaksignore; a whole class of false positives -> an allowlist below.
+title = "OpenScan gitleaks config"
+
+[extend]
+# Start from the built-in rule set (GitHub, AWS, Slack, generic-api-key, ...).
+useDefault = true
+
+# --- Project-specific rules ---------------------------------------------------------------
+# RPC provider keys are embedded in URLs ("https://mainnet.infura.io/v3/<key>"); the generic
+# rule needs a key=/token: style assignment and does not match these.
+[[rules]]
+id = "infura-project-id"
+description = "Infura project ID embedded in an RPC URL"
+regex = '''(?i)infura\.io/v3/([a-f0-9]{32})'''
+secretGroup = 1
+keywords = ["infura"]
+
+[[rules]]
+id = "alchemy-api-key"
+description = "Alchemy API key embedded in an RPC URL"
+regex = '''(?i)(?:alchemy\.com|alchemyapi\.io)/v2/([A-Za-z0-9_-]{32})'''
+secretGroup = 1
+keywords = ["alchemy"]
+
+# --- Global allowlists (apply to every rule, built-in ones included) ------------------------
+[[allowlists]]
+description = "EVM addresses (0x + 40 hex) are public identifiers; e2e fixtures name them canonicalToken"
+regexTarget = "secret"
+regexes = ['''^0x[0-9a-fA-F]{40}$''']
+
+[[allowlists]]
+description = "Documented placeholder keys in tests/docs, e.g. 0123456789abcdef0123456789abcdef"
+stopwords = ["0123456789abcdef"]

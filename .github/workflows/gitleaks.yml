@@ -1,0 +1,72 @@
+name: Gitleaks
+
+on:
+  push:
+    branches:
+      - dev
+      - main
+  pull_request:
+    branches:
+      - dev
+      - main
+  schedule:
+    # Weekly full-history scan (Mondays 05:00 UTC). Scheduled runs use the workflow file
+    # on the default branch only.
+    - cron: "0 5 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  gitleaks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      pull-requests: write # gitleaks-action posts review comments on findings (same-repo PRs)
+    env:
+      GITLEAKS_VERSION: "8.30.1" # keep in sync with GITLEAKS_SHA256 below
+      # Secrets are not exposed to workflows triggered by fork or Dependabot PRs, and
+      # gitleaks-action exits 1 without GITLEAKS_LICENSE on organization repos. Those PRs
+      # are scanned with the plain binary instead (same config and rules).
+      GITLEAKS_HAS_LICENSE: ${{ secrets.GITLEAKS_LICENSE != '' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0 # commits are scanned, not just the tree
+          persist-credentials: false
+
+      - name: Run Gitleaks (gitleaks-action)
+        if: env.GITLEAKS_HAS_LICENSE == 'true' || github.event_name != 'pull_request'
+        uses: gitleaks/gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e # v3.0.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
+
+      - name: Run Gitleaks (PR without license)
+        if: env.GITLEAKS_HAS_LICENSE != 'true' && github.event_name == 'pull_request'
+        env:
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          GITLEAKS_SHA256: 551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb # gitleaks_8.30.1_linux_x64.tar.gz
+        run: |
+          curl -sSfL -o "$RUNNER_TEMP/gitleaks.tar.gz" \
+            "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
+          echo "${GITLEAKS_SHA256}  $RUNNER_TEMP/gitleaks.tar.gz" | sha256sum -c -
+          tar -xzf "$RUNNER_TEMP/gitleaks.tar.gz" -C "$RUNNER_TEMP" gitleaks
+          base="$(git merge-base "origin/${BASE_REF}" "${HEAD_SHA}")"
+          rc=0
+          "$RUNNER_TEMP/gitleaks" git . --redact -v --no-banner \
+            --log-opts="--no-merges --first-parent ${base}..${HEAD_SHA}" \
+            --report-format json --report-path "$RUNNER_TEMP/gitleaks.json" || rc=$?
+          # Surface findings as PR annotations; needs no API token, so it works for forks.
+          if [ -f "$RUNNER_TEMP/gitleaks.json" ]; then
+            jq -r '.[]? | "::error file=\(.File),line=\(.StartLine),endLine=\(.EndLine),title=Gitleaks \(.RuleID)::\(.Description) in commit \(.Commit[0:7]). Fingerprint: \(.Fingerprint)"' \
+              "$RUNNER_TEMP/gitleaks.json"
+            echo "Gitleaks v${GITLEAKS_VERSION} scanned ${base:0:7}..${HEAD_SHA:0:7}: $(jq 'length' "$RUNNER_TEMP/gitleaks.json") finding(s)." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Gitleaks v${GITLEAKS_VERSION} scanned ${base:0:7}..${HEAD_SHA:0:7}: no findings." >> "$GITHUB_STEP_SUMMARY"
+          fi
+          exit "$rc"
