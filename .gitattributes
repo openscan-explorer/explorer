@@ -1,0 +1,4 @@
+# Normalize line endings: every text file is stored and checked out with LF on all platforms.
+# Biome's formatter expects LF, so a CRLF working copy (core.autocrlf=true on Windows) would fail
+# `biome check` and the husky pre-commit hook; sh also needs LF for the hook scripts.
+* text=auto eol=lf
