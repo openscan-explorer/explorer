@@ -1,4 +1,19 @@
 import type {
+  ZecBlock,
+  ZecBlockchainInfo,
+  ZecChainSupply,
+  ZecJoinSplit,
+  ZecMempoolEntry,
+  ZecOrchardBundle,
+  ZecRawTransaction,
+  ZecScriptPubKey,
+  ZecValuePoolBalance,
+  ZecVin,
+  ZecVout,
+} from "@openscan/network-connectors";
+import { ZCASH_TREE_POOLS, ZCASH_VALUE_POOL_IDS } from "../../../config/zcashConstants";
+import type {
+  DataWithMetadata,
   ZcashActionBundle,
   ZcashBlock,
   ZcashBlockWithTransactions,
@@ -7,10 +22,13 @@ import type {
   ZcashShieldedBundles,
   ZcashShieldedPool,
   ZcashTransaction,
+  ZcashTreePool,
+  ZcashTreeSizes,
   ZcashValuePool,
   ZcashValuePoolId,
 } from "../../../types";
 import {
+  getShieldedNetZat,
   getShieldedPools,
   getTransparentOutputZat,
   isCoinbaseTransaction,
@@ -18,132 +36,122 @@ import {
 } from "../../../utils/zcashUtils";
 
 /*
- * Raw Zebra RPC shapes, limited to the fields the explorer reads. They are looser than the
- * connector's types on purpose: they also cover the NU6.3 Ironwood bundle and note commitment
- * tree, which @openscan/network-connectors does not model yet.
+ * Raw Zebra RPC shapes, limited to the fields the explorer reads. They are picked from the
+ * connector's types so renamed fields fail to compile, and loosened where Zebra omits fields
+ * or where the NU6.3 Ironwood bundle and note commitment tree aren't modelled upstream yet.
  */
 
-export interface ZcashRawActionBundle {
+export type ZcashRawActionBundle = Partial<
+  Pick<ZecOrchardBundle, "valueBalance" | "valueBalanceZat">
+> & {
   actions?: unknown[];
-  valueBalance?: number;
-  valueBalanceZat?: number;
-}
+};
 
-export interface ZcashRawVin {
-  txid?: string;
-  vout?: number;
-  coinbase?: string;
-  sequence: number;
-}
+export type ZcashRawVin = Pick<ZecVin, "txid" | "vout" | "coinbase" | "sequence">;
 
-export interface ZcashRawVout {
-  value: number;
-  valueZat?: number;
-  n: number;
-  scriptPubKey: { type: string; addresses?: string[] };
-}
+export type ZcashRawVout = Pick<ZecVout, "value" | "valueZat" | "n"> & {
+  scriptPubKey: Pick<ZecScriptPubKey, "type" | "addresses">;
+};
 
-export interface ZcashRawJoinSplit {
-  vpub_old: number;
-  vpub_new: number;
-  vpub_oldZat?: number;
-  vpub_newZat?: number;
-}
+export type ZcashRawJoinSplit = Pick<
+  ZecJoinSplit,
+  "vpub_old" | "vpub_new" | "vpub_oldZat" | "vpub_newZat"
+>;
 
-export interface ZcashRawTransaction {
-  txid?: string;
-  size?: number;
-  version?: number;
-  versiongroupid?: string;
-  locktime?: number;
-  expiryheight?: number;
+export type ZcashRawTransaction = Pick<
+  ZecRawTransaction,
+  | "txid"
+  | "size"
+  | "version"
+  | "versiongroupid"
+  | "locktime"
+  | "expiryheight"
+  | "valueBalance"
+  | "valueBalanceZat"
+  | "blockhash"
+  | "height"
+  | "confirmations"
+  | "time"
+  | "blocktime"
+> & {
   vin: ZcashRawVin[];
   vout: ZcashRawVout[];
-  valueBalance?: number;
-  valueBalanceZat?: number;
   vShieldedSpend?: unknown[];
   vShieldedOutput?: unknown[];
   vjoinsplit?: ZcashRawJoinSplit[];
   orchard?: ZcashRawActionBundle;
-  ironwood?: ZcashRawActionBundle;
-  blockhash?: string;
-  height?: number;
-  confirmations?: number;
-  time?: number;
-  blocktime?: number;
-}
+  ironwood?: ZcashRawActionBundle; // NU6.3, not in the connector yet
+};
 
-export interface ZcashRawValuePool {
-  id: string;
-  chainValueZat: number;
-}
+// Pool ids stay strings: a newer node may report pools this explorer doesn't know
+export type ZcashRawValuePool = Pick<ZecValuePoolBalance, "chainValueZat"> & { id: string };
 
-interface ZcashRawBlockCommon {
-  hash: string;
-  confirmations?: number;
-  height: number;
-  version: number;
-  merkleroot: string;
-  blockcommitments?: string;
-  finalsaplingroot?: string;
-  finalorchardroot?: string;
-  time: number;
-  nonce: string;
-  solution?: string;
-  bits: string;
-  difficulty: number;
-  previousblockhash?: string;
-  nextblockhash?: string;
-  size?: number;
-  nTx?: number;
-  trees?: {
-    sapling?: { size: number };
-    orchard?: { size: number };
-    ironwood?: { size: number };
+type ZcashRawBlockCommon = Pick<
+  ZecBlock,
+  | "hash"
+  | "height"
+  | "version"
+  | "merkleroot"
+  | "finalorchardroot"
+  | "time"
+  | "nonce"
+  | "bits"
+  | "difficulty"
+  | "previousblockhash"
+  | "nextblockhash"
+  | "size"
+  | "nTx"
+> &
+  Partial<
+    Pick<ZecBlock, "confirmations" | "blockcommitments" | "finalsaplingroot" | "solution">
+  > & {
+    trees?: Partial<Record<ZcashTreePool, { size: number }>>;
+    chainSupply?: Pick<ZecChainSupply, "chainValueZat">;
+    valuePools?: ZcashRawValuePool[];
   };
-  chainSupply?: { chainValueZat: number };
-  valuePools?: ZcashRawValuePool[];
-}
 
 /** getblock with verbosity 1 (transaction ids only) */
-export interface ZcashRawBlockSummary extends ZcashRawBlockCommon {
-  tx: string[];
-}
+export type ZcashRawBlockSummary = ZcashRawBlockCommon & { tx: string[] };
 
 /** getblock with verbosity 2 (full transactions) */
-export interface ZcashRawBlock extends ZcashRawBlockCommon {
-  tx: ZcashRawTransaction[];
-}
+export type ZcashRawBlock = ZcashRawBlockCommon & { tx: ZcashRawTransaction[] };
 
-export interface ZcashRawBlockchainInfo {
-  chain: string;
-  blocks: number;
-  bestblockhash: string;
-  difficulty: number;
-  estimatedheight?: number;
-  verificationprogress?: number;
-  chainSupply?: { chainValueZat: number };
-  valuePools?: ZcashRawValuePool[];
-}
+export type ZcashRawBlockchainInfo = Pick<
+  ZecBlockchainInfo,
+  "chain" | "blocks" | "bestblockhash" | "difficulty"
+> &
+  Partial<Pick<ZecBlockchainInfo, "estimatedheight" | "verificationprogress">> & {
+    chainSupply?: Pick<ZecChainSupply, "chainValueZat">;
+    valuePools?: ZcashRawValuePool[];
+  };
 
-export interface ZcashRawMempoolEntry {
-  size: number;
-  fee: number;
-  time: number;
-  height: number;
-}
+export type ZcashRawMempoolEntry = Pick<ZecMempoolEntry, "size" | "fee" | "time" | "height">;
 
-const VALUE_POOL_IDS: ZcashValuePoolId[] = [
-  "transparent",
-  "sprout",
-  "sapling",
-  "orchard",
-  "lockbox",
-  "ironwood",
-];
+/**
+ * Apply a transform to every provider response in parallel-strategy metadata, so each provider
+ * carries a complete domain object rather than raw Zebra JSON
+ */
+export function mapMetadata<T>(
+  metadata: unknown,
+  transform: (raw: never) => T,
+): DataWithMetadata<T>["metadata"] {
+  const typed = metadata as DataWithMetadata<T>["metadata"];
+  if (!typed?.responses) return typed;
+  return {
+    ...typed,
+    responses: typed.responses.map((response) => {
+      if (response.data === undefined) return response;
+      try {
+        return { ...response, data: transform(response.data as never) };
+      } catch {
+        return response;
+      }
+    }),
+  };
+}
 
 function isValuePoolId(id: string): id is ZcashValuePoolId {
-  return (VALUE_POOL_IDS as string[]).includes(id);
+  return (ZCASH_VALUE_POOL_IDS as readonly string[]).includes(id);
 }
 
 export function transformValuePools(pools: ZcashRawValuePool[] | undefined): ZcashValuePool[] {
@@ -221,6 +229,15 @@ export function transformTransaction(raw: ZcashRawTransaction): ZcashTransaction
   };
 }
 
+function transformTrees(trees: NonNullable<ZcashRawBlockCommon["trees"]>): ZcashTreeSizes {
+  const sizes: ZcashTreeSizes = {};
+  for (const pool of ZCASH_TREE_POOLS) {
+    const size = trees[pool]?.size;
+    if (size !== undefined) sizes[pool] = size;
+  }
+  return sizes;
+}
+
 function transformBlockCommon(raw: ZcashRawBlockCommon, txCount: number): ZcashBlock {
   return {
     hash: raw.hash,
@@ -240,11 +257,7 @@ function transformBlockCommon(raw: ZcashRawBlockCommon, txCount: number): ZcashB
     blockCommitments: raw.blockcommitments,
     finalSaplingRoot: raw.finalsaplingroot,
     finalOrchardRoot: raw.finalorchardroot,
-    trees: raw.trees && {
-      sapling: raw.trees.sapling?.size,
-      orchard: raw.trees.orchard?.size,
-      ironwood: raw.trees.ironwood?.size,
-    },
+    trees: raw.trees && transformTrees(raw.trees),
     chainSupplyZat: raw.chainSupply?.chainValueZat,
     valuePools: raw.valuePools && transformValuePools(raw.valuePools),
   };
@@ -257,6 +270,7 @@ export function transformBlockSummary(raw: ZcashRawBlockSummary): ZcashBlock {
 export function transformBlock(raw: ZcashRawBlock): ZcashBlockWithTransactions {
   const transactions = raw.tx.map(transformTransaction);
   const coinbase = transactions[0];
+  const isCoinbase = coinbase !== undefined && isCoinbaseTransaction(coinbase);
 
   const shieldedTxCounts: Partial<Record<ZcashShieldedPool, number>> = {};
   for (const tx of transactions) {
@@ -269,10 +283,11 @@ export function transformBlock(raw: ZcashRawBlock): ZcashBlockWithTransactions {
     block: {
       ...transformBlockCommon(raw, transactions.length),
       txids: transactions.map((tx) => tx.txid),
-      coinbaseOutputs:
-        coinbase && isCoinbaseTransaction(coinbase)
-          ? coinbase.vout.map((output) => ({ address: output.address, valueZat: output.valueZat }))
-          : [],
+      coinbaseOutputs: isCoinbase
+        ? coinbase.vout.map((output) => ({ address: output.address, valueZat: output.valueZat }))
+        : [],
+      // A shielded coinbase pays the miner into Sapling or Orchard: the value entering the pools
+      coinbaseShieldedZat: isCoinbase ? Math.max(0, -getShieldedNetZat(coinbase)) : 0,
       shieldedTxCounts,
       transparentOutputZat: transactions.reduce((sum, tx) => sum + getTransparentOutputZat(tx), 0),
     },

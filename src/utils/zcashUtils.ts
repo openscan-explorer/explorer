@@ -2,9 +2,14 @@
  * Zcash helpers: address detection, transaction classification, fees and RPC error handling
  */
 
-import { ZATOSHIS_PER_ZEC } from "../config/zcashConstants";
+import {
+  ZATOSHIS_PER_ZEC,
+  ZCASH_SHIELDED_POOLS,
+  type ZcashNetworkKind,
+} from "../config/zcashConstants";
 import type {
   ZcashAddressType,
+  ZcashFee,
   ZcashShieldedPool,
   ZcashTransaction,
   ZcashTxKind,
@@ -14,25 +19,75 @@ import type {
 const BASE58 = "[1-9A-HJ-NP-Za-km-z]";
 const BECH32 = "[02-9ac-hj-np-z]";
 
-// Mainnet and testnet prefixes. Only prefix, alphabet and length are checked, not checksums.
-const ADDRESS_PATTERNS: Array<{ type: ZcashAddressType; pattern: RegExp }> = [
-  { type: "p2pkh", pattern: new RegExp(`^(t1|tm)${BASE58}{33}$`) },
-  { type: "p2sh", pattern: new RegExp(`^(t3|t2)${BASE58}{33}$`) },
-  { type: "sprout", pattern: new RegExp(`^(zc|zt)${BASE58}{93}$`) },
-  { type: "sapling", pattern: new RegExp(`^(zs|ztestsapling)1${BECH32}{75}$`) },
-  { type: "tex", pattern: new RegExp(`^(tex|textest)1${BECH32}{38}$`) },
-  { type: "unified", pattern: new RegExp(`^(u|utest)1${BECH32}{50,}$`) },
-];
-
-/**
- * Detect a Zcash address encoding from its prefix and shape
- */
-export function detectZcashAddressType(address: string): ZcashAddressType {
-  return ADDRESS_PATTERNS.find(({ pattern }) => pattern.test(address))?.type ?? "unknown";
+interface AddressPattern {
+  type: ZcashAddressType;
+  network: ZcashNetworkKind;
+  // Bech32(m) is case-insensitive (all-uppercase is valid, e.g. in QR codes); Base58 is not
+  bech32: boolean;
+  pattern: RegExp;
 }
 
-export function isZcashAddress(term: string): boolean {
-  return detectZcashAddressType(term) !== "unknown";
+// Only prefix, alphabet and length are checked, not checksums
+const ADDRESS_PATTERNS: AddressPattern[] = [
+  { type: "p2pkh", network: "mainnet", bech32: false, pattern: new RegExp(`^t1${BASE58}{33}$`) },
+  { type: "p2pkh", network: "testnet", bech32: false, pattern: new RegExp(`^tm${BASE58}{33}$`) },
+  { type: "p2sh", network: "mainnet", bech32: false, pattern: new RegExp(`^t3${BASE58}{33}$`) },
+  { type: "p2sh", network: "testnet", bech32: false, pattern: new RegExp(`^t2${BASE58}{33}$`) },
+  { type: "sprout", network: "mainnet", bech32: false, pattern: new RegExp(`^zc${BASE58}{93}$`) },
+  { type: "sprout", network: "testnet", bech32: false, pattern: new RegExp(`^zt${BASE58}{93}$`) },
+  { type: "sapling", network: "mainnet", bech32: true, pattern: new RegExp(`^zs1${BECH32}{75}$`) },
+  {
+    type: "sapling",
+    network: "testnet",
+    bech32: true,
+    pattern: new RegExp(`^ztestsapling1${BECH32}{75}$`),
+  },
+  { type: "tex", network: "mainnet", bech32: true, pattern: new RegExp(`^tex1${BECH32}{38}$`) },
+  { type: "tex", network: "testnet", bech32: true, pattern: new RegExp(`^textest1${BECH32}{38}$`) },
+  { type: "unified", network: "mainnet", bech32: true, pattern: new RegExp(`^u1${BECH32}{50,}$`) },
+  {
+    type: "unified",
+    network: "testnet",
+    bech32: true,
+    pattern: new RegExp(`^utest1${BECH32}{50,}$`),
+  },
+];
+
+function matchAddress(
+  address: string,
+  network?: ZcashNetworkKind,
+): { pattern: AddressPattern; address: string } | undefined {
+  const candidates = ADDRESS_PATTERNS.filter((entry) => !network || entry.network === network);
+  const exact = candidates.find(({ pattern }) => pattern.test(address));
+  if (exact) return { pattern: exact, address };
+
+  if (address !== address.toUpperCase()) return undefined;
+  const lowered = address.toLowerCase();
+  const bech32 = candidates.find((entry) => entry.bech32 && entry.pattern.test(lowered));
+  return bech32 && { pattern: bech32, address: lowered };
+}
+
+/**
+ * Detect a Zcash address encoding from its prefix and shape. With a network, addresses of the
+ * other network (e.g. a testnet `tm…` address on mainnet) are reported as unknown.
+ */
+export function detectZcashAddressType(
+  address: string,
+  network?: ZcashNetworkKind,
+): ZcashAddressType {
+  return matchAddress(address, network)?.pattern.type ?? "unknown";
+}
+
+export function isZcashAddress(term: string, network?: ZcashNetworkKind): boolean {
+  return detectZcashAddressType(term, network) !== "unknown";
+}
+
+/**
+ * Canonical form of an address: all-uppercase Bech32(m) addresses are lowercased, everything
+ * else is returned as is
+ */
+export function normalizeZcashAddress(address: string): string {
+  return matchAddress(address)?.address ?? address;
 }
 
 /**
@@ -42,14 +97,16 @@ export function zecToZat(value: number): number {
   return Math.round(value * ZATOSHIS_PER_ZEC);
 }
 
+/**
+ * Zebra marks the coinbase input with a `coinbase` field, so check for it directly rather than
+ * Bitcoin's "single input without a txid" heuristic (shielded transactions can have no inputs)
+ */
 export function isCoinbaseTransaction(tx: ZcashTransaction): boolean {
   return tx.vin[0]?.coinbase !== undefined;
 }
 
-const SHIELDED_POOLS: ZcashShieldedPool[] = ["sprout", "sapling", "orchard", "ironwood"];
-
 export function getShieldedPools(tx: ZcashTransaction): ZcashShieldedPool[] {
-  return SHIELDED_POOLS.filter((pool) => tx.shielded[pool] !== undefined);
+  return ZCASH_SHIELDED_POOLS.filter((pool) => tx.shielded[pool] !== undefined);
 }
 
 export function getTransactionPools(tx: ZcashTransaction): ZcashTxPool[] {
@@ -78,38 +135,55 @@ export function getTransparentOutputZat(tx: ZcashTransaction): number {
 }
 
 /**
- * Fee in zatoshis, from the transparent value balance:
- * inputs + value leaving the shielded pools = outputs + fee.
- * Returns null for coinbase, and while any transparent input value is still unknown.
+ * Net value leaving the shielded pools into the transparent value balance, in zatoshis.
+ * Negative when the transaction moves value into the shielded pools.
  */
-export function computeFeeZat(tx: ZcashTransaction): number | null {
-  if (isCoinbaseTransaction(tx)) return null;
-
-  let inputZat = 0;
-  for (const input of tx.vin) {
-    if (input.valueZat === undefined) return null;
-    inputZat += input.valueZat;
-  }
-
+export function getShieldedNetZat(tx: ZcashTransaction): number {
   const { sprout, sapling, orchard, ironwood } = tx.shielded;
-  const shieldedNetZat =
+  return (
     (sprout ? sprout.vpubNewZat - sprout.vpubOldZat : 0) +
     (sapling?.valueBalanceZat ?? 0) +
     (orchard?.valueBalanceZat ?? 0) +
-    (ironwood?.valueBalanceZat ?? 0);
+    (ironwood?.valueBalanceZat ?? 0)
+  );
+}
 
-  return inputZat + shieldedNetZat - getTransparentOutputZat(tx);
+/**
+ * Fee from the transparent value balance: inputs + value leaving the shielded pools =
+ * outputs + fee. Unknown while any transparent input value is still unresolved.
+ */
+export function computeFee(tx: ZcashTransaction): ZcashFee {
+  if (isCoinbaseTransaction(tx)) return { kind: "coinbase" };
+
+  let inputZat = 0;
+  for (const input of tx.vin) {
+    if (input.valueZat === undefined) return { kind: "unknown" };
+    inputZat += input.valueZat;
+  }
+
+  return { kind: "known", zat: inputZat + getShieldedNetZat(tx) - getTransparentOutputZat(tx) };
 }
 
 export type ZcashRpcErrorKind = "unsupported" | "rateLimited" | "failed";
 
 const RATE_LIMITED_PATTERN = /status: 429/;
-const UNSUPPORTED_PATTERN = /method not found|-32601/i;
+// The connector reports JSON-RPC errors as "RPC error: <message>" and drops the code, so an
+// unsupported method (-32601) can only be recognised by its message
+const UNSUPPORTED_PATTERN = /method not found/i;
+const RPC_ERROR_PATTERN = /^RPC error:/;
 
 /**
- * Classify the per-endpoint error messages of a failed RPC call
+ * Classify the per-endpoint error messages of a failed RPC call:
+ * 1. Any endpoint answered with a JSON-RPC error other than "method not found": that answer is
+ *    definitive (e.g. "No such transaction"), so retrying a rate-limited endpoint can't help.
+ * 2. Otherwise any HTTP 429: rate limited, worth retrying.
+ * 3. Otherwise every endpoint rejected the method: unsupported.
  */
 export function classifyRpcErrors(messages: string[]): ZcashRpcErrorKind {
+  const definitive = messages.some(
+    (message) => RPC_ERROR_PATTERN.test(message) && !UNSUPPORTED_PATTERN.test(message),
+  );
+  if (definitive) return "failed";
   if (messages.some((message) => RATE_LIMITED_PATTERN.test(message))) return "rateLimited";
   if (messages.length > 0 && messages.every((message) => UNSUPPORTED_PATTERN.test(message))) {
     return "unsupported";

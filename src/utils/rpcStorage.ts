@@ -8,9 +8,10 @@ const METADATA_RPC_STORAGE_KEY = "OPENSCAN_METADATA_RPCS";
 const METADATA_RPC_TTL = 24 * 60 * 60 * 1000; // 24 hours
 
 /**
- * Hardcoded fallback defaults for networks that are never in the metadata service.
- * Includes localhost, worker-proxied BTC and EVM, and public Zcash and Solana endpoints.
- * Metadata service RPCs and user-configured RPCs take priority via getEffectiveRpcUrls().
+ * Built-in RPC endpoints, appended after the metadata service's endpoints for each network.
+ * They cover what the metadata service doesn't list (localhost), worker-proxied BTC and EVM
+ * endpoints, and public Zcash and Solana gateways. User-configured RPCs come first; these are
+ * still appended to them, so a built-in endpoint is always available as a fallback.
  */
 const BUILTIN_RPC_DEFAULTS: RpcUrlsContextType = {
   "eip155:31337": ["http://localhost:8545"],

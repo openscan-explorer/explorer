@@ -7,7 +7,7 @@ import { PolygonAdapter } from "./PolygonAdapter/PolygonAdapter";
 import { ArbitrumAdapter } from "./ArbitrumAdapter/ArbitrumAdapter";
 import { HardhatAdapter } from "./HardhatAdapter/HardhatAdapter";
 import { BitcoinAdapter } from "./BitcoinAdapter/BitcoinAdapter";
-import { ZcashAdapter } from "./ZcashAdapter/ZcashAdapter";
+import { ZcashAdapter, type ZcashAdapterOptions } from "./ZcashAdapter/ZcashAdapter";
 import { SolanaAdapter } from "./SolanaAdapter/SolanaAdapter";
 import type {
   ArbitrumClient,
@@ -81,8 +81,12 @@ export class AdapterFactory {
   /**
    * Create a Zcash network adapter
    */
-  static createZcashAdapter(networkId: string, client: ZcashClient): ZcashAdapter {
-    return new ZcashAdapter(networkId, client);
+  static createZcashAdapter(
+    networkId: string,
+    client: ZcashClient,
+    options?: ZcashAdapterOptions,
+  ): ZcashAdapter {
+    return new ZcashAdapter(networkId, client, options);
   }
 
   /**

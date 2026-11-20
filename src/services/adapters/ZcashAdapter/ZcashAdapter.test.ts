@@ -1,7 +1,7 @@
 import type { ZcashClient } from "@openscan/network-connectors";
-import { describe, expect, it, vi } from "vitest";
-import type { ZcashTransaction } from "../../../types";
-import { computeFeeZat } from "../../../utils/zcashUtils";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import type { RPCMetadata, ZcashTransaction } from "../../../types";
+import { computeFee } from "../../../utils/zcashUtils";
 import {
   BLOCK_3483400,
   COINBASE_TX,
@@ -9,11 +9,13 @@ import {
   SAPLING_IRONWOOD_TX,
   SHIELDING_TX,
 } from "./fixtures";
-import { ZcashAdapter, ZcashRpcError } from "./ZcashAdapter";
+import type { ZcashRawBlock, ZcashRawTransaction } from "./utils";
+import { getUnsupportedMethods, ZcashAdapter, ZcashRpcError } from "./ZcashAdapter";
 
 const NETWORK_ID = "bip122:00040fe8ec8471911baa1db1266ea15d";
 const T_ADDRESS = "t1KAuVfS2r2hc7RwSh6GTuyfqCGMFEpwkZ2";
 const METHOD_NOT_FOUND = "RPC error: Method not found: getaddressbalance";
+const RATE_LIMITED = "HTTP error! status: 429";
 
 const ok = <T>(data: T) => ({ success: true, data });
 const fail = (...errors: string[]) => ({
@@ -41,12 +43,19 @@ function createClient() {
   };
 }
 
-function setup() {
+function setup(unsupportedMethods = new Set<string>()) {
   const client = createClient();
   const sleep = vi.fn().mockResolvedValue(undefined);
-  const adapter = new ZcashAdapter(NETWORK_ID, client as unknown as ZcashClient, { sleep });
+  const adapter = new ZcashAdapter(NETWORK_ID, client as unknown as ZcashClient, {
+    sleep,
+    unsupportedMethods,
+  });
   return { adapter, client, sleep };
 }
+
+afterEach(() => {
+  vi.useRealTimers();
+});
 
 function findTx(transactions: ZcashTransaction[], txid: string | undefined): ZcashTransaction {
   const match = transactions.find((transaction) => transaction.txid === txid);
@@ -82,13 +91,68 @@ describe("ZcashAdapter blocks", () => {
 
     const { transactions } = (await adapter.getBlock(3483400)).data;
 
-    expect(computeFeeZat(findTx(transactions, IRONWOOD_ONLY_TX.txid))).toBe(10_000);
-    expect(computeFeeZat(findTx(transactions, SAPLING_IRONWOOD_TX.txid))).toBe(20_000);
-    expect(computeFeeZat(findTx(transactions, SHIELDING_TX.txid))).toBeNull();
-    expect(computeFeeZat(findTx(transactions, COINBASE_TX.txid))).toBeNull();
+    expect(computeFee(findTx(transactions, IRONWOOD_ONLY_TX.txid))).toEqual({
+      kind: "known",
+      zat: 10_000,
+    });
+    expect(computeFee(findTx(transactions, SAPLING_IRONWOOD_TX.txid))).toEqual({
+      kind: "known",
+      zat: 20_000,
+    });
+    expect(computeFee(findTx(transactions, SHIELDING_TX.txid))).toEqual({ kind: "unknown" });
+    expect(computeFee(findTx(transactions, COINBASE_TX.txid))).toEqual({ kind: "coinbase" });
   });
 
-  it("fetches block summaries one at a time and skips blocks that fail", async () => {
+  it("reports a transparent coinbase as paying nothing into the shielded pools", async () => {
+    const { adapter, client } = setup();
+    client.getBlock.mockResolvedValue(ok(BLOCK_3483400));
+
+    const { block } = (await adapter.getBlock(3483400)).data;
+
+    expect(block.coinbaseShieldedZat).toBe(0);
+  });
+
+  it("adds a shielded coinbase reward from the value entering the pools", async () => {
+    const { adapter, client } = setup();
+    const shieldedCoinbase: ZcashRawTransaction = {
+      ...COINBASE_TX,
+      vout: COINBASE_TX.vout.slice(1),
+      orchard: { actions: [{}, {}], valueBalanceZat: -125_490_751 },
+    };
+    const block: ZcashRawBlock = {
+      ...BLOCK_3483400,
+      tx: [shieldedCoinbase, ...BLOCK_3483400.tx.slice(1)],
+    };
+    client.getBlock.mockResolvedValue(ok(block));
+
+    const { data } = await adapter.getBlock(3483400);
+
+    expect(data.block.coinbaseShieldedZat).toBe(125_490_751);
+    expect(data.block.coinbaseOutputs).toEqual([
+      { address: "t3cFfPt1Bcvgez9ZbMBFWeZsskxTkPzGCow", valueZat: 12_500_000 },
+    ]);
+  });
+
+  it("transforms each provider's response in parallel mode", async () => {
+    const { adapter, client } = setup();
+    const metadata: RPCMetadata = {
+      strategy: "parallel",
+      timestamp: 0,
+      hasInconsistencies: false,
+      responses: [
+        { url: "https://a.test", status: "success", responseTime: 1, data: BLOCK_3483400 },
+        { url: "https://b.test", status: "error", responseTime: 1, error: "timeout" },
+      ],
+    };
+    client.getBlock.mockResolvedValue({ ...ok(BLOCK_3483400), metadata });
+
+    const result = await adapter.getBlock(3483400);
+
+    expect(result.metadata?.responses[0]?.data.block.height).toBe(3483400);
+    expect(result.metadata?.responses[1]).toEqual(metadata.responses[1]);
+  });
+
+  it("fetches block summaries one at a time and reports blocks that fail", async () => {
     const { adapter, client } = setup();
     const summary = (height: number) => ({ ...BLOCK_3483400, height, tx: ["a".repeat(64)] });
     client.getBlock
@@ -96,7 +160,7 @@ describe("ZcashAdapter blocks", () => {
       .mockResolvedValueOnce(fail("RPC error: Block not found"))
       .mockResolvedValueOnce(ok(summary(3483400)));
 
-    const blocks = await adapter.getBlockSummaries([3483399, 3483398, 3483400]);
+    const { blocks, failedHeights } = await adapter.getBlockSummaries([3483399, 3483398, 3483400]);
 
     expect(client.getBlock.mock.calls).toEqual([
       ["3483399", 1],
@@ -105,6 +169,20 @@ describe("ZcashAdapter blocks", () => {
     ]);
     expect(blocks.map((block) => block.height)).toEqual([3483400, 3483399]);
     expect(blocks[0]?.txids).toEqual(["a".repeat(64)]);
+    expect(failedHeights).toEqual([3483398]);
+  });
+
+  it("stops fetching summaries once a block stays rate limited", async () => {
+    const { adapter, client, sleep } = setup();
+    client.getBlock.mockResolvedValue(fail(RATE_LIMITED));
+
+    const { blocks, failedHeights } = await adapter.getBlockSummaries([10, 9, 8]);
+
+    // One block: the first attempt plus two retries, then the rest are reported untried
+    expect(client.getBlock).toHaveBeenCalledTimes(3);
+    expect(sleep).toHaveBeenCalledTimes(2);
+    expect(blocks).toEqual([]);
+    expect(failedHeights).toEqual([10, 9, 8]);
   });
 });
 
@@ -122,6 +200,30 @@ describe("ZcashAdapter transactions", () => {
     expect(data.shielded).toEqual({
       sapling: { spends: 0, outputs: 2, valueBalanceZat: -1_877_663_138 },
     });
+  });
+
+  it("sums Sprout JoinSplit public values, preferring the integer zatoshi fields", async () => {
+    const { adapter, client } = setup();
+    const sproutTx: ZcashRawTransaction = {
+      txid: "9".repeat(64),
+      version: 2,
+      vin: [],
+      vout: [],
+      vjoinsplit: [
+        { vpub_old: 0, vpub_new: 0.4, vpub_newZat: 40_000_000 },
+        { vpub_old: 0.10000001, vpub_new: 0 },
+      ],
+    };
+    client.getRawTransaction.mockResolvedValue(ok(sproutTx));
+
+    const { data } = await adapter.getTransaction(sproutTx.txid ?? "");
+
+    expect(data.shielded.sprout).toEqual({
+      joinSplits: 2,
+      vpubOldZat: 10_000_001,
+      vpubNewZat: 40_000_000,
+    });
+    expect(computeFee(data)).toEqual({ kind: "known", zat: 29_999_999 });
   });
 
   describe("resolveTransparentInputs", () => {
@@ -160,22 +262,47 @@ describe("ZcashAdapter transactions", () => {
       const result = await adapter.resolveTransparentInputs(spending, { onProgress });
 
       expect(client.getRawTransaction).toHaveBeenCalledTimes(2);
-      expect(result).toMatchObject({ resolved: 2, total: 2 });
+      expect(result).toMatchObject({ resolved: 2, total: 2, exceedsCap: false });
       expect(onProgress).toHaveBeenLastCalledWith(2, 2);
       expect(result.transaction.vin.map((vin) => vin.valueZat)).toEqual([30_000, 20_000, 20_000]);
       expect(result.transaction.vin[0]?.address).toBe(T_ADDRESS);
-      expect(computeFeeZat(result.transaction)).toBe(10_000);
+      expect(computeFee(result.transaction)).toEqual({ kind: "known", zat: 10_000 });
     });
 
-    it("stops at the lookup cap and leaves the fee unknown", async () => {
+    it("spends no calls when the inputs exceed the lookup cap", async () => {
       const { adapter, client } = setup();
-      client.getRawTransaction.mockResolvedValue(ok(previousTx(firstTxid, [0.0003, 0.0002])));
 
       const result = await adapter.resolveTransparentInputs(spending, { max: 1 });
 
-      expect(client.getRawTransaction).toHaveBeenCalledTimes(1);
-      expect(result).toMatchObject({ resolved: 1, total: 2 });
-      expect(computeFeeZat(result.transaction)).toBeNull();
+      expect(client.getRawTransaction).not.toHaveBeenCalled();
+      expect(result).toMatchObject({ resolved: 0, total: 2, exceedsCap: true });
+      expect(computeFee(result.transaction)).toEqual({ kind: "unknown" });
+    });
+
+    it("keeps inputs resolved before a failure and resumes from them", async () => {
+      const { adapter, client } = setup();
+      client.getRawTransaction
+        .mockResolvedValueOnce(ok(previousTx(firstTxid, [0.0003, 0.0002])))
+        .mockResolvedValueOnce(fail("HTTP error! status: 502"));
+
+      const partial = await adapter.resolveTransparentInputs(spending);
+
+      expect(partial).toMatchObject({ resolved: 1, total: 2, exceedsCap: false });
+      expect(partial.error).toBeInstanceOf(ZcashRpcError);
+      expect(partial.transaction.vin.map((vin) => vin.valueZat)).toEqual([
+        30_000,
+        20_000,
+        undefined,
+      ]);
+
+      client.getRawTransaction.mockResolvedValueOnce(ok(previousTx(secondTxid, [0.0002])));
+      const resumed = await adapter.resolveTransparentInputs(partial.transaction);
+
+      expect(client.getRawTransaction).toHaveBeenLastCalledWith(secondTxid, 1);
+      expect(client.getRawTransaction).toHaveBeenCalledTimes(3);
+      expect(resumed).toMatchObject({ resolved: 2, total: 2 });
+      expect(resumed.error).toBeUndefined();
+      expect(computeFee(resumed.transaction)).toEqual({ kind: "known", zat: 10_000 });
     });
   });
 });
@@ -188,7 +315,7 @@ describe("ZcashAdapter RPC failures", () => {
       .mockResolvedValueOnce(ok(3483464));
 
     await expect(adapter.getLatestBlockNumber()).resolves.toBe(3483464);
-    expect(sleep).toHaveBeenCalledWith(15_000);
+    expect(sleep).toHaveBeenCalledWith(15_000, undefined);
   });
 
   it("gives up after the last backoff", async () => {
@@ -199,7 +326,7 @@ describe("ZcashAdapter RPC failures", () => {
       name: "ZcashRpcError",
       kind: "rateLimited",
     });
-    expect(sleep.mock.calls).toEqual([[15_000], [30_000]]);
+    expect(sleep.mock.calls.map(([ms]) => ms)).toEqual([15_000, 30_000]);
     expect(client.getBlockCount).toHaveBeenCalledTimes(3);
   });
 
@@ -213,6 +340,79 @@ describe("ZcashAdapter RPC failures", () => {
     expect(error).toMatchObject({ kind: "failed", messages: ["RPC error: Block not found"] });
     expect(sleep).not.toHaveBeenCalled();
   });
+
+  it("returns a definitive answer without waiting on a rate-limited endpoint", async () => {
+    const { adapter, client, sleep } = setup();
+    client.getRawTransaction.mockResolvedValue(
+      fail("RPC error: No such mempool or main chain transaction", RATE_LIMITED),
+    );
+
+    await expect(adapter.getTransaction("a".repeat(64))).rejects.toMatchObject({ kind: "failed" });
+    expect(sleep).not.toHaveBeenCalled();
+    expect(client.getRawTransaction).toHaveBeenCalledTimes(1);
+  });
+
+  it("retries concurrent rate-limited calls and still combines their results", async () => {
+    const { adapter, client, sleep } = setup();
+    client.getBlockchainInfo
+      .mockResolvedValueOnce(fail(RATE_LIMITED))
+      .mockResolvedValueOnce(
+        ok({ chain: "main", blocks: 1, bestblockhash: "0".repeat(64), difficulty: 1 }),
+      );
+    client.getMempoolInfo
+      .mockResolvedValueOnce(fail(RATE_LIMITED))
+      .mockResolvedValueOnce(ok({ size: 2, bytes: 300, usage: 0 }));
+
+    const { data } = await adapter.getNetworkStats();
+
+    expect(sleep.mock.calls).toEqual([
+      [15_000, undefined],
+      [15_000, undefined],
+    ]);
+    expect(data).toMatchObject({ blockHeight: 1, mempoolSize: 2 });
+  });
+
+  it("stops waiting to retry when aborted", async () => {
+    vi.useFakeTimers();
+    const client = createClient();
+    const adapter = new ZcashAdapter(NETWORK_ID, client as unknown as ZcashClient);
+    client.getBlockCount.mockResolvedValue(fail(RATE_LIMITED));
+    const controller = new AbortController();
+
+    const pending = adapter.getLatestBlockNumber({ signal: controller.signal });
+    const outcome = pending.catch((caught: unknown) => caught);
+    await vi.advanceTimersByTimeAsync(5_000);
+    controller.abort();
+
+    expect(await outcome).toMatchObject({ name: "AbortError" });
+    await vi.advanceTimersByTimeAsync(60_000);
+    expect(client.getBlockCount).toHaveBeenCalledTimes(1);
+  });
+
+  it("doesn't send a call that was aborted before it started", async () => {
+    const { adapter, client } = setup();
+    const controller = new AbortController();
+    controller.abort();
+
+    await expect(adapter.getBlock(1, { signal: controller.signal })).rejects.toMatchObject({
+      name: "AbortError",
+    });
+    expect(client.getBlock).not.toHaveBeenCalled();
+  });
+
+  it("remembers unsupported methods across adapters sharing an endpoint list", async () => {
+    const unsupported = getUnsupportedMethods(NETWORK_ID, ["https://rpc.test/remember"]);
+    const first = setup(unsupported);
+    first.client.getAddressBalance.mockResolvedValue(fail(METHOD_NOT_FOUND));
+    await first.adapter.getAddress(T_ADDRESS);
+
+    const second = setup(getUnsupportedMethods(NETWORK_ID, ["https://rpc.test/remember"]));
+    const result = await second.adapter.getAddress(T_ADDRESS);
+
+    expect(result.balance).toEqual({ availability: "unsupported" });
+    expect(second.client.getAddressBalance).not.toHaveBeenCalled();
+    expect(getUnsupportedMethods(NETWORK_ID, ["https://other.test"]).size).toBe(0);
+  });
 });
 
 describe("ZcashAdapter addresses", () => {
@@ -225,6 +425,9 @@ describe("ZcashAdapter addresses", () => {
     const result = await adapter.getAddress(T_ADDRESS);
 
     expect(client.getAddressBalance).toHaveBeenCalledWith({ addresses: [T_ADDRESS] });
+    // The three methods share the address index, so one probe is enough
+    expect(client.getAddressUtxos).not.toHaveBeenCalled();
+    expect(client.getAddressTxIds).not.toHaveBeenCalled();
     expect(result).toEqual({
       address: T_ADDRESS,
       type: "p2pkh",
@@ -238,13 +441,46 @@ describe("ZcashAdapter addresses", () => {
   it("reports other address index failures as errors", async () => {
     const { adapter, client } = setup();
     client.getAddressBalance.mockResolvedValue(fail("RPC error: invalid address"));
-    client.getAddressUtxos.mockResolvedValue(ok([]));
-    client.getAddressTxIds.mockResolvedValue(ok([]));
 
     const result = await adapter.getAddress(T_ADDRESS);
 
     expect(result.balance).toEqual({ availability: "error" });
-    expect(result.utxos).toEqual({ availability: "ok", data: [] });
+    expect(result.utxos).toEqual({ availability: "error" });
+    expect(result.txids).toEqual({ availability: "error" });
+    expect(client.getAddressUtxos).not.toHaveBeenCalled();
+  });
+
+  it("reports one section's failure when the index is available", async () => {
+    const { adapter, client } = setup();
+    client.getAddressBalance.mockResolvedValue(ok({ balance: 5 }));
+    client.getAddressUtxos.mockResolvedValue(fail("RPC error: index busy"));
+    client.getAddressTxIds.mockResolvedValue(ok([]));
+
+    const result = await adapter.getAddress(T_ADDRESS);
+
+    expect(result.utxos).toEqual({ availability: "error" });
+    expect(result.txids).toEqual({ availability: "ok", data: [] });
+  });
+
+  it("makes no RPC calls for an address of the other network", async () => {
+    const { adapter, client } = setup();
+    const testnetAddress = `tm${"a".repeat(33)}`;
+
+    const result = await adapter.getAddress(testnetAddress);
+
+    expect(result).toEqual({ address: testnetAddress, type: "unknown" });
+    expect(client.getAddressBalance).not.toHaveBeenCalled();
+  });
+
+  it("normalizes an all-uppercase unified address before querying it", async () => {
+    const { adapter, client } = setup();
+    const unified = `u1${"q".repeat(100)}`;
+    client.zListUnifiedReceivers.mockResolvedValue(ok({ orchard: `u1${"p".repeat(60)}` }));
+
+    const result = await adapter.getAddress(unified.toUpperCase());
+
+    expect(client.zListUnifiedReceivers).toHaveBeenCalledWith(unified);
+    expect(result).toMatchObject({ address: unified, type: "unified" });
   });
 
   it("maps address index data when the node exposes it", async () => {

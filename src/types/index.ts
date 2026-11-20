@@ -1,5 +1,10 @@
 import type { EthLog, SupportedChainId } from "@openscan/network-connectors";
 import type React from "react";
+import type {
+  ZCASH_SHIELDED_POOLS,
+  ZCASH_TREE_POOLS,
+  ZCASH_VALUE_POOL_IDS,
+} from "../config/zcashConstants";
 
 // ==================== NETWORK TYPES ====================
 
@@ -284,18 +289,17 @@ export interface BitcoinAddress {
 /**
  * Zcash value pools, in the order the protocol introduced them
  */
-export type ZcashValuePoolId =
-  | "transparent"
-  | "sprout"
-  | "sapling"
-  | "orchard"
-  | "lockbox"
-  | "ironwood";
+export type ZcashValuePoolId = (typeof ZCASH_VALUE_POOL_IDS)[number];
 
 /**
  * Shielded pools a transaction can move value through
  */
-export type ZcashShieldedPool = "sprout" | "sapling" | "orchard" | "ironwood";
+export type ZcashShieldedPool = (typeof ZCASH_SHIELDED_POOLS)[number];
+
+/**
+ * Shielded pools with a note commitment tree
+ */
+export type ZcashTreePool = (typeof ZCASH_TREE_POOLS)[number];
 
 /**
  * Pools a transaction touches: transparent inputs/outputs plus its shielded bundles
@@ -329,11 +333,7 @@ export interface ZcashNetworkStats {
 /**
  * Note commitment tree sizes at a block
  */
-export interface ZcashTreeSizes {
-  sapling?: number;
-  orchard?: number;
-  ironwood?: number;
-}
+export type ZcashTreeSizes = Partial<Record<ZcashTreePool, number>>;
 
 /**
  * Transparent output of a coinbase transaction (miner reward or funding stream)
@@ -370,6 +370,7 @@ export interface ZcashBlock {
   txids?: string[];
   // Derived from full transaction data (getblock verbosity 2)
   coinbaseOutputs?: ZcashCoinbaseOutput[];
+  coinbaseShieldedZat?: number; // Reward paid into shielded pools (shielded coinbase, NU5+)
   shieldedTxCounts?: Partial<Record<ZcashShieldedPool, number>>;
   transparentOutputZat?: number;
 }
@@ -443,6 +444,12 @@ export type ZcashTxKind =
   | "deshielding"
   | "shielded"
   | "mixed";
+
+/**
+ * Transaction fee: coinbase transactions pay none, and it stays unknown until every transparent
+ * input value has been looked up
+ */
+export type ZcashFee = { kind: "coinbase" } | { kind: "unknown" } | { kind: "known"; zat: number };
 
 /**
  * Zcash transaction data
