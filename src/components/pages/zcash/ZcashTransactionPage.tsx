@@ -1,9 +1,10 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useLocation, useParams } from "react-router-dom";
-import { getNetworkBySlug } from "../../../config/networks";
+import { useParams } from "react-router-dom";
+import { CACHE_MIN_CONFIRMATIONS, LOADER_TIMEOUT_MS } from "../../../config/zcashConstants";
 import { useDataService } from "../../../hooks/useDataService";
 import { usePersistentCache } from "../../../hooks/usePersistentCache";
+import { useZcashNetworkFromPath } from "../../../hooks/useZcashNetworkFromPath";
 import type { ZcashTransaction } from "../../../types";
 import { truncateHash } from "../../../utils/zcashFormatters";
 import { countPreviousTransactions } from "../../../utils/zcashUtils";
@@ -14,61 +15,84 @@ import ZcashTransactionDisplay, { type InputResolution } from "./ZcashTransactio
 export default function ZcashTransactionPage() {
   const { t } = useTranslation("zcash");
   const { filter: txid } = useParams<{ filter?: string }>();
-  const location = useLocation();
-
-  // Extract network slug from path (e.g., "/tzec/tx/..." → "tzec")
-  const networkSlug = location.pathname.split("/")[1] || "zec";
+  const {
+    slug: networkSlug,
+    label: networkLabel,
+    currency,
+    cacheNetworkId,
+  } = useZcashNetworkFromPath();
   const dataService = useDataService(networkSlug);
-  const network = getNetworkBySlug(networkSlug);
-  const networkLabel = network?.shortName || networkSlug.toUpperCase();
-  const cacheNetworkId = network?.networkId ?? networkSlug;
   const { getCached, setCached } = usePersistentCache();
 
   const [transaction, setTransaction] = useState<ZcashTransaction | null>(null);
+  const [fromCache, setFromCache] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [attempt, setAttempt] = useState(0);
   const [resolution, setResolution] = useState<InputResolution>({ status: "idle" });
+  // The input lookup belongs to one transaction: it's aborted when the page shows another
+  const resolveControllerRef = useRef<AbortController | null>(null);
 
+  const cacheIfFinal = useCallback(
+    (tx: ZcashTransaction) => {
+      if (txid && (tx.confirmations ?? 0) >= CACHE_MIN_CONFIRMATIONS) {
+        setCached(cacheNetworkId, "transaction", txid, tx);
+      }
+    },
+    [txid, setCached, cacheNetworkId],
+  );
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: attempt re-runs the fetch on retry
   useEffect(() => {
     if (!dataService || !dataService.isZcash() || !txid) return;
 
-    let cancelled = false;
+    const controller = new AbortController();
+    const { signal } = controller;
     const adapter = dataService.getZcashAdapter();
 
     const fetchTransaction = async () => {
       setLoading(true);
       setError(null);
+      setFromCache(false);
       setResolution({ status: "idle" });
 
       try {
         const cached = getCached<ZcashTransaction>(cacheNetworkId, "transaction", txid);
         if (cached) {
-          if (!cancelled) setTransaction(cached);
+          setTransaction(cached);
+          setFromCache(true);
           return;
         }
 
-        const { data } = await adapter.getTransaction(txid);
-        if (cancelled) return;
+        const { data } = await adapter.getTransaction(txid, { signal });
+        if (signal.aborted) return;
         setTransaction(data);
-        if (data.confirmations) setCached(cacheNetworkId, "transaction", txid, data);
+        cacheIfFinal(data);
       } catch (err) {
-        if (!cancelled) setError(err instanceof Error ? err.message : String(err));
+        if (!signal.aborted) setError(err instanceof Error ? err.message : String(err));
       } finally {
-        if (!cancelled) setLoading(false);
+        if (!signal.aborted) setLoading(false);
       }
     };
 
     fetchTransaction();
     return () => {
-      cancelled = true;
+      controller.abort();
+      resolveControllerRef.current?.abort();
     };
-  }, [dataService, txid, getCached, setCached, cacheNetworkId]);
+  }, [dataService, txid, getCached, cacheNetworkId, cacheIfFinal, attempt]);
 
-  // Zebra omits transparent input values, so the fee is only resolved when the user asks
+  // Zebra omits transparent input values, so the fee is only resolved when the user asks.
+  // A failed run keeps what it resolved, so asking again resumes from there.
   const resolveInputs = useCallback(async () => {
     if (!dataService?.isZcash() || !transaction) return;
 
+    resolveControllerRef.current?.abort();
+    const controller = new AbortController();
+    resolveControllerRef.current = controller;
+    const { signal } = controller;
     const adapter = dataService.getZcashAdapter();
+
     setResolution({
       status: "resolving",
       resolved: 0,
@@ -77,17 +101,34 @@ export default function ZcashTransactionPage() {
 
     try {
       const result = await adapter.resolveTransparentInputs(transaction, {
-        onProgress: (resolved, total) => setResolution({ status: "resolving", resolved, total }),
+        signal,
+        onProgress: (resolved, total) => {
+          if (!signal.aborted) setResolution({ status: "resolving", resolved, total });
+        },
       });
+      if (signal.aborted) return;
       setTransaction(result.transaction);
-      setResolution({ status: "done", resolved: result.resolved, total: result.total });
-      if (result.transaction.confirmations && txid) {
-        setCached(cacheNetworkId, "transaction", txid, result.transaction);
+      if (result.error) {
+        setResolution({
+          status: "error",
+          resolved: result.resolved,
+          total: result.total,
+          message: result.error instanceof Error ? result.error.message : String(result.error),
+        });
+        return;
       }
+      setResolution({ status: "done", resolved: result.resolved, total: result.total });
+      cacheIfFinal(result.transaction);
     } catch (err) {
-      setResolution({ status: "error", message: err instanceof Error ? err.message : String(err) });
+      if (signal.aborted) return;
+      setResolution({
+        status: "error",
+        resolved: 0,
+        total: countPreviousTransactions(transaction),
+        message: err instanceof Error ? err.message : String(err),
+      });
     }
-  }, [dataService, transaction, txid, setCached, cacheNetworkId]);
+  }, [dataService, transaction, cacheIfFinal]);
 
   if (loading) {
     return (
@@ -97,7 +138,12 @@ export default function ZcashTransactionPage() {
             <span className="block-label">{t("tx.title")}</span>
           </div>
           <div className="card-content-loading">
-            <LoaderWithTimeout text={t("tx.loading")} onRetry={() => window.location.reload()} />
+            <LoaderWithTimeout
+              key={attempt}
+              text={t("tx.loading")}
+              timeoutMs={LOADER_TIMEOUT_MS}
+              onRetry={() => setAttempt((count) => count + 1)}
+            />
           </div>
         </div>
       </div>
@@ -130,7 +176,8 @@ export default function ZcashTransactionPage() {
         <ZcashTransactionDisplay
           transaction={transaction}
           networkId={networkSlug}
-          currency={network?.currency ?? "ZEC"}
+          currency={currency}
+          confirmationsAtLeast={fromCache}
           resolution={resolution}
           onResolveInputs={resolveInputs}
         />

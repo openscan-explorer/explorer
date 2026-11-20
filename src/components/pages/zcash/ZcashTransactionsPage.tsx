@@ -1,35 +1,29 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
-import { getNetworkBySlug } from "../../../config/networks";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { TXS_PER_PAGE } from "../../../config/zcashConstants";
 import { useDataService } from "../../../hooks/useDataService";
+import { useZcashNetworkFromPath } from "../../../hooks/useZcashNetworkFromPath";
 import type { ZcashBlock, ZcashTransaction } from "../../../types";
 import { logger } from "../../../utils/logger";
-import { formatNumber, formatSize, formatZEC, truncateHash } from "../../../utils/zcashFormatters";
-import { classifyTransaction, getTransparentOutputZat } from "../../../utils/zcashUtils";
+import { formatNumber, formatSize, truncateHash } from "../../../utils/zcashFormatters";
+import { classifyTransaction } from "../../../utils/zcashUtils";
 import Breadcrumb from "../../common/Breadcrumb";
-import { TX_KIND_LABEL_KEYS } from "./labels";
+import { ZcashKindBadge, ZcashOutputValue, ZcashSkeleton } from "./ZcashCells";
 
 const SKELETON_ROWS = 10;
 
-const skeletonCell = (width: string) => (
-  <span className="skeleton-pulse" style={{ width, height: 14 }} />
-);
-
 export default function ZcashTransactionsPage() {
   const { t } = useTranslation("zcash");
-  const location = useLocation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-
-  // Extract network slug from path (e.g., "/tzec/txs" → "tzec")
-  const networkSlug = location.pathname.split("/")[1] || "zec";
+  const {
+    slug: networkSlug,
+    name: networkName,
+    label: networkLabel,
+    currency,
+  } = useZcashNetworkFromPath();
   const dataService = useDataService(networkSlug);
-  const network = getNetworkBySlug(networkSlug);
-  const networkName = network?.name ?? networkSlug;
-  const networkLabel = network?.shortName || networkSlug.toUpperCase();
-  const currency = network?.currency ?? "ZEC";
 
   const blockParam = searchParams.get("block");
   const requestedBlock =
@@ -45,7 +39,8 @@ export default function ZcashTransactionsPage() {
   useEffect(() => {
     if (!dataService || !dataService.isZcash()) return;
 
-    let cancelled = false;
+    const controller = new AbortController();
+    const { signal } = controller;
     const adapter = dataService.getZcashAdapter();
 
     const fetchTransactions = async () => {
@@ -53,23 +48,22 @@ export default function ZcashTransactionsPage() {
       setError(null);
 
       try {
-        const height = requestedBlock ?? (await adapter.getLatestBlockNumber());
-        const { data } = await adapter.getBlock(height);
-        if (cancelled) return;
+        const height = requestedBlock ?? (await adapter.getLatestBlockNumber({ signal }));
+        const { data } = await adapter.getBlock(height, { signal });
+        if (signal.aborted) return;
         setBlock(data.block);
         setTransactions(data.transactions);
       } catch (err) {
+        if (signal.aborted) return;
         logger.error("Error fetching Zcash transactions:", err);
-        if (!cancelled) setError(err instanceof Error ? err.message : String(err));
+        setError(err instanceof Error ? err.message : String(err));
       } finally {
-        if (!cancelled) setLoading(false);
+        if (!signal.aborted) setLoading(false);
       }
     };
 
     fetchTransactions();
-    return () => {
-      cancelled = true;
-    };
+    return () => controller.abort();
   }, [dataService, requestedBlock]);
 
   const totalPages = Math.max(1, Math.ceil(transactions.length / TXS_PER_PAGE));
@@ -152,11 +146,21 @@ export default function ZcashTransactionsPage() {
                 {Array.from({ length: SKELETON_ROWS }).map((_, i) => (
                   // biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholder
                   <tr key={i}>
-                    <td>{skeletonCell("120px")}</td>
-                    <td>{skeletonCell("70px")}</td>
-                    <td className="hide-mobile">{skeletonCell("60px")}</td>
-                    <td>{skeletonCell("80px")}</td>
-                    <td className="hide-mobile">{skeletonCell("60px")}</td>
+                    <td>
+                      <ZcashSkeleton width={120} />
+                    </td>
+                    <td>
+                      <ZcashSkeleton width={70} />
+                    </td>
+                    <td className="hide-mobile">
+                      <ZcashSkeleton width={60} />
+                    </td>
+                    <td>
+                      <ZcashSkeleton width={80} />
+                    </td>
+                    <td className="hide-mobile">
+                      <ZcashSkeleton width={60} />
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -260,41 +264,29 @@ export default function ZcashTransactionsPage() {
             <table className="dash-table">
               {tableHead}
               <tbody>
-                {displayed.map((tx) => {
-                  const kind = classifyTransaction(tx);
-                  const transparentOutputZat = getTransparentOutputZat(tx);
-                  return (
-                    <tr key={tx.txid}>
-                      <td className="table-cell-mono">
-                        <Link
-                          to={`/${networkSlug}/tx/${tx.txid}`}
-                          className="table-cell-address"
-                          title={tx.txid}
-                        >
-                          {truncateHash(tx.txid, "long")}
-                        </Link>
-                      </td>
-                      <td>
-                        <span className={`zec-kind-badge zec-kind-${kind}`}>
-                          {t(TX_KIND_LABEL_KEYS[kind])}
-                        </span>
-                      </td>
-                      <td className="table-cell-value hide-mobile">
-                        {t("txsPage.ioCount", { inputs: tx.vin.length, outputs: tx.vout.length })}
-                      </td>
-                      <td className="table-cell-text">
-                        {transparentOutputZat > 0 ? (
-                          <span className="tx-value-highlight">
-                            {formatZEC(transparentOutputZat, currency)}
-                          </span>
-                        ) : (
-                          <span className="text-muted">{t("transactions.shieldedValue")}</span>
-                        )}
-                      </td>
-                      <td className="table-cell-muted hide-mobile">{formatSize(tx.size)}</td>
-                    </tr>
-                  );
-                })}
+                {displayed.map((tx) => (
+                  <tr key={tx.txid}>
+                    <td className="table-cell-mono">
+                      <Link
+                        to={`/${networkSlug}/tx/${tx.txid}`}
+                        className="table-cell-address"
+                        title={tx.txid}
+                      >
+                        {truncateHash(tx.txid, "long")}
+                      </Link>
+                    </td>
+                    <td>
+                      <ZcashKindBadge kind={classifyTransaction(tx)} />
+                    </td>
+                    <td className="table-cell-value hide-mobile">
+                      {t("txsPage.ioCount", { inputs: tx.vin.length, outputs: tx.vout.length })}
+                    </td>
+                    <td className="table-cell-text">
+                      <ZcashOutputValue transaction={tx} currency={currency} />
+                    </td>
+                    <td className="table-cell-muted hide-mobile">{formatSize(tx.size)}</td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>

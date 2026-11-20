@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { MAX_INPUT_LOOKUPS } from "../../../config/zcashConstants";
 import { useSettings } from "../../../context/SettingsContext";
-import { useZcashTimeAgo } from "../../../hooks/useZcashTimeAgo";
+import { useTimeAgo } from "../../../hooks/useTimeAgo";
 import type { ZcashTransaction } from "../../../types";
 import {
   formatNumber,
@@ -15,16 +15,15 @@ import {
 } from "../../../utils/zcashFormatters";
 import {
   classifyTransaction,
-  computeFeeZat,
+  computeFee,
   countPreviousTransactions,
   getTransactionPools,
   getTransparentOutputZat,
-  isCoinbaseTransaction,
 } from "../../../utils/zcashUtils";
 import CopyButton from "../../common/CopyButton";
 import FieldLabel from "../../common/FieldLabel";
 import HelperTooltip from "../../common/HelperTooltip";
-import { TX_KIND_LABEL_KEYS, VALUE_POOL_LABEL_KEYS } from "./labels";
+import { ZcashKindBadge, ZcashPoolChip } from "./ZcashCells";
 import ZcashShieldedBundles from "./ZcashShieldedBundles";
 
 /** Progress of the on-demand transparent input lookup */
@@ -32,31 +31,42 @@ export type InputResolution =
   | { status: "idle" }
   | { status: "resolving"; resolved: number; total: number }
   | { status: "done"; resolved: number; total: number }
-  | { status: "error"; message: string };
+  /** Inputs resolved before the error are kept; asking again resumes */
+  | { status: "error"; resolved: number; total: number; message: string };
 
 interface ZcashTransactionDisplayProps {
   transaction: ZcashTransaction;
   networkId: string;
   currency: string;
+  /** The transaction came from the cache: its confirmation count is a lower bound */
+  confirmationsAtLeast?: boolean;
   resolution: InputResolution;
   onResolveInputs: () => void;
 }
 
 const ZcashTransactionDisplay: React.FC<ZcashTransactionDisplayProps> = React.memo(
-  ({ transaction, networkId, currency, resolution, onResolveInputs }) => {
+  ({
+    transaction,
+    networkId,
+    currency,
+    confirmationsAtLeast = false,
+    resolution,
+    onResolveInputs,
+  }) => {
     const { t } = useTranslation("zcash");
     const { t: tTooltips } = useTranslation("tooltips");
     const { settings } = useSettings();
-    const timeAgo = useZcashTimeAgo();
+    const timeAgo = useTimeAgo();
     const showTooltips = settings.showHelperTooltips !== false;
 
     const kind = classifyTransaction(transaction);
     // The kind badge already covers transactions that only use the transparent pool
     const pools =
       kind === "transparent" || kind === "coinbase" ? [] : getTransactionPools(transaction);
-    const isCoinbase = isCoinbaseTransaction(transaction);
-    const feeZat = computeFeeZat(transaction);
+    const fee = computeFee(transaction);
+    const isCoinbase = fee.kind === "coinbase";
     const previousCount = countPreviousTransactions(transaction);
+    const exceedsLookupCap = previousCount > MAX_INPUT_LOOKUPS;
     const inputTotalZat =
       !isCoinbase && transaction.vin.every((input) => input.valueZat !== undefined)
         ? transaction.vin.reduce((sum, input) => sum + (input.valueZat ?? 0), 0)
@@ -66,13 +76,13 @@ const ZcashTransactionDisplay: React.FC<ZcashTransactionDisplayProps> = React.me
     const hasTransparent = transaction.vin.length > 0 || transaction.vout.length > 0;
 
     const renderFee = () => {
-      if (feeZat !== null) {
+      if (fee.kind === "known") {
         return (
           <span className="tx-value tx-value-highlight">
-            {formatZEC(feeZat, currency)}
+            {formatZEC(fee.zat, currency)}
             {transaction.size > 0 && (
               <span className="zec-fee-rate">
-                {t("tx.feeRate", { rate: (feeZat / transaction.size).toFixed(2) })}
+                {t("tx.feeRate", { rate: (fee.zat / transaction.size).toFixed(2) })}
               </span>
             )}
           </span>
@@ -92,6 +102,14 @@ const ZcashTransactionDisplay: React.FC<ZcashTransactionDisplayProps> = React.me
           </span>
         );
       }
+      // Over the cap the lookup can't complete the fee, so don't offer it
+      if (exceedsLookupCap) {
+        return (
+          <span className="tx-value text-muted">
+            {t("tx.lookUpCapped", { max: MAX_INPUT_LOOKUPS, count: previousCount })}
+          </span>
+        );
+      }
       return (
         <span className="tx-value zec-fee-resolve">
           <button type="button" className="more-details-toggle" onClick={onResolveInputs}>
@@ -99,10 +117,12 @@ const ZcashTransactionDisplay: React.FC<ZcashTransactionDisplayProps> = React.me
           </button>
           <span className="text-muted">
             {resolution.status === "error"
-              ? t("tx.resolveError", { message: resolution.message })
-              : previousCount > MAX_INPUT_LOOKUPS
-                ? t("tx.lookUpCapped", { max: MAX_INPUT_LOOKUPS, count: previousCount })
-                : t("tx.feeNeedsInputs", { count: previousCount })}
+              ? t("tx.resolveError", {
+                  message: resolution.message,
+                  resolved: resolution.resolved,
+                  total: resolution.total,
+                })
+              : t("tx.feeNeedsInputs", { count: previousCount })}
           </span>
         </span>
       );
@@ -116,7 +136,9 @@ const ZcashTransactionDisplay: React.FC<ZcashTransactionDisplayProps> = React.me
             <span className="block-status-badge block-status-pending">{t("tx.inMempool")}</span>
           ) : (
             <span className="block-status-badge block-status-finalized">
-              {t("tx.confirmations", { count: transaction.confirmations ?? 0 })}
+              {confirmationsAtLeast
+                ? t("tx.confirmationsAtLeast", { count: transaction.confirmations ?? 0 })
+                : t("tx.confirmations", { count: transaction.confirmations ?? 0 })}
               {showTooltips && (
                 <HelperTooltip content={tTooltips("zcash.tx.confirmations")} placement="left" />
               )}
@@ -158,13 +180,9 @@ const ZcashTransactionDisplay: React.FC<ZcashTransactionDisplayProps> = React.me
                   visibleFor={["beginner", "intermediate"]}
                 />
                 <span className="tx-value zec-kind-row">
-                  <span className={`zec-kind-badge zec-kind-${kind}`}>
-                    {t(TX_KIND_LABEL_KEYS[kind])}
-                  </span>
+                  <ZcashKindBadge kind={kind} />
                   {pools.map((pool) => (
-                    <span key={pool} className={`zec-pool-chip zec-pool-${pool}`}>
-                      {t(VALUE_POOL_LABEL_KEYS[pool])}
-                    </span>
+                    <ZcashPoolChip key={pool} pool={pool} />
                   ))}
                 </span>
               </div>

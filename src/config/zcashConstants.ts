@@ -34,6 +34,10 @@ export function getZcashNetworkKind(networkId: string): ZcashNetworkKind {
 // Transparent input values cost one getrawtransaction per previous transaction
 export const MAX_INPUT_LOOKUPS = 10;
 
+// Transactions are cached once this deep (coinbase maturity), safely past any reorg; cached
+// confirmation counts are shown as a lower bound
+export const CACHE_MIN_CONFIRMATIONS = 100;
+
 // Backoff before retrying a rate-limited call (hosted gateways allow ~5 requests/min per IP)
 export const RATE_LIMIT_RETRY_DELAYS_MS = [15_000, 30_000];
 

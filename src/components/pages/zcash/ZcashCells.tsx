@@ -1,6 +1,6 @@
 import type React from "react";
 import { useTranslation } from "react-i18next";
-import type { ZcashShieldedPool, ZcashTransaction, ZcashTxKind } from "../../../types";
+import type { ZcashTransaction, ZcashTxKind, ZcashTxPool } from "../../../types";
 import { formatZEC } from "../../../utils/zcashFormatters";
 import { getTransparentOutputZat } from "../../../utils/zcashUtils";
 import { TX_KIND_LABEL_KEYS, VALUE_POOL_LABEL_KEYS } from "./labels";
@@ -48,13 +48,13 @@ export const ZcashOutputValue: React.FC<ZcashOutputValueProps> = ({ transaction,
 };
 
 interface ZcashPoolChipProps {
-  pool: ZcashShieldedPool;
+  pool: ZcashTxPool;
   /** Chip text; the pool name by default */
   children?: React.ReactNode;
 }
 
 /**
- * A shielded pool tag, colored per pool
+ * A value pool tag, colored per pool
  */
 export const ZcashPoolChip: React.FC<ZcashPoolChipProps> = ({ pool, children }) => {
   const { t } = useTranslation("zcash");
