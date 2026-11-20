@@ -6366,10 +6366,15 @@ button.tx-section-header-toggle {
 	height: 14px;
 }
 
+.zec-skeleton-row {
+	height: 18px;
+}
+
 .zec-skeleton-stat {
 	height: 20px;
 }
 
+.zec-skeleton-w40 { width: 40px; }
 .zec-skeleton-w50 { width: 50px; }
 .zec-skeleton-w60 { width: 60px; }
 .zec-skeleton-w70 { width: 70px; }
@@ -6378,6 +6383,15 @@ button.tx-section-header-toggle {
 .zec-skeleton-w100 { width: 100px; }
 .zec-skeleton-w120 { width: 120px; }
 .zec-skeleton-w140 { width: 140px; }
+
+.zec-retry-button {
+	background: none;
+	border: none;
+	padding: 0;
+	margin-left: 8px;
+	font: inherit;
+	cursor: pointer;
+}
 
 /* Zcash value pools */
 .zec-value-pools {

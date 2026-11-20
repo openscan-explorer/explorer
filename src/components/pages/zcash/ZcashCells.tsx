@@ -1,16 +1,16 @@
 import type React from "react";
 import { useTranslation } from "react-i18next";
-import type { ZcashTransaction, ZcashTxKind } from "../../../types";
+import type { ZcashShieldedPool, ZcashTransaction, ZcashTxKind } from "../../../types";
 import { formatZEC } from "../../../utils/zcashFormatters";
 import { getTransparentOutputZat } from "../../../utils/zcashUtils";
-import { TX_KIND_LABEL_KEYS } from "./labels";
+import { TX_KIND_LABEL_KEYS, VALUE_POOL_LABEL_KEYS } from "./labels";
 
-type SkeletonWidth = 50 | 60 | 70 | 80 | 90 | 100 | 120 | 140;
+type SkeletonWidth = 40 | 50 | 60 | 70 | 80 | 90 | 100 | 120 | 140;
 
 interface ZcashSkeletonProps {
   width: SkeletonWidth;
   /** Line height of the text the placeholder stands in for */
-  size?: "small" | "text" | "stat";
+  size?: "small" | "text" | "row" | "stat";
 }
 
 /**
@@ -44,5 +44,23 @@ export const ZcashOutputValue: React.FC<ZcashOutputValueProps> = ({ transaction,
     <span className="tx-value-highlight">{formatZEC(transparentOutputZat, currency)}</span>
   ) : (
     <span className="text-muted">{t("transactions.shieldedValue")}</span>
+  );
+};
+
+interface ZcashPoolChipProps {
+  pool: ZcashShieldedPool;
+  /** Chip text; the pool name by default */
+  children?: React.ReactNode;
+}
+
+/**
+ * A shielded pool tag, colored per pool
+ */
+export const ZcashPoolChip: React.FC<ZcashPoolChipProps> = ({ pool, children }) => {
+  const { t } = useTranslation("zcash");
+  return (
+    <span className={`zec-pool-chip zec-pool-${pool}`}>
+      {children ?? t(VALUE_POOL_LABEL_KEYS[pool])}
+    </span>
   );
 };

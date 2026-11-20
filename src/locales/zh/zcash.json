@@ -52,6 +52,7 @@
   "blocksPage": {
     "title": "{{network}} 区块",
     "showingLatest": "显示最近 {{count}} 个区块",
+    "showingLatest_other": "显示最近 {{count}} 个区块",
     "showingRange": "显示区块 {{from}} – {{to}}",
     "height": "高度",
     "hash": "哈希",
@@ -64,7 +65,9 @@
     "newerTitle": "查看较新的区块",
     "older": "较旧 →",
     "olderTitle": "查看较旧的区块",
-    "loadError": "无法加载区块: {{message}}"
+    "loadError": "无法加载区块: {{message}}",
+    "unavailable": "无法加载此区块",
+    "retryBlock": "重试"
   },
   "block": {
     "title": "区块",
@@ -74,12 +77,17 @@
     "previousBlock": "上一个区块",
     "nextBlock": "下一个区块",
     "confirmations": "{{count}} 个确认",
+    "confirmations_other": "{{count}} 个确认",
+    "confirmationsAtLeast": "{{count}}+ 个确认",
+    "confirmationsAtLeast_other": "{{count}}+ 个确认",
     "hash": "区块哈希:",
     "reward": "区块奖励:",
+    "shieldedReward": "（其中 {{amount}} 进入屏蔽池）",
     "coinbaseOutputs": "Coinbase 输出:",
     "noAddress": "非标准脚本",
     "transactions": "交易:",
     "txCount": "{{count}} 笔交易",
+    "txCount_other": "{{count}} 笔交易",
     "poolTxCount": "{{pool}} {{count}} 笔",
     "transparentOutput": "透明输出:",
     "difficulty": "难度:",

@@ -37,6 +37,9 @@ export const MAX_INPUT_LOOKUPS = 10;
 // Backoff before retrying a rate-limited call (hosted gateways allow ~5 requests/min per IP)
 export const RATE_LIMIT_RETRY_DELAYS_MS = [15_000, 30_000];
 
+// Loaders wait out the whole retry window (15s + 30s plus request time) before offering a retry
+export const LOADER_TIMEOUT_MS = 50_000;
+
 // Dashboard sizing, kept small so a refresh fits within hosted rate limits
 export const DASHBOARD_BLOCKS = 5;
 export const DASHBOARD_TXS = 10;

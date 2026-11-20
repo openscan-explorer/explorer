@@ -52,6 +52,7 @@
   "blocksPage": {
     "title": "{{network}} のブロック",
     "showingLatest": "最新 {{count}} 件のブロックを表示",
+    "showingLatest_other": "最新 {{count}} 件のブロックを表示",
     "showingRange": "ブロック {{from}} – {{to}} を表示",
     "height": "高さ",
     "hash": "ハッシュ",
@@ -64,7 +65,9 @@
     "newerTitle": "新しいブロックを表示",
     "older": "古い →",
     "olderTitle": "古いブロックを表示",
-    "loadError": "ブロックを読み込めませんでした: {{message}}"
+    "loadError": "ブロックを読み込めませんでした: {{message}}",
+    "unavailable": "このブロックを読み込めませんでした",
+    "retryBlock": "再試行"
   },
   "block": {
     "title": "ブロック",
@@ -74,12 +77,17 @@
     "previousBlock": "前のブロック",
     "nextBlock": "次のブロック",
     "confirmations": "{{count}} 承認",
+    "confirmations_other": "{{count}} 承認",
+    "confirmationsAtLeast": "{{count}}+ 承認",
+    "confirmationsAtLeast_other": "{{count}}+ 承認",
     "hash": "ブロックハッシュ:",
     "reward": "ブロック報酬:",
+    "shieldedReward": "（うち {{amount}} はシールドプールへ）",
     "coinbaseOutputs": "コインベース出力:",
     "noAddress": "非標準スクリプト",
     "transactions": "トランザクション:",
     "txCount": "{{count}} 件のトランザクション",
+    "txCount_other": "{{count}} 件のトランザクション",
     "poolTxCount": "{{pool}} {{count}} 件",
     "transparentOutput": "トランスペアレント出力:",
     "difficulty": "難易度:",

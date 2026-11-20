@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
+import { ZCASH_SHIELDED_POOLS, ZCASH_TREE_POOLS } from "../../../config/zcashConstants";
 import { useSettings } from "../../../context/SettingsContext";
-import { useZcashTimeAgo } from "../../../hooks/useZcashTimeAgo";
-import type { ZcashBlock, ZcashShieldedPool } from "../../../types";
+import { useTimeAgo } from "../../../hooks/useTimeAgo";
+import type { KnowledgeLevel, ZcashBlock } from "../../../types";
 import {
   formatDifficulty,
   formatNumber,
@@ -15,31 +16,30 @@ import {
 import CopyButton from "../../common/CopyButton";
 import FieldLabel from "../../common/FieldLabel";
 import HelperTooltip from "../../common/HelperTooltip";
+import LongString from "../../common/LongString";
+import { VALUE_POOL_LABEL_KEYS } from "./labels";
+import { ZcashPoolChip } from "./ZcashCells";
 import ZcashValuePools from "./ZcashValuePools";
 
-const SHIELDED_POOLS: ZcashShieldedPool[] = ["sprout", "sapling", "orchard", "ironwood"];
-const TREE_POOLS = ["sapling", "orchard", "ironwood"] as const;
-
-const POOL_NAME_KEYS = {
-  sprout: "valuePools.pools.sprout",
-  sapling: "valuePools.pools.sapling",
-  orchard: "valuePools.pools.orchard",
-  ironwood: "valuePools.pools.ironwood",
-} as const satisfies Record<ZcashShieldedPool, string>;
+// Header internals are self-explanatory to advanced users
+const DETAIL_TOOLTIP_LEVELS: KnowledgeLevel[] = ["beginner", "intermediate"];
 
 interface DetailRowProps {
   label: string;
-  tooltip?: string;
+  tooltipKey: string;
   mono?: boolean;
   children: React.ReactNode;
 }
 
-const DetailRow: React.FC<DetailRowProps> = ({ label, tooltip, mono, children }) => (
+/** A row of the "more details" section; FieldLabel decides whether the tooltip shows */
+const DetailRow: React.FC<DetailRowProps> = ({ label, tooltipKey, mono, children }) => (
   <div className="detail-row">
-    <span className="detail-label">
-      {label}
-      {tooltip && <HelperTooltip content={tooltip} />}
-    </span>
+    <FieldLabel
+      label={label}
+      tooltipKey={tooltipKey}
+      visibleFor={DETAIL_TOOLTIP_LEVELS}
+      className="detail-label"
+    />
     <span className={mono ? "detail-value tx-mono" : "detail-value"}>{children}</span>
   </div>
 );
@@ -48,30 +48,40 @@ interface ZcashBlockDisplayProps {
   block: ZcashBlock;
   networkId: string;
   currency: string;
+  /** The block came from the cache: its confirmation count is a lower bound */
+  confirmationsAtLeast?: boolean;
 }
 
 const ZcashBlockDisplay: React.FC<ZcashBlockDisplayProps> = React.memo(
-  ({ block, networkId, currency }) => {
+  ({ block, networkId, currency, confirmationsAtLeast = false }) => {
     const { t } = useTranslation("zcash");
     const { t: tTooltips } = useTranslation("tooltips");
     const { settings } = useSettings();
-    const timeAgo = useZcashTimeAgo();
+    const timeAgo = useTimeAgo();
     const [showMoreDetails, setShowMoreDetails] = useState(false);
     const [showTransactions, setShowTransactions] = useState(false);
     const showTooltips = settings.showHelperTooltips !== false;
 
     const coinbaseOutputs = block.coinbaseOutputs ?? [];
-    const rewardZat = coinbaseOutputs.reduce((sum, output) => sum + output.valueZat, 0);
+    const coinbaseShieldedZat = block.coinbaseShieldedZat ?? 0;
+    // A shielded coinbase pays (part of) the reward into Sapling or Orchard
+    const rewardZat =
+      coinbaseOutputs.reduce((sum, output) => sum + output.valueZat, 0) + coinbaseShieldedZat;
     const txids = block.txids ?? [];
-    const poolCounts = SHIELDED_POOLS.flatMap((pool) => {
+    const poolCounts = ZCASH_SHIELDED_POOLS.flatMap((pool) => {
       const count = block.shieldedTxCounts?.[pool];
       return count ? [{ pool, count }] : [];
     });
-    const treeSizes = TREE_POOLS.flatMap((pool) => {
+    const treeSizes = ZCASH_TREE_POOLS.flatMap((pool) => {
       const size = block.trees?.[pool];
       return size === undefined
         ? []
-        : [t("block.treeSize", { pool: t(POOL_NAME_KEYS[pool]), size: formatNumber(size) })];
+        : [
+            t("block.treeSize", {
+              pool: t(VALUE_POOL_LABEL_KEYS[pool]),
+              size: formatNumber(size),
+            }),
+          ];
     });
 
     return (
@@ -108,7 +118,9 @@ const ZcashBlockDisplay: React.FC<ZcashBlockDisplayProps> = React.memo(
           </div>
           {block.confirmations !== undefined && (
             <span className="block-status-badge block-status-finalized">
-              {t("block.confirmations", { count: block.confirmations })}
+              {confirmationsAtLeast
+                ? t("block.confirmationsAtLeast", { count: block.confirmations })
+                : t("block.confirmations", { count: block.confirmations })}
               {showTooltips && (
                 <HelperTooltip content={tTooltips("zcash.block.confirmations")} placement="left" />
               )}
@@ -131,7 +143,7 @@ const ZcashBlockDisplay: React.FC<ZcashBlockDisplayProps> = React.memo(
 
           <div className="btc-tx-details-grid">
             <div className="btc-tx-details-column">
-              {coinbaseOutputs.length > 0 && (
+              {rewardZat > 0 && (
                 <div className="tx-row">
                   <FieldLabel
                     label={t("block.reward")}
@@ -140,6 +152,14 @@ const ZcashBlockDisplay: React.FC<ZcashBlockDisplayProps> = React.memo(
                   />
                   <span className="tx-value tx-value-highlight">
                     {formatZEC(rewardZat, currency)}
+                    {coinbaseShieldedZat > 0 && (
+                      <span className="text-muted">
+                        {" "}
+                        {t("block.shieldedReward", {
+                          amount: formatZEC(coinbaseShieldedZat, currency),
+                        })}
+                      </span>
+                    )}
                   </span>
                 </div>
               )}
@@ -155,9 +175,9 @@ const ZcashBlockDisplay: React.FC<ZcashBlockDisplayProps> = React.memo(
                   {poolCounts.length > 0 && (
                     <span className="zec-pool-chips">
                       {poolCounts.map(({ pool, count }) => (
-                        <span key={pool} className={`zec-pool-chip zec-pool-${pool}`}>
-                          {t("block.poolTxCount", { count, pool: t(POOL_NAME_KEYS[pool]) })}
-                        </span>
+                        <ZcashPoolChip key={pool} pool={pool}>
+                          {t("block.poolTxCount", { count, pool: t(VALUE_POOL_LABEL_KEYS[pool]) })}
+                        </ZcashPoolChip>
                       ))}
                     </span>
                   )}
@@ -270,17 +290,13 @@ const ZcashBlockDisplay: React.FC<ZcashBlockDisplayProps> = React.memo(
 
             {showMoreDetails && (
               <div className="more-details-content">
-                <DetailRow
-                  label={t("block.merkleRoot")}
-                  tooltip={showTooltips ? tTooltips("zcash.block.merkleRoot") : undefined}
-                  mono
-                >
+                <DetailRow label={t("block.merkleRoot")} tooltipKey="zcash.block.merkleRoot" mono>
                   {block.merkleRoot}
                 </DetailRow>
                 {block.blockCommitments && (
                   <DetailRow
                     label={t("block.blockCommitments")}
-                    tooltip={showTooltips ? tTooltips("zcash.block.blockCommitments") : undefined}
+                    tooltipKey="zcash.block.blockCommitments"
                     mono
                   >
                     {block.blockCommitments}
@@ -289,7 +305,7 @@ const ZcashBlockDisplay: React.FC<ZcashBlockDisplayProps> = React.memo(
                 {block.finalSaplingRoot && (
                   <DetailRow
                     label={t("block.finalSaplingRoot")}
-                    tooltip={showTooltips ? tTooltips("zcash.block.finalSaplingRoot") : undefined}
+                    tooltipKey="zcash.block.finalSaplingRoot"
                     mono
                   >
                     {block.finalSaplingRoot}
@@ -298,51 +314,28 @@ const ZcashBlockDisplay: React.FC<ZcashBlockDisplayProps> = React.memo(
                 {block.finalOrchardRoot && (
                   <DetailRow
                     label={t("block.finalOrchardRoot")}
-                    tooltip={showTooltips ? tTooltips("zcash.block.finalOrchardRoot") : undefined}
+                    tooltipKey="zcash.block.finalOrchardRoot"
                     mono
                   >
                     {block.finalOrchardRoot}
                   </DetailRow>
                 )}
-                <DetailRow
-                  label={t("block.version")}
-                  tooltip={showTooltips ? tTooltips("zcash.block.version") : undefined}
-                >
+                <DetailRow label={t("block.version")} tooltipKey="zcash.block.version">
                   {block.version}
                 </DetailRow>
-                <DetailRow
-                  label={t("block.bits")}
-                  tooltip={showTooltips ? tTooltips("zcash.block.bits") : undefined}
-                  mono
-                >
+                <DetailRow label={t("block.bits")} tooltipKey="zcash.block.bits" mono>
                   {block.bits}
                 </DetailRow>
-                <DetailRow
-                  label={t("block.nonce")}
-                  tooltip={showTooltips ? tTooltips("zcash.block.nonce") : undefined}
-                  mono
-                >
+                <DetailRow label={t("block.nonce")} tooltipKey="zcash.block.nonce" mono>
                   {block.nonce}
                 </DetailRow>
                 {block.solution && (
-                  <DetailRow
-                    label={t("block.solution")}
-                    tooltip={showTooltips ? tTooltips("zcash.block.solution") : undefined}
-                    mono
-                  >
-                    <span className="zec-inline-copy zec-solution">
-                      {block.solution.length > 64
-                        ? `${block.solution.slice(0, 32)}…${block.solution.slice(-32)}`
-                        : block.solution}
-                      <CopyButton value={block.solution} />
-                    </span>
+                  <DetailRow label={t("block.solution")} tooltipKey="zcash.block.solution" mono>
+                    <LongString value={block.solution} start={32} end={32} />
                   </DetailRow>
                 )}
                 {treeSizes.length > 0 && (
-                  <DetailRow
-                    label={t("block.trees")}
-                    tooltip={showTooltips ? tTooltips("zcash.block.trees") : undefined}
-                  >
+                  <DetailRow label={t("block.trees")} tooltipKey="zcash.block.trees">
                     {treeSizes.join(" · ")}
                   </DetailRow>
                 )}

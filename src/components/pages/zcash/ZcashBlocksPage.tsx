@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
-import { getNetworkBySlug } from "../../../config/networks";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { BLOCKS_PER_PAGE } from "../../../config/zcashConstants";
 import { useDataService } from "../../../hooks/useDataService";
-import { useZcashTimeAgo } from "../../../hooks/useZcashTimeAgo";
+import { useTimeAgo } from "../../../hooks/useTimeAgo";
+import { useZcashNetworkFromPath } from "../../../hooks/useZcashNetworkFromPath";
 import type { ZcashBlock } from "../../../types";
 import { logger } from "../../../utils/logger";
 import {
@@ -14,70 +14,94 @@ import {
   truncateBlockHash,
 } from "../../../utils/zcashFormatters";
 import Breadcrumb from "../../common/Breadcrumb";
-
-const skeletonCell = (width: string) => (
-  <span className="skeleton-pulse" style={{ width, height: 18 }} />
-);
+import { ZcashSkeleton } from "./ZcashCells";
 
 export default function ZcashBlocksPage() {
   const { t } = useTranslation("zcash");
-  const timeAgo = useZcashTimeAgo();
-  const location = useLocation();
+  const timeAgo = useTimeAgo();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-
-  // Extract network slug from path (e.g., "/tzec/blocks" → "tzec")
-  const networkSlug = location.pathname.split("/")[1] || "zec";
+  const { slug: networkSlug, name: networkName, label: networkLabel } = useZcashNetworkFromPath();
   const dataService = useDataService(networkSlug);
-  const network = getNetworkBySlug(networkSlug);
-  const networkName = network?.name ?? networkSlug;
-  const networkLabel = network?.shortName || networkSlug.toUpperCase();
 
   const fromBlockParam = searchParams.get("fromBlock");
   const fromBlock =
     fromBlockParam !== null && /^\d+$/.test(fromBlockParam) ? Number(fromBlockParam) : null;
 
-  const [blocks, setBlocks] = useState<ZcashBlock[]>([]);
+  const [blocks, setBlocks] = useState<Map<number, ZcashBlock>>(new Map());
+  const [failedHeights, setFailedHeights] = useState<number[]>([]);
   const [latestHeight, setLatestHeight] = useState<number | null>(null);
   const [fetching, setFetching] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  // Aborted when the page or network changes, so retries of an old page can't land here
+  const pageSignalRef = useRef<AbortSignal | null>(null);
+
+  const addBlock = useCallback((block: ZcashBlock) => {
+    setBlocks((prev) => new Map(prev).set(block.height, block));
+  }, []);
 
   useEffect(() => {
     if (!dataService || !dataService.isZcash()) return;
 
-    let cancelled = false;
+    const controller = new AbortController();
+    const { signal } = controller;
+    pageSignalRef.current = signal;
     const adapter = dataService.getZcashAdapter();
 
     const fetchBlocks = async () => {
       setFetching(true);
       setError(null);
-      setBlocks([]);
+      setBlocks(new Map());
+      setFailedHeights([]);
 
       try {
-        const tipHeight = await adapter.getLatestBlockNumber();
-        if (cancelled) return;
+        const tipHeight = await adapter.getLatestBlockNumber({ signal });
+        if (signal.aborted) return;
         setLatestHeight(tipHeight);
 
         const start = Math.min(fromBlock ?? tipHeight, tipHeight);
-        for (let height = start; height > start - BLOCKS_PER_PAGE && height >= 0; height--) {
-          // One block per call, so rows appear as they arrive on rate-limited endpoints
-          const [block] = await adapter.getBlockSummaries([height]);
-          if (cancelled) return;
-          if (block) setBlocks((prev) => [...prev, block]);
-        }
+        const heights = Array.from({ length: BLOCKS_PER_PAGE }, (_, i) => start - i).filter(
+          (height) => height >= 0,
+        );
+        // One block per call; rows appear as they arrive on rate-limited endpoints
+        const result = await adapter.getBlockSummaries(heights, {
+          signal,
+          onBlock: (block) => {
+            if (!signal.aborted) addBlock(block);
+          },
+        });
+        if (signal.aborted) return;
+        setFailedHeights(result.failedHeights);
       } catch (err) {
+        if (signal.aborted) return;
         logger.error("Error fetching Zcash blocks:", err);
-        if (!cancelled) setError(err instanceof Error ? err.message : String(err));
+        setError(err instanceof Error ? err.message : String(err));
       } finally {
-        if (!cancelled) setFetching(false);
+        if (!signal.aborted) setFetching(false);
       }
     };
 
     fetchBlocks();
-    return () => {
-      cancelled = true;
-    };
-  }, [dataService, fromBlock]);
+    return () => controller.abort();
+  }, [dataService, fromBlock, addBlock]);
+
+  const retryBlock = async (height: number) => {
+    const signal = pageSignalRef.current;
+    if (!dataService?.isZcash() || !signal) return;
+    setFailedHeights((prev) => prev.filter((failed) => failed !== height));
+    try {
+      const result = await dataService.getZcashAdapter().getBlockSummaries([height], {
+        signal,
+        onBlock: (block) => {
+          if (!signal.aborted) addBlock(block);
+        },
+      });
+      if (signal.aborted) return;
+      setFailedHeights((prev) => [...prev, ...result.failedHeights]);
+    } catch {
+      // Aborted: the page moved on
+    }
+  };
 
   const startHeight =
     latestHeight === null ? null : Math.min(fromBlock ?? latestHeight, latestHeight);
@@ -86,9 +110,11 @@ export default function ZcashBlocksPage() {
   const canGoNewer = !isAtLatest && startHeight !== null;
   const canGoOlder = startHeight !== null && startHeight - BLOCKS_PER_PAGE >= 0;
 
-  const expectedRows =
-    startHeight === null ? BLOCKS_PER_PAGE : Math.min(BLOCKS_PER_PAGE, startHeight + 1);
-  const skeletonRows = fetching ? Math.max(expectedRows - blocks.length, 0) : 0;
+  const pageHeights =
+    startHeight === null || oldestHeight === null
+      ? []
+      : Array.from({ length: startHeight - oldestHeight + 1 }, (_, i) => startHeight - i);
+  const skeletonRows = startHeight === null && fetching ? BLOCKS_PER_PAGE : 0;
 
   const goToLatest = () => navigate(`/${networkSlug}/blocks`);
 
@@ -151,41 +177,65 @@ export default function ZcashBlocksPage() {
                 </tr>
               </thead>
               <tbody>
-                {blocks.map((block) => (
-                  <tr key={block.hash}>
-                    <td>
-                      <Link
-                        to={`/${networkSlug}/block/${block.height}`}
-                        className="table-cell-number"
-                      >
-                        {block.height.toLocaleString()}
-                      </Link>
-                    </td>
-                    <td className="table-cell-mono">
-                      <Link
-                        to={`/${networkSlug}/block/${block.hash}`}
-                        className="table-cell-address"
-                        title={block.hash}
-                      >
-                        {truncateBlockHash(block.hash)}
-                      </Link>
-                    </td>
-                    <td className="table-cell-text" title={formatTimestamp(block.time)}>
-                      {timeAgo(block.time)}
-                    </td>
-                    <td className="table-cell-value">{block.nTx.toLocaleString()}</td>
-                    <td className="table-cell-muted hide-mobile">{formatSize(block.size)}</td>
-                  </tr>
-                ))}
+                {pageHeights.map((height) => {
+                  const block = blocks.get(height);
+                  if (block) {
+                    return (
+                      <tr key={block.hash}>
+                        <td>
+                          <Link
+                            to={`/${networkSlug}/block/${block.height}`}
+                            className="table-cell-number"
+                          >
+                            {block.height.toLocaleString()}
+                          </Link>
+                        </td>
+                        <td className="table-cell-mono">
+                          <Link
+                            to={`/${networkSlug}/block/${block.hash}`}
+                            className="table-cell-address"
+                            title={block.hash}
+                          >
+                            {truncateBlockHash(block.hash)}
+                          </Link>
+                        </td>
+                        <td className="table-cell-text" title={formatTimestamp(block.time)}>
+                          {timeAgo(block.time)}
+                        </td>
+                        <td className="table-cell-value">{block.nTx.toLocaleString()}</td>
+                        <td className="table-cell-muted hide-mobile">{formatSize(block.size)}</td>
+                      </tr>
+                    );
+                  }
+                  if (failedHeights.includes(height)) {
+                    return (
+                      <tr key={`failed-${height}`} data-testid="zcash-block-unavailable">
+                        <td>
+                          <Link
+                            to={`/${networkSlug}/block/${height}`}
+                            className="table-cell-number"
+                          >
+                            {height.toLocaleString()}
+                          </Link>
+                        </td>
+                        <td colSpan={4} className="table-cell-muted">
+                          {t("blocksPage.unavailable")}
+                          <button
+                            type="button"
+                            className="link-accent zec-retry-button"
+                            onClick={() => retryBlock(height)}
+                          >
+                            {t("blocksPage.retryBlock")}
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  }
+                  return <SkeletonRow key={`loading-${height}`} />;
+                })}
                 {Array.from({ length: skeletonRows }).map((_, i) => (
                   // biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholder
-                  <tr key={`skeleton-${i}`}>
-                    <td>{skeletonCell("70px")}</td>
-                    <td>{skeletonCell("120px")}</td>
-                    <td>{skeletonCell("60px")}</td>
-                    <td>{skeletonCell("40px")}</td>
-                    <td className="hide-mobile">{skeletonCell("80px")}</td>
-                  </tr>
+                  <SkeletonRow key={`skeleton-${i}`} />
                 ))}
               </tbody>
             </table>
@@ -225,3 +275,23 @@ export default function ZcashBlocksPage() {
     </div>
   );
 }
+
+const SkeletonRow = () => (
+  <tr>
+    <td>
+      <ZcashSkeleton width={70} size="row" />
+    </td>
+    <td>
+      <ZcashSkeleton width={120} size="row" />
+    </td>
+    <td>
+      <ZcashSkeleton width={60} size="row" />
+    </td>
+    <td>
+      <ZcashSkeleton width={40} size="row" />
+    </td>
+    <td className="hide-mobile">
+      <ZcashSkeleton width={80} size="row" />
+    </td>
+  </tr>
+);

@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useLocation, useParams } from "react-router-dom";
-import { getNetworkBySlug } from "../../../config/networks";
+import { useParams } from "react-router-dom";
+import { LOADER_TIMEOUT_MS } from "../../../config/zcashConstants";
 import { useDataService } from "../../../hooks/useDataService";
 import { usePersistentCache } from "../../../hooks/usePersistentCache";
+import { useZcashNetworkFromPath } from "../../../hooks/useZcashNetworkFromPath";
 import type { ZcashBlock } from "../../../types";
 import Breadcrumb from "../../common/Breadcrumb";
 import LoaderWithTimeout from "../../common/LoaderWithTimeout";
@@ -12,59 +13,66 @@ import ZcashBlockDisplay from "./ZcashBlockDisplay";
 export default function ZcashBlockPage() {
   const { t } = useTranslation("zcash");
   const { filter } = useParams<{ filter?: string }>();
-  const location = useLocation();
-
-  // Extract network slug from path (e.g., "/tzec/block/123" → "tzec")
-  const networkSlug = location.pathname.split("/")[1] || "zec";
+  const {
+    slug: networkSlug,
+    label: networkLabel,
+    currency,
+    cacheNetworkId,
+  } = useZcashNetworkFromPath();
   const dataService = useDataService(networkSlug);
-  const network = getNetworkBySlug(networkSlug);
-  const networkLabel = network?.shortName || networkSlug.toUpperCase();
-  const cacheNetworkId = network?.networkId ?? networkSlug;
   const { getCached, setCached } = usePersistentCache();
 
   const [block, setBlock] = useState<ZcashBlock | null>(null);
+  const [fromCache, setFromCache] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [attempt, setAttempt] = useState(0);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: attempt re-runs the fetch on retry
   useEffect(() => {
     if (!dataService || !dataService.isZcash() || !filter) return;
 
-    let cancelled = false;
+    const controller = new AbortController();
+    const { signal } = controller;
     const adapter = dataService.getZcashAdapter();
 
     const fetchBlock = async () => {
       setLoading(true);
       setError(null);
+      setFromCache(false);
 
       try {
         let blockId: string | number = filter;
         if (filter === "latest") {
-          blockId = await adapter.getLatestBlockNumber();
+          blockId = await adapter.getLatestBlockNumber({ signal });
         } else if (/^\d+$/.test(filter)) {
           const cached = getCached<ZcashBlock>(cacheNetworkId, "block", filter);
           if (cached) {
-            if (!cancelled) setBlock(cached);
+            setBlock(cached);
+            setFromCache(true);
             return;
           }
         }
 
         // A single getblock call returns the header, transactions and value pools
-        const { data } = await adapter.getBlock(blockId);
-        if (cancelled) return;
+        const { data } = await adapter.getBlock(blockId, { signal });
+        if (signal.aborted) return;
         setBlock(data.block);
-        setCached(cacheNetworkId, "block", String(data.block.height), data.block);
+        // The tip still changes (next block link, confirmations), so only cache blocks that
+        // already have a successor
+        if (data.block.nextBlockHash) {
+          setCached(cacheNetworkId, "block", String(data.block.height), data.block);
+        }
       } catch (err) {
-        if (!cancelled) setError(err instanceof Error ? err.message : String(err));
+        if (!signal.aborted) setError(err instanceof Error ? err.message : String(err));
       } finally {
-        if (!cancelled) setLoading(false);
+        if (!signal.aborted) setLoading(false);
       }
     };
 
     fetchBlock();
-    return () => {
-      cancelled = true;
-    };
-  }, [dataService, filter, getCached, setCached, cacheNetworkId]);
+    return () => controller.abort();
+  }, [dataService, filter, getCached, setCached, cacheNetworkId, attempt]);
 
   if (loading) {
     return (
@@ -75,7 +83,12 @@ export default function ZcashBlockPage() {
             <span className="tx-mono header-subtitle">{filter}</span>
           </div>
           <div className="card-content-loading">
-            <LoaderWithTimeout text={t("block.loading")} onRetry={() => window.location.reload()} />
+            <LoaderWithTimeout
+              key={attempt}
+              text={t("block.loading")}
+              timeoutMs={LOADER_TIMEOUT_MS}
+              onRetry={() => setAttempt((count) => count + 1)}
+            />
           </div>
         </div>
       </div>
@@ -111,7 +124,8 @@ export default function ZcashBlockPage() {
         <ZcashBlockDisplay
           block={block}
           networkId={networkSlug}
-          currency={network?.currency ?? "ZEC"}
+          currency={currency}
+          confirmationsAtLeast={fromCache}
         />
       ) : (
         <div className="page-card">
