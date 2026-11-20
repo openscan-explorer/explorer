@@ -8902,11 +8902,11 @@ button.tx-section-header-toggle {
 }
 
 .gas-tendency-chart-bar {
-	fill: var(--color-primary-alpha-15, rgba(99, 102, 241, 0.15));
+	fill: var(--color-primary-alpha-15);
 }
 
 .gas-tendency-chart-area {
-	fill: var(--color-primary-alpha-15, rgba(99, 102, 241, 0.15));
+	fill: var(--color-primary-alpha-15);
 	stroke: none;
 }
 
@@ -8962,7 +8962,11 @@ button.tx-section-header-toggle {
 .gas-tendency-chart-tooltip {
 	position: absolute;
 	bottom: calc(100% + 6px);
-	transform: translateX(-50%);
+	/* --gas-tendency-tooltip-pos is the hovered bar's center as a 0..1 fraction.
+	   Shifting by the same fraction of the tooltip's own width keeps it inside the
+	   plot at both edges and centered in the middle. */
+	left: calc(var(--gas-tendency-tooltip-pos, 0.5) * 100%);
+	transform: translateX(calc(var(--gas-tendency-tooltip-pos, 0.5) * -100%));
 	background: var(--bg-primary);
 	border: 1px solid var(--overlay-light-6);
 	border-radius: 8px;
@@ -8972,7 +8976,7 @@ button.tx-section-header-toggle {
 	color: var(--text-secondary);
 	pointer-events: none;
 	z-index: 2;
-	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+	box-shadow: var(--shadow-md);
 }
 
 .gas-tendency-chart-tooltip-block {
@@ -9017,7 +9021,7 @@ button.tx-section-header-toggle {
 	display: inline-block;
 	width: 8px;
 	height: 8px;
-	background: var(--color-primary-alpha-15, rgba(99, 102, 241, 0.15));
+	background: var(--color-primary-alpha-15);
 	border-radius: 1px;
 	margin-right: 2px;
 	margin-left: 8px;
@@ -9033,7 +9037,7 @@ button.tx-section-header-toggle {
 	background: linear-gradient(
 		90deg,
 		var(--overlay-light-6) 0%,
-		var(--overlay-light-3, rgba(255, 255, 255, 0.04)) 50%,
+		var(--overlay-light-3) 50%,
 		var(--overlay-light-6) 100%
 	);
 	background-size: 200% 100%;

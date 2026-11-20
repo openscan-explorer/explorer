@@ -282,7 +282,7 @@ export default function Blocks() {
           )}
         </div>
 
-        <GasTendencyChartSection network={numericNetworkId} namespace="block" />
+        <GasTendencyChartSection network={numericNetworkId} />
 
         <div className="table-wrapper">
           <table className="dash-table blocks-table">

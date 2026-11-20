@@ -3,8 +3,8 @@ import { useTranslation } from "react-i18next";
 import type { FeeHistory } from "../../../../types";
 
 interface Props {
+  /** Plottable fee history, or null while the first fetch is in flight. */
   feeHistory: FeeHistory | null;
-  isLoading: boolean;
 }
 
 const WEI_PER_GWEI = 1_000_000_000n;
@@ -24,12 +24,12 @@ const formatGwei = (gwei: number): string => {
   return gwei.toFixed(3);
 };
 
-const GasTendencyChart: React.FC<Props> = ({ feeHistory, isLoading }) => {
+const GasTendencyChart: React.FC<Props> = ({ feeHistory }) => {
   const { t } = useTranslation("network");
   const [hoverIdx, setHoverIdx] = useState<number | null>(null);
 
   const chartData = useMemo(() => {
-    if (!feeHistory || feeHistory.gasUsedRatio.length === 0) return null;
+    if (!feeHistory) return null;
     const ratios = feeHistory.gasUsedRatio;
     const baseFees = feeHistory.baseFeePerGas.slice(0, ratios.length); // align lengths
     const gweis = baseFees.map(weiToGwei);
@@ -47,7 +47,7 @@ const GasTendencyChart: React.FC<Props> = ({ feeHistory, isLoading }) => {
     };
   }, [feeHistory]);
 
-  if (isLoading && !chartData) {
+  if (!chartData) {
     return (
       <div
         className="gas-tendency-chart gas-tendency-chart-loading"
@@ -58,19 +58,15 @@ const GasTendencyChart: React.FC<Props> = ({ feeHistory, isLoading }) => {
     );
   }
 
-  if (!chartData) {
-    return null;
-  }
-
   const { ratios, gweis, minGwei, maxGwei, range, oldestBlock, newestBlock } = chartData;
   const n = ratios.length;
   const barWidth = VIEW_WIDTH / n;
 
   const pointX = (i: number) => (i + 0.5) * barWidth;
   const pointY = (gwei: number) => {
-    // 8% top/bottom padding so the line never hits the edges
-    const t = (gwei - minGwei) / range;
-    return VIEW_HEIGHT * (0.9 - 0.8 * t);
+    // 10% top/bottom padding so the line never hits the edges
+    const normalized = (gwei - minGwei) / range;
+    return VIEW_HEIGHT * (0.9 - 0.8 * normalized);
   };
 
   const linePath = gweis
@@ -86,16 +82,17 @@ const GasTendencyChart: React.FC<Props> = ({ feeHistory, isLoading }) => {
     <div className="gas-tendency-chart" data-testid="gas-tendency-chart">
       <div className="gas-tendency-chart-meta">
         <span className="gas-tendency-chart-meta-value">
-          {formatGwei(latestGwei ?? 0)} <span className="gas-tendency-chart-meta-unit">gwei</span>
+          {formatGwei(latestGwei ?? 0)}{" "}
+          <span className="gas-tendency-chart-meta-unit">{t("gasTendency.unit")}</span>
         </span>
         <span className="gas-tendency-chart-meta-range">
-          {formatGwei(minGwei)} – {formatGwei(maxGwei)} gwei
+          {t("gasTendency.range", { min: formatGwei(minGwei), max: formatGwei(maxGwei) })}
         </span>
       </div>
 
       <div className="gas-tendency-chart-plot">
         <span className="gas-tendency-chart-reference-label" aria-hidden="true">
-          50%
+          {t("gasTendency.referenceLabel")}
         </span>
         <svg
           className="gas-tendency-chart-svg"
@@ -127,7 +124,8 @@ const GasTendencyChart: React.FC<Props> = ({ feeHistory, isLoading }) => {
             );
           })}
 
-          {/* 50% gas-used reference line */}
+          {/* 50% gas-used reference line: the EIP-1559 target at elasticity 2 (Ethereum L1).
+              OP Stack chains use elasticity 6, so their target sits lower. */}
           <line
             x1={0}
             x2={VIEW_WIDTH}
@@ -163,7 +161,7 @@ const GasTendencyChart: React.FC<Props> = ({ feeHistory, isLoading }) => {
         {hoverIdx !== null && gweis[hoverIdx] !== undefined && (
           <div
             className="gas-tendency-chart-tooltip"
-            style={{ left: `${((hoverIdx + 0.5) / n) * 100}%` }}
+            style={{ "--gas-tendency-tooltip-pos": (hoverIdx + 0.5) / n } as React.CSSProperties}
             data-testid="gas-tendency-chart-tooltip"
           >
             <div className="gas-tendency-chart-tooltip-block">

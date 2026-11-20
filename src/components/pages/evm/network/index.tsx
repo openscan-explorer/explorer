@@ -69,7 +69,7 @@ export default function Network() {
           networkId={chainId}
         />
 
-        {network && <GasTendencyChartSection network={network} namespace="network" />}
+        {network && <GasTendencyChartSection network={network} />}
 
         <div className="dashboard-tables-row">
           <LatestBlocksTable
