@@ -1,5 +1,5 @@
 import { expect, test } from "../../../fixtures/test";
-import { mockZcashRpc, T_ADDRESS, ZCASH } from "../../../fixtures/zcash";
+import { mockZcashRpc, T_ADDRESS, ZCASH, ZCASH_RPC_PATTERN } from "../../../fixtures/zcash";
 
 /**
  * Hermetic Zcash address page. By default the mocked gateway blocks Zebra's address index, as
@@ -28,8 +28,18 @@ test.describe("Zcash address", () => {
       "href",
       /settings/,
     );
-    expect(calls.map((call) => call.method)).toEqual(
-      expect.arrayContaining(["getaddressbalance", "getaddressutxos", "getaddresstxids"]),
+    // The three methods share the index, so one probe tells the page it's blocked
+    const methods = calls.map((call) => call.method);
+    expect(methods).toContain("getaddressbalance");
+    expect(methods).not.toContain("getaddressutxos");
+    expect(methods).not.toContain("getaddresstxids");
+
+    // The gateway's answer is remembered: another address costs no index calls at all
+    const before = calls.length;
+    await page.goto(addressUrl("t1SqwRAAdSig6dE4EBPLonAait219VmkUjP"));
+    await expect(page.getByText("doesn't provide Zebra's address index")).toBeVisible();
+    expect(calls.slice(before).filter((call) => call.method.startsWith("getaddress"))).toEqual(
+      [],
     );
   });
 
@@ -48,10 +58,10 @@ test.describe("Zcash address", () => {
     );
 
     await page.getByRole("button", { name: /Unspent Outputs \(1\)/ }).click();
-    await expect(page.locator(".btc-utxo-list")).toContainText("0.00050000 ZEC");
+    await expect(page.locator(".utxo-list")).toContainText("0.00050000 ZEC");
 
     await page.getByRole("button", { name: /Transactions \(2\)/ }).click();
-    await expect(page.locator(".btc-tx-list .btc-tx-list-item").first()).toContainText(
+    await expect(page.locator(".utxo-tx-list .utxo-tx-list-item").first()).toContainText(
       ZCASH.transparentTxid,
     );
   });
@@ -66,9 +76,10 @@ test.describe("Zcash address", () => {
     const receivers = page.locator(".tx-row").filter({ hasText: "Receivers:" });
     await expect(receivers).toContainText("Orchard");
     await expect(receivers).toContainText(T_ADDRESS);
-    await expect(page.locator(".tx-row").filter({ hasText: "Balance:" })).toContainText(
-      "0.09514810 ZEC",
-    );
+    // Only the transparent receiver's balance is known, and the label says so
+    const balance = page.locator(".tx-row").filter({ hasText: "Transparent Balance:" });
+    await expect(balance).toContainText("0.09514810 ZEC");
+    await expect(balance).toContainText("(transparent receiver t1KAuV");
 
     const balanceCall = calls.find((call) => call.method === "getaddressbalance");
     expect(balanceCall?.params[0]).toEqual({ addresses: [T_ADDRESS] });
@@ -87,5 +98,46 @@ test.describe("Zcash address", () => {
         (call) => call.method.startsWith("getaddress") || call.method === "z_listunifiedreceivers",
       ),
     ).toBe(false);
+  });
+
+  test("points to the RPC settings when the gateway can't decode a unified address", async ({
+    page,
+  }) => {
+    await mockZcashRpc(page);
+
+    await page.goto(addressUrl(UNIFIED_ADDRESS));
+
+    await expect(page.getByText("can't decode unified addresses")).toBeVisible();
+    await expect(page.getByRole("link", { name: "Configure RPC endpoints" })).toHaveAttribute(
+      "href",
+      /settings/,
+    );
+  });
+
+  test("pages through a long transaction history", async ({ page }) => {
+    await mockZcashRpc(page, { addressIndex: true });
+    // Oldest first, as getaddresstxids returns them
+    const history = Array.from({ length: 60 }, (_, i) => i.toString(16).padStart(64, "0"));
+    await page.route(ZCASH_RPC_PATTERN, async (route) => {
+      const body = JSON.parse(route.request().postData() ?? "{}");
+      if (body.method !== "getaddresstxids") {
+        await route.fallback();
+        return;
+      }
+      await route.fulfill({
+        contentType: "application/json",
+        body: JSON.stringify({ jsonrpc: "2.0", id: body.id, result: history }),
+      });
+    });
+
+    await page.goto(addressUrl(T_ADDRESS));
+    await page.getByRole("button", { name: /Transactions \(60\)/ }).click();
+
+    const items = page.locator(".utxo-tx-list .utxo-tx-list-item");
+    await expect(items).toHaveCount(50);
+    await expect(items.first()).toContainText(history[59] ?? "");
+    await page.getByRole("button", { name: "Next →" }).click();
+    await expect(items).toHaveCount(10);
+    await expect(items.last()).toContainText(history[0] ?? "");
   });
 });

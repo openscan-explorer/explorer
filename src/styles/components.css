@@ -8420,17 +8420,20 @@ button.tx-section-header-toggle {
    ================================ */
 
 /* Bitcoin Transaction Section (Inputs/Outputs) */
-.btc-tx-section {
+.btc-tx-section,
+.utxo-tx-section {
 	margin-top: 20px;
 	border-top: 1px solid var(--border-primary);
 	padding-top: 15px;
 }
 
-.btc-tx-section-header {
+.btc-tx-section-header,
+.utxo-tx-section-header {
 	margin-bottom: 10px;
 }
 
-.btc-tx-section-toggle {
+.btc-tx-section-toggle,
+.utxo-tx-section-toggle {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
@@ -8443,17 +8446,20 @@ button.tx-section-header-toggle {
 	transition: background-color 0.15s ease;
 }
 
-.btc-tx-section-toggle:hover {
+.btc-tx-section-toggle:hover,
+.utxo-tx-section-toggle:hover {
 	background: var(--bg-tertiary);
 }
 
-.btc-tx-section-title {
+.btc-tx-section-title,
+.utxo-tx-section-title {
 	font-weight: 600;
 	font-size: 0.95rem;
 	color: var(--text-primary);
 }
 
-.btc-tx-section-arrow {
+.btc-tx-section-arrow,
+.utxo-tx-section-arrow {
 	font-size: 0.85rem;
 	color: var(--text-secondary);
 	font-weight: 600;
@@ -8592,7 +8598,8 @@ button.tx-section-header-toggle {
 }
 
 /* UTXO List Styles */
-.btc-utxo-list {
+.btc-utxo-list,
+.utxo-list {
 	display: flex;
 	flex-direction: column;
 	gap: 6px;
@@ -8601,7 +8608,8 @@ button.tx-section-header-toggle {
 	border-radius: 8px;
 }
 
-.btc-utxo-item {
+.btc-utxo-item,
+.utxo-item {
 	display: flex;
 	gap: 12px;
 	align-items: center;
@@ -8611,13 +8619,15 @@ button.tx-section-header-toggle {
 	border: 1px solid var(--border-primary);
 }
 
-.btc-utxo-index {
+.btc-utxo-index,
+.utxo-index {
 	min-width: 20px;
 	color: var(--text-secondary);
 	font-size: 0.8rem;
 }
 
-.btc-utxo-content {
+.btc-utxo-content,
+.utxo-content {
 	flex: 1;
 	display: flex;
 	flex-wrap: wrap;
@@ -8626,21 +8636,25 @@ button.tx-section-header-toggle {
 	min-width: 0;
 }
 
-.btc-utxo-hash {
+.btc-utxo-hash,
+.utxo-hash {
 	word-break: break-all;
 }
 
-.btc-utxo-value {
+.btc-utxo-value,
+.utxo-value {
 	font-weight: 600;
 }
 
-.btc-utxo-confirmations {
+.btc-utxo-confirmations,
+.utxo-confirmations {
 	color: var(--text-secondary);
 	font-size: 0.85rem;
 }
 
 /* Bitcoin Transaction List (in address view) */
-.btc-tx-list {
+.btc-tx-list,
+.utxo-tx-list {
 	display: flex;
 	flex-direction: column;
 	gap: 4px;
@@ -8649,7 +8663,8 @@ button.tx-section-header-toggle {
 	border-radius: 8px;
 }
 
-.btc-tx-list-item {
+.btc-tx-list-item,
+.utxo-tx-list-item {
 	display: flex;
 	gap: 12px;
 	align-items: center;
@@ -8659,13 +8674,15 @@ button.tx-section-header-toggle {
 	border: 1px solid var(--border-primary);
 }
 
-.btc-tx-index {
+.btc-tx-index,
+.utxo-tx-index {
 	min-width: 24px;
 	color: var(--text-secondary);
 	font-size: 0.8rem;
 }
 
-.btc-tx-hash {
+.btc-tx-hash,
+.utxo-tx-hash {
 	word-break: break-all;
 }
 

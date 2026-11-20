@@ -74,14 +74,14 @@
       "p2pkh": "Transparente (P2PKH)",
       "p2sh": "Transparente (P2SH)"
     },
-    "transparentReceiverNote": "receptor transparente {{address}}",
+    "transparentReceiverNote": "(receptor transparente {{address}})",
     "balance": "Saldo:",
+    "transparentBalance": "Saldo transparente:",
     "received": "Total recibido:",
     "unspentOutputsLabel": "Salidas no gastadas:",
     "transactionsLabel": "Transacciones:",
     "unspentOutputs": "Salidas no gastadas ({{count}})",
     "transactions": "Transacciones ({{count}})",
-    "moreTransactions": "…y {{count}} más",
     "noUtxos": "Sin salidas no gastadas",
     "atHeight": "bloque #{{height}}",
     "unavailable": "No disponible en este endpoint RPC",
@@ -92,6 +92,7 @@
     "texNotice": "Las direcciones TEX solo reciben fondos transparentes. Aún no se pueden consultar su saldo ni su historial.",
     "unknownNotice": "Esto no parece una dirección de Zcash.",
     "indexUnsupported": "Este endpoint RPC no ofrece el índice de direcciones de Zebra, así que no se pueden mostrar el saldo, las salidas no gastadas ni el historial. Los gateways alojados bloquean estos métodos; agrega un nodo Zebra propio para verlos.",
+    "receiversUnsupported": "Este endpoint RPC no puede decodificar direcciones unificadas, así que no se pueden mostrar sus receptores ni su saldo transparente. Los gateways alojados bloquean este método; agrega un nodo Zebra propio para verlos.",
     "configureRpc": "Configurar endpoints RPC"
   },
   "mempool": {

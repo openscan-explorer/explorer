@@ -16,7 +16,7 @@ const RECEIVER_LABEL_KEYS = {
   p2sh: "address.receiverTypes.p2sh",
 } as const satisfies Record<keyof ZcashUnifiedReceivers, string>;
 
-const MAX_LISTED_TXIDS = 50;
+const TXIDS_PER_PAGE = 50;
 
 interface ZcashAddressDisplayProps {
   address: ZcashAddress;
@@ -30,6 +30,7 @@ const ZcashAddressDisplay: React.FC<ZcashAddressDisplayProps> = React.memo(
     const { t } = useTranslation("zcash");
     const [showUtxos, setShowUtxos] = useState(false);
     const [showTransactions, setShowTransactions] = useState(false);
+    const [txPage, setTxPage] = useState(1);
 
     const { type, receivers, balance, utxos, txids, transparentAddress } = address;
     const indexAvailability = [balance, utxos, txids].flatMap((section) =>
@@ -42,8 +43,14 @@ const ZcashAddressDisplay: React.FC<ZcashAddressDisplayProps> = React.memo(
     const isShielded = type === "sapling" || type === "sprout";
     const unifiedWithoutTransparent =
       type === "unified" && receivers?.availability === "ok" && !transparentAddress;
+    // A gateway that can't decode unified addresses needs the same fix as the address index
+    const receiversUnsupported = receivers?.availability === "unsupported";
     // getaddresstxids returns transactions in chain order, oldest first
     const recentTxids = txids?.data ? [...txids.data].reverse() : [];
+    const txPages = Math.max(1, Math.ceil(recentTxids.length / TXIDS_PER_PAGE));
+    const currentTxPage = Math.min(txPage, txPages);
+    const pageStart = (currentTxPage - 1) * TXIDS_PER_PAGE;
+    const pageTxids = recentTxids.slice(pageStart, pageStart + TXIDS_PER_PAGE);
 
     const unavailable = (availability: ZcashRpcAvailability) => (
       <span className="tx-value text-muted">
@@ -74,9 +81,11 @@ const ZcashAddressDisplay: React.FC<ZcashAddressDisplayProps> = React.memo(
         {type === "tex" && (
           <div className="info-box zec-address-notice">{t("address.texNotice")}</div>
         )}
-        {indexUnsupported && (
+        {(indexUnsupported || receiversUnsupported) && (
           <div className="info-box info-box--warning zec-address-notice">
-            <p>{t("address.indexUnsupported")}</p>
+            <p>
+              {indexUnsupported ? t("address.indexUnsupported") : t("address.receiversUnsupported")}
+            </p>
             <Link to="/settings" className="link-accent">
               {t("address.configureRpc")}
             </Link>
@@ -138,7 +147,11 @@ const ZcashAddressDisplay: React.FC<ZcashAddressDisplayProps> = React.memo(
           {balance && !indexUnsupported && (
             <div className="tx-row">
               <FieldLabel
-                label={t("address.balance")}
+                label={
+                  // A unified address's other receivers are shielded: this is only the
+                  // transparent receiver's balance
+                  type === "unified" ? t("address.transparentBalance") : t("address.balance")
+                }
                 tooltipKey="zcash.address.balance"
                 visibleFor={["beginner"]}
               />
@@ -150,11 +163,9 @@ const ZcashAddressDisplay: React.FC<ZcashAddressDisplayProps> = React.memo(
                   {type === "unified" && transparentAddress && (
                     <span className="text-muted">
                       {" "}
-                      (
                       {t("address.transparentReceiverNote", {
                         address: truncateHash(transparentAddress, "short"),
                       })}
-                      )
                     </span>
                   )}
                 </span>
@@ -199,17 +210,17 @@ const ZcashAddressDisplay: React.FC<ZcashAddressDisplayProps> = React.memo(
         </div>
 
         {utxos?.availability === "ok" && utxos.data && (
-          <div className="btc-tx-section">
-            <div className="btc-tx-section-header">
+          <div className="utxo-tx-section">
+            <div className="utxo-tx-section-header">
               <button
                 type="button"
-                className="btc-tx-section-toggle"
+                className="utxo-tx-section-toggle"
                 onClick={() => setShowUtxos(!showUtxos)}
               >
-                <span className="btc-tx-section-title">
+                <span className="utxo-tx-section-title">
                   {t("address.unspentOutputs", { count: utxos.data.length })}
                 </span>
-                <span className="btc-tx-section-arrow" aria-hidden="true">
+                <span className="utxo-tx-section-arrow" aria-hidden="true">
                   {showUtxos ? "▾" : "▸"}
                 </span>
               </button>
@@ -218,20 +229,20 @@ const ZcashAddressDisplay: React.FC<ZcashAddressDisplayProps> = React.memo(
               (utxos.data.length === 0 ? (
                 <p className="text-muted">{t("address.noUtxos")}</p>
               ) : (
-                <div className="btc-utxo-list">
+                <div className="utxo-list">
                   {utxos.data.map((utxo, index) => (
-                    <div key={`${utxo.txid}-${utxo.outputIndex}`} className="btc-utxo-item">
-                      <span className="btc-utxo-index">{index}</span>
-                      <div className="btc-utxo-content">
-                        <span className="btc-utxo-hash tx-mono">
+                    <div key={`${utxo.txid}-${utxo.outputIndex}`} className="utxo-item">
+                      <span className="utxo-index">{index}</span>
+                      <div className="utxo-content">
+                        <span className="utxo-hash tx-mono">
                           <Link to={`/${networkId}/tx/${utxo.txid}`} className="link-accent">
                             {truncateHash(utxo.txid, "long")}:{utxo.outputIndex}
                           </Link>
                         </span>
-                        <span className="btc-utxo-value tx-value-highlight">
+                        <span className="utxo-value tx-value-highlight">
                           {formatZEC(utxo.valueZat, currency)}
                         </span>
-                        <span className="btc-utxo-confirmations">
+                        <span className="utxo-confirmations">
                           <Link to={`/${networkId}/block/${utxo.height}`} className="link-accent">
                             {t("address.atHeight", { height: formatNumber(utxo.height) })}
                           </Link>
@@ -245,38 +256,56 @@ const ZcashAddressDisplay: React.FC<ZcashAddressDisplayProps> = React.memo(
         )}
 
         {txids?.availability === "ok" && recentTxids.length > 0 && (
-          <div className="btc-tx-section">
-            <div className="btc-tx-section-header">
+          <div className="utxo-tx-section">
+            <div className="utxo-tx-section-header">
               <button
                 type="button"
-                className="btc-tx-section-toggle"
+                className="utxo-tx-section-toggle"
                 onClick={() => setShowTransactions(!showTransactions)}
               >
-                <span className="btc-tx-section-title">
+                <span className="utxo-tx-section-title">
                   {t("address.transactions", { count: recentTxids.length })}
                 </span>
-                <span className="btc-tx-section-arrow" aria-hidden="true">
+                <span className="utxo-tx-section-arrow" aria-hidden="true">
                   {showTransactions ? "▾" : "▸"}
                 </span>
               </button>
             </div>
             {showTransactions && (
-              <div className="btc-tx-list">
-                {recentTxids.slice(0, MAX_LISTED_TXIDS).map((txid, index) => (
-                  <div key={txid} className="btc-tx-list-item">
-                    <span className="btc-tx-index">{index}</span>
-                    <span className="btc-tx-hash tx-mono">
+              <div className="utxo-tx-list">
+                {pageTxids.map((txid, index) => (
+                  <div key={txid} className="utxo-tx-list-item">
+                    <span className="utxo-tx-index">{pageStart + index}</span>
+                    <span className="utxo-tx-hash tx-mono">
                       <Link to={`/${networkId}/tx/${txid}`} className="link-accent">
                         {txid}
                       </Link>
                     </span>
                   </div>
                 ))}
-                {recentTxids.length > MAX_LISTED_TXIDS && (
-                  <div className="btc-tx-list-more">
-                    {t("address.moreTransactions", {
-                      count: recentTxids.length - MAX_LISTED_TXIDS,
-                    })}
+                {txPages > 1 && (
+                  <div className="pagination-container no-margin-top">
+                    <button
+                      type="button"
+                      onClick={() => setTxPage(currentTxPage - 1)}
+                      disabled={currentTxPage <= 1}
+                      className="pagination-btn"
+                      title={t("txsPage.prevTitle")}
+                    >
+                      {t("txsPage.prev")}
+                    </button>
+                    <span className="pagination-page-info">
+                      {t("txsPage.pageInfo", { page: currentTxPage, totalPages: txPages })}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setTxPage(currentTxPage + 1)}
+                      disabled={currentTxPage >= txPages}
+                      className="pagination-btn"
+                      title={t("txsPage.nextTitle")}
+                    >
+                      {t("txsPage.next")}
+                    </button>
                   </div>
                 )}
               </div>

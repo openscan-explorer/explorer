@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useLocation, useParams } from "react-router-dom";
-import { getNetworkBySlug } from "../../../config/networks";
+import { useParams } from "react-router-dom";
+import { LOADER_TIMEOUT_MS } from "../../../config/zcashConstants";
 import { useDataService } from "../../../hooks/useDataService";
+import { useZcashNetworkFromPath } from "../../../hooks/useZcashNetworkFromPath";
 import type { ZcashAddress } from "../../../types";
 import { truncateHash } from "../../../utils/zcashFormatters";
 import Breadcrumb from "../../common/Breadcrumb";
@@ -12,13 +13,8 @@ import ZcashAddressDisplay from "./ZcashAddressDisplay";
 export default function ZcashAddressPage() {
   const { t } = useTranslation("zcash");
   const { address } = useParams<{ address?: string }>();
-  const location = useLocation();
-
-  // Extract network slug from path (e.g., "/tzec/address/..." → "tzec")
-  const networkSlug = location.pathname.split("/")[1] || "zec";
+  const { slug: networkSlug, label: networkLabel, currency } = useZcashNetworkFromPath();
   const dataService = useDataService(networkSlug);
-  const network = getNetworkBySlug(networkSlug);
-  const networkLabel = network?.shortName || networkSlug.toUpperCase();
 
   const [result, setResult] = useState<ZcashAddress | null>(null);
   const [loading, setLoading] = useState(true);
@@ -31,26 +27,25 @@ export default function ZcashAddressPage() {
   useEffect(() => {
     if (!dataService || !dataService.isZcash() || !address) return;
 
-    let cancelled = false;
+    const controller = new AbortController();
+    const { signal } = controller;
     setLoading(true);
     setError(null);
 
     dataService
       .getZcashAdapter()
-      .getAddress(address)
+      .getAddress(address, { signal })
       .then((data) => {
-        if (!cancelled) setResult(data);
+        if (!signal.aborted) setResult(data);
       })
       .catch((err) => {
-        if (!cancelled) setError(err instanceof Error ? err.message : String(err));
+        if (!signal.aborted) setError(err instanceof Error ? err.message : String(err));
       })
       .finally(() => {
-        if (!cancelled) setLoading(false);
+        if (!signal.aborted) setLoading(false);
       });
 
-    return () => {
-      cancelled = true;
-    };
+    return () => controller.abort();
   }, [dataService, address, reloadKey]);
 
   if (loading) {
@@ -62,8 +57,10 @@ export default function ZcashAddressPage() {
           </div>
           <div className="card-content-loading">
             <LoaderWithTimeout
+              key={reloadKey}
               text={t("address.loading")}
-              onRetry={() => window.location.reload()}
+              timeoutMs={LOADER_TIMEOUT_MS}
+              onRetry={() => setReloadKey((key) => key + 1)}
             />
           </div>
         </div>
@@ -96,7 +93,7 @@ export default function ZcashAddressPage() {
         <ZcashAddressDisplay
           address={result}
           networkId={networkSlug}
-          currency={network?.currency ?? "ZEC"}
+          currency={currency}
           onRetry={() => setReloadKey((key) => key + 1)}
         />
       )}

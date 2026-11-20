@@ -74,14 +74,14 @@
       "p2pkh": "トランスペアレント (P2PKH)",
       "p2sh": "トランスペアレント (P2SH)"
     },
-    "transparentReceiverNote": "トランスペアレントレシーバー {{address}}",
+    "transparentReceiverNote": "（トランスペアレントレシーバー {{address}}）",
     "balance": "残高:",
+    "transparentBalance": "トランスペアレント残高:",
     "received": "総受取額:",
     "unspentOutputsLabel": "未使用出力:",
     "transactionsLabel": "トランザクション:",
     "unspentOutputs": "未使用出力 ({{count}})",
     "transactions": "トランザクション ({{count}})",
-    "moreTransactions": "…他 {{count}} 件",
     "noUtxos": "未使用出力はありません",
     "atHeight": "ブロック #{{height}}",
     "unavailable": "このRPCエンドポイントでは利用できません",
@@ -92,6 +92,7 @@
     "texNotice": "TEXアドレスはトランスペアレントな資金のみを受け取ります。残高と履歴の照会はまだ利用できません。",
     "unknownNotice": "これはZcashアドレスではないようです。",
     "indexUnsupported": "このRPCエンドポイントはZebraのアドレスインデックスを提供していないため、残高・未使用出力・履歴を表示できません。ホスト型ゲートウェイはこれらのメソッドをブロックしています。表示するには自前のZebraノードを追加してください。",
+    "receiversUnsupported": "このRPCエンドポイントはユニファイドアドレスをデコードできないため、レシーバーとトランスペアレント残高を表示できません。ホスト型ゲートウェイはこのメソッドをブロックしています。表示するには自前のZebraノードを追加してください。",
     "configureRpc": "RPCエンドポイントを設定"
   },
   "mempool": {

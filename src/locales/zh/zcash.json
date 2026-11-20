@@ -74,14 +74,14 @@
       "p2pkh": "透明 (P2PKH)",
       "p2sh": "透明 (P2SH)"
     },
-    "transparentReceiverNote": "透明接收器 {{address}}",
+    "transparentReceiverNote": "（透明接收器 {{address}}）",
     "balance": "余额:",
+    "transparentBalance": "透明余额:",
     "received": "累计接收:",
     "unspentOutputsLabel": "未花费输出:",
     "transactionsLabel": "交易:",
     "unspentOutputs": "未花费输出 ({{count}})",
     "transactions": "交易 ({{count}})",
-    "moreTransactions": "…还有 {{count}} 笔",
     "noUtxos": "没有未花费输出",
     "atHeight": "区块 #{{height}}",
     "unavailable": "此 RPC 端点不提供该数据",
@@ -92,6 +92,7 @@
     "texNotice": "TEX 地址只接收透明资金，暂不支持查询其余额和历史。",
     "unknownNotice": "这看起来不是 Zcash 地址。",
     "indexUnsupported": "此 RPC 端点不提供 Zebra 地址索引，因此无法显示余额、未花费输出和历史。托管网关会屏蔽这些方法；请添加自建的 Zebra 节点以查看。",
+    "receiversUnsupported": "此 RPC 端点无法解码统一地址，因此无法显示其接收器和透明余额。托管网关会屏蔽此方法；请添加自建的 Zebra 节点以查看。",
     "configureRpc": "配置 RPC 端点"
   },
   "mempool": {
