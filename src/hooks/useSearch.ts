@@ -2,8 +2,10 @@ import { useCallback, useContext, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { AppContext, useNetworks } from "../context";
 import { ENSService } from "../services/ENS/ENSService";
-import { isEVMNetwork, resolveNetwork } from "../utils/networkResolver";
-import { isZcashAddress } from "../utils/zcashUtils";
+import { getZcashNetworkKind } from "../config/zcashConstants";
+import { isHex64Hash } from "../utils/hashUtils";
+import { isEVMNetwork, isZcashNetwork, resolveNetwork } from "../utils/networkResolver";
+import { isZcashAddress, normalizeZcashAddress } from "../utils/zcashUtils";
 
 interface UseSearchResult {
   searchTerm: string;
@@ -94,14 +96,19 @@ export function useSearch(): UseSearchResult {
       // Determine what type of search this is
       const isEvmTransactionHash = /^0x[a-fA-F0-9]{64}$/.test(term);
       const isEvmAddress = /^0x[a-fA-F0-9]{40}$/.test(term);
-      const isBitcoinTxid = /^[a-fA-F0-9]{64}$/.test(term);
+      // A Bitcoin or Zcash txid. Zcash block hashes look the same: they go to the transaction
+      // page, which redirects to the block when the node finds no such transaction.
+      const isUtxoHash = isHex64Hash(term);
       const isBitcoinAddress = /^(1|3|bc1)[a-zA-Z0-9]{25,62}$/.test(term);
-      // Transparent, Sapling, unified, Sprout and TEX addresses. Zcash block hashes are also 64
-      // hex characters: they go to the transaction page, which redirects to the matching block.
-      const isZcashAddressTerm = resolvedNetwork?.type === "zcash" && isZcashAddress(term);
+      // Transparent, Sapling, unified, Sprout and TEX addresses of the selected Zcash network.
+      // With no network selected any Zcash address counts, so the "select a network" hint shows.
+      const isZcashAddressTerm = resolvedNetwork
+        ? isZcashNetwork(resolvedNetwork) &&
+          isZcashAddress(term, getZcashNetworkKind(resolvedNetwork.networkId))
+        : isZcashAddress(term);
       const isBlockNumber = /^\d+$/.test(term);
 
-      const isTransactionHash = isEvmTransactionHash || isBitcoinTxid;
+      const isTransactionHash = isEvmTransactionHash || isUtxoHash;
       const isAddress = isEvmAddress || isBitcoinAddress || isZcashAddressTerm;
 
       // If pattern doesn't match any valid type, show error immediately
@@ -121,7 +128,8 @@ export function useSearch(): UseSearchResult {
         navigate(`/${networkId}/tx/${term}`);
         setSearchTerm("");
       } else if (isAddress) {
-        navigate(`/${networkId}/address/${term}`);
+        const address = isZcashAddressTerm ? normalizeZcashAddress(term) : term;
+        navigate(`/${networkId}/address/${address}`);
         setSearchTerm("");
       } else if (isBlockNumber) {
         navigate(`/${networkId}/block/${term}`);

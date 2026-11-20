@@ -194,6 +194,14 @@ const UNSUPPORTED_PATTERN = /method not found/i;
 const RPC_ERROR_PATTERN = /^RPC error:/;
 
 /**
+ * Whether an endpoint answered with a JSON-RPC error (e.g. "No such transaction"), as opposed
+ * to an HTTP or network failure
+ */
+export function isRpcErrorAnswer(message: string): boolean {
+  return RPC_ERROR_PATTERN.test(message);
+}
+
+/**
  * Classify the per-endpoint error messages of a failed RPC call:
  * 1. Any endpoint answered with a JSON-RPC error other than "method not found": that answer is
  *    definitive (e.g. "No such transaction"), so retrying a rate-limited endpoint can't help.
@@ -202,7 +210,7 @@ const RPC_ERROR_PATTERN = /^RPC error:/;
  */
 export function classifyRpcErrors(messages: string[]): ZcashRpcErrorKind {
   const definitive = messages.some(
-    (message) => RPC_ERROR_PATTERN.test(message) && !UNSUPPORTED_PATTERN.test(message),
+    (message) => isRpcErrorAnswer(message) && !UNSUPPORTED_PATTERN.test(message),
   );
   if (definitive) return "failed";
   if (messages.some((message) => RATE_LIMITED_PATTERN.test(message))) return "rateLimited";

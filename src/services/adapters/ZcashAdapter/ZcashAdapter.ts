@@ -18,6 +18,7 @@ import { logger } from "../../../utils/logger";
 import {
   classifyRpcErrors,
   detectZcashAddressType,
+  isRpcErrorAnswer,
   normalizeZcashAddress,
   type ZcashRpcErrorKind,
 } from "../../../utils/zcashUtils";
@@ -58,6 +59,14 @@ export class ZcashRpcError extends Error {
     this.method = method;
     this.kind = kind;
     this.messages = messages;
+  }
+
+  /**
+   * An endpoint gave a definitive JSON-RPC answer (e.g. "not found"), rather than being rate
+   * limited or unreachable
+   */
+  get answered(): boolean {
+    return this.kind === "failed" && this.messages.some(isRpcErrorAnswer);
   }
 }
 

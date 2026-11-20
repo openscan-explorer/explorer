@@ -5,14 +5,14 @@ import { CACHE_MIN_CONFIRMATIONS, LOADER_TIMEOUT_MS } from "../../../config/zcas
 import { useDataService } from "../../../hooks/useDataService";
 import { usePersistentCache } from "../../../hooks/usePersistentCache";
 import { useZcashNetworkFromPath } from "../../../hooks/useZcashNetworkFromPath";
+import { ZcashRpcError } from "../../../services/adapters/ZcashAdapter";
 import type { ZcashTransaction } from "../../../types";
+import { isHex64Hash } from "../../../utils/hashUtils";
 import { truncateHash } from "../../../utils/zcashFormatters";
 import { countPreviousTransactions } from "../../../utils/zcashUtils";
 import Breadcrumb from "../../common/Breadcrumb";
 import LoaderWithTimeout from "../../common/LoaderWithTimeout";
 import ZcashTransactionDisplay, { type InputResolution } from "./ZcashTransactionDisplay";
-
-const HASH_PATTERN = /^[0-9a-f]{64}$/i;
 
 export default function ZcashTransactionPage() {
   const { t } = useTranslation("zcash");
@@ -73,14 +73,22 @@ export default function ZcashTransactionPage() {
         cacheIfFinal(data);
       } catch (err) {
         if (signal.aborted) return;
-        // Search sends every 64-character hash here, and Zcash block hashes look like txids,
-        // so a hash that matches no transaction may still be a block
-        const block = HASH_PATTERN.test(txid)
-          ? await adapter.getBlock(txid, { signal }).catch(() => null)
-          : null;
+        // Zcash block hashes look like txids, so a hash the node says matches no transaction
+        // may be a block (from search, or a pasted /tx/<block hash> URL). Rate-limited or
+        // unreachable endpoints said nothing about the hash, so don't spend a call on those.
+        const notATransaction = err instanceof ZcashRpcError && err.answered;
+        const result =
+          notATransaction && isHex64Hash(txid)
+            ? await adapter.getBlock(txid, { signal }).catch(() => null)
+            : null;
         if (signal.aborted) return;
-        if (block) {
-          navigate(`/${networkSlug}/block/${block.data.block.hash}`, { replace: true });
+        if (result) {
+          const { block } = result.data;
+          if (block.nextBlockHash) {
+            setCached(cacheNetworkId, "block", String(block.height), block);
+          }
+          // Hand the block over so its page doesn't fetch it again
+          navigate(`/${networkSlug}/block/${block.height}`, { replace: true, state: { block } });
           return;
         }
         setError(err instanceof Error ? err.message : String(err));
@@ -103,6 +111,7 @@ export default function ZcashTransactionPage() {
     attempt,
     navigate,
     networkSlug,
+    setCached,
   ]);
 
   // Zebra omits transparent input values, so the fee is only resolved when the user asks.

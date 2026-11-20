@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { LOADER_TIMEOUT_MS } from "../../../config/zcashConstants";
 import { useDataService } from "../../../hooks/useDataService";
 import { usePersistentCache } from "../../../hooks/usePersistentCache";
@@ -13,6 +13,8 @@ import ZcashBlockDisplay from "./ZcashBlockDisplay";
 export default function ZcashBlockPage() {
   const { t } = useTranslation("zcash");
   const { filter } = useParams<{ filter?: string }>();
+  // The transaction page hands over a block it already fetched while resolving a hash
+  const handedOver = (useLocation().state as { block?: ZcashBlock } | null)?.block;
   const {
     slug: networkSlug,
     label: networkLabel,
@@ -42,6 +44,11 @@ export default function ZcashBlockPage() {
       setFromCache(false);
 
       try {
+        if (handedOver && String(handedOver.height) === filter) {
+          setBlock(handedOver);
+          return;
+        }
+
         let blockId: string | number = filter;
         if (filter === "latest") {
           blockId = await adapter.getLatestBlockNumber({ signal });
@@ -72,7 +79,7 @@ export default function ZcashBlockPage() {
 
     fetchBlock();
     return () => controller.abort();
-  }, [dataService, filter, getCached, setCached, cacheNetworkId, attempt]);
+  }, [dataService, filter, getCached, setCached, cacheNetworkId, attempt, handedOver]);
 
   if (loading) {
     return (
