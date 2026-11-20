@@ -140,4 +140,16 @@ test.describe("Zcash address", () => {
     await expect(items).toHaveCount(10);
     await expect(items.last()).toContainText(history[0] ?? "");
   });
+
+  test("offers AI analysis only when the address has public data", async ({ page }) => {
+    await mockZcashRpc(page);
+
+    await page.goto(addressUrl(T_ADDRESS));
+    await expect(page.locator(".ai-analysis-panel")).toHaveCount(1);
+
+    // A Sapling address has nothing public to analyze, so it isn't sent to the AI provider
+    await page.goto(addressUrl(SAPLING_ADDRESS));
+    await expect(page.getByText("Shielded addresses don't reveal balances")).toBeVisible();
+    await expect(page.locator(".ai-analysis-panel")).toHaveCount(0);
+  });
 });

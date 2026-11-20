@@ -212,7 +212,7 @@ const POWER_STABLE_CONFIGS: Record<AIAnalysisType, PromptConfig> = {
     role: "Zcash blockchain analyst",
     conciseness: "3-5 sentences",
     focusAreas:
-      "transaction count, how many transactions use each shielded pool, coinbase outputs (miner reward and funding streams), difficulty, and the value pool balances after the block",
+      "transaction count, how many transactions use each shielded pool, the coinbase reward (transparent outputs for the miner and funding streams, plus any reward paid into a shielded pool), difficulty, and the value pool balances after the block",
     audience: "senior Zcash developer",
     task: "Analyze this Zcash block",
     sections: ["Block Analysis", "Shielded Activity", "Reward and Value Pools", "Notable Aspects"],

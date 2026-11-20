@@ -322,13 +322,17 @@ const ZcashAddressDisplay: React.FC<ZcashAddressDisplayProps> = React.memo(
             </div>
           )}
         </div>
-        <AIAnalysisPanel
-          analysisType="zcash_address"
-          context={aiContext}
-          networkName={network?.name ?? "Zcash"}
-          networkCurrency={currency}
-          cacheKey={`openscan_ai_zcash_address_${networkId}_${address.address}`}
-        />
+        {/* Without a transparent receiver there's nothing public to analyze, so a shielded
+            address isn't sent to the AI provider */}
+        {transparentAddress && (
+          <AIAnalysisPanel
+            analysisType="zcash_address"
+            context={aiContext}
+            networkName={network?.name ?? "Zcash"}
+            networkCurrency={currency}
+            cacheKey={`openscan_ai_zcash_address_${networkId}_${address.address}`}
+          />
+        )}
       </div>
     );
   },

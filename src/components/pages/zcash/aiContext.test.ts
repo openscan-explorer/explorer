@@ -53,6 +53,28 @@ describe("buildTransactionAnalysisContext", () => {
   });
 });
 
+describe("buildTransactionAnalysisContext for Sprout", () => {
+  it("reports JoinSplit public values and the fee once inputs are known", () => {
+    const sprout: ZcashTransaction = {
+      txid: "5".repeat(64),
+      version: 2,
+      size: 1_802,
+      locktime: 0,
+      vin: [{ txid: "a".repeat(64), vout: 0, sequence: 0, valueZat: 30_000 }],
+      vout: [],
+      shielded: { sprout: { joinSplits: 1, vpubOldZat: 20_000, vpubNewZat: 0 } },
+    };
+
+    expect(buildTransactionAnalysisContext(sprout)).toMatchObject({
+      kind: "shielding",
+      pools: ["transparent", "sprout"],
+      isCoinbase: false,
+      feeZEC: 0.0001,
+      shieldedBundles: { sprout: { joinSplits: 1, enteredSproutZEC: 0.0002, leftSproutZEC: 0 } },
+    });
+  });
+});
+
 describe("buildBlockAnalysisContext", () => {
   it("converts the coinbase outputs and value pools to ZEC", () => {
     const block: ZcashBlock = {
@@ -77,8 +99,33 @@ describe("buildBlockAnalysisContext", () => {
     expect(buildBlockAnalysisContext(block)).toMatchObject({
       transactionCount: 18,
       coinbaseTotalZEC: 1.37990751,
+      coinbaseShieldedZEC: undefined,
       shieldedTransactionCounts: { sapling: 2, ironwood: 2 },
       valuePoolsZEC: { sapling: 511442.92792244 },
+    });
+  });
+});
+
+describe("buildBlockAnalysisContext for a shielded coinbase", () => {
+  it("includes the reward paid into the shielded pools", () => {
+    const block: ZcashBlock = {
+      hash: "0".repeat(64),
+      height: 3483401,
+      time: 1789411547,
+      nTx: 1,
+      size: 2_000,
+      version: 4,
+      merkleRoot: "0".repeat(64),
+      bits: "1c008816",
+      nonce: "a9a1",
+      difficulty: 252_490_000,
+      coinbaseOutputs: [{ address: "t3cFfPt1Bcvgez9ZbMBFWeZsskxTkPzGCow", valueZat: 12_500_000 }],
+      coinbaseShieldedZat: 125_490_751,
+    };
+
+    expect(buildBlockAnalysisContext(block)).toMatchObject({
+      coinbaseTotalZEC: 1.37990751,
+      coinbaseShieldedZEC: 1.25490751,
     });
   });
 });
@@ -104,7 +151,7 @@ describe("buildAddressAnalysisContext", () => {
         history: "unsupported",
       },
     });
-    expect(context.balanceZEC).toBeUndefined();
+    expect(context.transparentBalanceZEC).toBeUndefined();
     expect(context.transparentReceiver).toBeUndefined();
   });
 
@@ -121,7 +168,7 @@ describe("buildAddressAnalysisContext", () => {
     expect(context).toMatchObject({
       transparentReceiver: T_ADDRESS,
       receiverTypes: ["orchard", "p2pkh"],
-      balanceZEC: 0.0951481,
+      transparentBalanceZEC: 0.0951481,
       recentTxids: ["newer", "older"],
     });
   });

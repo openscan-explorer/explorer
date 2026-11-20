@@ -11,10 +11,9 @@ import type {
 } from "../../../types";
 import {
   classifyTransaction,
-  computeFeeZat,
+  computeFee,
   getTransactionPools,
   getTransparentOutputZat,
-  isCoinbaseTransaction,
   zatToZec,
 } from "../../../utils/zcashUtils";
 
@@ -42,7 +41,8 @@ function summarizeShieldedBundles({ sprout, sapling, orchard, ironwood }: ZcashS
 }
 
 export function buildTransactionAnalysisContext(tx: ZcashTransaction): Record<string, unknown> {
-  const feeZat = computeFeeZat(tx);
+  const fee = computeFee(tx);
+  const feeZat = fee.kind === "known" ? fee.zat : undefined;
   const inputValuesKnown =
     tx.vin.length > 0 && tx.vin.every((input) => input.valueZat !== undefined);
 
@@ -53,7 +53,7 @@ export function buildTransactionAnalysisContext(tx: ZcashTransaction): Record<st
     blockHeight: tx.blockheight,
     kind: classifyTransaction(tx),
     pools: getTransactionPools(tx),
-    isCoinbase: isCoinbaseTransaction(tx),
+    isCoinbase: fee.kind === "coinbase",
     version: tx.version,
     expiryHeight: tx.expiryHeight,
     sizeBytes: tx.size,
@@ -63,9 +63,9 @@ export function buildTransactionAnalysisContext(tx: ZcashTransaction): Record<st
       ? zatToZec(tx.vin.reduce((sum, input) => sum + (input.valueZat ?? 0), 0))
       : undefined,
     transparentOutputsZEC: zatToZec(getTransparentOutputZat(tx)),
-    feeZEC: feeZat === null ? undefined : zatToZec(feeZat),
+    feeZEC: feeZat === undefined ? undefined : zatToZec(feeZat),
     feeRateZatPerByte:
-      feeZat !== null && tx.size > 0 ? Number((feeZat / tx.size).toFixed(2)) : undefined,
+      feeZat !== undefined && tx.size > 0 ? Number((feeZat / tx.size).toFixed(2)) : undefined,
     shieldedBundles: summarizeShieldedBundles(tx.shielded),
     transparentOutputs: tx.vout.map((output) => ({
       address: output.address,
@@ -77,6 +77,9 @@ export function buildTransactionAnalysisContext(tx: ZcashTransaction): Record<st
 
 export function buildBlockAnalysisContext(block: ZcashBlock): Record<string, unknown> {
   const coinbaseOutputs = block.coinbaseOutputs ?? [];
+  const coinbaseShieldedZat = block.coinbaseShieldedZat ?? 0;
+  const coinbaseTotalZat =
+    coinbaseOutputs.reduce((sum, output) => sum + output.valueZat, 0) + coinbaseShieldedZat;
 
   return {
     height: block.height,
@@ -86,10 +89,9 @@ export function buildBlockAnalysisContext(block: ZcashBlock): Record<string, unk
     transactionCount: block.nTx,
     sizeBytes: block.size,
     difficulty: block.difficulty,
-    coinbaseTotalZEC:
-      coinbaseOutputs.length > 0
-        ? zatToZec(coinbaseOutputs.reduce((sum, output) => sum + output.valueZat, 0))
-        : undefined,
+    coinbaseTotalZEC: coinbaseTotalZat > 0 ? zatToZec(coinbaseTotalZat) : undefined,
+    // Reward paid into Sapling or Orchard by a shielded coinbase (not in coinbaseOutputs)
+    coinbaseShieldedZEC: coinbaseShieldedZat > 0 ? zatToZec(coinbaseShieldedZat) : undefined,
     coinbaseOutputs: coinbaseOutputs.map((output) => ({
       address: output.address,
       amountZEC: zatToZec(output.valueZat),
@@ -121,8 +123,10 @@ export function buildAddressAnalysisContext(address: ZcashAddress): Record<strin
       unspentOutputs: utxos?.availability,
       history: txids?.availability,
     },
-    balanceZEC: balance?.data === undefined ? undefined : zatToZec(balance.data.balanceZat),
-    totalReceivedZEC:
+    // Only the transparent receiver's: a unified address's other receivers are shielded
+    transparentBalanceZEC:
+      balance?.data === undefined ? undefined : zatToZec(balance.data.balanceZat),
+    transparentReceivedZEC:
       balance?.data?.receivedZat === undefined ? undefined : zatToZec(balance.data.receivedZat),
     unspentOutputCount: utxos?.data?.length,
     transactionCount: txids?.data?.length,
