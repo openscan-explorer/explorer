@@ -4,8 +4,9 @@
     "difficulty": "難易度: {{value}}",
     "mempool": "メンプール",
     "mempoolTxs": "{{count}} 件",
+    "mempoolTxs_other": "{{count}} 件",
     "chainSupply": "総供給量",
-    "shieldedShare": "{{percent}}% シールド",
+    "shieldedShare": "{{percent}} シールド",
     "loadError": "RPCエンドポイントからデータを読み込めませんでした: {{message}}",
     "rateLimited": "RPCエンドポイントがリクエストを制限しています。データは自動的に更新されます。"
   },
@@ -25,7 +26,9 @@
     "title": "最新ブロック",
     "viewAll": "すべて表示",
     "txCount": "{{count}} 件",
-    "noBlocks": "ブロックが見つかりません"
+    "txCount_other": "{{count}} 件",
+    "noBlocks": "ブロックが見つかりません",
+    "unavailable": "このブロックを読み込めませんでした。次回の更新で再試行します。"
   },
   "transactions": {
     "title": "最新トランザクション",
@@ -40,11 +43,5 @@
       "shielded": "完全シールド",
       "mixed": "混合"
     }
-  },
-  "common": {
-    "secondsAgo": "{{count}}秒前",
-    "minutesAgo": "{{count}}分前",
-    "hoursAgo": "{{count}}時間前",
-    "daysAgo": "{{count}}日前"
   }
 }

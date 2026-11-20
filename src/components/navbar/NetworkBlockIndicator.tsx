@@ -7,7 +7,16 @@ import { RpcClient } from "@openscan/network-connectors";
 import { useDataService } from "../../hooks/useDataService";
 import { formatGasPrice } from "../../utils/formatUtils";
 import { logger } from "../../utils/logger";
+import type { NetworkType } from "../../types";
 import { resolveNetwork, getNetworkRpcKey } from "../../utils/networkResolver";
+
+// Zcash polls slowly: 75 second blocks served by rate-limited gateways
+const POLL_INTERVAL_MS: Record<NetworkType, number> = {
+  evm: 12_000,
+  solana: 12_000,
+  bitcoin: 60_000,
+  zcash: ZCASH_REFRESH_INTERVAL_MS,
+};
 
 interface NetworkBlockIndicatorProps {
   className?: string;
@@ -45,26 +54,24 @@ export function NetworkBlockIndicator({ className }: NetworkBlockIndicatorProps)
 
     let isMounted = true;
     let intervalId: NodeJS.Timeout | null = null;
+    const controller = new AbortController();
 
     const fetchData = async () => {
       const networkRpcKey = getNetworkRpcKey(network);
       try {
-        if (network.type === "bitcoin" && dataService?.isBitcoin()) {
-          // Fetch Bitcoin block height
-          const adapter = dataService.getBitcoinAdapter();
-          const height = await adapter.getLatestBlockNumber();
+        // UTXO chains (Bitcoin, Zcash) report a block height and have no gas
+        const getUtxoHeight = dataService?.isBitcoin()
+          ? () => dataService.getBitcoinAdapter().getLatestBlockNumber()
+          : dataService?.isZcash()
+            ? () =>
+                dataService.getZcashAdapter().getLatestBlockNumber({ signal: controller.signal })
+            : null;
+
+        if (getUtxoHeight) {
+          const height = await getUtxoHeight();
           if (isMounted) {
             setBlockNumber(height);
-            setGasPrice(null); // Bitcoin doesn't have gas
-            setIsLoading(false);
-          }
-        } else if (network.type === "zcash" && dataService?.isZcash()) {
-          // Fetch Zcash block height
-          const adapter = dataService.getZcashAdapter();
-          const height = await adapter.getLatestBlockNumber();
-          if (isMounted) {
-            setBlockNumber(height);
-            setGasPrice(null); // Zcash doesn't have gas
+            setGasPrice(null);
             setIsLoading(false);
           }
         } else if (network.type === "solana" && dataService?.isSolana()) {
@@ -99,6 +106,7 @@ export function NetworkBlockIndicator({ className }: NetworkBlockIndicatorProps)
           }
         }
       } catch (error) {
+        if (controller.signal.aborted) return;
         logger.error("Failed to fetch block number:", error);
         if (isMounted) {
           setIsLoading(false);
@@ -109,18 +117,11 @@ export function NetworkBlockIndicator({ className }: NetworkBlockIndicatorProps)
     setIsLoading(true);
     fetchData();
 
-    // Poll every 12 seconds for EVM, 60 seconds for Bitcoin, and 90 seconds for Zcash
-    // (75 second blocks served by rate-limited gateways)
-    const pollInterval =
-      network.type === "zcash"
-        ? ZCASH_REFRESH_INTERVAL_MS
-        : network.type === "bitcoin"
-          ? 60000
-          : 12000;
-    intervalId = setInterval(fetchData, pollInterval);
+    intervalId = setInterval(fetchData, POLL_INTERVAL_MS[network.type]);
 
     return () => {
       isMounted = false;
+      controller.abort();
       if (intervalId) {
         clearInterval(intervalId);
       }

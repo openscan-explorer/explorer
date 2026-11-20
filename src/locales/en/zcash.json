@@ -3,9 +3,10 @@
     "blockHeight": "Block Height",
     "difficulty": "Difficulty: {{value}}",
     "mempool": "Mempool",
-    "mempoolTxs": "{{count}} txs",
+    "mempoolTxs": "{{count}} tx",
+    "mempoolTxs_other": "{{count}} txs",
     "chainSupply": "Chain Supply",
-    "shieldedShare": "{{percent}}% shielded",
+    "shieldedShare": "{{percent}} shielded",
     "loadError": "Couldn't load data from the RPC endpoint: {{message}}",
     "rateLimited": "The RPC endpoint is rate limiting requests. Data refreshes automatically."
   },
@@ -24,8 +25,10 @@
   "blocks": {
     "title": "Latest Blocks",
     "viewAll": "View all",
-    "txCount": "{{count}} txns",
-    "noBlocks": "No blocks found"
+    "txCount": "{{count}} txn",
+    "txCount_other": "{{count}} txns",
+    "noBlocks": "No blocks found",
+    "unavailable": "Couldn't load this block. It will be retried on the next refresh."
   },
   "transactions": {
     "title": "Latest Transactions",
@@ -40,11 +43,5 @@
       "shielded": "Fully shielded",
       "mixed": "Mixed"
     }
-  },
-  "common": {
-    "secondsAgo": "{{count}}s ago",
-    "minutesAgo": "{{count}}m ago",
-    "hoursAgo": "{{count}}h ago",
-    "daysAgo": "{{count}}d ago"
   }
 }

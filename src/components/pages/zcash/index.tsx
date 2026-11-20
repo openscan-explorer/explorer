@@ -1,10 +1,8 @@
 import { useTranslation } from "react-i18next";
-import { useLocation } from "react-router-dom";
-import { getAllNetworks } from "../../../config/networks";
 import { useZcashDashboard } from "../../../hooks/useZcashDashboard";
+import { useZcashNetworkFromPath } from "../../../hooks/useZcashNetworkFromPath";
 import { ZcashRpcError } from "../../../services/adapters/ZcashAdapter";
 import type { NetworkConfig } from "../../../types";
-import { resolveNetwork } from "../../../utils/networkResolver";
 import SearchBox from "../../common/SearchBox";
 import ZcashBlocksTable from "./ZcashBlocksTable";
 import ZcashDashboardStats from "./ZcashDashboardStats";
@@ -24,11 +22,8 @@ const DEFAULT_ZCASH_NETWORK: NetworkConfig = {
 
 export default function ZcashNetwork() {
   const { t } = useTranslation("zcash");
-  const location = useLocation();
-
-  // Extract network slug from path (e.g., "/tzec" → "tzec", "/zec" → "zec")
-  const pathSlug = location.pathname.split("/")[1] || "zec";
-  const network = resolveNetwork(pathSlug, getAllNetworks()) || DEFAULT_ZCASH_NETWORK;
+  const { slug: pathSlug, network: pathNetwork } = useZcashNetworkFromPath();
+  const network = pathNetwork ?? DEFAULT_ZCASH_NETWORK;
   const dashboard = useZcashDashboard(network);
 
   const networkName = network.name.toUpperCase();
@@ -68,6 +63,7 @@ export default function ZcashNetwork() {
         <div className="dashboard-tables-row">
           <ZcashBlocksTable
             blocks={dashboard.latestBlocks}
+            failedHeights={dashboard.failedHeights}
             loading={dashboard.loading}
             networkId={pathSlug}
           />

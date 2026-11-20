@@ -32,3 +32,13 @@ export function formatZECCompact(valueZat: number, currency = "ZEC"): string {
   return `${value.toLocaleString(undefined, { maximumFractionDigits })} ${currency}`;
 }
 
+/**
+ * Format a percentage (0–100) with one decimal, using the viewer's locale like the amounts
+ */
+export function formatPercent(percent: number): string {
+  return (percent / 100).toLocaleString(undefined, {
+    style: "percent",
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+  });
+}

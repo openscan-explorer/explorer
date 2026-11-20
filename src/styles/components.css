@@ -6353,6 +6353,32 @@ button.tx-section-header-toggle {
 	justify-content: center;
 }
 
+/* Zcash loading placeholders, sized like the text they stand in for */
+.zec-skeleton {
+	display: inline-block;
+}
+
+.zec-skeleton-small {
+	height: 12px;
+}
+
+.zec-skeleton-text {
+	height: 14px;
+}
+
+.zec-skeleton-stat {
+	height: 20px;
+}
+
+.zec-skeleton-w50 { width: 50px; }
+.zec-skeleton-w60 { width: 60px; }
+.zec-skeleton-w70 { width: 70px; }
+.zec-skeleton-w80 { width: 80px; }
+.zec-skeleton-w90 { width: 90px; }
+.zec-skeleton-w100 { width: 100px; }
+.zec-skeleton-w120 { width: 120px; }
+.zec-skeleton-w140 { width: 140px; }
+
 /* Zcash value pools */
 .zec-value-pools {
 	background: var(--bg-secondary);

@@ -3,9 +3,10 @@
     "blockHeight": "Altura do bloco",
     "difficulty": "Dificuldade: {{value}}",
     "mempool": "Mempool",
-    "mempoolTxs": "{{count}} txs",
+    "mempoolTxs": "{{count}} tx",
+    "mempoolTxs_other": "{{count}} txs",
     "chainSupply": "Oferta total",
-    "shieldedShare": "{{percent}}% blindado",
+    "shieldedShare": "{{percent}} blindado",
     "loadError": "Não foi possível carregar dados do endpoint RPC: {{message}}",
     "rateLimited": "O endpoint RPC está limitando as requisições. Os dados são atualizados automaticamente."
   },
@@ -24,8 +25,10 @@
   "blocks": {
     "title": "Últimos blocos",
     "viewAll": "Ver todos",
-    "txCount": "{{count}} txs",
-    "noBlocks": "Nenhum bloco encontrado"
+    "txCount": "{{count}} tx",
+    "txCount_other": "{{count}} txs",
+    "noBlocks": "Nenhum bloco encontrado",
+    "unavailable": "Não foi possível carregar este bloco. Ele será tentado novamente na próxima atualização."
   },
   "transactions": {
     "title": "Últimas transações",
@@ -40,11 +43,5 @@
       "shielded": "Totalmente blindada",
       "mixed": "Mista"
     }
-  },
-  "common": {
-    "secondsAgo": "há {{count}} s",
-    "minutesAgo": "há {{count}} min",
-    "hoursAgo": "há {{count}} h",
-    "daysAgo": "há {{count}} d"
   }
 }

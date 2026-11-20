@@ -5,21 +5,19 @@ import type { ZcashNetworkStats } from "../../../types";
 import {
   formatDifficulty,
   formatNumber,
+  formatPercent,
   formatSize,
   formatZECCompact,
 } from "../../../utils/zcashFormatters";
 import { getShieldedSupplyPercent } from "../../../utils/zcashUtils";
 import HelperTooltip from "../../common/HelperTooltip";
+import { ZcashSkeleton } from "./ZcashCells";
 
 interface ZcashDashboardStatsProps {
   stats: ZcashNetworkStats | null;
   currency: string;
   loading: boolean;
 }
-
-const skeleton = (width: string) => (
-  <span className="skeleton-pulse" style={{ width, height: 20, display: "inline-block" }} />
-);
 
 const ZcashDashboardStats: React.FC<ZcashDashboardStatsProps> = ({ stats, currency, loading }) => {
   const { t } = useTranslation("zcash");
@@ -34,7 +32,13 @@ const ZcashDashboardStats: React.FC<ZcashDashboardStatsProps> = ({ stats, curren
       <div className="dashboard-stat-card">
         <div className="dashboard-stat-label">{t("dashboard.blockHeight")}</div>
         <div className="dashboard-stat-value">
-          {isLoading ? skeleton("100px") : stats ? `#${formatNumber(stats.blockHeight)}` : "—"}
+          {isLoading ? (
+            <ZcashSkeleton width={100} size="stat" />
+          ) : stats ? (
+            `#${formatNumber(stats.blockHeight)}`
+          ) : (
+            "—"
+          )}
         </div>
         <div className="dashboard-stat-subvalue">
           {stats ? t("dashboard.difficulty", { value: formatDifficulty(stats.difficulty) }) : ""}
@@ -44,11 +48,13 @@ const ZcashDashboardStats: React.FC<ZcashDashboardStatsProps> = ({ stats, curren
       <div className="dashboard-stat-card">
         <div className="dashboard-stat-label">{t("dashboard.mempool")}</div>
         <div className="dashboard-stat-value">
-          {isLoading
-            ? skeleton("90px")
-            : stats
-              ? t("dashboard.mempoolTxs", { count: stats.mempoolSize })
-              : "—"}
+          {isLoading ? (
+            <ZcashSkeleton width={90} size="stat" />
+          ) : stats ? (
+            t("dashboard.mempoolTxs", { count: stats.mempoolSize })
+          ) : (
+            "—"
+          )}
         </div>
         <div className="dashboard-stat-subvalue">{stats ? formatSize(stats.mempoolBytes) : ""}</div>
       </div>
@@ -59,15 +65,17 @@ const ZcashDashboardStats: React.FC<ZcashDashboardStatsProps> = ({ stats, curren
           {showTooltips && <HelperTooltip content={tTooltips("zcash.chainSupply")} />}
         </div>
         <div className="dashboard-stat-value">
-          {isLoading
-            ? skeleton("140px")
-            : stats?.chainSupplyZat !== undefined
-              ? formatZECCompact(stats.chainSupplyZat, currency)
-              : "—"}
+          {isLoading ? (
+            <ZcashSkeleton width={140} size="stat" />
+          ) : stats?.chainSupplyZat !== undefined ? (
+            formatZECCompact(stats.chainSupplyZat, currency)
+          ) : (
+            "—"
+          )}
         </div>
         <div className="dashboard-stat-subvalue">
           {shieldedPercent !== null
-            ? t("dashboard.shieldedShare", { percent: shieldedPercent.toFixed(1) })
+            ? t("dashboard.shieldedShare", { percent: formatPercent(shieldedPercent) })
             : ""}
         </div>
       </div>
