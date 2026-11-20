@@ -1,10 +1,14 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Link, useLocation, useSearchParams } from "react-router-dom";
-import { getNetworkBySlug } from "../../../config/networks";
-import { MEMPOOL_PAGE_SIZE, MEMPOOL_REFRESH_MS } from "../../../config/zcashConstants";
+import { Link, useSearchParams } from "react-router-dom";
+import {
+  LOADER_TIMEOUT_MS,
+  MEMPOOL_PAGE_SIZE,
+  MEMPOOL_REFRESH_MS,
+} from "../../../config/zcashConstants";
 import { useDataService } from "../../../hooks/useDataService";
-import { useZcashTimeAgo } from "../../../hooks/useZcashTimeAgo";
+import { useTimeAgo } from "../../../hooks/useTimeAgo";
+import { useZcashNetworkFromPath } from "../../../hooks/useZcashNetworkFromPath";
 import type { ZcashMempoolEntry } from "../../../types";
 import { logger } from "../../../utils/logger";
 import { formatNumber, formatSize, formatZEC, truncateHash } from "../../../utils/zcashFormatters";
@@ -13,17 +17,15 @@ import LoaderWithTimeout from "../../common/LoaderWithTimeout";
 
 export default function ZcashMempoolPage() {
   const { t } = useTranslation("zcash");
-  const timeAgo = useZcashTimeAgo();
-  const location = useLocation();
+  const timeAgo = useTimeAgo();
   const [searchParams, setSearchParams] = useSearchParams();
-
-  // Extract network slug from path (e.g., "/tzec/mempool" → "tzec")
-  const networkSlug = location.pathname.split("/")[1] || "zec";
+  const {
+    slug: networkSlug,
+    name: networkName,
+    label: networkLabel,
+    currency,
+  } = useZcashNetworkFromPath();
   const dataService = useDataService(networkSlug);
-  const network = getNetworkBySlug(networkSlug);
-  const networkName = network?.name ?? networkSlug;
-  const networkLabel = network?.shortName || networkSlug.toUpperCase();
-  const currency = network?.currency ?? "ZEC";
 
   const pageParam = Number(searchParams.get("page"));
   const page = Number.isInteger(pageParam) && pageParam > 1 ? pageParam : 1;
@@ -31,29 +33,48 @@ export default function ZcashMempoolPage() {
   const [entries, setEntries] = useState<ZcashMempoolEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [attempt, setAttempt] = useState(0);
 
   // A single verbose getrawmempool call returns every entry with its fee, so no per-transaction
   // fetches are needed
-  const fetchMempool = useCallback(async () => {
+  // biome-ignore lint/correctness/useExhaustiveDependencies: attempt re-runs the fetch on retry
+  useEffect(() => {
+    setEntries([]);
+    setLoading(true);
+    setError(null);
     if (!dataService || !dataService.isZcash()) return;
 
-    try {
-      const { data } = await dataService.getZcashAdapter().getMempoolEntries();
-      setEntries(data);
-      setError(null);
-    } catch (err) {
-      logger.error("Error fetching Zcash mempool:", err);
-      setError(err instanceof Error ? err.message : String(err));
-    } finally {
-      setLoading(false);
-    }
-  }, [dataService]);
+    // Switching networks aborts this, so a slow response can't fill the other network's list
+    const controller = new AbortController();
+    const { signal } = controller;
+    const adapter = dataService.getZcashAdapter();
+    let inFlight = false;
 
-  useEffect(() => {
+    const fetchMempool = async () => {
+      if (inFlight) return;
+      inFlight = true;
+      try {
+        const { data } = await adapter.getMempoolEntries({ signal });
+        if (signal.aborted) return;
+        setEntries(data);
+        setError(null);
+      } catch (err) {
+        if (signal.aborted) return;
+        logger.error("Error fetching Zcash mempool:", err);
+        setError(err instanceof Error ? err.message : String(err));
+      } finally {
+        inFlight = false;
+        if (!signal.aborted) setLoading(false);
+      }
+    };
+
     fetchMempool();
     const intervalId = setInterval(fetchMempool, MEMPOOL_REFRESH_MS);
-    return () => clearInterval(intervalId);
-  }, [fetchMempool]);
+    return () => {
+      controller.abort();
+      clearInterval(intervalId);
+    };
+  }, [dataService, attempt]);
 
   const totalPages = Math.max(1, Math.ceil(entries.length / MEMPOOL_PAGE_SIZE));
   const safePage = Math.min(page, totalPages);
@@ -82,8 +103,10 @@ export default function ZcashMempoolPage() {
           </div>
           <div className="card-content-loading">
             <LoaderWithTimeout
+              key={attempt}
               text={t("mempool.loading")}
-              onRetry={() => window.location.reload()}
+              timeoutMs={LOADER_TIMEOUT_MS}
+              onRetry={() => setAttempt((count) => count + 1)}
             />
           </div>
         </div>

@@ -55,7 +55,8 @@
   "mempool": {
     "title": "Mempool de {{network}}",
     "loading": "Carregando mempool...",
-    "summary": "{{count}} transações pendentes ({{size}})",
+    "summary": "{{count}} transação pendente ({{size}})",
+    "summary_other": "{{count}} transações pendentes ({{size}})",
     "empty": "Nenhuma transação pendente na mempool",
     "txid": "ID da transação",
     "age": "Idade",

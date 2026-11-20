@@ -56,6 +56,7 @@
     "title": "{{network}} 内存池",
     "loading": "正在加载内存池...",
     "summary": "{{count}} 笔待处理交易（{{size}}）",
+    "summary_other": "{{count}} 笔待处理交易（{{size}}）",
     "empty": "内存池中没有待处理的交易",
     "txid": "交易 ID",
     "age": "时长",
