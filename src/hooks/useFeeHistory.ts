@@ -4,7 +4,7 @@
  * Returns null for non-EVM networks.
  */
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import type { FeeHistory, NetworkConfig } from "../types";
 import { logger } from "../utils/logger";
 import { useDataService } from "./useDataService";
@@ -13,8 +13,10 @@ const REFRESH_INTERVAL = 10000; // 10 seconds — matches useNetworkDashboard ca
 const DEFAULT_BLOCK_COUNT = 50;
 
 export interface UseFeeHistoryResult {
+  /** Latest successful fetch for the current network. Kept when a later refresh fails. */
   feeHistory: FeeHistory | null;
   isLoading: boolean;
+  /** Error from the most recent fetch, cleared on the next success. */
   error: Error | null;
 }
 
@@ -26,20 +28,25 @@ export function useFeeHistory(
   const [feeHistory, setFeeHistory] = useState<FeeHistory | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
-  const isFetchingRef = useRef(false);
 
   useEffect(() => {
+    // Drop the previous network's data so it never renders under the new one.
+    setFeeHistory(null);
+    setError(null);
+
     if (!dataService || !dataService.isEVM()) {
-      setFeeHistory(null);
       setIsLoading(false);
       return;
     }
 
+    // Scoped to this effect run, so an in-flight request for the previous
+    // network can't block the first fetch for the new one.
     let cancelled = false;
+    let isFetching = false;
 
     const fetchHistory = async () => {
-      if (isFetchingRef.current) return;
-      isFetchingRef.current = true;
+      if (isFetching) return;
+      isFetching = true;
 
       try {
         const adapter = dataService.getEVMAdapter();
@@ -53,7 +60,7 @@ export function useFeeHistory(
         logger.warn("useFeeHistory: fetch failed", e);
         setError(e);
       } finally {
-        isFetchingRef.current = false;
+        isFetching = false;
         if (!cancelled) setIsLoading(false);
       }
     };
