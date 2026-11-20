@@ -333,7 +333,10 @@ export class ZcashAdapter {
    */
   async getBlockSummaries(
     heights: number[],
-    options: ZcashCallOptions = {},
+    options: ZcashCallOptions & {
+      /** Called as each block arrives, so pages can render rows progressively */
+      onBlock?: (block: ZcashBlock) => void;
+    } = {},
   ): Promise<ZcashBlockSummaries> {
     const blocks: ZcashBlock[] = [];
     const failedHeights: number[] = [];
@@ -345,7 +348,9 @@ export class ZcashAdapter {
           () => this.client.getBlock(String(height), 1),
           options.signal,
         );
-        blocks.push(transformBlockSummary(data));
+        const block = transformBlockSummary(data);
+        blocks.push(block);
+        options.onBlock?.(block);
       } catch (error) {
         if (options.signal?.aborted) throw error;
         logger.warn(`Failed to fetch Zcash block ${height}:`, error);

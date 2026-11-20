@@ -162,7 +162,10 @@ describe("ZcashAdapter blocks", () => {
       .mockResolvedValueOnce(fail("RPC error: Block not found"))
       .mockResolvedValueOnce(ok(summary(3483400)));
 
-    const { blocks, failedHeights } = await adapter.getBlockSummaries([3483399, 3483398, 3483400]);
+    const onBlock = vi.fn();
+    const { blocks, failedHeights } = await adapter.getBlockSummaries([3483399, 3483398, 3483400], {
+      onBlock,
+    });
 
     expect(client.getBlock.mock.calls).toEqual([
       ["3483399", 1],
@@ -172,6 +175,8 @@ describe("ZcashAdapter blocks", () => {
     expect(blocks.map((block) => block.height)).toEqual([3483400, 3483399]);
     expect(blocks[0]?.txids).toEqual(["a".repeat(64)]);
     expect(failedHeights).toEqual([3483398]);
+    // Rows can render in request order as each block arrives
+    expect(onBlock.mock.calls.map(([block]) => block.height)).toEqual([3483399, 3483400]);
   });
 
   it("stops fetching summaries once a block stays rate limited", async () => {
