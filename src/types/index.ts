@@ -34,6 +34,12 @@ export interface GasPrices {
   lastBlock: string; // Block number hex
 }
 
+export interface FeeHistory {
+  oldestBlock: number; // decimal
+  baseFeePerGas: bigint[]; // length = blockCount + 1 (wei)
+  gasUsedRatio: number[]; // length = blockCount, values in 0..1
+}
+
 export interface Block {
   difficulty: string;
   extraData: string;

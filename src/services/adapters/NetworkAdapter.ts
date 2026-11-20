@@ -8,6 +8,7 @@ import type {
   DataWithMetadata,
   AddressTransactionsResult,
   GasPrices,
+  FeeHistory,
 } from "../../types";
 import { logger } from "../../utils/logger";
 
@@ -340,6 +341,31 @@ export abstract class NetworkAdapter {
         lastBlock: `0x${lastBlock.toString(16)}`,
       },
       metadata: feeHistoryResult.metadata as DataWithMetadata<GasPrices>["metadata"],
+    };
+  }
+
+  /**
+   * Get base fee + gas-used ratio history for the latest N blocks via eth_feeHistory.
+   * Returns ready-to-plot values (bigint base fees in wei, decimal gas-used ratios).
+   * @param blockCount - Number of blocks to retrieve (e.g. 50)
+   * @returns Fee history with base fees and gas-used ratios
+   * @throws When the RPC returns no fee history (all providers failed or method unsupported)
+   */
+  async getFeeHistory(blockCount: number): Promise<DataWithMetadata<FeeHistory>> {
+    const result = await this.getClient().feeHistory(`0x${blockCount.toString(16)}`, "latest");
+    const raw = result.data;
+
+    if (!raw?.baseFeePerGas || !raw.gasUsedRatio) {
+      throw new Error("Fee history not available");
+    }
+
+    return {
+      data: {
+        oldestBlock: Number(BigInt(raw.oldestBlock)),
+        baseFeePerGas: raw.baseFeePerGas.map((v: string) => BigInt(v)),
+        gasUsedRatio: raw.gasUsedRatio,
+      },
+      metadata: result.metadata as DataWithMetadata<FeeHistory>["metadata"],
     };
   }
 
