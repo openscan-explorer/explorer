@@ -69,15 +69,26 @@ export interface ZcashCallOptions {
   signal?: AbortSignal;
 }
 
+/**
+ * State shared by every adapter for one network and endpoint list. A new DataService (and
+ * adapter) is created per page, so anything worth keeping across pages lives here.
+ */
+export interface ZcashSession {
+  /** Methods the endpoints reported as unsupported, so pages stop probing them */
+  unsupportedMethods: Set<string>;
+  /** Latest getblockchaininfo request, reused briefly by the navbar and the dashboard */
+  chainInfo?: { at: number; request: Promise<DataWithMetadata<ZcashRawBlockchainInfo>> };
+}
+
 export interface ZcashAdapterOptions {
   /** Wait between rate-limit retries (injectable for tests) */
   sleep?: (ms: number, signal?: AbortSignal) => Promise<void>;
-  /**
-   * Methods the configured endpoints reported as unsupported. Share one set per endpoint list
-   * (see getUnsupportedMethods) so pages stop probing methods a gateway blocks.
-   */
-  unsupportedMethods?: Set<string>;
+  /** Shared session state (see getZcashSession); a private one by default */
+  session?: ZcashSession;
 }
+
+// How long a getblockchaininfo result is shared (blocks arrive every ~75s)
+const CHAIN_INFO_TTL_MS = 30_000;
 
 export interface ZcashBlockSummaries {
   /** Newest first */
@@ -115,20 +126,32 @@ const defaultSleep = (ms: number, signal?: AbortSignal) =>
     signal?.addEventListener("abort", onAbort, { once: true });
   });
 
-const unsupportedByEndpoints = new Map<string, Set<string>>();
+const sessions = new Map<string, ZcashSession>();
 
 /**
- * The session-wide set of unsupported methods for one network and endpoint list. A new
- * DataService is created per page, so the set lives here rather than on the adapter.
+ * The session state for one network and endpoint list, shared by every page's adapter
  */
-export function getUnsupportedMethods(networkId: string, rpcUrls: string[]): Set<string> {
+export function getZcashSession(networkId: string, rpcUrls: string[]): ZcashSession {
   const key = `${networkId}|${rpcUrls.join(",")}`;
-  let methods = unsupportedByEndpoints.get(key);
-  if (!methods) {
-    methods = new Set();
-    unsupportedByEndpoints.set(key, methods);
+  let session = sessions.get(key);
+  if (!session) {
+    session = { unsupportedMethods: new Set() };
+    sessions.set(key, session);
   }
-  return methods;
+  return session;
+}
+
+/**
+ * Wait for a shared request without letting one caller's abort cancel it for the others
+ */
+function untilAborted<T>(request: Promise<T>, signal?: AbortSignal): Promise<T> {
+  if (!signal) return request;
+  signal.throwIfAborted();
+  return new Promise<T>((resolve, reject) => {
+    const onAbort = () => reject(signal.reason);
+    signal.addEventListener("abort", onAbort, { once: true });
+    request.then(resolve, reject).finally(() => signal.removeEventListener("abort", onAbort));
+  });
 }
 
 function mapSection<T, U>(section: ZcashRpcSection<T>, map: (data: T) => U): ZcashRpcSection<U> {
@@ -148,13 +171,13 @@ export class ZcashAdapter {
   readonly networkId: string;
   private client: ZcashClient;
   private sleep: (ms: number, signal?: AbortSignal) => Promise<void>;
-  private unsupportedMethods: Set<string>;
+  private session: ZcashSession;
 
   constructor(networkId: string, client: ZcashClient, options: ZcashAdapterOptions = {}) {
     this.networkId = networkId;
     this.client = client;
     this.sleep = options.sleep ?? defaultSleep;
-    this.unsupportedMethods = options.unsupportedMethods ?? new Set();
+    this.session = options.session ?? { unsupportedMethods: new Set() };
   }
 
   /**
@@ -181,7 +204,7 @@ export class ZcashAdapter {
     request: () => Promise<RpcResult<T>>,
     signal?: AbortSignal,
   ): Promise<DataWithMetadata<T>> {
-    if (this.unsupportedMethods.has(method)) {
+    if (this.session.unsupportedMethods.has(method)) {
       throw new ZcashRpcError(method, "unsupported", [
         `${method} is not supported by the configured endpoints`,
       ]);
@@ -202,7 +225,7 @@ export class ZcashAdapter {
         response.error ? [response.error] : [],
       );
       const kind = classifyRpcErrors(messages);
-      if (kind === "unsupported") this.unsupportedMethods.add(method);
+      if (kind === "unsupported") this.session.unsupportedMethods.add(method);
 
       const delay = RATE_LIMIT_RETRY_DELAYS_MS[attempt];
       if (kind !== "rateLimited" || delay === undefined) {
@@ -237,15 +260,33 @@ export class ZcashAdapter {
   }
 
   /**
-   * Get the latest block height (1 call)
+   * getblockchaininfo, shared for a few seconds between every caller on this network (the
+   * navbar polls the height while the dashboard reads the same response for its stats)
+   */
+  private getChainInfo(signal?: AbortSignal): Promise<DataWithMetadata<ZcashRawBlockchainInfo>> {
+    const cached = this.session.chainInfo;
+    if (cached && Date.now() - cached.at < CHAIN_INFO_TTL_MS) {
+      return untilAborted(cached.request, signal);
+    }
+
+    // Not tied to the caller's signal: other callers may be waiting on the same request
+    const request = this.call<ZcashRawBlockchainInfo>("getblockchaininfo", () =>
+      this.client.getBlockchainInfo(),
+    );
+    const entry = { at: Date.now(), request };
+    this.session.chainInfo = entry;
+    request.catch(() => {
+      if (this.session.chainInfo === entry) this.session.chainInfo = undefined;
+    });
+    return untilAborted(request, signal);
+  }
+
+  /**
+   * Get the latest block height (1 call, shared with getNetworkStats)
    */
   async getLatestBlockNumber(options: ZcashCallOptions = {}): Promise<number> {
-    const { data } = await this.call(
-      "getblockcount",
-      () => this.client.getBlockCount(),
-      options.signal,
-    );
-    return data;
+    const { data } = await this.getChainInfo(options.signal);
+    return data.blocks;
   }
 
   /**
@@ -255,11 +296,7 @@ export class ZcashAdapter {
     options: ZcashCallOptions = {},
   ): Promise<DataWithMetadata<ZcashNetworkStats>> {
     const [info, mempool] = await Promise.all([
-      this.call<ZcashRawBlockchainInfo>(
-        "getblockchaininfo",
-        () => this.client.getBlockchainInfo(),
-        options.signal,
-      ),
+      this.getChainInfo(options.signal),
       this.call("getmempoolinfo", () => this.client.getMempoolInfo(), options.signal),
     ]);
 

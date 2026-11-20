@@ -10,7 +10,7 @@ import {
   SHIELDING_TX,
 } from "./fixtures";
 import type { ZcashRawBlock, ZcashRawTransaction } from "./utils";
-import { getUnsupportedMethods, ZcashAdapter, ZcashRpcError } from "./ZcashAdapter";
+import { getZcashSession, ZcashAdapter, ZcashRpcError, type ZcashSession } from "./ZcashAdapter";
 
 const NETWORK_ID = "bip122:00040fe8ec8471911baa1db1266ea15d";
 const T_ADDRESS = "t1KAuVfS2r2hc7RwSh6GTuyfqCGMFEpwkZ2";
@@ -43,15 +43,17 @@ function createClient() {
   };
 }
 
-function setup(unsupportedMethods = new Set<string>()) {
+function setup(session: ZcashSession = { unsupportedMethods: new Set() }) {
   const client = createClient();
   const sleep = vi.fn().mockResolvedValue(undefined);
   const adapter = new ZcashAdapter(NETWORK_ID, client as unknown as ZcashClient, {
     sleep,
-    unsupportedMethods,
+    session,
   });
   return { adapter, client, sleep };
 }
+
+const CHAIN_INFO = { chain: "main", blocks: 3483464, bestblockhash: "0".repeat(64), difficulty: 1 };
 
 afterEach(() => {
   vi.useRealTimers();
@@ -310,24 +312,24 @@ describe("ZcashAdapter transactions", () => {
 describe("ZcashAdapter RPC failures", () => {
   it("retries rate-limited calls after a backoff", async () => {
     const { adapter, client, sleep } = setup();
-    client.getBlockCount
-      .mockResolvedValueOnce(fail("HTTP error! status: 429", "HTTP error! status: 429"))
-      .mockResolvedValueOnce(ok(3483464));
+    client.getRawMempool
+      .mockResolvedValueOnce(fail(RATE_LIMITED, RATE_LIMITED))
+      .mockResolvedValueOnce(ok({}));
 
-    await expect(adapter.getLatestBlockNumber()).resolves.toBe(3483464);
+    await expect(adapter.getMempoolEntries()).resolves.toMatchObject({ data: [] });
     expect(sleep).toHaveBeenCalledWith(15_000, undefined);
   });
 
   it("gives up after the last backoff", async () => {
     const { adapter, client, sleep } = setup();
-    client.getBlockCount.mockResolvedValue(fail("HTTP error! status: 429"));
+    client.getRawMempool.mockResolvedValue(fail(RATE_LIMITED));
 
-    await expect(adapter.getLatestBlockNumber()).rejects.toMatchObject({
+    await expect(adapter.getMempoolEntries()).rejects.toMatchObject({
       name: "ZcashRpcError",
       kind: "rateLimited",
     });
     expect(sleep.mock.calls.map(([ms]) => ms)).toEqual([15_000, 30_000]);
-    expect(client.getBlockCount).toHaveBeenCalledTimes(3);
+    expect(client.getRawMempool).toHaveBeenCalledTimes(3);
   });
 
   it("throws instead of returning empty data when every endpoint fails", async () => {
@@ -376,17 +378,17 @@ describe("ZcashAdapter RPC failures", () => {
     vi.useFakeTimers();
     const client = createClient();
     const adapter = new ZcashAdapter(NETWORK_ID, client as unknown as ZcashClient);
-    client.getBlockCount.mockResolvedValue(fail(RATE_LIMITED));
+    client.getRawMempool.mockResolvedValue(fail(RATE_LIMITED));
     const controller = new AbortController();
 
-    const pending = adapter.getLatestBlockNumber({ signal: controller.signal });
+    const pending = adapter.getMempoolEntries({ signal: controller.signal });
     const outcome = pending.catch((caught: unknown) => caught);
     await vi.advanceTimersByTimeAsync(5_000);
     controller.abort();
 
     expect(await outcome).toMatchObject({ name: "AbortError" });
     await vi.advanceTimersByTimeAsync(60_000);
-    expect(client.getBlockCount).toHaveBeenCalledTimes(1);
+    expect(client.getRawMempool).toHaveBeenCalledTimes(1);
   });
 
   it("doesn't send a call that was aborted before it started", async () => {
@@ -401,17 +403,79 @@ describe("ZcashAdapter RPC failures", () => {
   });
 
   it("remembers unsupported methods across adapters sharing an endpoint list", async () => {
-    const unsupported = getUnsupportedMethods(NETWORK_ID, ["https://rpc.test/remember"]);
-    const first = setup(unsupported);
+    const first = setup(getZcashSession(NETWORK_ID, ["https://rpc.test/remember"]));
     first.client.getAddressBalance.mockResolvedValue(fail(METHOD_NOT_FOUND));
     await first.adapter.getAddress(T_ADDRESS);
 
-    const second = setup(getUnsupportedMethods(NETWORK_ID, ["https://rpc.test/remember"]));
+    const second = setup(getZcashSession(NETWORK_ID, ["https://rpc.test/remember"]));
     const result = await second.adapter.getAddress(T_ADDRESS);
 
     expect(result.balance).toEqual({ availability: "unsupported" });
     expect(second.client.getAddressBalance).not.toHaveBeenCalled();
-    expect(getUnsupportedMethods(NETWORK_ID, ["https://other.test"]).size).toBe(0);
+    expect(getZcashSession(NETWORK_ID, ["https://other.test"]).unsupportedMethods.size).toBe(0);
+  });
+});
+
+describe("ZcashAdapter shared chain info", () => {
+  it("serves the height and the network stats from one getblockchaininfo call", async () => {
+    const { adapter, client } = setup();
+    client.getBlockchainInfo.mockResolvedValue(ok(CHAIN_INFO));
+    client.getMempoolInfo.mockResolvedValue(ok({ size: 0, bytes: 0, usage: 0 }));
+
+    const [height, stats] = await Promise.all([
+      adapter.getLatestBlockNumber(),
+      adapter.getNetworkStats(),
+    ]);
+
+    expect(height).toBe(3483464);
+    expect(stats.data.blockHeight).toBe(3483464);
+    expect(client.getBlockchainInfo).toHaveBeenCalledTimes(1);
+    expect(client.getBlockCount).not.toHaveBeenCalled();
+  });
+
+  it("shares the response across adapters of one session, then refreshes it", async () => {
+    vi.useFakeTimers();
+    const session: ZcashSession = { unsupportedMethods: new Set() };
+    const navbar = setup(session);
+    const page = setup(session);
+    navbar.client.getBlockchainInfo.mockResolvedValue(ok(CHAIN_INFO));
+    page.client.getBlockchainInfo.mockResolvedValue(ok({ ...CHAIN_INFO, blocks: 3483465 }));
+
+    await navbar.adapter.getLatestBlockNumber();
+    await expect(page.adapter.getLatestBlockNumber()).resolves.toBe(3483464);
+    expect(page.client.getBlockchainInfo).not.toHaveBeenCalled();
+
+    vi.advanceTimersByTime(31_000);
+    await expect(page.adapter.getLatestBlockNumber()).resolves.toBe(3483465);
+  });
+
+  it("lets one caller abort without cancelling the shared request for the others", async () => {
+    const { adapter, client } = setup();
+    let respond: (value: unknown) => void = () => {};
+    client.getBlockchainInfo.mockReturnValue(
+      new Promise((resolve) => {
+        respond = resolve;
+      }),
+    );
+    const controller = new AbortController();
+
+    const aborted = adapter.getLatestBlockNumber({ signal: controller.signal });
+    const other = adapter.getLatestBlockNumber();
+    controller.abort();
+    respond(ok(CHAIN_INFO));
+
+    await expect(aborted).rejects.toMatchObject({ name: "AbortError" });
+    await expect(other).resolves.toBe(3483464);
+  });
+
+  it("drops a failed response so the next caller asks again", async () => {
+    const { adapter, client } = setup();
+    client.getBlockchainInfo
+      .mockResolvedValueOnce(fail("HTTP error! status: 502"))
+      .mockResolvedValueOnce(ok(CHAIN_INFO));
+
+    await expect(adapter.getLatestBlockNumber()).rejects.toBeInstanceOf(ZcashRpcError);
+    await expect(adapter.getLatestBlockNumber()).resolves.toBe(3483464);
   });
 });
 

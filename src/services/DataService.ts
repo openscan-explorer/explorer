@@ -15,7 +15,7 @@ import { AdapterFactory } from "./adapters/adaptersFactory";
 import type { NetworkAdapter } from "./adapters/NetworkAdapter";
 import type { BitcoinAdapter } from "./adapters/BitcoinAdapter/BitcoinAdapter";
 import type { SolanaAdapter } from "./adapters/SolanaAdapter/SolanaAdapter";
-import { getUnsupportedMethods, type ZcashAdapter } from "./adapters/ZcashAdapter/ZcashAdapter";
+import { getZcashSession, type ZcashAdapter } from "./adapters/ZcashAdapter/ZcashAdapter";
 import type { NetworkConfig, NetworkType, RpcUrlsContextType } from "../types";
 import { getRPCUrls } from "../config/rpcConfig";
 import { getNetworkRpcKey, getChainIdFromNetwork } from "../utils/networkResolver";
@@ -85,7 +85,7 @@ export class DataService {
         type: strategy,
       });
       this.zcashAdapter = AdapterFactory.createZcashAdapter(network.networkId, zcashClient, {
-        unsupportedMethods: getUnsupportedMethods(network.networkId, rpcUrls),
+        session: getZcashSession(network.networkId, rpcUrls),
       });
       this.networkAdapter = null as unknown as NetworkAdapter;
     } else if (network.type === "solana") {
