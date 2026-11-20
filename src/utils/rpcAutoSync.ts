@@ -55,7 +55,9 @@ export async function autoSyncRpcs(
       .filter(([, urls]) => urls.length >= 2)
       .map(async ([networkId, urls]) => {
         const network = networks.find((n) => n.networkId === networkId);
-        if (!network) return;
+        // Zcash's built-in gateways share a ~5 requests/min per-IP limit: probing them on every
+        // first load would spend the budget its pages need, so they keep their order
+        if (!network || network.type === "zcash") return;
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 5_000);
         try {
