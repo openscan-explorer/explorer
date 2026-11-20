@@ -6,7 +6,7 @@ Thank you for your interest in contributing to OpenScan! This guide will help yo
 
 ### Prerequisites
 
-- [Bun](https://bun.sh/) v1.1.0 or later
+- [Bun](https://bun.sh/) v1.4.0 or later (the lockfile is `lockfileVersion` 3)
 
 ### Setup
 
