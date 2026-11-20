@@ -333,5 +333,9 @@
     "connectWallet": "Conectar wallet",
     "wrongNetwork": "Red incorrecta",
     "chainIcon": "Ícono de red"
+  },
+  "loaderTimeout": {
+    "message": "Los datos están tardando más de lo esperado.",
+    "retry": "Reintentar"
   }
 }

@@ -318,5 +318,9 @@
     "badgeUnknown": "Unknown",
     "noQueryHelp": "Search for an address, transaction hash, block number, or ENS name.",
     "goHome": "Go Home"
+  },
+  "loaderTimeout": {
+    "message": "Data is taking longer than expected.",
+    "retry": "Retry"
   }
 }
