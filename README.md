@@ -80,7 +80,7 @@ A trustless, open-source blockchain explorer for Bitcoin, Ethereum, and Layer 2 
 
 ### Prerequisites
 
-- Bun >= 1.1.0 ([Installation guide](https://bun.sh/docs/installation))
+- Bun >= 1.4.0 ([Installation guide](https://bun.sh/docs/installation))
 
 ### Installation
 
