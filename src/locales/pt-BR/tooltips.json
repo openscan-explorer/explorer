@@ -151,6 +151,58 @@
     "inputsColumn": "Saídas de transações anteriores sendo gastas. Cada entrada referencia um UTXO (Saída de Transação Não Gasta).",
     "outputsColumn": "Novas saídas criadas por esta transação. Cada saída bloqueia BTC para um endereço receptor."
   },
+  "zcash": {
+    "valuePools": "Saldos em cada pool de valor do Zcash. Fundos transparentes são públicos, como no Bitcoin; os pools blindados (Sprout, Sapling, Orchard, Ironwood) ocultam valores e participantes.",
+    "chainSupply": "Total de ZEC em circulação em todos os pools de valor.",
+    "pools": {
+      "transparent": "UTXOs públicos com endereços e valores visíveis, como no Bitcoin.",
+      "sprout": "O pool blindado original do lançamento do Zcash em 2016. Obsoleto: os fundos só podem sair.",
+      "sapling": "Pool blindado introduzido em 2018 com provas rápidas e leves.",
+      "orchard": "Pool blindado introduzido com o NU5 em 2022, usando provas Halo 2 que dispensam configuração confiável.",
+      "lockbox": "Fundo de desenvolvimento diferido: parte de cada recompensa de bloco desde o NU6, retida pelo protocolo até que seu uso seja decidido.",
+      "ironwood": "Pool blindado introduzido com a atualização de rede NU6.3 (Ironwood)."
+    },
+    "block": {
+      "hash": "Identificador único deste bloco, derivado do seu cabeçalho.",
+      "confirmations": "Blocos minerados sobre este. Mais confirmações significa que o bloco é mais difícil de reverter.",
+      "reward": "Valor total das saídas coinbase: o subsídio do minerador mais as taxas e os fluxos de financiamento pagos a endereços transparentes.",
+      "coinbaseOutputs": "Saídas transparentes criadas pela transação coinbase, como a recompensa do minerador e os pagamentos ao fundo de desenvolvimento.",
+      "transactions": "Transações neste bloco. As etiquetas contam as transações que usam cada pool blindado.",
+      "transparentOutput": "Soma de todas as saídas transparentes deste bloco. Valores blindados não são públicos.",
+      "difficulty": "Quão difícil foi encontrar uma solução Equihash válida para este bloco.",
+      "size": "Tamanho do bloco serializado, incluindo as provas blindadas.",
+      "previousBlock": "O bloco sobre o qual este é construído.",
+      "nextBlock": "O bloco construído sobre este, se houver.",
+      "merkleRoot": "Raiz da árvore Merkle de todos os IDs de transação deste bloco.",
+      "blockCommitments": "Compromisso com o histórico da cadeia e os dados de autorização, exigido desde o NU5.",
+      "finalSaplingRoot": "Raiz da árvore de compromissos de notas do Sapling após este bloco.",
+      "finalOrchardRoot": "Raiz da árvore de compromissos de notas do Orchard após este bloco. Presente em blocos posteriores ao NU5.",
+      "version": "Versão do formato do bloco.",
+      "bits": "Codificação compacta do alvo da prova de trabalho.",
+      "nonce": "Valor de 32 bytes que os mineradores variam ao buscar uma solução Equihash válida.",
+      "solution": "A solução de prova de trabalho Equihash deste bloco.",
+      "trees": "Número de notas comprometidas na árvore de compromissos de cada pool blindado até este bloco."
+    },
+    "tx": {
+      "txid": "Identificador único desta transação.",
+      "confirmations": "Blocos minerados desde o bloco que contém esta transação. Mais confirmações significa maior finalidade.",
+      "kind": "Como o valor se move: entre endereços transparentes, para pools blindados (blindagem), para fora deles (desblindagem), inteiramente dentro deles (totalmente blindada) ou uma combinação.",
+      "transparentInputs": "Saídas transparentes anteriores sendo gastas. O Zebra não retorna seus valores, então eles são consultados sob demanda.",
+      "transparentOutputs": "Novas saídas transparentes. Como no Bitcoin, seus endereços e valores são públicos.",
+      "fee": "Paga ao minerador: entradas transparentes mais o valor que sai dos pools blindados, menos as saídas transparentes.",
+      "size": "Tamanho da transação serializada, incluindo as provas blindadas.",
+      "versionGroupId": "Identifica qual formato de transação de atualização de rede esta transação usa.",
+      "expiryHeight": "A transação não pode mais ser minerada após esta altura de bloco.",
+      "locktime": "Altura de bloco ou momento mais cedo em que esta transação pode ser minerada.",
+      "shieldedActivity": "Valor circulando pelos pools blindados do Zcash. Valores e participantes permanecem criptografados; só o saldo líquido de cada pool é público."
+    },
+    "address": {
+      "address": "Um endereço Zcash. Endereços transparentes (t1, t3) são públicos como no Bitcoin; blindados (zs) e unificados (u1) mantêm valores e histórico privados.",
+      "receivers": "Um endereço unificado agrupa vários receptores. Quem envia paga ao receptor mais privado que sua carteira suporta.",
+      "balance": "Soma das saídas transparentes não gastas deste endereço, segundo o índice de endereços do Zebra.",
+      "received": "Valor transparente total recebido por este endereço."
+    }
+  },
   "network": {
     "gasPrice": "Custo atual por unidade de gas nesta rede.",
     "blockNumber": "O número do bloco mais recentemente minerado nesta rede.",

@@ -309,5 +309,9 @@
     "badgeBlock": "Bloco",
     "badgeEns": "ENS",
     "badgeUnknown": "Desconhecido"
+  },
+  "loaderTimeout": {
+    "message": "Os dados estão demorando mais do que o esperado.",
+    "retry": "Tentar novamente"
   }
 }

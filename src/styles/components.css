@@ -6353,6 +6353,340 @@ button.tx-section-header-toggle {
 	justify-content: center;
 }
 
+/* Zcash loading placeholders, sized like the text they stand in for */
+.zec-skeleton {
+	display: inline-block;
+}
+
+.zec-skeleton-small {
+	height: 12px;
+}
+
+.zec-skeleton-text {
+	height: 14px;
+}
+
+.zec-skeleton-row {
+	height: 18px;
+}
+
+.zec-skeleton-stat {
+	height: 20px;
+}
+
+.zec-skeleton-w40 { width: 40px; }
+.zec-skeleton-w50 { width: 50px; }
+.zec-skeleton-w60 { width: 60px; }
+.zec-skeleton-w70 { width: 70px; }
+.zec-skeleton-w80 { width: 80px; }
+.zec-skeleton-w90 { width: 90px; }
+.zec-skeleton-w100 { width: 100px; }
+.zec-skeleton-w120 { width: 120px; }
+.zec-skeleton-w140 { width: 140px; }
+
+.zec-retry-button {
+	background: none;
+	border: none;
+	padding: 0;
+	margin-left: 8px;
+	font: inherit;
+	cursor: pointer;
+}
+
+/* Zcash value pools */
+.zec-value-pools {
+	background: var(--bg-secondary);
+	border: 1px solid var(--overlay-light-8);
+	border-radius: 12px;
+	padding: 16px 20px;
+	margin: 16px 0;
+}
+
+.zec-value-pools-header {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	margin-bottom: 12px;
+}
+
+.zec-pool-bar {
+	display: flex;
+	height: 10px;
+	border-radius: 5px;
+	overflow: hidden;
+	background: var(--overlay-light-5);
+}
+
+.zec-pool-segment {
+	width: var(--pool-share);
+	background: var(--pool-color);
+}
+
+.zec-pool-list {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 8px 16px;
+	list-style: none;
+	margin: 12px 0 0;
+	padding: 0;
+}
+
+.zec-pool-item {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	min-width: 0;
+	font-size: 0.85rem;
+}
+
+.zec-pool-swatch {
+	width: 10px;
+	height: 10px;
+	border-radius: 2px;
+	flex-shrink: 0;
+	background: var(--pool-color);
+}
+
+.zec-pool-name {
+	color: var(--text-primary);
+}
+
+.zec-pool-value {
+	margin-left: auto;
+	color: var(--text-secondary);
+	font-variant-numeric: tabular-nums;
+	white-space: nowrap;
+}
+
+.zec-pool-share {
+	min-width: 3.5em;
+	text-align: right;
+	color: var(--color-text-muted);
+	font-variant-numeric: tabular-nums;
+}
+
+.zec-pool-transparent {
+	--pool-color: var(--text-tertiary);
+}
+
+.zec-pool-sprout {
+	--pool-color: var(--color-primary-muted);
+}
+
+.zec-pool-sapling {
+	--pool-color: var(--color-info);
+}
+
+.zec-pool-orchard {
+	--pool-color: var(--color-primary);
+}
+
+.zec-pool-lockbox {
+	--pool-color: var(--color-warning);
+}
+
+.zec-pool-ironwood {
+	--pool-color: var(--color-accent);
+}
+
+@media (max-width: 768px) {
+	.zec-pool-list {
+		grid-template-columns: 1fr;
+	}
+}
+
+/* Zcash transaction kind badge */
+.zec-kind-badge {
+	display: inline-block;
+	padding: 1px 8px;
+	border-radius: 10px;
+	font-size: 0.7rem;
+	font-weight: 600;
+	white-space: nowrap;
+	background: var(--overlay-light-5);
+	color: var(--text-secondary);
+}
+
+.zec-kind-shielded,
+.zec-kind-shielding,
+.zec-kind-deshielding,
+.zec-kind-mixed {
+	background: var(--color-primary-alpha-15);
+	color: var(--color-primary);
+}
+
+.zec-kind-coinbase {
+	background: var(--color-warning-alpha-15);
+	color: var(--color-warning);
+}
+
+/* Zcash block details */
+.zec-inline-copy {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+}
+
+.zec-solution {
+	word-break: break-all;
+}
+
+.zec-pool-chips {
+	display: inline-flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	margin-left: 8px;
+	vertical-align: middle;
+}
+
+.zec-pool-chip {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	padding: 1px 8px;
+	border-radius: 10px;
+	font-size: 0.75rem;
+	background: var(--overlay-light-5);
+	color: var(--text-secondary);
+}
+
+.zec-pool-chip::before {
+	content: "";
+	width: 8px;
+	height: 8px;
+	border-radius: 2px;
+	background: var(--pool-color);
+}
+
+.zec-coinbase-outputs {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.zec-coinbase-outputs li {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px;
+}
+
+.zec-coinbase-value {
+	color: var(--text-secondary);
+	font-variant-numeric: tabular-nums;
+}
+
+/* Zcash transaction details */
+.zec-kind-row {
+	display: inline-flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 6px;
+}
+
+.zec-fee-rate {
+	margin-left: 8px;
+	font-weight: 400;
+	color: var(--text-secondary);
+}
+
+.zec-fee-resolve {
+	display: inline-flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px;
+}
+
+.zec-shielded {
+	background: var(--bg-secondary);
+	border: 1px solid var(--overlay-light-8);
+	border-radius: 12px;
+	padding: 16px 20px;
+	margin: 16px 0;
+}
+
+.zec-fully-shielded {
+	padding: 12px 16px;
+	margin-bottom: 12px;
+	border: 1px solid var(--color-primary-alpha-20);
+	border-radius: 8px;
+	background: var(--color-primary-alpha-8);
+	color: var(--text-primary);
+}
+
+.zec-fully-shielded p {
+	margin: 4px 0 0;
+	font-size: 0.85rem;
+	color: var(--text-secondary);
+}
+
+.zec-bundle-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+	gap: 12px;
+}
+
+.zec-bundle-card {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	padding: 12px 14px;
+	border-left: 3px solid var(--pool-color);
+	border-radius: 6px;
+	background: var(--overlay-light-3);
+}
+
+.zec-bundle-title {
+	font-weight: 600;
+	color: var(--text-primary);
+}
+
+.zec-bundle-counts,
+.zec-bundle-balance {
+	font-size: 0.85rem;
+	color: var(--text-secondary);
+	font-variant-numeric: tabular-nums;
+}
+
+/* Zcash address page */
+.zec-address-notice {
+	margin: 12px 0;
+}
+
+.zec-address-notice p {
+	margin: 0 0 6px;
+}
+
+.zec-address-value {
+	word-break: break-all;
+}
+
+.zec-receivers {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.zec-receivers li {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px;
+	min-width: 0;
+}
+
+.zec-receiver-kind {
+	min-width: 9em;
+	font-size: 0.85rem;
+	color: var(--text-secondary);
+}
+
 /* Clickable stat label */
 .dashboard-stat-label-link {
 	display: block;
@@ -8086,17 +8420,20 @@ button.tx-section-header-toggle {
    ================================ */
 
 /* Bitcoin Transaction Section (Inputs/Outputs) */
-.btc-tx-section {
+.btc-tx-section,
+.utxo-tx-section {
 	margin-top: 20px;
 	border-top: 1px solid var(--border-primary);
 	padding-top: 15px;
 }
 
-.btc-tx-section-header {
+.btc-tx-section-header,
+.utxo-tx-section-header {
 	margin-bottom: 10px;
 }
 
-.btc-tx-section-toggle {
+.btc-tx-section-toggle,
+.utxo-tx-section-toggle {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
@@ -8109,17 +8446,20 @@ button.tx-section-header-toggle {
 	transition: background-color 0.15s ease;
 }
 
-.btc-tx-section-toggle:hover {
+.btc-tx-section-toggle:hover,
+.utxo-tx-section-toggle:hover {
 	background: var(--bg-tertiary);
 }
 
-.btc-tx-section-title {
+.btc-tx-section-title,
+.utxo-tx-section-title {
 	font-weight: 600;
 	font-size: 0.95rem;
 	color: var(--text-primary);
 }
 
-.btc-tx-section-arrow {
+.btc-tx-section-arrow,
+.utxo-tx-section-arrow {
 	font-size: 0.85rem;
 	color: var(--text-secondary);
 	font-weight: 600;
@@ -8258,7 +8598,8 @@ button.tx-section-header-toggle {
 }
 
 /* UTXO List Styles */
-.btc-utxo-list {
+.btc-utxo-list,
+.utxo-list {
 	display: flex;
 	flex-direction: column;
 	gap: 6px;
@@ -8267,7 +8608,8 @@ button.tx-section-header-toggle {
 	border-radius: 8px;
 }
 
-.btc-utxo-item {
+.btc-utxo-item,
+.utxo-item {
 	display: flex;
 	gap: 12px;
 	align-items: center;
@@ -8277,13 +8619,15 @@ button.tx-section-header-toggle {
 	border: 1px solid var(--border-primary);
 }
 
-.btc-utxo-index {
+.btc-utxo-index,
+.utxo-index {
 	min-width: 20px;
 	color: var(--text-secondary);
 	font-size: 0.8rem;
 }
 
-.btc-utxo-content {
+.btc-utxo-content,
+.utxo-content {
 	flex: 1;
 	display: flex;
 	flex-wrap: wrap;
@@ -8292,21 +8636,25 @@ button.tx-section-header-toggle {
 	min-width: 0;
 }
 
-.btc-utxo-hash {
+.btc-utxo-hash,
+.utxo-hash {
 	word-break: break-all;
 }
 
-.btc-utxo-value {
+.btc-utxo-value,
+.utxo-value {
 	font-weight: 600;
 }
 
-.btc-utxo-confirmations {
+.btc-utxo-confirmations,
+.utxo-confirmations {
 	color: var(--text-secondary);
 	font-size: 0.85rem;
 }
 
 /* Bitcoin Transaction List (in address view) */
-.btc-tx-list {
+.btc-tx-list,
+.utxo-tx-list {
 	display: flex;
 	flex-direction: column;
 	gap: 4px;
@@ -8315,7 +8663,8 @@ button.tx-section-header-toggle {
 	border-radius: 8px;
 }
 
-.btc-tx-list-item {
+.btc-tx-list-item,
+.utxo-tx-list-item {
 	display: flex;
 	gap: 12px;
 	align-items: center;
@@ -8325,13 +8674,15 @@ button.tx-section-header-toggle {
 	border: 1px solid var(--border-primary);
 }
 
-.btc-tx-index {
+.btc-tx-index,
+.utxo-tx-index {
 	min-width: 24px;
 	color: var(--text-secondary);
 	font-size: 0.8rem;
 }
 
-.btc-tx-hash {
+.btc-tx-hash,
+.utxo-tx-hash {
 	word-break: break-all;
 }
 

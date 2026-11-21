@@ -10,6 +10,7 @@ import type transaction from "./locales/en/transaction.json";
 import type tokenDetails from "./locales/en/tokenDetails.json";
 import type rpcs from "./locales/en/rpcs.json";
 import type tooltips from "./locales/en/tooltips.json";
+import type zcash from "./locales/en/zcash.json";
 declare module "i18next" {
   interface CustomTypeOptions {
     defaultNS: "common";
@@ -26,6 +27,7 @@ declare module "i18next" {
       rpcs: typeof rpcs;
       tooltips: typeof tooltips;
       solana: typeof solana;
+      zcash: typeof zcash;
     };
   }
 }

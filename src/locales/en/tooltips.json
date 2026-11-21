@@ -151,6 +151,58 @@
     "inputsColumn": "Previous transaction outputs being spent. Each input references a UTXO (Unspent Transaction Output).",
     "outputsColumn": "New outputs created by this transaction. Each output locks BTC to a recipient address."
   },
+  "zcash": {
+    "valuePools": "Balances held in each of Zcash's value pools. Transparent funds are public, like Bitcoin; shielded pools (Sprout, Sapling, Orchard, Ironwood) hide amounts and parties.",
+    "chainSupply": "Total ZEC in circulation across all value pools.",
+    "pools": {
+      "transparent": "Public UTXOs with visible addresses and amounts, like Bitcoin.",
+      "sprout": "The original shielded pool from Zcash's 2016 launch. Deprecated: funds can only move out.",
+      "sapling": "Shielded pool introduced in 2018 with fast, lightweight proofs.",
+      "orchard": "Shielded pool introduced with NU5 in 2022, using Halo 2 proofs that need no trusted setup.",
+      "lockbox": "Deferred development fund: part of every block reward since NU6, held by the protocol until its use is decided.",
+      "ironwood": "Shielded pool introduced with the NU6.3 (Ironwood) network upgrade."
+    },
+    "block": {
+      "hash": "The unique identifier of this block, derived from its header.",
+      "confirmations": "Blocks mined on top of this one. More confirmations means the block is harder to reverse.",
+      "reward": "Total value of the coinbase outputs: the miner's subsidy plus fees, and funding streams paid to transparent addresses.",
+      "coinbaseOutputs": "Transparent outputs created by the coinbase transaction, such as the miner reward and development fund payments.",
+      "transactions": "Transactions in this block. Chips count the transactions that use each shielded pool.",
+      "transparentOutput": "Sum of all transparent outputs in this block. Shielded amounts are not publicly visible.",
+      "difficulty": "How hard it was to find a valid Equihash solution for this block.",
+      "size": "Size of the serialized block, including shielded proofs.",
+      "previousBlock": "The block this one builds on.",
+      "nextBlock": "The block built on top of this one, if any.",
+      "merkleRoot": "Root of the Merkle tree of all transaction IDs in this block.",
+      "blockCommitments": "Commitment to the chain history and authorizing data, required since NU5.",
+      "finalSaplingRoot": "Root of the Sapling note commitment tree after this block.",
+      "finalOrchardRoot": "Root of the Orchard note commitment tree after this block. Present on blocks after NU5.",
+      "version": "Block format version.",
+      "bits": "Compact encoding of the proof-of-work target.",
+      "nonce": "32-byte value miners vary while searching for a valid Equihash solution.",
+      "solution": "The Equihash proof-of-work solution for this block.",
+      "trees": "Number of notes committed to each shielded pool's note commitment tree as of this block."
+    },
+    "tx": {
+      "txid": "A unique identifier for this transaction.",
+      "confirmations": "Blocks mined since the block containing this transaction. More confirmations means higher finality.",
+      "kind": "How value moves: between transparent addresses, into shielded pools (shielding), out of them (deshielding), entirely inside them (fully shielded), or a mix.",
+      "transparentInputs": "Previous transparent outputs being spent. Zebra doesn't return their values, so they are looked up on request.",
+      "transparentOutputs": "New transparent outputs. Like Bitcoin, their addresses and amounts are public.",
+      "fee": "Paid to the miner: transparent inputs plus value leaving the shielded pools, minus transparent outputs.",
+      "size": "Serialized transaction size, including shielded proofs.",
+      "versionGroupId": "Identifies which network upgrade's transaction format this transaction uses.",
+      "expiryHeight": "The transaction can no longer be mined after this block height.",
+      "locktime": "Earliest block height or time at which this transaction can be mined.",
+      "shieldedActivity": "Value moving through Zcash's shielded pools. Amounts and parties stay encrypted; only each pool's net value balance is public."
+    },
+    "address": {
+      "address": "A Zcash address. Transparent addresses (t1, t3) are public like Bitcoin; shielded (zs) and unified (u1) addresses keep amounts and history private.",
+      "receivers": "A unified address bundles several receivers. Senders pay the most private receiver their wallet supports.",
+      "balance": "Sum of this address's unspent transparent outputs, from Zebra's address index.",
+      "received": "Total transparent value this address has received."
+    }
+  },
   "network": {
     "gasPrice": "Current cost per unit of gas on this network.",
     "blockNumber": "The most recently mined block number on this network.",

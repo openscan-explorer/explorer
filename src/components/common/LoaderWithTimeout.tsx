@@ -1,5 +1,6 @@
 import type React from "react";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import OpenScanCubeLoader from "../LoadingLogo";
 
@@ -16,8 +17,9 @@ const LoaderWithTimeout: React.FC<LoaderWithTimeoutProps> = ({
   size = 60,
   timeoutMs = 15000,
   onRetry,
-  timeoutText = "Data is taking longer than expected.",
+  timeoutText,
 }) => {
+  const { t } = useTranslation("common");
   const [timedOut, setTimedOut] = useState(false);
 
   useEffect(() => {
@@ -40,15 +42,15 @@ const LoaderWithTimeout: React.FC<LoaderWithTimeoutProps> = ({
           <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5" />
           <path d="M12 6v6l4 2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
         </svg>
-        <p className="loader-timeout-text">{timeoutText}</p>
+        <p className="loader-timeout-text">{timeoutText ?? t("loaderTimeout.message")}</p>
         <div className="loader-timeout-actions">
           {onRetry && (
             <button type="button" onClick={onRetry} className="button-primary-inline">
-              Retry
+              {t("loaderTimeout.retry")}
             </button>
           )}
           <Link to="/" className="button-secondary-inline">
-            Go Home
+            {t("errors.goHome")}
           </Link>
         </div>
       </div>

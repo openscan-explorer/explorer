@@ -20,6 +20,15 @@ const BitcoinTransactionsPage = lazy(() => import("./pages/bitcoin/BitcoinTransa
 const BitcoinAddressPage = lazy(() => import("./pages/bitcoin/BitcoinAddressPage"));
 const BitcoinMempoolPage = lazy(() => import("./pages/bitcoin/BitcoinMempoolPage"));
 
+// Lazy load page components - Zcash
+const ZcashNetwork = lazy(() => import("./pages/zcash"));
+const ZcashBlocksPage = lazy(() => import("./pages/zcash/ZcashBlocksPage"));
+const ZcashBlockPage = lazy(() => import("./pages/zcash/ZcashBlockPage"));
+const ZcashTransactionsPage = lazy(() => import("./pages/zcash/ZcashTransactionsPage"));
+const ZcashTransactionPage = lazy(() => import("./pages/zcash/ZcashTransactionPage"));
+const ZcashMempoolPage = lazy(() => import("./pages/zcash/ZcashMempoolPage"));
+const ZcashAddressPage = lazy(() => import("./pages/zcash/ZcashAddressPage"));
+
 // Lazy load page components - Solana
 const SolanaNetwork = lazy(() => import("./pages/solana"));
 const SolanaSlotsPage = lazy(() => import("./pages/solana/SolanaSlotsPage"));
@@ -64,6 +73,13 @@ export const LazyBitcoinTx = withSuspense(BitcoinTransactionPage);
 export const LazyBitcoinTxs = withSuspense(BitcoinTransactionsPage);
 export const LazyBitcoinAddress = withSuspense(BitcoinAddressPage);
 export const LazyBitcoinMempool = withSuspense(BitcoinMempoolPage);
+export const LazyZcashNetwork = withSuspense(ZcashNetwork);
+export const LazyZcashBlocks = withSuspense(ZcashBlocksPage);
+export const LazyZcashBlock = withSuspense(ZcashBlockPage);
+export const LazyZcashTxs = withSuspense(ZcashTransactionsPage);
+export const LazyZcashTx = withSuspense(ZcashTransactionPage);
+export const LazyZcashMempool = withSuspense(ZcashMempoolPage);
+export const LazyZcashAddress = withSuspense(ZcashAddressPage);
 export const LazySolanaNetwork = withSuspense(SolanaNetwork);
 export const LazySolanaSlots = withSuspense(SolanaSlotsPage);
 export const LazySolanaSlot = withSuspense(SolanaSlotPage);
@@ -109,6 +125,14 @@ export function preloadAllRoutes() {
   import("./pages/bitcoin/BitcoinTransactionsPage");
   import("./pages/bitcoin/BitcoinAddressPage");
   import("./pages/bitcoin/BitcoinMempoolPage");
+  // Zcash pages
+  import("./pages/zcash");
+  import("./pages/zcash/ZcashBlocksPage");
+  import("./pages/zcash/ZcashBlockPage");
+  import("./pages/zcash/ZcashTransactionsPage");
+  import("./pages/zcash/ZcashTransactionPage");
+  import("./pages/zcash/ZcashMempoolPage");
+  import("./pages/zcash/ZcashAddressPage");
   // Solana pages
   import("./pages/solana");
   import("./pages/solana/SolanaSlotsPage");

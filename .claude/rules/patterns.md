@@ -3,7 +3,9 @@
 ## When Modifying Data Fetching
 
 - Always maintain the adapter pattern: Client → Adapter → Service
-- All adapters extend the abstract `NetworkAdapter` class (`services/adapters/NetworkAdapter.ts`)
+- EVM adapters extend the abstract `NetworkAdapter` class (`services/adapters/NetworkAdapter.ts`).
+  Non-EVM adapters (`BitcoinAdapter`, `ZcashAdapter`, `SolanaAdapter`) are standalone classes with
+  chain-specific types, reached through `DataService` getters such as `getZcashAdapter()`
 - If adding parallel strategy support, ensure complete objects are built for each provider
 - Test `fallback`, `parallel`, and `race` strategies
 - Update TypeScript types in `src/types/index.ts` if adding new fields

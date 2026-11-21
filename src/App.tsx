@@ -56,6 +56,13 @@ import {
   LazyTokenDetails,
   LazyTx,
   LazyTxs,
+  LazyZcashAddress,
+  LazyZcashBlock,
+  LazyZcashBlocks,
+  LazyZcashMempool,
+  LazyZcashNetwork,
+  LazyZcashTx,
+  LazyZcashTxs,
   preloadAllRoutes,
 } from "./components/LazyComponents";
 import { SettingsProvider, useSettings, useTheme } from "./context/SettingsContext";
@@ -159,6 +166,24 @@ function AppContent() {
               <Route path="tbtc/address/:address" element={<LazyBitcoinAddress />} />
               <Route path="tbtc/mempool" element={<LazyBitcoinMempool />} />
               <Route path="tbtc/mempool/:filter" element={<LazyBitcoinTx />} />
+              {/* Zcash Mainnet routes (must come before :networkId catch-all) */}
+              <Route path="zec" element={<LazyZcashNetwork />} />
+              <Route path="zec/blocks" element={<LazyZcashBlocks />} />
+              <Route path="zec/block/:filter" element={<LazyZcashBlock />} />
+              <Route path="zec/txs" element={<LazyZcashTxs />} />
+              <Route path="zec/tx/:filter" element={<LazyZcashTx />} />
+              <Route path="zec/mempool" element={<LazyZcashMempool />} />
+              <Route path="zec/mempool/:filter" element={<LazyZcashTx />} />
+              <Route path="zec/address/:address" element={<LazyZcashAddress />} />
+              {/* Zcash Testnet routes */}
+              <Route path="tzec" element={<LazyZcashNetwork />} />
+              <Route path="tzec/blocks" element={<LazyZcashBlocks />} />
+              <Route path="tzec/block/:filter" element={<LazyZcashBlock />} />
+              <Route path="tzec/txs" element={<LazyZcashTxs />} />
+              <Route path="tzec/tx/:filter" element={<LazyZcashTx />} />
+              <Route path="tzec/mempool" element={<LazyZcashMempool />} />
+              <Route path="tzec/mempool/:filter" element={<LazyZcashTx />} />
+              <Route path="tzec/address/:address" element={<LazyZcashAddress />} />
               {/* Solana Mainnet routes (must come before :networkId catch-all) */}
               <Route path="sol" element={<LazySolanaNetwork />} />
               <Route path="sol/slots" element={<LazySolanaSlots />} />

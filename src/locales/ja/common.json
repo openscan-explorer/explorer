@@ -306,5 +306,9 @@
     "badgeBlock": "ブロック",
     "badgeEns": "ENS",
     "badgeUnknown": "不明"
+  },
+  "loaderTimeout": {
+    "message": "データの取得に予想以上に時間がかかっています。",
+    "retry": "再試行"
   }
 }

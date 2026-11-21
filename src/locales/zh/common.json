@@ -291,5 +291,9 @@
     "badgeBlock": "区块",
     "badgeEns": "ENS",
     "badgeUnknown": "未知"
+  },
+  "loaderTimeout": {
+    "message": "数据加载时间超出预期。",
+    "retry": "重试"
   }
 }

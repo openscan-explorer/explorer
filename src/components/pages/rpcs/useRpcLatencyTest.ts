@@ -24,8 +24,13 @@ function isHttpRpcUrl(url: string): boolean {
   }
 }
 
+// Zcash (Zebra) serves the same getblockcount method as Bitcoin Core
+function usesBitcoinRpc(networkType: NetworkType): boolean {
+  return networkType === "bitcoin" || networkType === "zcash";
+}
+
 function buildRpcBody(networkType: NetworkType): string {
-  if (networkType === "bitcoin") {
+  if (usesBitcoinRpc(networkType)) {
     return JSON.stringify({ jsonrpc: "2.0", id: 1, method: "getblockcount", params: [] });
   }
   return JSON.stringify({ jsonrpc: "2.0", id: 1, method: "eth_blockNumber", params: [] });
@@ -78,8 +83,9 @@ export async function testRpcEndpoint(
       };
     }
 
-    const blockNumber =
-      networkType === "bitcoin" ? String(json.result ?? "") : (json.result ?? null);
+    const blockNumber = usesBitcoinRpc(networkType)
+      ? String(json.result ?? "")
+      : (json.result ?? null);
 
     return {
       url,
